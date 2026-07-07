@@ -52,6 +52,7 @@ dependencies:
     path: packages/storage_access
   activity_tracker:
     path: packages/activity_tracker
+  google_fonts: ^8.1.0
 
 dev_dependencies:
   flutter_test:
