@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'core/theme/app_theme.dart';
 import 'features/timer/timer_screen.dart';
 
 class HickoryApp extends StatelessWidget {
@@ -9,12 +10,8 @@ class HickoryApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Hickory',
-      theme: ThemeData(colorSchemeSeed: const Color(0xFF5B8DEF), useMaterial3: true),
-      darkTheme: ThemeData(
-        colorSchemeSeed: const Color(0xFF5B8DEF),
-        brightness: Brightness.dark,
-        useMaterial3: true,
-      ),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       home: const TimerScreen(),
     );
   }
