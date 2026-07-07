@@ -1,0 +1,14 @@
+name: sync_engine
+description: >
+  Pure-Dart event model, JSONL codec, and last-write-wins merge algorithm for
+  Hickory's file-based, per-device event log sync format. No Flutter
+  dependency so the merge logic is trivially unit-testable.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.12.2
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^6.0.0
