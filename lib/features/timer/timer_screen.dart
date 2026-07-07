@@ -9,6 +9,7 @@ import '../entries/entries_list.dart';
 import '../entries/manual_entry_dialog.dart';
 import '../projects/new_project_dialog.dart';
 import '../projects/projects_providers.dart';
+import '../sync/sync_settings_dialog.dart';
 import 'timer_providers.dart';
 
 class TimerScreen extends ConsumerStatefulWidget {
@@ -50,9 +51,22 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
   Widget build(BuildContext context) {
     final runningAsync = ref.watch(runningEntryProvider);
     ref.watch(timerTickProvider);
+    // Watching this activates the initial-sync + folder-watcher for the
+    // app's lifetime; the sync settings dialog re-reads its dependencies
+    // directly rather than relying on this AsyncValue.
+    ref.watch(syncWatcherProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Hickory')),
+      appBar: AppBar(
+        title: const Text('Hickory'),
+        actions: [
+          IconButton(
+            tooltip: 'Sync-Einstellungen',
+            onPressed: () => showSyncSettingsDialog(context),
+            icon: const Icon(Icons.sync),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(

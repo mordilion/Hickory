@@ -1,0 +1,27 @@
+name: storage_access
+description: >
+  Cross-platform folder-access abstraction for Hickory's sync folder: lets
+  the user point the app at a directory (expected to already be synced by
+  iCloud Drive / Google Drive / Dropbox / OneDrive), persists that choice,
+  and exposes a change-watch stream. This milestone only implements the
+  desktop (macOS/Windows) path; mobile needs SAF/UIDocumentPicker-based
+  implementations added in a later milestone.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.12.2
+  flutter: ">=3.38.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  file_picker: ^11.0.2
+  path: ^1.9.1
+  path_provider: ^2.1.6
+  watcher: ^1.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  lints: ^6.0.0
