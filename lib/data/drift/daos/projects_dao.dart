@@ -19,6 +19,12 @@ class ProjectsDao extends DatabaseAccessor<AppDatabase> with _$ProjectsDaoMixin 
         .watch();
   }
 
+  /// Includes archived projects — reports need to resolve the name/rate of
+  /// a project an old entry points to even after it's been archived.
+  Stream<List<Project>> watchAllProjects() {
+    return (select(projects)..orderBy([(p) => OrderingTerm.asc(p.name)])).watch();
+  }
+
   Future<Project> createProject({
     required String name,
     required String colorHex,

@@ -11,6 +11,7 @@ import '../entries/entries_list.dart';
 import '../entries/manual_entry_dialog.dart';
 import '../projects/new_project_dialog.dart';
 import '../projects/projects_providers.dart';
+import '../reports/reports_screen.dart';
 import '../sync/sync_settings_dialog.dart';
 import 'idle_prompt_dialog.dart';
 import 'idle_tracking.dart';
@@ -115,6 +116,13 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
       appBar: AppBar(
         title: const Text('Hickory'),
         actions: [
+          IconButton(
+            tooltip: 'Reports',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ReportsScreen()),
+            ),
+            icon: const Icon(Icons.bar_chart),
+          ),
           IconButton(
             tooltip: 'Sync-Einstellungen',
             onPressed: () => showSyncSettingsDialog(context),

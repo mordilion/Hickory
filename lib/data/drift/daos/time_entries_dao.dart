@@ -23,6 +23,20 @@ class TimeEntriesDao extends DatabaseAccessor<AppDatabase> with _$TimeEntriesDao
     return (select(timeEntries)..where((t) => t.endAt.isNull())).watchSingleOrNull();
   }
 
+  /// Finished entries starting in `[start, end)`, for reports. [start] and
+  /// [end] must be UTC (matches how startAt is stored).
+  Stream<List<TimeEntry>> watchEntriesInRange(DateTime start, DateTime end) {
+    return (select(timeEntries)
+          ..where(
+            (t) =>
+                t.startAt.isBiggerOrEqualValue(start) &
+                t.startAt.isSmallerThanValue(end) &
+                t.endAt.isNotNull(),
+          )
+          ..orderBy([(t) => OrderingTerm.asc(t.startAt)]))
+        .watch();
+  }
+
   Future<TimeEntry> startEntry({
     required String deviceId,
     String? projectId,
