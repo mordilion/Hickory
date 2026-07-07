@@ -6,13 +6,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/di/device_id_provider.dart';
 import '../../core/di/sync_providers.dart';
 import '../../core/format/duration_format.dart';
+import '../../core/theme/hickory_colors.dart';
+import '../../core/widgets/gradient_buttons.dart';
 import '../../data/drift/database.dart';
 import '../entries/entries_list.dart';
-import '../entries/manual_entry_dialog.dart';
 import '../projects/new_project_dialog.dart';
 import '../projects/projects_providers.dart';
-import '../reports/reports_screen.dart';
-import '../sync/sync_settings_dialog.dart';
 import 'idle_prompt_dialog.dart';
 import 'idle_tracking.dart';
 import 'timer_providers.dart';
@@ -21,6 +20,8 @@ import 'timer_providers.dart';
 /// only (see [isDesktopTrackingSupported]).
 const _idleThresholdSeconds = 5 * 60;
 
+/// Timer tab content — hosted by the app shell (features/shell/app_shell.dart),
+/// which owns the Scaffold, AppBar, bottom nav, and the manual-entry FAB.
 class TimerScreen extends ConsumerStatefulWidget {
   const TimerScreen({super.key});
 
@@ -95,14 +96,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
   Widget build(BuildContext context) {
     final runningAsync = ref.watch(runningEntryProvider);
     ref.watch(timerTickProvider);
-    // Watching this activates the initial-sync + folder-watcher for the
-    // app's lifetime; the sync settings dialog re-reads its dependencies
-    // directly rather than relying on this AsyncValue.
     ref.watch(syncWatcherProvider);
 
-    // Desktop-only auto-tracking: idle-time prompt on the running timer,
-    // and a record of which app/window was active while it ran. Both
-    // no-op (never fire) on platforms activity_tracker doesn't support.
     ref.listen<AsyncValue<int>>(idleSecondsProvider, (previous, next) {
       final idleSeconds = next.value;
       if (idleSeconds != null) _handleIdleSecondsChanged(idleSeconds);
@@ -112,86 +107,86 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
       if (sample != null) _recordActivitySample(sample);
     });
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Hickory'),
-        actions: [
-          IconButton(
-            tooltip: 'Reports',
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ReportsScreen()),
-            ),
-            icon: const Icon(Icons.bar_chart),
-          ),
-          IconButton(
-            tooltip: 'Sync-Einstellungen',
-            onPressed: () => showSyncSettingsDialog(context),
-            icon: const Icon(Icons.sync),
-          ),
-        ],
-      ),
-      body: Column(
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: runningAsync.when(
-              data: (running) => running != null
-                  ? _RunningCard(running: running, onStop: () => _stop(running))
-                  : _StartCard(
-                      descriptionController: _descriptionController,
-                      selectedProjectId: _selectedProjectId,
-                      onProjectChanged: (id) => setState(() => _selectedProjectId = id),
-                      onStart: _start,
-                    ),
-              loading: () => const CircularProgressIndicator(),
-              error: (e, _) => Text('Fehler: $e'),
-            ),
+          runningAsync.when(
+            data: (running) => running != null
+                ? _RunningCard(running: running, onStop: () => _stop(running))
+                : _StartCard(
+                    descriptionController: _descriptionController,
+                    selectedProjectId: _selectedProjectId,
+                    onProjectChanged: (id) => setState(() => _selectedProjectId = id),
+                    onStart: _start,
+                  ),
+            loading: () => const CircularProgressIndicator(),
+            error: (e, _) => Text('Fehler: $e'),
           ),
-          const Divider(height: 1),
-          Expanded(child: EntriesList()),
+          const SizedBox(height: 16),
+          const Expanded(child: EntriesList()),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showManualEntryDialog(context, ref),
-        child: const Icon(Icons.add),
       ),
     );
   }
 }
 
-class _RunningCard extends StatelessWidget {
+class _RunningCard extends ConsumerWidget {
   const _RunningCard({required this.running, required this.onStop});
 
   final TimeEntry running;
   final VoidCallback onStop;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final elapsed = DateTime.now().toUtc().difference(running.startAt);
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    formatDuration(elapsed),
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                  if (running.description != null) Text(running.description!),
-                ],
-              ),
-            ),
-            FilledButton.tonalIcon(
-              onPressed: onStop,
-              icon: const Icon(Icons.stop),
-              label: const Text('Stop'),
-            ),
-          ],
+    final tokens = HickoryColors.of(context);
+    final projectsAsync = ref.watch(activeProjectsProvider);
+    final projectsById = {
+      for (final p in projectsAsync.value ?? const <Project>[]) p.id: p,
+    };
+    final project = running.projectId == null ? null : projectsById[running.projectId];
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: tokens.surfaceGradient,
         ),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            formatDuration(elapsed),
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.displayLarge?.fontFamily,
+              fontWeight: FontWeight.w700,
+              fontSize: 34,
+              color: tokens.timerNumeral,
+            ),
+          ),
+          if (running.description?.isNotEmpty ?? false) ...[
+            const SizedBox(height: 6),
+            Text(running.description!),
+          ],
+          if (project != null) ...[
+            const SizedBox(height: 8),
+            Chip(label: Text(project.name)),
+          ],
+          const SizedBox(height: 16),
+          GradientPillButton(
+            label: 'Stop',
+            icon: Icons.stop,
+            gradient: tokens.primaryGradient,
+            foregroundColor: tokens.onPrimaryGradient,
+            onPressed: onStop,
+          ),
+        ],
       ),
     );
   }
@@ -213,6 +208,7 @@ class _StartCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final projectsAsync = ref.watch(activeProjectsProvider);
+    final tokens = HickoryColors.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -250,13 +246,12 @@ class _StartCard extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: onStart,
-                icon: const Icon(Icons.play_arrow),
-                label: const Text('Start'),
-              ),
+            GradientPillButton(
+              label: 'Start',
+              icon: Icons.play_arrow,
+              gradient: tokens.primaryGradient,
+              foregroundColor: tokens.onPrimaryGradient,
+              onPressed: onStart,
             ),
           ],
         ),
