@@ -39,6 +39,16 @@ Future<T> _isolatingFontLoadErrors<T>(T Function() action) {
       }
     },
     (error, stack) {
+      // Only swallow the specific, expected google_fonts asset-loading
+      // failure (confirmed via manual run: a plain `Exception` whose message
+      // reads "...font ... was not found in the application assets...").
+      // Anything else - e.g. a genuine synchronous bug in
+      // [buildAppTextTheme], or a `TestFailure` from a `returnsNormally`
+      // expectation inside [action] - must still fail the test loudly
+      // instead of being silently absorbed here.
+      if (!error.toString().contains('was not found in the application assets')) {
+        Error.throwWithStackTrace(error, stack);
+      }
       // Expected: the fonts aren't bundled as test assets. Swallow it; if
       // [action] already returned, this is a no-op.
       if (!completer.isCompleted) {
