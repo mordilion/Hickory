@@ -5,9 +5,11 @@ import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import 'daos/activity_samples_dao.dart';
 import 'daos/events_dao.dart';
 import 'daos/projects_dao.dart';
 import 'daos/time_entries_dao.dart';
+import 'tables/activity_samples_table.dart';
 import 'tables/clients_table.dart';
 import 'tables/events_table.dart';
 import 'tables/projects_table.dart';
@@ -19,8 +21,17 @@ import 'tables/time_entry_tags_table.dart';
 part 'database.g.dart';
 
 @DriftDatabase(
-  tables: [Clients, Projects, Tags, TimeEntries, TimeEntryTags, Events, SyncFileStates],
-  daos: [ProjectsDao, TimeEntriesDao, EventsDao],
+  tables: [
+    Clients,
+    Projects,
+    Tags,
+    TimeEntries,
+    TimeEntryTags,
+    Events,
+    SyncFileStates,
+    ActivitySamples,
+  ],
+  daos: [ProjectsDao, TimeEntriesDao, EventsDao, ActivitySamplesDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());

@@ -50,6 +50,8 @@ dependencies:
     path: packages/sync_engine
   storage_access:
     path: packages/storage_access
+  activity_tracker:
+    path: packages/activity_tracker
 
 dev_dependencies:
   flutter_test:

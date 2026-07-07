@@ -137,6 +137,14 @@ class SyncIngestor {
               .into(db.timeEntries)
               .insertOnConflictUpdate(TimeEntry.fromJson(entity.payload!).toCompanion(true));
         }
+      case EntityTypes.activitySample:
+        // Samples are append-only observations — no delete events are ever
+        // written for them, so there's nothing to do for entity.isDeleted.
+        if (!entity.isDeleted) {
+          await db
+              .into(db.activitySamples)
+              .insertOnConflictUpdate(ActivitySampleRow.fromJson(entity.payload!).toCompanion(true));
+        }
       default:
         // Client/Tag aren't wired into the app yet (no DAO to apply them
         // to) — ignored until a later milestone adds them.

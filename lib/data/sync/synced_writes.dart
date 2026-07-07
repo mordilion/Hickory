@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:sync_engine/sync_engine.dart';
+import 'package:uuid/uuid.dart';
 
 import '../drift/database.dart';
 import 'entity_types.dart';
@@ -15,6 +16,8 @@ class SyncedWrites {
 
   final AppDatabase db;
   final SyncLogWriter logWriter;
+
+  static const _uuid = Uuid();
 
   Future<Project> createProject({
     required String name,
@@ -102,6 +105,31 @@ class SyncedWrites {
       entityId: id,
       op: EventOp.delete,
       payload: null,
+    );
+  }
+
+  /// Records a raw activity observation. Per the architecture plan
+  /// (decision 6) this is synced like any other entity, not kept
+  /// local-only — appended straight away since samples are never edited.
+  Future<void> recordActivitySample({
+    required String deviceId,
+    required String appName,
+    String? windowTitle,
+    required DateTime observedAt,
+  }) async {
+    final row = ActivitySampleRow(
+      id: _uuid.v4(),
+      deviceId: deviceId,
+      appName: appName,
+      windowTitle: windowTitle,
+      observedAt: observedAt.toUtc(),
+    );
+    await db.activitySamplesDao.insertSample(row.toCompanion(true));
+    await logWriter.appendEvent(
+      entityType: EntityTypes.activitySample,
+      entityId: row.id,
+      op: EventOp.create,
+      payload: row.toJson(),
     );
   }
 

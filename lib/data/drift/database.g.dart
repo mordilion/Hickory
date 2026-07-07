@@ -2912,6 +2912,378 @@ class SyncFileStatesCompanion extends UpdateCompanion<SyncFileState> {
   }
 }
 
+class $ActivitySamplesTable extends ActivitySamples
+    with TableInfo<$ActivitySamplesTable, ActivitySampleRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivitySamplesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _appNameMeta = const VerificationMeta(
+    'appName',
+  );
+  @override
+  late final GeneratedColumn<String> appName = GeneratedColumn<String>(
+    'app_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _windowTitleMeta = const VerificationMeta(
+    'windowTitle',
+  );
+  @override
+  late final GeneratedColumn<String> windowTitle = GeneratedColumn<String>(
+    'window_title',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _observedAtMeta = const VerificationMeta(
+    'observedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> observedAt = GeneratedColumn<DateTime>(
+    'observed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    deviceId,
+    appName,
+    windowTitle,
+    observedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activity_samples';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ActivitySampleRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('app_name')) {
+      context.handle(
+        _appNameMeta,
+        appName.isAcceptableOrUnknown(data['app_name']!, _appNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_appNameMeta);
+    }
+    if (data.containsKey('window_title')) {
+      context.handle(
+        _windowTitleMeta,
+        windowTitle.isAcceptableOrUnknown(
+          data['window_title']!,
+          _windowTitleMeta,
+        ),
+      );
+    }
+    if (data.containsKey('observed_at')) {
+      context.handle(
+        _observedAtMeta,
+        observedAt.isAcceptableOrUnknown(data['observed_at']!, _observedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_observedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ActivitySampleRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ActivitySampleRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      appName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}app_name'],
+      )!,
+      windowTitle: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}window_title'],
+      ),
+      observedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}observed_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ActivitySamplesTable createAlias(String alias) {
+    return $ActivitySamplesTable(attachedDatabase, alias);
+  }
+}
+
+class ActivitySampleRow extends DataClass
+    implements Insertable<ActivitySampleRow> {
+  final String id;
+  final String deviceId;
+  final String appName;
+  final String? windowTitle;
+  final DateTime observedAt;
+  const ActivitySampleRow({
+    required this.id,
+    required this.deviceId,
+    required this.appName,
+    this.windowTitle,
+    required this.observedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['device_id'] = Variable<String>(deviceId);
+    map['app_name'] = Variable<String>(appName);
+    if (!nullToAbsent || windowTitle != null) {
+      map['window_title'] = Variable<String>(windowTitle);
+    }
+    map['observed_at'] = Variable<DateTime>(observedAt);
+    return map;
+  }
+
+  ActivitySamplesCompanion toCompanion(bool nullToAbsent) {
+    return ActivitySamplesCompanion(
+      id: Value(id),
+      deviceId: Value(deviceId),
+      appName: Value(appName),
+      windowTitle: windowTitle == null && nullToAbsent
+          ? const Value.absent()
+          : Value(windowTitle),
+      observedAt: Value(observedAt),
+    );
+  }
+
+  factory ActivitySampleRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ActivitySampleRow(
+      id: serializer.fromJson<String>(json['id']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      appName: serializer.fromJson<String>(json['appName']),
+      windowTitle: serializer.fromJson<String?>(json['windowTitle']),
+      observedAt: serializer.fromJson<DateTime>(json['observedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'appName': serializer.toJson<String>(appName),
+      'windowTitle': serializer.toJson<String?>(windowTitle),
+      'observedAt': serializer.toJson<DateTime>(observedAt),
+    };
+  }
+
+  ActivitySampleRow copyWith({
+    String? id,
+    String? deviceId,
+    String? appName,
+    Value<String?> windowTitle = const Value.absent(),
+    DateTime? observedAt,
+  }) => ActivitySampleRow(
+    id: id ?? this.id,
+    deviceId: deviceId ?? this.deviceId,
+    appName: appName ?? this.appName,
+    windowTitle: windowTitle.present ? windowTitle.value : this.windowTitle,
+    observedAt: observedAt ?? this.observedAt,
+  );
+  ActivitySampleRow copyWithCompanion(ActivitySamplesCompanion data) {
+    return ActivitySampleRow(
+      id: data.id.present ? data.id.value : this.id,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      appName: data.appName.present ? data.appName.value : this.appName,
+      windowTitle: data.windowTitle.present
+          ? data.windowTitle.value
+          : this.windowTitle,
+      observedAt: data.observedAt.present
+          ? data.observedAt.value
+          : this.observedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivitySampleRow(')
+          ..write('id: $id, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('appName: $appName, ')
+          ..write('windowTitle: $windowTitle, ')
+          ..write('observedAt: $observedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, deviceId, appName, windowTitle, observedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ActivitySampleRow &&
+          other.id == this.id &&
+          other.deviceId == this.deviceId &&
+          other.appName == this.appName &&
+          other.windowTitle == this.windowTitle &&
+          other.observedAt == this.observedAt);
+}
+
+class ActivitySamplesCompanion extends UpdateCompanion<ActivitySampleRow> {
+  final Value<String> id;
+  final Value<String> deviceId;
+  final Value<String> appName;
+  final Value<String?> windowTitle;
+  final Value<DateTime> observedAt;
+  final Value<int> rowid;
+  const ActivitySamplesCompanion({
+    this.id = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.appName = const Value.absent(),
+    this.windowTitle = const Value.absent(),
+    this.observedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ActivitySamplesCompanion.insert({
+    required String id,
+    required String deviceId,
+    required String appName,
+    this.windowTitle = const Value.absent(),
+    required DateTime observedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       deviceId = Value(deviceId),
+       appName = Value(appName),
+       observedAt = Value(observedAt);
+  static Insertable<ActivitySampleRow> custom({
+    Expression<String>? id,
+    Expression<String>? deviceId,
+    Expression<String>? appName,
+    Expression<String>? windowTitle,
+    Expression<DateTime>? observedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (deviceId != null) 'device_id': deviceId,
+      if (appName != null) 'app_name': appName,
+      if (windowTitle != null) 'window_title': windowTitle,
+      if (observedAt != null) 'observed_at': observedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ActivitySamplesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? deviceId,
+    Value<String>? appName,
+    Value<String?>? windowTitle,
+    Value<DateTime>? observedAt,
+    Value<int>? rowid,
+  }) {
+    return ActivitySamplesCompanion(
+      id: id ?? this.id,
+      deviceId: deviceId ?? this.deviceId,
+      appName: appName ?? this.appName,
+      windowTitle: windowTitle ?? this.windowTitle,
+      observedAt: observedAt ?? this.observedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (appName.present) {
+      map['app_name'] = Variable<String>(appName.value);
+    }
+    if (windowTitle.present) {
+      map['window_title'] = Variable<String>(windowTitle.value);
+    }
+    if (observedAt.present) {
+      map['observed_at'] = Variable<DateTime>(observedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivitySamplesCompanion(')
+          ..write('id: $id, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('appName: $appName, ')
+          ..write('windowTitle: $windowTitle, ')
+          ..write('observedAt: $observedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2922,6 +3294,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $TimeEntryTagsTable timeEntryTags = $TimeEntryTagsTable(this);
   late final $EventsTable events = $EventsTable(this);
   late final $SyncFileStatesTable syncFileStates = $SyncFileStatesTable(this);
+  late final $ActivitySamplesTable activitySamples = $ActivitySamplesTable(
+    this,
+  );
   late final Index idxEventsEntityId = Index(
     'idx_events_entity_id',
     'CREATE INDEX idx_events_entity_id ON events (entity_id)',
@@ -2931,6 +3306,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this as AppDatabase,
   );
   late final EventsDao eventsDao = EventsDao(this as AppDatabase);
+  late final ActivitySamplesDao activitySamplesDao = ActivitySamplesDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2943,6 +3321,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     timeEntryTags,
     events,
     syncFileStates,
+    activitySamples,
     idxEventsEntityId,
   ];
 }
@@ -5302,6 +5681,216 @@ typedef $$SyncFileStatesTableProcessedTableManager =
       SyncFileState,
       PrefetchHooks Function()
     >;
+typedef $$ActivitySamplesTableCreateCompanionBuilder =
+    ActivitySamplesCompanion Function({
+      required String id,
+      required String deviceId,
+      required String appName,
+      Value<String?> windowTitle,
+      required DateTime observedAt,
+      Value<int> rowid,
+    });
+typedef $$ActivitySamplesTableUpdateCompanionBuilder =
+    ActivitySamplesCompanion Function({
+      Value<String> id,
+      Value<String> deviceId,
+      Value<String> appName,
+      Value<String?> windowTitle,
+      Value<DateTime> observedAt,
+      Value<int> rowid,
+    });
+
+class $$ActivitySamplesTableFilterComposer
+    extends Composer<_$AppDatabase, $ActivitySamplesTable> {
+  $$ActivitySamplesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get appName => $composableBuilder(
+    column: $table.appName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get windowTitle => $composableBuilder(
+    column: $table.windowTitle,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get observedAt => $composableBuilder(
+    column: $table.observedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ActivitySamplesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ActivitySamplesTable> {
+  $$ActivitySamplesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get appName => $composableBuilder(
+    column: $table.appName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get windowTitle => $composableBuilder(
+    column: $table.windowTitle,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get observedAt => $composableBuilder(
+    column: $table.observedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ActivitySamplesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ActivitySamplesTable> {
+  $$ActivitySamplesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<String> get appName =>
+      $composableBuilder(column: $table.appName, builder: (column) => column);
+
+  GeneratedColumn<String> get windowTitle => $composableBuilder(
+    column: $table.windowTitle,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get observedAt => $composableBuilder(
+    column: $table.observedAt,
+    builder: (column) => column,
+  );
+}
+
+class $$ActivitySamplesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ActivitySamplesTable,
+          ActivitySampleRow,
+          $$ActivitySamplesTableFilterComposer,
+          $$ActivitySamplesTableOrderingComposer,
+          $$ActivitySamplesTableAnnotationComposer,
+          $$ActivitySamplesTableCreateCompanionBuilder,
+          $$ActivitySamplesTableUpdateCompanionBuilder,
+          (
+            ActivitySampleRow,
+            BaseReferences<
+              _$AppDatabase,
+              $ActivitySamplesTable,
+              ActivitySampleRow
+            >,
+          ),
+          ActivitySampleRow,
+          PrefetchHooks Function()
+        > {
+  $$ActivitySamplesTableTableManager(
+    _$AppDatabase db,
+    $ActivitySamplesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivitySamplesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ActivitySamplesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ActivitySamplesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<String> appName = const Value.absent(),
+                Value<String?> windowTitle = const Value.absent(),
+                Value<DateTime> observedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivitySamplesCompanion(
+                id: id,
+                deviceId: deviceId,
+                appName: appName,
+                windowTitle: windowTitle,
+                observedAt: observedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String deviceId,
+                required String appName,
+                Value<String?> windowTitle = const Value.absent(),
+                required DateTime observedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ActivitySamplesCompanion.insert(
+                id: id,
+                deviceId: deviceId,
+                appName: appName,
+                windowTitle: windowTitle,
+                observedAt: observedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ActivitySamplesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ActivitySamplesTable,
+      ActivitySampleRow,
+      $$ActivitySamplesTableFilterComposer,
+      $$ActivitySamplesTableOrderingComposer,
+      $$ActivitySamplesTableAnnotationComposer,
+      $$ActivitySamplesTableCreateCompanionBuilder,
+      $$ActivitySamplesTableUpdateCompanionBuilder,
+      (
+        ActivitySampleRow,
+        BaseReferences<_$AppDatabase, $ActivitySamplesTable, ActivitySampleRow>,
+      ),
+      ActivitySampleRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5319,4 +5908,6 @@ class $AppDatabaseManager {
       $$EventsTableTableManager(_db, _db.events);
   $$SyncFileStatesTableTableManager get syncFileStates =>
       $$SyncFileStatesTableTableManager(_db, _db.syncFileStates);
+  $$ActivitySamplesTableTableManager get activitySamples =>
+      $$ActivitySamplesTableTableManager(_db, _db.activitySamples);
 }

@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  activity_tracker
   screen_retriever_windows
   share_plus
   tray_manager
