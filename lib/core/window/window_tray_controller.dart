@@ -91,7 +91,13 @@ class WindowTrayController with WindowListener, TrayListener {
   }
 
   Future<void> _quit() async {
-    await onBeforeQuit?.call();
+    try {
+      await onBeforeQuit?.call();
+    } catch (_) {
+      // Best-effort: quitting must always succeed even if finalizing a
+      // paused entry fails (e.g. the sync folder is temporarily
+      // unreachable) — the alternative is an unquittable app.
+    }
     await windowManager.destroy();
   }
 
