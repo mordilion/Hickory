@@ -30,7 +30,6 @@ class _NavShellState extends State<NavShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Hickory')),
       body: IndexedStack(index: _selectedIndex, children: widget.children),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
