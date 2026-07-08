@@ -24,6 +24,12 @@ class WindowTrayController with WindowListener, TrayListener {
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
 
+  /// Invoked right before the app actually quits (the tray menu's
+  /// "Beenden", the only path that really exits — minimize/close only hide
+  /// to tray). Set by `main()`, which has provider access this controller
+  /// deliberately doesn't — see lib/core/window/quit_behavior.dart.
+  Future<void> Function()? onBeforeQuit;
+
   Future<void> initialize() async {
     windowManager.addListener(this);
     trayManager.addListener(this);
@@ -60,7 +66,7 @@ class WindowTrayController with WindowListener, TrayListener {
         items: [
           MenuItem(key: 'open', label: 'Öffnen', onClick: (_) => _restore()),
           MenuItem.separator(),
-          MenuItem(key: 'quit', label: 'Beenden', onClick: (_) => windowManager.destroy()),
+          MenuItem(key: 'quit', label: 'Beenden', onClick: (_) => _quit()),
         ],
       ),
     );
@@ -82,6 +88,11 @@ class WindowTrayController with WindowListener, TrayListener {
         const SnackBar(content: Text('Hickory läuft im Hintergrund weiter.')),
       );
     }
+  }
+
+  Future<void> _quit() async {
+    await onBeforeQuit?.call();
+    await windowManager.destroy();
   }
 
   @override
