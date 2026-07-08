@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/theme/hickory_colors.dart';
+import '../../core/widgets/gradient_buttons.dart';
 import '../entries/manual_entry_dialog.dart';
 import '../reports/reports_screen.dart';
 import '../settings/settings_screen.dart';
@@ -43,9 +45,11 @@ class AppShell extends ConsumerWidget {
       destinations: _destinations,
       children: const [TimerScreen(), ReportsScreen(), SyncScreen(), SettingsScreen()],
       fabBuilder: (selectedIndex) => selectedIndex == 0
-          ? FloatingActionButton(
+          ? GradientFab(
+              icon: Icons.add,
+              gradient: HickoryColors.of(context).primaryGradient,
+              foregroundColor: HickoryColors.of(context).onPrimaryGradient,
               onPressed: () => showManualEntryDialog(context, ref),
-              child: const Icon(Icons.add),
             )
           : null,
     );
