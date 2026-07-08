@@ -53,6 +53,8 @@ dependencies:
   activity_tracker:
     path: packages/activity_tracker
   google_fonts: ^8.1.0
+  launch_at_startup: ^0.5.1
+  package_info_plus: ^9.0.1
 
 dev_dependencies:
   flutter_test:
