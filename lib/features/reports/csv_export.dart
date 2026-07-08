@@ -6,7 +6,12 @@ import '../../data/drift/time_entry_extensions.dart';
 
 /// One row per finished entry, in chronological order. Amounts follow the
 /// same billable-project-with-hourly-rate rule as [totalsByProject].
-String entriesToCsv(List<TimeEntry> entries, List<Project> projects) {
+String entriesToCsv(
+  List<TimeEntry> entries,
+  List<Project> projects, {
+  DateFormatStyle dateFormatStyle = defaultDateFormatStyle,
+  TimeFormatStyle timeFormatStyle = defaultTimeFormatStyle,
+}) {
   final projectsById = {for (final p in projects) p.id: p};
   final rows = <List<dynamic>>[
     [
@@ -33,9 +38,9 @@ String entriesToCsv(List<TimeEntry> entries, List<Project> projects) {
     final amount = (billable && rateCents != null) ? (rateCents * hours / 100) : null;
 
     rows.add([
-      formatDate(entry.startAt),
-      formatTime(entry.startAt),
-      formatTime(endAt),
+      formatDate(entry.startAt, dateFormatStyle),
+      formatTime(entry.startAt, timeFormatStyle),
+      formatTime(endAt, timeFormatStyle),
       hours.toStringAsFixed(2),
       project?.name ?? '',
       entry.description ?? '',
