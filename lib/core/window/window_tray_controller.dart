@@ -1,4 +1,6 @@
 // lib/core/window/window_tray_controller.dart
+import 'dart:async';
+
 import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -27,16 +29,24 @@ class WindowTrayController with WindowListener, TrayListener {
     trayManager.addListener(this);
 
     await windowManager.ensureInitialized();
-    await windowManager.waitUntilReadyToShow(
-      const WindowOptions(size: _windowSize, center: true, title: 'Hickory'),
-      () async {
-        await windowManager.setResizable(false);
-        await windowManager.setMinimumSize(_windowSize);
-        await windowManager.setMaximumSize(_windowSize);
-        await windowManager.setPreventClose(true);
-        await windowManager.show();
-        await windowManager.focus();
-      },
+    // Deliberately not awaited: per window_manager's documented pattern,
+    // this runs concurrently with Flutter building its first frame (which
+    // only starts once `runApp` is called back in `main()`, after this
+    // whole `initialize()` future completes). Awaiting it here would show
+    // the native window before Flutter has anything to render into it,
+    // producing a blank white window until the next paint is triggered.
+    unawaited(
+      windowManager.waitUntilReadyToShow(
+        const WindowOptions(size: _windowSize, center: true, title: 'Hickory'),
+        () async {
+          await windowManager.setResizable(false);
+          await windowManager.setMinimumSize(_windowSize);
+          await windowManager.setMaximumSize(_windowSize);
+          await windowManager.setPreventClose(true);
+          await windowManager.show();
+          await windowManager.focus();
+        },
+      ),
     );
 
     await trayManager.setIcon(
