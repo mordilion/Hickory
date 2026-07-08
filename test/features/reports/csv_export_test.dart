@@ -1,8 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/features/reports/csv_export.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
+  setUpAll(() async {
+    await initializeDateFormatting('de_DE');
+  });
   test('entriesToCsv writes one row per finished entry with a header', () {
     final now = DateTime.utc(2026, 7, 1);
     final project = Project(
