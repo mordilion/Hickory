@@ -112,10 +112,8 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
   Widget build(BuildContext context) {
     final projectsAsync = ref.watch(activeProjectsProvider);
     final settings = ref.watch(appSettingsProvider).value;
-    final dateStyle =
-        settings == null ? defaultDateFormatStyle : DateFormatStyle.fromWireName(settings.dateFormat);
-    final timeStyle =
-        settings == null ? defaultTimeFormatStyle : TimeFormatStyle.fromWireName(settings.timeFormat);
+    final dateStyle = settings.dateStyle;
+    final timeStyle = settings.timeStyle;
 
     return AlertDialog(
       title: Text(widget.existing == null ? 'Manueller Eintrag' : 'Eintrag bearbeiten'),

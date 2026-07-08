@@ -24,10 +24,8 @@ class EntriesList extends ConsumerWidget {
     final entriesAsync = ref.watch(allEntriesProvider);
     final projectsAsync = ref.watch(activeProjectsProvider);
     final settings = ref.watch(appSettingsProvider).value;
-    final dateStyle =
-        settings == null ? defaultDateFormatStyle : DateFormatStyle.fromWireName(settings.dateFormat);
-    final timeStyle =
-        settings == null ? defaultTimeFormatStyle : TimeFormatStyle.fromWireName(settings.timeFormat);
+    final dateStyle = settings.dateStyle;
+    final timeStyle = settings.timeStyle;
 
     return entriesAsync.when(
       data: (entries) {

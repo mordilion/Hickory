@@ -606,6 +606,34 @@ git commit -m "Sync the date/time format setting as a singleton app_settings ent
 
 ---
 
+### Task 5 addendum (post-review fix): shared style-resolution helper
+
+Task 5's review found the null-fallback style-resolution logic (`settings == null ? default... : ...fromWireName(...)`, for both date and time) was duplicated verbatim across this task's two call sites, and would have been duplicated again in Tasks 6 and 7 — four copies total of the same 3-line block. Fixed by adding a small extension to `lib/core/format/date_format.dart` (after the `formatTime` function):
+
+```dart
+extension AppSettingsStyles on AppSettingsRow? {
+  DateFormatStyle get dateStyle =>
+      this == null ? defaultDateFormatStyle : DateFormatStyle.fromWireName(this!.dateFormat);
+
+  TimeFormatStyle get timeStyle =>
+      this == null ? defaultTimeFormatStyle : TimeFormatStyle.fromWireName(this!.timeFormat);
+}
+```
+
+(Requires adding `import '../../data/drift/database.dart' show AppSettingsRow;` to `date_format.dart`.)
+
+Every call site that previously wrote the three-line resolution block now writes:
+
+```dart
+final settings = ref.watch(appSettingsProvider).value; // or ref.read(...) where appropriate
+final dateStyle = settings.dateStyle;
+final timeStyle = settings.timeStyle;
+```
+
+This applies retroactively to Task 5 (already fixed) and prospectively to Task 6 and Task 7 below — their code blocks in this document have been updated to use `.dateStyle`/`.timeStyle` instead of inline resolution.
+
+---
+
 ### Task 5: Wire the entries list and manual-entry dialog to the setting
 
 **Files:**
@@ -841,12 +869,8 @@ Change `_exportCsv`:
     final csv = entriesToCsv(
       entries,
       projects,
-      dateFormatStyle: settings == null
-          ? defaultDateFormatStyle
-          : DateFormatStyle.fromWireName(settings.dateFormat),
-      timeFormatStyle: settings == null
-          ? defaultTimeFormatStyle
-          : TimeFormatStyle.fromWireName(settings.timeFormat),
+      dateFormatStyle: settings.dateStyle,
+      timeFormatStyle: settings.timeStyle,
     );
     final path = await FilePicker.saveFile(
       dialogTitle: 'CSV exportieren',
@@ -941,12 +965,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(appSettingsProvider).value;
-    final dateStyle = settings == null
-        ? defaultDateFormatStyle
-        : DateFormatStyle.fromWireName(settings.dateFormat);
-    final timeStyle = settings == null
-        ? defaultTimeFormatStyle
-        : TimeFormatStyle.fromWireName(settings.timeFormat);
+    final dateStyle = settings.dateStyle;
+    final timeStyle = settings.timeStyle;
     final now = DateTime.now();
 
     return Padding(

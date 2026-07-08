@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/core/format/date_format.dart';
+import 'package:hickory/data/drift/database.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
@@ -38,6 +39,25 @@ void main() {
       for (final style in TimeFormatStyle.values) {
         expect(TimeFormatStyle.fromWireName(style.wireName), style);
       }
+    });
+  });
+
+  group('AppSettingsStyles', () {
+    test('falls back to defaults when settings row is null', () {
+      const AppSettingsRow? settings = null;
+      expect(settings.dateStyle, defaultDateFormatStyle);
+      expect(settings.timeStyle, defaultTimeFormatStyle);
+    });
+
+    test('resolves via fromWireName when settings row is present', () {
+      final settings = AppSettingsRow(
+        id: 'default',
+        dateFormat: 'de',
+        timeFormat: '12h_sec',
+        updatedAt: DateTime(2026, 1, 1),
+      );
+      expect(settings.dateStyle, DateFormatStyle.de);
+      expect(settings.timeStyle, TimeFormatStyle.h12Sec);
     });
   });
 }

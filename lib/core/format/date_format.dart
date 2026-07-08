@@ -1,5 +1,7 @@
 import 'package:intl/intl.dart';
 
+import '../../data/drift/database.dart' show AppSettingsRow;
+
 enum DateFormatStyle {
   de,
   iso,
@@ -70,4 +72,12 @@ String formatTime(DateTime dt, [TimeFormatStyle style = defaultTimeFormatStyle])
     TimeFormatStyle.h12Sec => 'h:mm:ss a',
   };
   return DateFormat(pattern, 'en_US').format(local);
+}
+
+extension AppSettingsStyles on AppSettingsRow? {
+  DateFormatStyle get dateStyle =>
+      this == null ? defaultDateFormatStyle : DateFormatStyle.fromWireName(this!.dateFormat);
+
+  TimeFormatStyle get timeStyle =>
+      this == null ? defaultTimeFormatStyle : TimeFormatStyle.fromWireName(this!.timeFormat);
 }
