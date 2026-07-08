@@ -83,4 +83,13 @@ void main() {
     expect(stopped.endAt, isNotNull);
     expect(stopped.pausedAt, isNull);
   });
+
+  test('getRunningEntry returns the open entry, or null if none exists', () async {
+    expect(await db.timeEntriesDao.getRunningEntry(), isNull);
+
+    final entry = await db.timeEntriesDao.startEntry(deviceId: 'dev_a');
+    final running = await db.timeEntriesDao.getRunningEntry();
+
+    expect(running?.id, entry.id);
+  });
 }

@@ -23,6 +23,13 @@ class TimeEntriesDao extends DatabaseAccessor<AppDatabase> with _$TimeEntriesDao
     return (select(timeEntries)..where((t) => t.endAt.isNull())).watchSingleOrNull();
   }
 
+  /// One-shot counterpart to [watchRunningEntry], for callers outside the
+  /// widget tree (e.g. the quit-time check) that need a fresh direct read
+  /// rather than a cached stream value.
+  Future<TimeEntry?> getRunningEntry() {
+    return (select(timeEntries)..where((t) => t.endAt.isNull())).getSingleOrNull();
+  }
+
   /// Finished entries starting in `[start, end)`, for reports. [start] and
   /// [end] must be UTC (matches how startAt is stored).
   Stream<List<TimeEntry>> watchEntriesInRange(DateTime start, DateTime end) {
