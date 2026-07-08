@@ -1296,6 +1296,28 @@ class $TimeEntriesTable extends TimeEntries
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _pausedAtMeta = const VerificationMeta(
+    'pausedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> pausedAt = GeneratedColumn<DateTime>(
+    'paused_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _totalPausedSecondsMeta =
+      const VerificationMeta('totalPausedSeconds');
+  @override
+  late final GeneratedColumn<int> totalPausedSeconds = GeneratedColumn<int>(
+    'total_paused_seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _billableOverrideMeta = const VerificationMeta(
     'billableOverride',
   );
@@ -1360,6 +1382,8 @@ class $TimeEntriesTable extends TimeEntries
     description,
     startAt,
     endAt,
+    pausedAt,
+    totalPausedSeconds,
     billableOverride,
     source,
     deviceId,
@@ -1410,6 +1434,21 @@ class $TimeEntriesTable extends TimeEntries
       context.handle(
         _endAtMeta,
         endAt.isAcceptableOrUnknown(data['end_at']!, _endAtMeta),
+      );
+    }
+    if (data.containsKey('paused_at')) {
+      context.handle(
+        _pausedAtMeta,
+        pausedAt.isAcceptableOrUnknown(data['paused_at']!, _pausedAtMeta),
+      );
+    }
+    if (data.containsKey('total_paused_seconds')) {
+      context.handle(
+        _totalPausedSecondsMeta,
+        totalPausedSeconds.isAcceptableOrUnknown(
+          data['total_paused_seconds']!,
+          _totalPausedSecondsMeta,
+        ),
       );
     }
     if (data.containsKey('billable_override')) {
@@ -1480,6 +1519,14 @@ class $TimeEntriesTable extends TimeEntries
         DriftSqlType.dateTime,
         data['${effectivePrefix}end_at'],
       ),
+      pausedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}paused_at'],
+      ),
+      totalPausedSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}total_paused_seconds'],
+      )!,
       billableOverride: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}billable_override'],
@@ -1515,6 +1562,8 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
   final String? description;
   final DateTime startAt;
   final DateTime? endAt;
+  final DateTime? pausedAt;
+  final int totalPausedSeconds;
   final bool? billableOverride;
   final String source;
   final String deviceId;
@@ -1526,6 +1575,8 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
     this.description,
     required this.startAt,
     this.endAt,
+    this.pausedAt,
+    required this.totalPausedSeconds,
     this.billableOverride,
     required this.source,
     required this.deviceId,
@@ -1546,6 +1597,10 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
     if (!nullToAbsent || endAt != null) {
       map['end_at'] = Variable<DateTime>(endAt);
     }
+    if (!nullToAbsent || pausedAt != null) {
+      map['paused_at'] = Variable<DateTime>(pausedAt);
+    }
+    map['total_paused_seconds'] = Variable<int>(totalPausedSeconds);
     if (!nullToAbsent || billableOverride != null) {
       map['billable_override'] = Variable<bool>(billableOverride);
     }
@@ -1569,6 +1624,10 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
       endAt: endAt == null && nullToAbsent
           ? const Value.absent()
           : Value(endAt),
+      pausedAt: pausedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pausedAt),
+      totalPausedSeconds: Value(totalPausedSeconds),
       billableOverride: billableOverride == null && nullToAbsent
           ? const Value.absent()
           : Value(billableOverride),
@@ -1590,6 +1649,8 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
       description: serializer.fromJson<String?>(json['description']),
       startAt: serializer.fromJson<DateTime>(json['startAt']),
       endAt: serializer.fromJson<DateTime?>(json['endAt']),
+      pausedAt: serializer.fromJson<DateTime?>(json['pausedAt']),
+      totalPausedSeconds: serializer.fromJson<int>(json['totalPausedSeconds']),
       billableOverride: serializer.fromJson<bool?>(json['billableOverride']),
       source: serializer.fromJson<String>(json['source']),
       deviceId: serializer.fromJson<String>(json['deviceId']),
@@ -1606,6 +1667,8 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
       'description': serializer.toJson<String?>(description),
       'startAt': serializer.toJson<DateTime>(startAt),
       'endAt': serializer.toJson<DateTime?>(endAt),
+      'pausedAt': serializer.toJson<DateTime?>(pausedAt),
+      'totalPausedSeconds': serializer.toJson<int>(totalPausedSeconds),
       'billableOverride': serializer.toJson<bool?>(billableOverride),
       'source': serializer.toJson<String>(source),
       'deviceId': serializer.toJson<String>(deviceId),
@@ -1620,6 +1683,8 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
     Value<String?> description = const Value.absent(),
     DateTime? startAt,
     Value<DateTime?> endAt = const Value.absent(),
+    Value<DateTime?> pausedAt = const Value.absent(),
+    int? totalPausedSeconds,
     Value<bool?> billableOverride = const Value.absent(),
     String? source,
     String? deviceId,
@@ -1631,6 +1696,8 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
     description: description.present ? description.value : this.description,
     startAt: startAt ?? this.startAt,
     endAt: endAt.present ? endAt.value : this.endAt,
+    pausedAt: pausedAt.present ? pausedAt.value : this.pausedAt,
+    totalPausedSeconds: totalPausedSeconds ?? this.totalPausedSeconds,
     billableOverride: billableOverride.present
         ? billableOverride.value
         : this.billableOverride,
@@ -1648,6 +1715,10 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
           : this.description,
       startAt: data.startAt.present ? data.startAt.value : this.startAt,
       endAt: data.endAt.present ? data.endAt.value : this.endAt,
+      pausedAt: data.pausedAt.present ? data.pausedAt.value : this.pausedAt,
+      totalPausedSeconds: data.totalPausedSeconds.present
+          ? data.totalPausedSeconds.value
+          : this.totalPausedSeconds,
       billableOverride: data.billableOverride.present
           ? data.billableOverride.value
           : this.billableOverride,
@@ -1666,6 +1737,8 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
           ..write('description: $description, ')
           ..write('startAt: $startAt, ')
           ..write('endAt: $endAt, ')
+          ..write('pausedAt: $pausedAt, ')
+          ..write('totalPausedSeconds: $totalPausedSeconds, ')
           ..write('billableOverride: $billableOverride, ')
           ..write('source: $source, ')
           ..write('deviceId: $deviceId, ')
@@ -1682,6 +1755,8 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
     description,
     startAt,
     endAt,
+    pausedAt,
+    totalPausedSeconds,
     billableOverride,
     source,
     deviceId,
@@ -1697,6 +1772,8 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
           other.description == this.description &&
           other.startAt == this.startAt &&
           other.endAt == this.endAt &&
+          other.pausedAt == this.pausedAt &&
+          other.totalPausedSeconds == this.totalPausedSeconds &&
           other.billableOverride == this.billableOverride &&
           other.source == this.source &&
           other.deviceId == this.deviceId &&
@@ -1710,6 +1787,8 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
   final Value<String?> description;
   final Value<DateTime> startAt;
   final Value<DateTime?> endAt;
+  final Value<DateTime?> pausedAt;
+  final Value<int> totalPausedSeconds;
   final Value<bool?> billableOverride;
   final Value<String> source;
   final Value<String> deviceId;
@@ -1722,6 +1801,8 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
     this.description = const Value.absent(),
     this.startAt = const Value.absent(),
     this.endAt = const Value.absent(),
+    this.pausedAt = const Value.absent(),
+    this.totalPausedSeconds = const Value.absent(),
     this.billableOverride = const Value.absent(),
     this.source = const Value.absent(),
     this.deviceId = const Value.absent(),
@@ -1735,6 +1816,8 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
     this.description = const Value.absent(),
     required DateTime startAt,
     this.endAt = const Value.absent(),
+    this.pausedAt = const Value.absent(),
+    this.totalPausedSeconds = const Value.absent(),
     this.billableOverride = const Value.absent(),
     this.source = const Value.absent(),
     required String deviceId,
@@ -1752,6 +1835,8 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
     Expression<String>? description,
     Expression<DateTime>? startAt,
     Expression<DateTime>? endAt,
+    Expression<DateTime>? pausedAt,
+    Expression<int>? totalPausedSeconds,
     Expression<bool>? billableOverride,
     Expression<String>? source,
     Expression<String>? deviceId,
@@ -1765,6 +1850,9 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
       if (description != null) 'description': description,
       if (startAt != null) 'start_at': startAt,
       if (endAt != null) 'end_at': endAt,
+      if (pausedAt != null) 'paused_at': pausedAt,
+      if (totalPausedSeconds != null)
+        'total_paused_seconds': totalPausedSeconds,
       if (billableOverride != null) 'billable_override': billableOverride,
       if (source != null) 'source': source,
       if (deviceId != null) 'device_id': deviceId,
@@ -1780,6 +1868,8 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
     Value<String?>? description,
     Value<DateTime>? startAt,
     Value<DateTime?>? endAt,
+    Value<DateTime?>? pausedAt,
+    Value<int>? totalPausedSeconds,
     Value<bool?>? billableOverride,
     Value<String>? source,
     Value<String>? deviceId,
@@ -1793,6 +1883,8 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
       description: description ?? this.description,
       startAt: startAt ?? this.startAt,
       endAt: endAt ?? this.endAt,
+      pausedAt: pausedAt ?? this.pausedAt,
+      totalPausedSeconds: totalPausedSeconds ?? this.totalPausedSeconds,
       billableOverride: billableOverride ?? this.billableOverride,
       source: source ?? this.source,
       deviceId: deviceId ?? this.deviceId,
@@ -1819,6 +1911,12 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
     }
     if (endAt.present) {
       map['end_at'] = Variable<DateTime>(endAt.value);
+    }
+    if (pausedAt.present) {
+      map['paused_at'] = Variable<DateTime>(pausedAt.value);
+    }
+    if (totalPausedSeconds.present) {
+      map['total_paused_seconds'] = Variable<int>(totalPausedSeconds.value);
     }
     if (billableOverride.present) {
       map['billable_override'] = Variable<bool>(billableOverride.value);
@@ -1849,6 +1947,8 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
           ..write('description: $description, ')
           ..write('startAt: $startAt, ')
           ..write('endAt: $endAt, ')
+          ..write('pausedAt: $pausedAt, ')
+          ..write('totalPausedSeconds: $totalPausedSeconds, ')
           ..write('billableOverride: $billableOverride, ')
           ..write('source: $source, ')
           ..write('deviceId: $deviceId, ')
@@ -4384,6 +4484,8 @@ typedef $$TimeEntriesTableCreateCompanionBuilder =
       Value<String?> description,
       required DateTime startAt,
       Value<DateTime?> endAt,
+      Value<DateTime?> pausedAt,
+      Value<int> totalPausedSeconds,
       Value<bool?> billableOverride,
       Value<String> source,
       required String deviceId,
@@ -4398,6 +4500,8 @@ typedef $$TimeEntriesTableUpdateCompanionBuilder =
       Value<String?> description,
       Value<DateTime> startAt,
       Value<DateTime?> endAt,
+      Value<DateTime?> pausedAt,
+      Value<int> totalPausedSeconds,
       Value<bool?> billableOverride,
       Value<String> source,
       Value<String> deviceId,
@@ -4472,6 +4576,16 @@ class $$TimeEntriesTableFilterComposer
 
   ColumnFilters<DateTime> get endAt => $composableBuilder(
     column: $table.endAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get pausedAt => $composableBuilder(
+    column: $table.pausedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get totalPausedSeconds => $composableBuilder(
+    column: $table.totalPausedSeconds,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4578,6 +4692,16 @@ class $$TimeEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get pausedAt => $composableBuilder(
+    column: $table.pausedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get totalPausedSeconds => $composableBuilder(
+    column: $table.totalPausedSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get billableOverride => $composableBuilder(
     column: $table.billableOverride,
     builder: (column) => ColumnOrderings(column),
@@ -4649,6 +4773,14 @@ class $$TimeEntriesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get endAt =>
       $composableBuilder(column: $table.endAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get pausedAt =>
+      $composableBuilder(column: $table.pausedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get totalPausedSeconds => $composableBuilder(
+    column: $table.totalPausedSeconds,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<bool> get billableOverride => $composableBuilder(
     column: $table.billableOverride,
@@ -4749,6 +4881,8 @@ class $$TimeEntriesTableTableManager
                 Value<String?> description = const Value.absent(),
                 Value<DateTime> startAt = const Value.absent(),
                 Value<DateTime?> endAt = const Value.absent(),
+                Value<DateTime?> pausedAt = const Value.absent(),
+                Value<int> totalPausedSeconds = const Value.absent(),
                 Value<bool?> billableOverride = const Value.absent(),
                 Value<String> source = const Value.absent(),
                 Value<String> deviceId = const Value.absent(),
@@ -4761,6 +4895,8 @@ class $$TimeEntriesTableTableManager
                 description: description,
                 startAt: startAt,
                 endAt: endAt,
+                pausedAt: pausedAt,
+                totalPausedSeconds: totalPausedSeconds,
                 billableOverride: billableOverride,
                 source: source,
                 deviceId: deviceId,
@@ -4775,6 +4911,8 @@ class $$TimeEntriesTableTableManager
                 Value<String?> description = const Value.absent(),
                 required DateTime startAt,
                 Value<DateTime?> endAt = const Value.absent(),
+                Value<DateTime?> pausedAt = const Value.absent(),
+                Value<int> totalPausedSeconds = const Value.absent(),
                 Value<bool?> billableOverride = const Value.absent(),
                 Value<String> source = const Value.absent(),
                 required String deviceId,
@@ -4787,6 +4925,8 @@ class $$TimeEntriesTableTableManager
                 description: description,
                 startAt: startAt,
                 endAt: endAt,
+                pausedAt: pausedAt,
+                totalPausedSeconds: totalPausedSeconds,
                 billableOverride: billableOverride,
                 source: source,
                 deviceId: deviceId,

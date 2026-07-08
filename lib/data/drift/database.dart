@@ -39,7 +39,18 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.connection);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.addColumn(timeEntries, timeEntries.pausedAt);
+        await m.addColumn(timeEntries, timeEntries.totalPausedSeconds);
+      }
+    },
+  );
 
   static LazyDatabase _openConnection() {
     return LazyDatabase(() async {

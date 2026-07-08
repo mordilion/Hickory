@@ -12,6 +12,14 @@ class TimeEntries extends Table {
   DateTimeColumn get startAt => dateTime()();
   // Null endAt means this is the currently running entry.
   DateTimeColumn get endAt => dateTime().nullable()();
+  // Set while the entry is paused (endAt still null); null while running or
+  // stopped. Cleared back to null on resume.
+  DateTimeColumn get pausedAt => dateTime().nullable()();
+  // Sum of every pause span for this entry, across as many pause/resume
+  // cycles as the user performs. Subtracted from (endAt ?? pausedAt ?? now)
+  // - startAt to get the actual worked duration — see workedDuration in
+  // lib/data/drift/time_entry_extensions.dart.
+  IntColumn get totalPausedSeconds => integer().withDefault(const Constant(0))();
   BoolColumn get billableOverride => boolean().nullable()();
   TextColumn get source => text().withDefault(const Constant('manual'))();
   TextColumn get deviceId => text()();
