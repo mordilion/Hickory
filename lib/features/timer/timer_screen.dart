@@ -9,6 +9,7 @@ import '../../core/format/duration_format.dart';
 import '../../core/theme/hickory_colors.dart';
 import '../../core/widgets/gradient_buttons.dart';
 import '../../data/drift/database.dart';
+import '../../data/drift/time_entry_extensions.dart';
 import '../entries/entries_list.dart';
 import '../projects/new_project_dialog.dart';
 import '../projects/projects_providers.dart';
@@ -47,7 +48,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
     }
     if (_idlePromptShowing) return;
     final running = ref.read(runningEntryProvider).value;
-    if (running == null) return;
+    if (running == null || running.pausedAt != null) return;
 
     _idlePromptShowing = true;
     final idleDuration = Duration(seconds: idleSeconds);
@@ -63,7 +64,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
 
   Future<void> _recordActivitySample(ActivitySample sample) async {
     final running = ref.read(runningEntryProvider).value;
-    if (running == null) return;
+    if (running == null || running.pausedAt != null) return;
     final deviceId = await ref.read(deviceIdProvider.future);
     final writes = await ref.read(syncedWritesProvider.future);
     await writes.recordActivitySample(
@@ -92,6 +93,16 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
     await writes.stopEntry(running.id);
   }
 
+  Future<void> _pause(TimeEntry running) async {
+    final writes = await ref.read(syncedWritesProvider.future);
+    await writes.pauseEntry(running.id);
+  }
+
+  Future<void> _resume(TimeEntry running) async {
+    final writes = await ref.read(syncedWritesProvider.future);
+    await writes.resumeEntry(running.id);
+  }
+
   @override
   Widget build(BuildContext context) {
     final runningAsync = ref.watch(runningEntryProvider);
@@ -113,7 +124,12 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
         children: [
           runningAsync.when(
             data: (running) => running != null
-                ? _RunningCard(running: running, onStop: () => _stop(running))
+                ? _RunningCard(
+                    running: running,
+                    onPause: () => _pause(running),
+                    onResume: () => _resume(running),
+                    onStop: () => _stop(running),
+                  )
                 : _StartCard(
                     descriptionController: _descriptionController,
                     selectedProjectId: _selectedProjectId,
@@ -132,14 +148,22 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
 }
 
 class _RunningCard extends ConsumerWidget {
-  const _RunningCard({required this.running, required this.onStop});
+  const _RunningCard({
+    required this.running,
+    required this.onPause,
+    required this.onResume,
+    required this.onStop,
+  });
 
   final TimeEntry running;
+  final VoidCallback onPause;
+  final VoidCallback onResume;
   final VoidCallback onStop;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final elapsed = DateTime.now().toUtc().difference(running.startAt);
+    final isPaused = running.pausedAt != null;
+    final elapsed = running.workedDuration;
     final tokens = HickoryColors.of(context);
     final projectsAsync = ref.watch(activeProjectsProvider);
     final projectsById = {
@@ -179,12 +203,26 @@ class _RunningCard extends ConsumerWidget {
             Chip(label: Text(project.name)),
           ],
           const SizedBox(height: 16),
-          GradientPillButton(
-            label: 'Stop',
-            icon: Icons.stop,
-            gradient: tokens.primaryGradient,
-            foregroundColor: tokens.onPrimaryGradient,
-            onPressed: onStop,
+          Row(
+            children: [
+              Expanded(
+                child: GradientPillButton(
+                  label: isPaused ? 'Fortsetzen' : 'Pause',
+                  icon: isPaused ? Icons.play_arrow : Icons.pause,
+                  gradient: tokens.primaryGradient,
+                  foregroundColor: tokens.onPrimaryGradient,
+                  onPressed: isPaused ? onResume : onPause,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: onStop,
+                  icon: const Icon(Icons.stop),
+                  label: const Text('Stop'),
+                ),
+              ),
+            ],
           ),
         ],
       ),
