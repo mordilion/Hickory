@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/sync_providers.dart';
+import '../../core/format/date_format.dart';
 import '../../core/format/duration_format.dart';
 import '../../data/drift/database.dart';
 import '../projects/projects_providers.dart';
@@ -69,7 +70,8 @@ class EntriesList extends ConsumerWidget {
                       ? entry.description!
                       : (project?.name ?? 'Ohne Beschreibung')),
                   subtitle: Text(
-                    '${project?.name ?? 'Kein Projekt'} · ${entry.startAt.toLocal()}',
+                    '${project?.name ?? 'Kein Projekt'} · '
+                    '${formatDate(entry.startAt)} ${formatTime(entry.startAt)}',
                   ),
                   trailing: Text(formatDuration(duration)),
                   onTap: () => showManualEntryDialog(context, ref, existing: entry),

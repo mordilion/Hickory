@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/device_id_provider.dart';
 import '../../core/di/sync_providers.dart';
+import '../../core/format/date_format.dart';
 import '../../data/drift/database.dart';
 import '../projects/projects_providers.dart';
 
@@ -141,13 +142,13 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
             ListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Start'),
-              subtitle: Text(_startAt.toString()),
+              subtitle: Text('${formatDate(_startAt)} ${formatTime(_startAt)}'),
               onTap: () => _pickDateTime(isStart: true),
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Ende'),
-              subtitle: Text(_endAt.toString()),
+              subtitle: Text('${formatDate(_endAt)} ${formatTime(_endAt)}'),
               onTap: () => _pickDateTime(isStart: false),
             ),
           ],
