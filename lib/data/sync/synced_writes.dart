@@ -63,6 +63,16 @@ class SyncedWrites {
     await _logCurrentState(id, EventOp.update);
   }
 
+  Future<void> pauseEntry(String id) async {
+    await db.timeEntriesDao.pauseEntry(id);
+    await _logCurrentState(id, EventOp.update);
+  }
+
+  Future<void> resumeEntry(String id) async {
+    await db.timeEntriesDao.resumeEntry(id);
+    await _logCurrentState(id, EventOp.update);
+  }
+
   Future<TimeEntry> createManualEntry({
     required String deviceId,
     required DateTime startAt,
