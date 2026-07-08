@@ -3,6 +3,7 @@ import 'package:sync_engine/sync_engine.dart';
 import 'package:uuid/uuid.dart';
 
 import '../drift/database.dart';
+import '../drift/tables/app_settings_table.dart' show appSettingsRowId;
 import 'entity_types.dart';
 import 'sync_log_writer.dart';
 
@@ -141,6 +142,25 @@ class SyncedWrites {
       op: EventOp.create,
       payload: row.toJson(),
     );
+  }
+
+  /// Updates the shared, synced app settings row. Uses the fixed
+  /// [appSettingsRowId] instead of a generated id — there is exactly one
+  /// settings row per synced identity, so every device's write targets the
+  /// same entity and last-write-wins resolves conflicts the same way it
+  /// does for every other synced entity.
+  Future<AppSettingsRow> updateAppSettings({String? dateFormat, String? timeFormat}) async {
+    final updated = await db.appSettingsDao.updateSettings(
+      dateFormat: dateFormat,
+      timeFormat: timeFormat,
+    );
+    await logWriter.appendEvent(
+      entityType: EntityTypes.appSettings,
+      entityId: appSettingsRowId,
+      op: EventOp.update,
+      payload: updated.toJson(),
+    );
+    return updated;
   }
 
   Future<void> _logCurrentState(String timeEntryId, EventOp op) async {

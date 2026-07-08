@@ -7,4 +7,5 @@ abstract final class EntityTypes {
   static const client = 'client';
   static const tag = 'tag';
   static const activitySample = 'activity_sample';
+  static const appSettings = 'app_settings';
 }
