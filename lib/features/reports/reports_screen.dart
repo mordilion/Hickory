@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/format/duration_format.dart';
+import '../../core/theme/hickory_colors.dart';
 import '../../data/drift/database.dart';
 import 'csv_export.dart';
 import 'report_calculations.dart';
@@ -66,67 +67,61 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   Widget build(BuildContext context) {
     final entriesAsync = ref.watch(reportEntriesProvider);
     final projectsAsync = ref.watch(reportProjectsProvider);
+    final tokens = HickoryColors.of(context);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Reports')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                ChoiceChip(
-                  label: const Text('Diese Woche'),
-                  selected: _selectedPreset == ReportRangePreset.thisWeek,
-                  onSelected: (_) => _selectPreset(ReportRangePreset.thisWeek),
-                ),
-                ChoiceChip(
-                  label: const Text('Dieser Monat'),
-                  selected: _selectedPreset == ReportRangePreset.thisMonth,
-                  onSelected: (_) => _selectPreset(ReportRangePreset.thisMonth),
-                ),
-                ChoiceChip(
-                  label: const Text('Letzte 30 Tage'),
-                  selected: _selectedPreset == ReportRangePreset.last30Days,
-                  onSelected: (_) => _selectPreset(ReportRangePreset.last30Days),
-                ),
-                ChoiceChip(
-                  label: const Text('Alle'),
-                  selected: _selectedPreset == ReportRangePreset.all,
-                  onSelected: (_) => _selectPreset(ReportRangePreset.all),
-                ),
-                ActionChip(
-                  label: const Text('Benutzerdefiniert…'),
-                  onPressed: _selectCustomRange,
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: entriesAsync.when(
-                data: (entries) => projectsAsync.when(
-                  data: (projects) => _ReportBody(
-                    entries: entries,
-                    projects: projects,
-                    onExport: () => _exportCsv(entries, projects),
-                  ),
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Center(child: Text('Fehler: $e')),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Reports', style: Theme.of(context).textTheme.headlineSmall),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _presetChip('Diese Woche', ReportRangePreset.thisWeek, tokens),
+              _presetChip('Dieser Monat', ReportRangePreset.thisMonth, tokens),
+              _presetChip('Letzte 30 Tage', ReportRangePreset.last30Days, tokens),
+              _presetChip('Alle', ReportRangePreset.all, tokens),
+              ActionChip(
+                label: const Text('Benutzerdefiniert…'),
+                onPressed: _selectCustomRange,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: entriesAsync.when(
+              data: (entries) => projectsAsync.when(
+                data: (projects) => _ReportBody(
+                  entries: entries,
+                  projects: projects,
+                  onExport: () => _exportCsv(entries, projects),
                 ),
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, _) => Center(child: Text('Fehler: $e')),
               ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Fehler: $e')),
             ),
-            if (_exportStatus != null) ...[
-              const SizedBox(height: 8),
-              Text(_exportStatus!, style: Theme.of(context).textTheme.bodySmall),
-            ],
+          ),
+          if (_exportStatus != null) ...[
+            const SizedBox(height: 8),
+            Text(_exportStatus!, style: Theme.of(context).textTheme.bodySmall),
           ],
-        ),
+        ],
       ),
+    );
+  }
+
+  Widget _presetChip(String label, ReportRangePreset preset, HickoryColors tokens) {
+    final selected = _selectedPreset == preset;
+    return ChoiceChip(
+      label: Text(label),
+      selected: selected,
+      selectedColor: tokens.navActiveIcon.withValues(alpha: 0.22),
+      onSelected: (_) => _selectPreset(preset),
     );
   }
 }
@@ -171,10 +166,15 @@ class _ReportBody extends StatelessWidget {
                     final amount = total.amountCents == null
                         ? null
                         : '${(total.amountCents! / 100).toStringAsFixed(2)} ${total.currency ?? ''}';
-                    return ListTile(
-                      title: Text(total.projectName),
-                      subtitle: amount == null ? null : Text(amount),
-                      trailing: Text(formatDuration(total.duration)),
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      shape: const StadiumBorder(),
+                      child: ListTile(
+                        shape: const StadiumBorder(),
+                        title: Text(total.projectName),
+                        subtitle: amount == null ? null : Text(amount),
+                        trailing: Text(formatDuration(total.duration)),
+                      ),
                     );
                   },
                 ),
