@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../entries/manual_entry_dialog.dart';
 import '../reports/reports_screen.dart';
+import '../settings/settings_screen.dart';
 import '../sync/sync_screen.dart';
 import '../timer/timer_screen.dart';
 import 'nav_shell.dart';
@@ -29,13 +30,18 @@ class AppShell extends ConsumerWidget {
       selectedIcon: Icon(Icons.sync),
       label: 'Sync',
     ),
+    NavigationDestination(
+      icon: Icon(Icons.settings_outlined),
+      selectedIcon: Icon(Icons.settings),
+      label: 'Einstellungen',
+    ),
   ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return NavShell(
       destinations: _destinations,
-      children: const [TimerScreen(), ReportsScreen(), SyncScreen()],
+      children: const [TimerScreen(), ReportsScreen(), SyncScreen(), SettingsScreen()],
       fabBuilder: (selectedIndex) => selectedIndex == 0
           ? FloatingActionButton(
               onPressed: () => showManualEntryDialog(context, ref),
