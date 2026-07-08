@@ -56,10 +56,35 @@ class TimeEntriesDao extends DatabaseAccessor<AppDatabase> with _$TimeEntriesDao
     return (select(timeEntries)..where((t) => t.id.equals(entry.id.value))).getSingle();
   }
 
-  Future<void> stopEntry(String id) {
+  Future<void> pauseEntry(String id) {
     final now = DateTime.now().toUtc();
     return (update(timeEntries)..where((t) => t.id.equals(id))).write(
-      TimeEntriesCompanion(endAt: Value(now), updatedAt: Value(now)),
+      TimeEntriesCompanion(pausedAt: Value(now), updatedAt: Value(now)),
+    );
+  }
+
+  Future<void> resumeEntry(String id) async {
+    final current = await (select(timeEntries)..where((t) => t.id.equals(id))).getSingle();
+    final pausedAt = current.pausedAt;
+    if (pausedAt == null) return;
+    final now = DateTime.now().toUtc();
+    final pausedSeconds = now.difference(pausedAt).inMilliseconds / 1000.0;
+    final additionalPausedSeconds = pausedSeconds.ceil();
+    await (update(timeEntries)..where((t) => t.id.equals(id))).write(
+      TimeEntriesCompanion(
+        pausedAt: const Value(null),
+        totalPausedSeconds: Value(current.totalPausedSeconds + additionalPausedSeconds),
+        updatedAt: Value(now),
+      ),
+    );
+  }
+
+  Future<void> stopEntry(String id) async {
+    final now = DateTime.now().toUtc();
+    final current = await (select(timeEntries)..where((t) => t.id.equals(id))).getSingle();
+    final endAt = current.pausedAt ?? now;
+    await (update(timeEntries)..where((t) => t.id.equals(id))).write(
+      TimeEntriesCompanion(endAt: Value(endAt), pausedAt: const Value(null), updatedAt: Value(now)),
     );
   }
 
