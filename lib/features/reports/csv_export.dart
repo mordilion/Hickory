@@ -2,6 +2,7 @@ import 'package:csv/csv.dart';
 
 import '../../core/format/date_format.dart';
 import '../../data/drift/database.dart';
+import '../../data/drift/time_entry_extensions.dart';
 
 /// One row per finished entry, in chronological order. Amounts follow the
 /// same billable-project-with-hourly-rate rule as [totalsByProject].
@@ -25,7 +26,7 @@ String entriesToCsv(List<TimeEntry> entries, List<Project> projects) {
     final endAt = entry.endAt;
     if (endAt == null) continue;
     final project = entry.projectId == null ? null : projectsById[entry.projectId];
-    final duration = endAt.difference(entry.startAt);
+    final duration = entry.workedDuration;
     final hours = duration.inMinutes / 60;
     final billable = project?.billable ?? false;
     final rateCents = project?.hourlyRateCents;

@@ -1,4 +1,5 @@
 import '../../data/drift/database.dart';
+import '../../data/drift/time_entry_extensions.dart';
 
 /// Pure calculation, no DB/Flutter dependency beyond the drift row types —
 /// straightforward to unit test with plain in-memory lists.
@@ -31,9 +32,8 @@ List<ProjectTotal> totalsByProject(List<TimeEntry> entries, List<Project> projec
   final durationByProject = <String?, Duration>{};
 
   for (final entry in entries) {
-    final endAt = entry.endAt;
-    if (endAt == null) continue;
-    final duration = endAt.difference(entry.startAt);
+    if (entry.endAt == null) continue;
+    final duration = entry.workedDuration;
     durationByProject.update(
       entry.projectId,
       (existing) => existing + duration,
@@ -68,11 +68,10 @@ List<ProjectTotal> totalsByProject(List<TimeEntry> entries, List<Project> projec
 Map<DateTime, Duration> totalsByDay(List<TimeEntry> entries) {
   final totals = <DateTime, Duration>{};
   for (final entry in entries) {
-    final endAt = entry.endAt;
-    if (endAt == null) continue;
+    if (entry.endAt == null) continue;
     final local = entry.startAt.toLocal();
     final day = DateTime(local.year, local.month, local.day);
-    final duration = endAt.difference(entry.startAt);
+    final duration = entry.workedDuration;
     totals.update(day, (existing) => existing + duration, ifAbsent: () => duration);
   }
   return totals;

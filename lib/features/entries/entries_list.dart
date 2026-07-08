@@ -5,6 +5,7 @@ import '../../core/di/sync_providers.dart';
 import '../../core/format/date_format.dart';
 import '../../core/format/duration_format.dart';
 import '../../data/drift/database.dart';
+import '../../data/drift/time_entry_extensions.dart';
 import '../projects/projects_providers.dart';
 import '../timer/timer_providers.dart';
 import 'manual_entry_dialog.dart';
@@ -37,7 +38,7 @@ class EntriesList extends ConsumerWidget {
           itemBuilder: (context, index) {
             final entry = finished[index];
             final project = entry.projectId == null ? null : projectsById[entry.projectId];
-            final duration = entry.endAt!.difference(entry.startAt);
+            final duration = entry.workedDuration;
             return Dismissible(
               key: ValueKey(entry.id),
               direction: DismissDirection.endToStart,

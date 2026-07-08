@@ -41,6 +41,7 @@ TimeEntry _entry({
     deviceId: 'dev_a',
     createdAt: now,
     updatedAt: now,
+    totalPausedSeconds: 0,
   );
 }
 
@@ -120,9 +121,32 @@ void main() {
         deviceId: 'dev_a',
         createdAt: now,
         updatedAt: now,
+        totalPausedSeconds: 0,
       );
 
       expect(totalsByProject([running], const []), isEmpty);
+    });
+
+    test('paused time is excluded from the summed duration', () {
+      final entries = [
+        TimeEntry(
+          id: 'e1',
+          projectId: 'p1',
+          startAt: DateTime.utc(2026, 7, 7, 9),
+          endAt: DateTime.utc(2026, 7, 7, 11), // 2h wall-clock
+          totalPausedSeconds: 20 * 60, // 20 minutes paused
+          source: 'manual',
+          deviceId: 'dev_a',
+          createdAt: DateTime.utc(2026, 7, 1),
+          updatedAt: DateTime.utc(2026, 7, 1),
+        ),
+      ];
+
+      final totals = totalsByProject(entries, [
+        _project(id: 'p1', name: 'Client X'),
+      ]);
+
+      expect(totals.single.duration, const Duration(hours: 1, minutes: 40));
     });
 
     test('results are sorted by duration, longest first', () {
