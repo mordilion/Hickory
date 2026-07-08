@@ -68,8 +68,7 @@ class TimeEntriesDao extends DatabaseAccessor<AppDatabase> with _$TimeEntriesDao
     final pausedAt = current.pausedAt;
     if (pausedAt == null) return;
     final now = DateTime.now().toUtc();
-    final pausedSeconds = now.difference(pausedAt).inMilliseconds / 1000.0;
-    final additionalPausedSeconds = pausedSeconds.ceil();
+    final additionalPausedSeconds = now.difference(pausedAt).inSeconds;
     await (update(timeEntries)..where((t) => t.id.equals(id))).write(
       TimeEntriesCompanion(
         pausedAt: const Value(null),

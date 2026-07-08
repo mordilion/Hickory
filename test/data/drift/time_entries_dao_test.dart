@@ -27,33 +27,33 @@ void main() {
   test('resumeEntry clears pausedAt and accumulates totalPausedSeconds', () async {
     final entry = await db.timeEntriesDao.startEntry(deviceId: 'dev_a');
     await db.timeEntriesDao.pauseEntry(entry.id);
-    await Future<void>.delayed(const Duration(milliseconds: 50));
+    await Future<void>.delayed(const Duration(milliseconds: 1100));
     await db.timeEntriesDao.resumeEntry(entry.id);
 
     final resumed =
         await (db.select(db.timeEntries)..where((t) => t.id.equals(entry.id))).getSingle();
     expect(resumed.pausedAt, isNull);
-    expect(resumed.totalPausedSeconds, greaterThan(0));
+    expect(resumed.totalPausedSeconds, greaterThanOrEqualTo(1));
   });
 
   test('multiple pause/resume cycles accumulate totalPausedSeconds monotonically', () async {
     final entry = await db.timeEntriesDao.startEntry(deviceId: 'dev_a');
 
     await db.timeEntriesDao.pauseEntry(entry.id);
-    await Future<void>.delayed(const Duration(milliseconds: 30));
+    await Future<void>.delayed(const Duration(milliseconds: 1100));
     await db.timeEntriesDao.resumeEntry(entry.id);
     final afterFirstCycle =
         await (db.select(db.timeEntries)..where((t) => t.id.equals(entry.id))).getSingle();
 
     await db.timeEntriesDao.pauseEntry(entry.id);
-    await Future<void>.delayed(const Duration(milliseconds: 30));
+    await Future<void>.delayed(const Duration(milliseconds: 1100));
     await db.timeEntriesDao.resumeEntry(entry.id);
     final afterSecondCycle =
         await (db.select(db.timeEntries)..where((t) => t.id.equals(entry.id))).getSingle();
 
     expect(
       afterSecondCycle.totalPausedSeconds,
-      greaterThanOrEqualTo(afterFirstCycle.totalPausedSeconds),
+      greaterThan(afterFirstCycle.totalPausedSeconds),
     );
     expect(afterSecondCycle.pausedAt, isNull);
   });
