@@ -8,6 +8,11 @@ import '../projects/projects_providers.dart';
 import '../timer/timer_providers.dart';
 import 'manual_entry_dialog.dart';
 
+/// Reserves space so the shell's floating action button (56px + margin)
+/// never overlaps the last entry — caught during design review, when an
+/// early mockup had the FAB sitting on top of list content.
+const _bottomPaddingForFab = 88.0;
+
 class EntriesList extends ConsumerWidget {
   const EntriesList({super.key});
 
@@ -26,6 +31,7 @@ class EntriesList extends ConsumerWidget {
           for (final p in projectsAsync.value ?? const <Project>[]) p.id: p,
         };
         return ListView.builder(
+          padding: const EdgeInsets.only(bottom: _bottomPaddingForFab),
           itemCount: finished.length,
           itemBuilder: (context, index) {
             final entry = finished[index];
@@ -35,7 +41,11 @@ class EntriesList extends ConsumerWidget {
               key: ValueKey(entry.id),
               direction: DismissDirection.endToStart,
               background: Container(
-                color: Theme.of(context).colorScheme.errorContainer,
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.errorContainer,
+                  borderRadius: BorderRadius.circular(999),
+                ),
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: const Icon(Icons.delete_outline),
@@ -43,22 +53,27 @@ class EntriesList extends ConsumerWidget {
               onDismissed: (_) {
                 ref.read(syncedWritesProvider.future).then((w) => w.deleteEntry(entry.id));
               },
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: project != null
-                      ? Color(int.parse(project.colorHex.replaceFirst('#', '0xFF')))
-                      : Colors.grey,
-                  radius: 8,
-                  child: const SizedBox.shrink(),
+              child: Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                shape: const StadiumBorder(),
+                child: ListTile(
+                  shape: const StadiumBorder(),
+                  leading: CircleAvatar(
+                    backgroundColor: project != null
+                        ? Color(int.parse(project.colorHex.replaceFirst('#', '0xFF')))
+                        : Colors.grey,
+                    radius: 8,
+                    child: const SizedBox.shrink(),
+                  ),
+                  title: Text(entry.description?.isNotEmpty == true
+                      ? entry.description!
+                      : (project?.name ?? 'Ohne Beschreibung')),
+                  subtitle: Text(
+                    '${project?.name ?? 'Kein Projekt'} · ${entry.startAt.toLocal()}',
+                  ),
+                  trailing: Text(formatDuration(duration)),
+                  onTap: () => showManualEntryDialog(context, ref, existing: entry),
                 ),
-                title: Text(entry.description?.isNotEmpty == true
-                    ? entry.description!
-                    : (project?.name ?? 'Ohne Beschreibung')),
-                subtitle: Text(
-                  '${project?.name ?? 'Kein Projekt'} · ${entry.startAt.toLocal()}',
-                ),
-                trailing: Text(formatDuration(duration)),
-                onTap: () => showManualEntryDialog(context, ref, existing: entry),
               ),
             );
           },
