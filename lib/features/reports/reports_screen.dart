@@ -5,6 +5,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/di/app_settings_provider.dart';
+import '../../core/format/date_format.dart';
 import '../../core/format/duration_format.dart';
 import '../../core/theme/hickory_colors.dart';
 import '../../data/drift/database.dart';
@@ -51,7 +53,13 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   }
 
   Future<void> _exportCsv(List<TimeEntry> entries, List<Project> projects) async {
-    final csv = entriesToCsv(entries, projects);
+    final settings = ref.read(appSettingsProvider).value;
+    final csv = entriesToCsv(
+      entries,
+      projects,
+      dateFormatStyle: settings.dateStyle,
+      timeFormatStyle: settings.timeStyle,
+    );
     final path = await FilePicker.saveFile(
       dialogTitle: 'CSV exportieren',
       fileName: 'hickory-export.csv',

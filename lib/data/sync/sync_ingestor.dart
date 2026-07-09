@@ -145,6 +145,15 @@ class SyncIngestor {
               .into(db.activitySamples)
               .insertOnConflictUpdate(ActivitySampleRow.fromJson(entity.payload!).toCompanion(true));
         }
+      case EntityTypes.appSettings:
+        // Singleton settings row — never deleted, so entity.isDeleted never
+        // fires for it in practice, but the guard stays for symmetry with
+        // every other case here.
+        if (!entity.isDeleted) {
+          await db
+              .into(db.appSettings)
+              .insertOnConflictUpdate(AppSettingsRow.fromJson(entity.payload!).toCompanion(true));
+        }
       default:
         // Client/Tag aren't wired into the app yet (no DAO to apply them
         // to) — ignored until a later milestone adds them.

@@ -107,4 +107,28 @@ void main() {
       expect(entries.single.description, 'only entry');
     },
   );
+
+  test(
+    'app settings sync as a singleton row across devices',
+    () async {
+      final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(writerDb.close);
+      final writerWrites = SyncedWrites(
+        db: writerDb,
+        logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'dev_a'),
+      );
+
+      await writerWrites.updateAppSettings(dateFormat: 'de', timeFormat: '12h');
+
+      final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(readerDb.close);
+      final ingestor = SyncIngestor(db: readerDb, syncRoot: syncRoot);
+      await ingestor.syncNow();
+
+      final rows = await readerDb.select(readerDb.appSettings).get();
+      expect(rows, hasLength(1));
+      expect(rows.single.dateFormat, 'de');
+      expect(rows.single.timeFormat, '12h');
+    },
+  );
 }

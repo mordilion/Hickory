@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/di/app_settings_provider.dart';
 import '../../core/di/device_id_provider.dart';
 import '../../core/di/sync_providers.dart';
 import '../../core/format/date_format.dart';
@@ -110,6 +111,9 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
   @override
   Widget build(BuildContext context) {
     final projectsAsync = ref.watch(activeProjectsProvider);
+    final settings = ref.watch(appSettingsProvider).value;
+    final dateStyle = settings.dateStyle;
+    final timeStyle = settings.timeStyle;
 
     return AlertDialog(
       title: Text(widget.existing == null ? 'Manueller Eintrag' : 'Eintrag bearbeiten'),
@@ -142,13 +146,13 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
             ListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Start'),
-              subtitle: Text('${formatDate(_startAt)} ${formatTime(_startAt)}'),
+              subtitle: Text('${formatDate(_startAt, dateStyle)} ${formatTime(_startAt, timeStyle)}'),
               onTap: () => _pickDateTime(isStart: true),
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Ende'),
-              subtitle: Text('${formatDate(_endAt)} ${formatTime(_endAt)}'),
+              subtitle: Text('${formatDate(_endAt, dateStyle)} ${formatTime(_endAt, timeStyle)}'),
               onTap: () => _pickDateTime(isStart: false),
             ),
           ],

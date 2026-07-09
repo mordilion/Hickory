@@ -6,10 +6,12 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import 'daos/activity_samples_dao.dart';
+import 'daos/app_settings_dao.dart';
 import 'daos/events_dao.dart';
 import 'daos/projects_dao.dart';
 import 'daos/time_entries_dao.dart';
 import 'tables/activity_samples_table.dart';
+import 'tables/app_settings_table.dart';
 import 'tables/clients_table.dart';
 import 'tables/events_table.dart';
 import 'tables/projects_table.dart';
@@ -30,8 +32,9 @@ part 'database.g.dart';
     Events,
     SyncFileStates,
     ActivitySamples,
+    AppSettings,
   ],
-  daos: [ProjectsDao, TimeEntriesDao, EventsDao, ActivitySamplesDao],
+  daos: [ProjectsDao, TimeEntriesDao, EventsDao, ActivitySamplesDao, AppSettingsDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -39,7 +42,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.connection);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -48,6 +51,9 @@ class AppDatabase extends _$AppDatabase {
       if (from < 2) {
         await m.addColumn(timeEntries, timeEntries.pausedAt);
         await m.addColumn(timeEntries, timeEntries.totalPausedSeconds);
+      }
+      if (from < 3) {
+        await m.createTable(appSettings);
       }
     },
   );

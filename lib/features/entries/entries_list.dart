@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/di/app_settings_provider.dart';
 import '../../core/di/sync_providers.dart';
 import '../../core/format/date_format.dart';
 import '../../core/format/duration_format.dart';
@@ -22,6 +23,9 @@ class EntriesList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final entriesAsync = ref.watch(allEntriesProvider);
     final projectsAsync = ref.watch(activeProjectsProvider);
+    final settings = ref.watch(appSettingsProvider).value;
+    final dateStyle = settings.dateStyle;
+    final timeStyle = settings.timeStyle;
 
     return entriesAsync.when(
       data: (entries) {
@@ -72,7 +76,7 @@ class EntriesList extends ConsumerWidget {
                       : (project?.name ?? 'Ohne Beschreibung')),
                   subtitle: Text(
                     '${project?.name ?? 'Kein Projekt'} · '
-                    '${formatDate(entry.startAt)} ${formatTime(entry.startAt)}',
+                    '${formatDate(entry.startAt, dateStyle)} ${formatTime(entry.startAt, timeStyle)}',
                   ),
                   trailing: Text(formatDuration(duration)),
                   onTap: () => showManualEntryDialog(context, ref, existing: entry),
