@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "scope": "project",
+  "setupType": "rules",
+  "selectedLanguages": ["general", "dart", "yaml", "json", "swift"],
+  "selectedDocumentation": ["documentation/code", "documentation/project"],
+  "selectedFrameworks": {
+    "dart": ["flutter", "riverpod"],
+    "swift": ["swiftui"]
+  },
+  "selectedStructures": {
+    "dart-flutter": "flutter-feature",
+    "swift-swiftui": "swiftui-mvvm"
+  },
+  "selectedProcesses": {
+    "dart": ["database-migrations"]
+  },
+  "enableCommitStandards": true,
+  "enableDatabaseDesign": true
+}
