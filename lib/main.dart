@@ -11,8 +11,9 @@ import 'core/window/window_tray_controller.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('de_DE');
-  await initializeDateFormatting('en_US');
+  for (final localeName in ['de_DE', 'en_US', 'de', 'en', 'fr', 'es', 'it', 'nl']) {
+    await initializeDateFormatting(localeName);
+  }
 
   final container = ProviderContainer();
 
