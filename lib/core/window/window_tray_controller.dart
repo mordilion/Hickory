@@ -120,4 +120,11 @@ class WindowTrayController with WindowListener, TrayListener {
   void onTrayIconMouseDown() {
     _restore();
   }
+
+  @override
+  void onTrayIconRightMouseDown() {
+    // setContextMenu() alone doesn't show the menu on Windows — tray_manager
+    // only displays it when explicitly popped up from the right-click event.
+    trayManager.popUpContextMenu();
+  }
 }
