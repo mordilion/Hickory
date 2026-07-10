@@ -5,6 +5,7 @@ import '../../core/di/app_settings_provider.dart';
 import '../../core/di/autostart_service.dart';
 import '../../core/di/sync_providers.dart';
 import '../../core/format/date_format.dart';
+import 'language_dropdown.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -107,6 +108,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         .toList(),
                     onChanged: (style) => style == null ? null : _setTimeFormat(style),
                   ),
+                  const SizedBox(height: 12),
+                  const LanguageDropdown(),
                 ],
               ),
             ),
