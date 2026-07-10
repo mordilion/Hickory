@@ -1,0 +1,8 @@
+{
+  "@@locale": "en",
+  "trayOpen": "Open",
+  "trayQuit": "Quit",
+  "trayBackgroundNotice": "Hickory keeps running in the background.",
+  "settingsLanguage": "Language",
+  "settingsLanguageSystem": "System default ({language})"
+}

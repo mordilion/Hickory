@@ -1,0 +1,8 @@
+{
+  "@@locale": "nl",
+  "trayOpen": "Openen",
+  "trayQuit": "Afsluiten",
+  "trayBackgroundNotice": "Hickory blijft op de achtergrond draaien.",
+  "settingsLanguage": "Taal",
+  "settingsLanguageSystem": "Systeemstandaard ({language})"
+}

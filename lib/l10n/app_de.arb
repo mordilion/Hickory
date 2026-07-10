@@ -1,0 +1,13 @@
+{
+  "@@locale": "de",
+  "trayOpen": "Öffnen",
+  "trayQuit": "Beenden",
+  "trayBackgroundNotice": "Hickory läuft im Hintergrund weiter.",
+  "settingsLanguage": "Sprache",
+  "settingsLanguageSystem": "Systemstandard ({language})",
+  "@settingsLanguageSystem": {
+    "placeholders": {
+      "language": { "type": "String" }
+    }
+  }
+}
