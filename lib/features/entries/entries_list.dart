@@ -76,7 +76,8 @@ class EntriesList extends ConsumerWidget {
                       : (project?.name ?? 'Ohne Beschreibung')),
                   subtitle: Text(
                     '${project?.name ?? 'Kein Projekt'} · '
-                    '${formatDate(entry.startAt, dateStyle)} ${formatTime(entry.startAt, timeStyle)}',
+                    '${formatDate(entry.startAt, dateStyle, Localizations.localeOf(context).languageCode)} '
+                    '${formatTime(entry.startAt, timeStyle)}',
                   ),
                   trailing: Text(formatDuration(duration)),
                   onTap: () => showManualEntryDialog(context, ref, existing: entry),

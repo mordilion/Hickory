@@ -88,7 +88,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         .map(
                           (style) => DropdownMenuItem(
                             value: style,
-                            child: Text(formatDate(now, style)),
+                            child: Text(
+                              formatDate(now, style, Localizations.localeOf(context).languageCode),
+                            ),
                           ),
                         )
                         .toList(),

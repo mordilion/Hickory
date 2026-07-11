@@ -7,6 +7,8 @@ void main() {
   setUpAll(() async {
     await initializeDateFormatting('de_DE');
     await initializeDateFormatting('en_US');
+    await initializeDateFormatting('fr');
+    await initializeDateFormatting('en');
   });
 
   final reference = DateTime(2026, 12, 24, 14, 30, 5);
@@ -18,6 +20,14 @@ void main() {
     test('long', () => expect(formatDate(reference, DateFormatStyle.long), '24. Dez. 2026'));
     test('defaults to iso when no style is given',
         () => expect(formatDate(reference), '2026-12-24'));
+
+    test('long style renders month names in the requested locale', () {
+      final date = DateTime(2026, 12, 5, 12);
+      expect(formatDate(date, DateFormatStyle.long, 'fr'), '5 déc. 2026');
+      expect(formatDate(date, DateFormatStyle.long, 'en'), 'Dec 5, 2026');
+      // Default stays German so existing call sites are unaffected.
+      expect(formatDate(date, DateFormatStyle.long), '5. Dez. 2026');
+    });
   });
 
   group('formatTime', () {

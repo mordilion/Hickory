@@ -44,19 +44,28 @@ enum TimeFormatStyle {
 const defaultDateFormatStyle = DateFormatStyle.iso;
 const defaultTimeFormatStyle = TimeFormatStyle.h24;
 
-/// German locale for date patterns (month abbreviations in [DateFormatStyle.long]
-/// read as German, e.g. "Dez." not "Dec.") — matches the rest of the app's
-/// German-language UI. Requires `initializeDateFormatting('de_DE')` to have
-/// run first (see `main.dart`); tests must call it in `setUpAll`.
-String formatDate(DateTime dt, [DateFormatStyle style = defaultDateFormatStyle]) {
+/// Date patterns are all-numeric except [DateFormatStyle.long], whose month
+/// abbreviation follows [localeName] (the active app language). The default
+/// stays 'de_DE' so callers that don't care keep today's output. For the
+/// long style, use a skeleton so ordering/punctuation localize too.
+/// Requires `initializeDateFormatting(localeName)` to have run first (see
+/// `main.dart`); tests must call it in `setUpAll`.
+String formatDate(
+  DateTime dt, [
+  DateFormatStyle style = defaultDateFormatStyle,
+  String localeName = 'de_DE',
+]) {
   final local = dt.toLocal();
+  if (style == DateFormatStyle.long) {
+    return DateFormat.yMMMd(localeName).format(local);
+  }
   final pattern = switch (style) {
     DateFormatStyle.de => 'dd.MM.yyyy',
     DateFormatStyle.iso => 'yyyy-MM-dd',
     DateFormatStyle.us => 'MM/dd/yyyy',
-    DateFormatStyle.long => 'd. MMM y',
+    DateFormatStyle.long => throw StateError('handled above'),
   };
-  return DateFormat(pattern, 'de_DE').format(local);
+  return DateFormat(pattern, localeName).format(local);
 }
 
 /// English locale for time patterns deliberately: the 12h styles' AM/PM

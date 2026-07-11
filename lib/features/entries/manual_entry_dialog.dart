@@ -146,13 +146,19 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
             ListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Start'),
-              subtitle: Text('${formatDate(_startAt, dateStyle)} ${formatTime(_startAt, timeStyle)}'),
+              subtitle: Text(
+                '${formatDate(_startAt, dateStyle, Localizations.localeOf(context).languageCode)} '
+                '${formatTime(_startAt, timeStyle)}',
+              ),
               onTap: () => _pickDateTime(isStart: true),
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Ende'),
-              subtitle: Text('${formatDate(_endAt, dateStyle)} ${formatTime(_endAt, timeStyle)}'),
+              subtitle: Text(
+                '${formatDate(_endAt, dateStyle, Localizations.localeOf(context).languageCode)} '
+                '${formatTime(_endAt, timeStyle)}',
+              ),
               onTap: () => _pickDateTime(isStart: false),
             ),
           ],
