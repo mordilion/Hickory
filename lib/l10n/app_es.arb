@@ -17,5 +17,22 @@
   "syncNowButton": "Sincronizar ahora",
   "syncChooseFolderButton": "Elegir carpeta",
   "syncFolderChosen": "Carpeta seleccionada: {path}",
-  "syncCompleted": "Sincronización completada."
+  "syncCompleted": "Sincronización completada.",
+  "navTimer": "Temporizador",
+  "navReports": "Informes",
+  "navSync": "Sincronización",
+  "navSettings": "Ajustes",
+  "commonNoProject": "Sin proyecto",
+  "timerError": "Error: {error}",
+  "timerResume": "Reanudar",
+  "timerPause": "Pausar",
+  "timerStop": "Detener",
+  "timerDescriptionLabel": "¿En qué estás trabajando?",
+  "timerProjectLabel": "Proyecto",
+  "timerNewProjectTooltip": "Nuevo proyecto",
+  "timerStart": "Iniciar",
+  "timerIdleTitle": "Inactividad detectada",
+  "timerIdleMessage": "Has estado inactivo durante {minutes} minutos. ¿Quieres restar este tiempo de la entrada en curso?",
+  "timerIdleKeepTime": "Mantener el tiempo",
+  "timerIdleTrimTime": "Restar el tiempo inactivo"
 }

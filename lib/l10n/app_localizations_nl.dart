@@ -72,4 +72,59 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get syncCompleted => 'Synchronisatie voltooid.';
+
+  @override
+  String get navTimer => 'Timer';
+
+  @override
+  String get navReports => 'Rapporten';
+
+  @override
+  String get navSync => 'Synchronisatie';
+
+  @override
+  String get navSettings => 'Instellingen';
+
+  @override
+  String get commonNoProject => 'Geen project';
+
+  @override
+  String timerError(String error) {
+    return 'Fout: $error';
+  }
+
+  @override
+  String get timerResume => 'Hervatten';
+
+  @override
+  String get timerPause => 'Pauzeren';
+
+  @override
+  String get timerStop => 'Stoppen';
+
+  @override
+  String get timerDescriptionLabel => 'Waar werk je aan?';
+
+  @override
+  String get timerProjectLabel => 'Project';
+
+  @override
+  String get timerNewProjectTooltip => 'Nieuw project';
+
+  @override
+  String get timerStart => 'Starten';
+
+  @override
+  String get timerIdleTitle => 'Inactiviteit gedetecteerd';
+
+  @override
+  String timerIdleMessage(int minutes) {
+    return 'Je bent al $minutes minuten inactief. Wil je deze tijd van de lopende invoer aftrekken?';
+  }
+
+  @override
+  String get timerIdleKeepTime => 'Tijd behouden';
+
+  @override
+  String get timerIdleTrimTime => 'Inactieve tijd aftrekken';
 }

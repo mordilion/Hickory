@@ -17,5 +17,22 @@
   "syncNowButton": "Nu synchroniseren",
   "syncChooseFolderButton": "Map kiezen",
   "syncFolderChosen": "Map geselecteerd: {path}",
-  "syncCompleted": "Synchronisatie voltooid."
+  "syncCompleted": "Synchronisatie voltooid.",
+  "navTimer": "Timer",
+  "navReports": "Rapporten",
+  "navSync": "Synchronisatie",
+  "navSettings": "Instellingen",
+  "commonNoProject": "Geen project",
+  "timerError": "Fout: {error}",
+  "timerResume": "Hervatten",
+  "timerPause": "Pauzeren",
+  "timerStop": "Stoppen",
+  "timerDescriptionLabel": "Waar werk je aan?",
+  "timerProjectLabel": "Project",
+  "timerNewProjectTooltip": "Nieuw project",
+  "timerStart": "Starten",
+  "timerIdleTitle": "Inactiviteit gedetecteerd",
+  "timerIdleMessage": "Je bent al {minutes} minuten inactief. Wil je deze tijd van de lopende invoer aftrekken?",
+  "timerIdleKeepTime": "Tijd behouden",
+  "timerIdleTrimTime": "Inactieve tijd aftrekken"
 }

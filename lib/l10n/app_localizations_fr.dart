@@ -72,4 +72,59 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get syncCompleted => 'Synchronisation terminée.';
+
+  @override
+  String get navTimer => 'Minuteur';
+
+  @override
+  String get navReports => 'Rapports';
+
+  @override
+  String get navSync => 'Synchronisation';
+
+  @override
+  String get navSettings => 'Paramètres';
+
+  @override
+  String get commonNoProject => 'Aucun projet';
+
+  @override
+  String timerError(String error) {
+    return 'Erreur : $error';
+  }
+
+  @override
+  String get timerResume => 'Reprendre';
+
+  @override
+  String get timerPause => 'Pause';
+
+  @override
+  String get timerStop => 'Arrêter';
+
+  @override
+  String get timerDescriptionLabel => 'Sur quoi travaillez-vous ?';
+
+  @override
+  String get timerProjectLabel => 'Projet';
+
+  @override
+  String get timerNewProjectTooltip => 'Nouveau projet';
+
+  @override
+  String get timerStart => 'Démarrer';
+
+  @override
+  String get timerIdleTitle => 'Inactivité détectée';
+
+  @override
+  String timerIdleMessage(int minutes) {
+    return 'Vous êtes inactif(ve) depuis $minutes minutes. Voulez-vous déduire ce temps de l\'entrée en cours ?';
+  }
+
+  @override
+  String get timerIdleKeepTime => 'Conserver le temps';
+
+  @override
+  String get timerIdleTrimTime => 'Déduire le temps inactif';
 }

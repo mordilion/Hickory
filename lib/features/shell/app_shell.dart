@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/hickory_colors.dart';
 import '../../core/widgets/gradient_buttons.dart';
+import '../../l10n/app_localizations.dart';
 import '../entries/manual_entry_dialog.dart';
 import '../reports/reports_screen.dart';
 import '../settings/settings_screen.dart';
@@ -16,33 +17,34 @@ import 'nav_shell.dart';
 class AppShell extends ConsumerWidget {
   const AppShell({super.key});
 
-  static const _destinations = [
+  static List<NavigationDestination> _destinations(AppLocalizations l10n) => [
     NavigationDestination(
-      icon: Icon(Icons.timer_outlined),
-      selectedIcon: Icon(Icons.timer),
-      label: 'Timer',
+      icon: const Icon(Icons.timer_outlined),
+      selectedIcon: const Icon(Icons.timer),
+      label: l10n.navTimer,
     ),
     NavigationDestination(
-      icon: Icon(Icons.bar_chart_outlined),
-      selectedIcon: Icon(Icons.bar_chart),
-      label: 'Reports',
+      icon: const Icon(Icons.bar_chart_outlined),
+      selectedIcon: const Icon(Icons.bar_chart),
+      label: l10n.navReports,
     ),
     NavigationDestination(
-      icon: Icon(Icons.sync_outlined),
-      selectedIcon: Icon(Icons.sync),
-      label: 'Sync',
+      icon: const Icon(Icons.sync_outlined),
+      selectedIcon: const Icon(Icons.sync),
+      label: l10n.navSync,
     ),
     NavigationDestination(
-      icon: Icon(Icons.settings_outlined),
-      selectedIcon: Icon(Icons.settings),
-      label: 'Einstellungen',
+      icon: const Icon(Icons.settings_outlined),
+      selectedIcon: const Icon(Icons.settings),
+      label: l10n.navSettings,
     ),
   ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     return NavShell(
-      destinations: _destinations,
+      destinations: _destinations(l10n),
       children: const [TimerScreen(), ReportsScreen(), SyncScreen(), SettingsScreen()],
       fabBuilder: (selectedIndex) => selectedIndex == 0
           ? GradientFab(

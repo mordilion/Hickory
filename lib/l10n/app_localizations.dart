@@ -213,6 +213,108 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Synchronisierung abgeschlossen.'**
   String get syncCompleted;
+
+  /// No description provided for @navTimer.
+  ///
+  /// In de, this message translates to:
+  /// **'Timer'**
+  String get navTimer;
+
+  /// No description provided for @navReports.
+  ///
+  /// In de, this message translates to:
+  /// **'Reports'**
+  String get navReports;
+
+  /// No description provided for @navSync.
+  ///
+  /// In de, this message translates to:
+  /// **'Sync'**
+  String get navSync;
+
+  /// No description provided for @navSettings.
+  ///
+  /// In de, this message translates to:
+  /// **'Einstellungen'**
+  String get navSettings;
+
+  /// No description provided for @commonNoProject.
+  ///
+  /// In de, this message translates to:
+  /// **'Kein Projekt'**
+  String get commonNoProject;
+
+  /// No description provided for @timerError.
+  ///
+  /// In de, this message translates to:
+  /// **'Fehler: {error}'**
+  String timerError(String error);
+
+  /// No description provided for @timerResume.
+  ///
+  /// In de, this message translates to:
+  /// **'Fortsetzen'**
+  String get timerResume;
+
+  /// No description provided for @timerPause.
+  ///
+  /// In de, this message translates to:
+  /// **'Pause'**
+  String get timerPause;
+
+  /// No description provided for @timerStop.
+  ///
+  /// In de, this message translates to:
+  /// **'Stop'**
+  String get timerStop;
+
+  /// No description provided for @timerDescriptionLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Was arbeitest du gerade?'**
+  String get timerDescriptionLabel;
+
+  /// No description provided for @timerProjectLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Projekt'**
+  String get timerProjectLabel;
+
+  /// No description provided for @timerNewProjectTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Neues Projekt'**
+  String get timerNewProjectTooltip;
+
+  /// No description provided for @timerStart.
+  ///
+  /// In de, this message translates to:
+  /// **'Start'**
+  String get timerStart;
+
+  /// No description provided for @timerIdleTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Inaktiv erkannt'**
+  String get timerIdleTitle;
+
+  /// No description provided for @timerIdleMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Du warst seit {minutes} Minuten inaktiv. Soll diese Zeit vom laufenden Eintrag abgezogen werden?'**
+  String timerIdleMessage(int minutes);
+
+  /// No description provided for @timerIdleKeepTime.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeit behalten'**
+  String get timerIdleKeepTime;
+
+  /// No description provided for @timerIdleTrimTime.
+  ///
+  /// In de, this message translates to:
+  /// **'Inaktive Zeit abziehen'**
+  String get timerIdleTrimTime;
 }
 
 class _AppLocalizationsDelegate

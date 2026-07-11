@@ -17,5 +17,22 @@
   "syncNowButton": "Sync now",
   "syncChooseFolderButton": "Choose folder",
   "syncFolderChosen": "Folder selected: {path}",
-  "syncCompleted": "Sync completed."
+  "syncCompleted": "Sync completed.",
+  "navTimer": "Timer",
+  "navReports": "Reports",
+  "navSync": "Sync",
+  "navSettings": "Settings",
+  "commonNoProject": "No project",
+  "timerError": "Error: {error}",
+  "timerResume": "Resume",
+  "timerPause": "Pause",
+  "timerStop": "Stop",
+  "timerDescriptionLabel": "What are you working on?",
+  "timerProjectLabel": "Project",
+  "timerNewProjectTooltip": "New project",
+  "timerStart": "Start",
+  "timerIdleTitle": "Idle detected",
+  "timerIdleMessage": "You've been idle for {minutes} minutes. Should this time be deducted from the running entry?",
+  "timerIdleKeepTime": "Keep time",
+  "timerIdleTrimTime": "Deduct idle time"
 }

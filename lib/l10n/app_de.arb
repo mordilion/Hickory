@@ -37,5 +37,32 @@
       "path": { "type": "String" }
     }
   },
-  "syncCompleted": "Synchronisierung abgeschlossen."
+  "syncCompleted": "Synchronisierung abgeschlossen.",
+  "navTimer": "Timer",
+  "navReports": "Reports",
+  "navSync": "Sync",
+  "navSettings": "Einstellungen",
+  "commonNoProject": "Kein Projekt",
+  "timerError": "Fehler: {error}",
+  "@timerError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "timerResume": "Fortsetzen",
+  "timerPause": "Pause",
+  "timerStop": "Stop",
+  "timerDescriptionLabel": "Was arbeitest du gerade?",
+  "timerProjectLabel": "Projekt",
+  "timerNewProjectTooltip": "Neues Projekt",
+  "timerStart": "Start",
+  "timerIdleTitle": "Inaktiv erkannt",
+  "timerIdleMessage": "Du warst seit {minutes} Minuten inaktiv. Soll diese Zeit vom laufenden Eintrag abgezogen werden?",
+  "@timerIdleMessage": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "timerIdleKeepTime": "Zeit behalten",
+  "timerIdleTrimTime": "Inaktive Zeit abziehen"
 }

@@ -71,4 +71,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get syncCompleted => 'Sync completed.';
+
+  @override
+  String get navTimer => 'Timer';
+
+  @override
+  String get navReports => 'Reports';
+
+  @override
+  String get navSync => 'Sync';
+
+  @override
+  String get navSettings => 'Settings';
+
+  @override
+  String get commonNoProject => 'No project';
+
+  @override
+  String timerError(String error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String get timerResume => 'Resume';
+
+  @override
+  String get timerPause => 'Pause';
+
+  @override
+  String get timerStop => 'Stop';
+
+  @override
+  String get timerDescriptionLabel => 'What are you working on?';
+
+  @override
+  String get timerProjectLabel => 'Project';
+
+  @override
+  String get timerNewProjectTooltip => 'New project';
+
+  @override
+  String get timerStart => 'Start';
+
+  @override
+  String get timerIdleTitle => 'Idle detected';
+
+  @override
+  String timerIdleMessage(int minutes) {
+    return 'You\'ve been idle for $minutes minutes. Should this time be deducted from the running entry?';
+  }
+
+  @override
+  String get timerIdleKeepTime => 'Keep time';
+
+  @override
+  String get timerIdleTrimTime => 'Deduct idle time';
 }

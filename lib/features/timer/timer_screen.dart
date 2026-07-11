@@ -10,6 +10,7 @@ import '../../core/theme/hickory_colors.dart';
 import '../../core/widgets/gradient_buttons.dart';
 import '../../data/drift/database.dart';
 import '../../data/drift/time_entry_extensions.dart';
+import '../../l10n/app_localizations.dart';
 import '../entries/entries_list.dart';
 import '../projects/new_project_dialog.dart';
 import '../projects/projects_providers.dart';
@@ -105,6 +106,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final runningAsync = ref.watch(runningEntryProvider);
     ref.watch(timerTickProvider);
     ref.watch(syncWatcherProvider);
@@ -137,7 +139,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                     onStart: _start,
                   ),
             loading: () => const CircularProgressIndicator(),
-            error: (e, _) => Text('Fehler: $e'),
+            error: (e, _) => Text(l10n.timerError('$e')),
           ),
           const SizedBox(height: 16),
           const Expanded(child: EntriesList()),
@@ -162,6 +164,7 @@ class _RunningCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final isPaused = running.pausedAt != null;
     final elapsed = running.workedDuration;
     final tokens = HickoryColors.of(context);
@@ -207,7 +210,7 @@ class _RunningCard extends ConsumerWidget {
             children: [
               Expanded(
                 child: GradientPillButton(
-                  label: isPaused ? 'Fortsetzen' : 'Pause',
+                  label: isPaused ? l10n.timerResume : l10n.timerPause,
                   icon: isPaused ? Icons.play_arrow : Icons.pause,
                   gradient: tokens.primaryGradient,
                   foregroundColor: tokens.onPrimaryGradient,
@@ -219,7 +222,7 @@ class _RunningCard extends ConsumerWidget {
                 child: OutlinedButton.icon(
                   onPressed: onStop,
                   icon: const Icon(Icons.stop),
-                  label: const Text('Stop'),
+                  label: Text(l10n.timerStop),
                 ),
               ),
             ],
@@ -245,6 +248,7 @@ class _StartCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final projectsAsync = ref.watch(activeProjectsProvider);
     final tokens = HickoryColors.of(context);
     return Card(
@@ -254,7 +258,7 @@ class _StartCard extends ConsumerWidget {
           children: [
             TextField(
               controller: descriptionController,
-              decoration: const InputDecoration(labelText: 'Was arbeitest du gerade?'),
+              decoration: InputDecoration(labelText: l10n.timerDescriptionLabel),
             ),
             const SizedBox(height: 12),
             Row(
@@ -263,9 +267,9 @@ class _StartCard extends ConsumerWidget {
                   child: projectsAsync.when(
                     data: (projects) => DropdownButtonFormField<String?>(
                       initialValue: selectedProjectId,
-                      decoration: const InputDecoration(labelText: 'Projekt'),
+                      decoration: InputDecoration(labelText: l10n.timerProjectLabel),
                       items: [
-                        const DropdownMenuItem<String?>(value: null, child: Text('Kein Projekt')),
+                        DropdownMenuItem<String?>(value: null, child: Text(l10n.commonNoProject)),
                         ...projects.map(
                           (p) => DropdownMenuItem<String?>(value: p.id, child: Text(p.name)),
                         ),
@@ -273,11 +277,11 @@ class _StartCard extends ConsumerWidget {
                       onChanged: onProjectChanged,
                     ),
                     loading: () => const LinearProgressIndicator(),
-                    error: (e, _) => Text('Fehler: $e'),
+                    error: (e, _) => Text(l10n.timerError('$e')),
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Neues Projekt',
+                  tooltip: l10n.timerNewProjectTooltip,
                   onPressed: () => showNewProjectDialog(context, ref),
                   icon: const Icon(Icons.add_box_outlined),
                 ),
@@ -285,7 +289,7 @@ class _StartCard extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             GradientPillButton(
-              label: 'Start',
+              label: l10n.timerStart,
               icon: Icons.play_arrow,
               gradient: tokens.primaryGradient,
               foregroundColor: tokens.onPrimaryGradient,
