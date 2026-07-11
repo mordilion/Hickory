@@ -24,4 +24,51 @@ class AppLocalizationsDe extends AppLocalizations {
   String settingsLanguageSystem(String language) {
     return 'Systemstandard ($language)';
   }
+
+  @override
+  String get settingsTitle => 'Einstellungen';
+
+  @override
+  String get settingsAutostart => 'Beim Systemstart öffnen';
+
+  @override
+  String get settingsDateFormat => 'Datumsformat';
+
+  @override
+  String get settingsTimeFormat => 'Zeitformat';
+
+  @override
+  String get syncTitle => 'Sync-Einstellungen';
+
+  @override
+  String get syncNoFolderSelected =>
+      'Kein Ordner gewählt – Daten bleiben nur lokal auf diesem Gerät.';
+
+  @override
+  String syncFolderPath(String path) {
+    return 'Sync-Ordner: $path';
+  }
+
+  @override
+  String syncError(String error) {
+    return 'Fehler: $error';
+  }
+
+  @override
+  String get syncFolderDescription =>
+      'Wähle einen Ordner, der bereits von iCloud Drive, Google Drive, Dropbox o.ä. synchronisiert wird. Hickory schreibt dort nur eigene Dateien und synchronisiert sich selbst nicht mit der Cloud.';
+
+  @override
+  String get syncNowButton => 'Jetzt synchronisieren';
+
+  @override
+  String get syncChooseFolderButton => 'Ordner wählen';
+
+  @override
+  String syncFolderChosen(String path) {
+    return 'Ordner gewählt: $path';
+  }
+
+  @override
+  String get syncCompleted => 'Synchronisierung abgeschlossen.';
 }

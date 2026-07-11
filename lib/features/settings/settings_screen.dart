@@ -5,6 +5,7 @@ import '../../core/di/app_settings_provider.dart';
 import '../../core/di/autostart_service.dart';
 import '../../core/di/sync_providers.dart';
 import '../../core/format/date_format.dart';
+import '../../l10n/app_localizations.dart';
 import 'language_dropdown.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -50,6 +51,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final settings = ref.watch(appSettingsProvider).value;
     final dateStyle = settings.dateStyle;
     final timeStyle = settings.timeStyle;
@@ -60,7 +62,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Einstellungen', style: Theme.of(context).textTheme.headlineSmall),
+          Text(l10n.settingsTitle, style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 16),
           Card(
             child: _loading
@@ -69,7 +71,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     child: LinearProgressIndicator(),
                   )
                 : SwitchListTile(
-                    title: const Text('Beim Systemstart öffnen'),
+                    title: Text(l10n.settingsAutostart),
                     value: _autostartEnabled,
                     onChanged: _setAutostart,
                   ),
@@ -83,7 +85,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   DropdownButtonFormField<DateFormatStyle>(
                     initialValue: dateStyle,
-                    decoration: const InputDecoration(labelText: 'Datumsformat'),
+                    decoration: InputDecoration(labelText: l10n.settingsDateFormat),
                     items: DateFormatStyle.values
                         .map(
                           (style) => DropdownMenuItem(
@@ -99,7 +101,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   const SizedBox(height: 12),
                   DropdownButtonFormField<TimeFormatStyle>(
                     initialValue: timeStyle,
-                    decoration: const InputDecoration(labelText: 'Zeitformat'),
+                    decoration: InputDecoration(labelText: l10n.settingsTimeFormat),
                     items: TimeFormatStyle.values
                         .map(
                           (style) => DropdownMenuItem(

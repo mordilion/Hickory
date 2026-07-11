@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/sync_providers.dart';
+import '../../l10n/app_localizations.dart';
 
 class SyncScreen extends ConsumerStatefulWidget {
   const SyncScreen({super.key});
@@ -22,8 +23,10 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
     });
     try {
       final picked = await pickAndApplySyncFolder(ref);
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context);
       setState(() {
-        _statusMessage = picked == null ? null : 'Ordner gewählt: $picked';
+        _statusMessage = picked == null ? null : l10n.syncFolderChosen(picked);
       });
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -38,7 +41,9 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
     try {
       final ingestor = await ref.read(syncIngestorProvider.future);
       await ingestor.syncNow();
-      setState(() => _statusMessage = 'Synchronisierung abgeschlossen.');
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context);
+      setState(() => _statusMessage = l10n.syncCompleted);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -46,6 +51,7 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final folderAsync = ref.watch(configuredSyncFolderPathProvider);
 
     return SingleChildScrollView(
@@ -53,7 +59,7 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Sync-Einstellungen', style: Theme.of(context).textTheme.headlineSmall),
+          Text(l10n.syncTitle, style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 16),
           Card(
             child: Padding(
@@ -64,17 +70,15 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
                   folderAsync.when(
                     data: (path) => Text(
                       path == null
-                          ? 'Kein Ordner gewählt – Daten bleiben nur lokal auf diesem Gerät.'
-                          : 'Sync-Ordner: $path',
+                          ? l10n.syncNoFolderSelected
+                          : l10n.syncFolderPath(path),
                     ),
                     loading: () => const LinearProgressIndicator(),
-                    error: (e, _) => Text('Fehler: $e'),
+                    error: (e, _) => Text(l10n.syncError('$e')),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Wähle einen Ordner, der bereits von iCloud Drive, Google Drive, '
-                    'Dropbox o.ä. synchronisiert wird. Hickory schreibt dort nur '
-                    'eigene Dateien und synchronisiert sich selbst nicht mit der Cloud.',
+                    l10n.syncFolderDescription,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   if (_statusMessage != null) ...[
@@ -88,11 +92,11 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
                     children: [
                       OutlinedButton(
                         onPressed: _busy ? null : _syncNow,
-                        child: const Text('Jetzt synchronisieren'),
+                        child: Text(l10n.syncNowButton),
                       ),
                       FilledButton(
                         onPressed: _busy ? null : _pickFolder,
-                        child: const Text('Ordner wählen'),
+                        child: Text(l10n.syncChooseFolderButton),
                       ),
                     ],
                   ),

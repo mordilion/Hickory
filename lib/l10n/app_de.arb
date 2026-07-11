@@ -9,5 +9,33 @@
     "placeholders": {
       "language": { "type": "String" }
     }
-  }
+  },
+  "settingsTitle": "Einstellungen",
+  "settingsAutostart": "Beim Systemstart öffnen",
+  "settingsDateFormat": "Datumsformat",
+  "settingsTimeFormat": "Zeitformat",
+  "syncTitle": "Sync-Einstellungen",
+  "syncNoFolderSelected": "Kein Ordner gewählt – Daten bleiben nur lokal auf diesem Gerät.",
+  "syncFolderPath": "Sync-Ordner: {path}",
+  "@syncFolderPath": {
+    "placeholders": {
+      "path": { "type": "String" }
+    }
+  },
+  "syncError": "Fehler: {error}",
+  "@syncError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "syncFolderDescription": "Wähle einen Ordner, der bereits von iCloud Drive, Google Drive, Dropbox o.ä. synchronisiert wird. Hickory schreibt dort nur eigene Dateien und synchronisiert sich selbst nicht mit der Cloud.",
+  "syncNowButton": "Jetzt synchronisieren",
+  "syncChooseFolderButton": "Ordner wählen",
+  "syncFolderChosen": "Ordner gewählt: {path}",
+  "@syncFolderChosen": {
+    "placeholders": {
+      "path": { "type": "String" }
+    }
+  },
+  "syncCompleted": "Synchronisierung abgeschlossen."
 }

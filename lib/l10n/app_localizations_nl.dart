@@ -25,4 +25,51 @@ class AppLocalizationsNl extends AppLocalizations {
   String settingsLanguageSystem(String language) {
     return 'Systeemstandaard ($language)';
   }
+
+  @override
+  String get settingsTitle => 'Instellingen';
+
+  @override
+  String get settingsAutostart => 'Openen bij systeemstart';
+
+  @override
+  String get settingsDateFormat => 'Datumnotatie';
+
+  @override
+  String get settingsTimeFormat => 'Tijdnotatie';
+
+  @override
+  String get syncTitle => 'Synchronisatie-instellingen';
+
+  @override
+  String get syncNoFolderSelected =>
+      'Geen map geselecteerd – gegevens blijven alleen op dit apparaat.';
+
+  @override
+  String syncFolderPath(String path) {
+    return 'Synchronisatiemap: $path';
+  }
+
+  @override
+  String syncError(String error) {
+    return 'Fout: $error';
+  }
+
+  @override
+  String get syncFolderDescription =>
+      'Kies een map die al wordt gesynchroniseerd door iCloud Drive, Google Drive, Dropbox of vergelijkbaar. Hickory schrijft daar alleen eigen bestanden en synchroniseert zichzelf niet met de cloud.';
+
+  @override
+  String get syncNowButton => 'Nu synchroniseren';
+
+  @override
+  String get syncChooseFolderButton => 'Map kiezen';
+
+  @override
+  String syncFolderChosen(String path) {
+    return 'Map geselecteerd: $path';
+  }
+
+  @override
+  String get syncCompleted => 'Synchronisatie voltooid.';
 }

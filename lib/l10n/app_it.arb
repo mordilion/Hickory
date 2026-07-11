@@ -4,5 +4,18 @@
   "trayQuit": "Esci",
   "trayBackgroundNotice": "Hickory continua a funzionare in background.",
   "settingsLanguage": "Lingua",
-  "settingsLanguageSystem": "Predefinita di sistema ({language})"
+  "settingsLanguageSystem": "Predefinita di sistema ({language})",
+  "settingsTitle": "Impostazioni",
+  "settingsAutostart": "Avvia all'accensione del sistema",
+  "settingsDateFormat": "Formato data",
+  "settingsTimeFormat": "Formato ora",
+  "syncTitle": "Impostazioni di sincronizzazione",
+  "syncNoFolderSelected": "Nessuna cartella selezionata: i dati restano solo su questo dispositivo.",
+  "syncFolderPath": "Cartella di sincronizzazione: {path}",
+  "syncError": "Errore: {error}",
+  "syncFolderDescription": "Scegli una cartella già sincronizzata da iCloud Drive, Google Drive, Dropbox o simili. Hickory scrive lì solo i propri file e non si sincronizza da solo con il cloud.",
+  "syncNowButton": "Sincronizza ora",
+  "syncChooseFolderButton": "Scegli cartella",
+  "syncFolderChosen": "Cartella selezionata: {path}",
+  "syncCompleted": "Sincronizzazione completata."
 }

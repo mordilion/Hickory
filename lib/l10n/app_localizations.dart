@@ -135,6 +135,84 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Systemstandard ({language})'**
   String settingsLanguageSystem(String language);
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Einstellungen'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsAutostart.
+  ///
+  /// In de, this message translates to:
+  /// **'Beim Systemstart öffnen'**
+  String get settingsAutostart;
+
+  /// No description provided for @settingsDateFormat.
+  ///
+  /// In de, this message translates to:
+  /// **'Datumsformat'**
+  String get settingsDateFormat;
+
+  /// No description provided for @settingsTimeFormat.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeitformat'**
+  String get settingsTimeFormat;
+
+  /// No description provided for @syncTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Sync-Einstellungen'**
+  String get syncTitle;
+
+  /// No description provided for @syncNoFolderSelected.
+  ///
+  /// In de, this message translates to:
+  /// **'Kein Ordner gewählt – Daten bleiben nur lokal auf diesem Gerät.'**
+  String get syncNoFolderSelected;
+
+  /// No description provided for @syncFolderPath.
+  ///
+  /// In de, this message translates to:
+  /// **'Sync-Ordner: {path}'**
+  String syncFolderPath(String path);
+
+  /// No description provided for @syncError.
+  ///
+  /// In de, this message translates to:
+  /// **'Fehler: {error}'**
+  String syncError(String error);
+
+  /// No description provided for @syncFolderDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Wähle einen Ordner, der bereits von iCloud Drive, Google Drive, Dropbox o.ä. synchronisiert wird. Hickory schreibt dort nur eigene Dateien und synchronisiert sich selbst nicht mit der Cloud.'**
+  String get syncFolderDescription;
+
+  /// No description provided for @syncNowButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Jetzt synchronisieren'**
+  String get syncNowButton;
+
+  /// No description provided for @syncChooseFolderButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Ordner wählen'**
+  String get syncChooseFolderButton;
+
+  /// No description provided for @syncFolderChosen.
+  ///
+  /// In de, this message translates to:
+  /// **'Ordner gewählt: {path}'**
+  String syncFolderChosen(String path);
+
+  /// No description provided for @syncCompleted.
+  ///
+  /// In de, this message translates to:
+  /// **'Synchronisierung abgeschlossen.'**
+  String get syncCompleted;
 }
 
 class _AppLocalizationsDelegate

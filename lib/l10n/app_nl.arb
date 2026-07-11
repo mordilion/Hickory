@@ -4,5 +4,18 @@
   "trayQuit": "Afsluiten",
   "trayBackgroundNotice": "Hickory blijft op de achtergrond draaien.",
   "settingsLanguage": "Taal",
-  "settingsLanguageSystem": "Systeemstandaard ({language})"
+  "settingsLanguageSystem": "Systeemstandaard ({language})",
+  "settingsTitle": "Instellingen",
+  "settingsAutostart": "Openen bij systeemstart",
+  "settingsDateFormat": "Datumnotatie",
+  "settingsTimeFormat": "Tijdnotatie",
+  "syncTitle": "Synchronisatie-instellingen",
+  "syncNoFolderSelected": "Geen map geselecteerd – gegevens blijven alleen op dit apparaat.",
+  "syncFolderPath": "Synchronisatiemap: {path}",
+  "syncError": "Fout: {error}",
+  "syncFolderDescription": "Kies een map die al wordt gesynchroniseerd door iCloud Drive, Google Drive, Dropbox of vergelijkbaar. Hickory schrijft daar alleen eigen bestanden en synchroniseert zichzelf niet met de cloud.",
+  "syncNowButton": "Nu synchroniseren",
+  "syncChooseFolderButton": "Map kiezen",
+  "syncFolderChosen": "Map geselecteerd: {path}",
+  "syncCompleted": "Synchronisatie voltooid."
 }
