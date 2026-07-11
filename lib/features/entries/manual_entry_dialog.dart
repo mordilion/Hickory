@@ -7,6 +7,7 @@ import '../../core/di/device_id_provider.dart';
 import '../../core/di/sync_providers.dart';
 import '../../core/format/date_format.dart';
 import '../../data/drift/database.dart';
+import '../../l10n/app_localizations.dart';
 import '../projects/projects_providers.dart';
 
 Future<void> showManualEntryDialog(
@@ -78,7 +79,7 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
   Future<void> _save() async {
     if (_endAt.isBefore(_startAt)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ende muss nach dem Start liegen.')),
+        SnackBar(content: Text(AppLocalizations.of(context).entriesEndBeforeStartError)),
       );
       return;
     }
@@ -110,13 +111,16 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final projectsAsync = ref.watch(activeProjectsProvider);
     final settings = ref.watch(appSettingsProvider).value;
     final dateStyle = settings.dateStyle;
     final timeStyle = settings.timeStyle;
 
     return AlertDialog(
-      title: Text(widget.existing == null ? 'Manueller Eintrag' : 'Eintrag bearbeiten'),
+      title: Text(
+        widget.existing == null ? l10n.entriesManualEntryTitle : l10n.entriesEditEntryTitle,
+      ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -124,15 +128,15 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
           children: [
             TextField(
               controller: _descriptionController,
-              decoration: const InputDecoration(labelText: 'Beschreibung'),
+              decoration: InputDecoration(labelText: l10n.entriesDescriptionLabel),
             ),
             const SizedBox(height: 12),
             projectsAsync.when(
               data: (projects) => DropdownButtonFormField<String?>(
                 initialValue: _projectId,
-                decoration: const InputDecoration(labelText: 'Projekt'),
+                decoration: InputDecoration(labelText: l10n.entriesProjectLabel),
                 items: [
-                  const DropdownMenuItem<String?>(value: null, child: Text('Kein Projekt')),
+                  DropdownMenuItem<String?>(value: null, child: Text(l10n.commonNoProject)),
                   ...projects.map(
                     (p) => DropdownMenuItem<String?>(value: p.id, child: Text(p.name)),
                   ),
@@ -140,12 +144,12 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
                 onChanged: (value) => setState(() => _projectId = value),
               ),
               loading: () => const LinearProgressIndicator(),
-              error: (e, _) => Text('Fehler: $e'),
+              error: (e, _) => Text(l10n.entriesError(e.toString())),
             ),
             const SizedBox(height: 12),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Start'),
+              title: Text(l10n.entriesStartLabel),
               subtitle: Text(
                 '${formatDate(_startAt, dateStyle, Localizations.localeOf(context).languageCode)} '
                 '${formatTime(_startAt, timeStyle)}',
@@ -154,7 +158,7 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Ende'),
+              title: Text(l10n.entriesEndLabel),
               subtitle: Text(
                 '${formatDate(_endAt, dateStyle, Localizations.localeOf(context).languageCode)} '
                 '${formatTime(_endAt, timeStyle)}',
@@ -167,9 +171,9 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Abbrechen'),
+          child: Text(l10n.commonCancel),
         ),
-        FilledButton(onPressed: _save, child: const Text('Speichern')),
+        FilledButton(onPressed: _save, child: Text(l10n.commonSave)),
       ],
     );
   }

@@ -34,5 +34,20 @@
   "timerIdleTitle": "Inactiviteit gedetecteerd",
   "timerIdleMessage": "Je bent al {minutes} minuten inactief. Wil je deze tijd van de lopende invoer aftrekken?",
   "timerIdleKeepTime": "Tijd behouden",
-  "timerIdleTrimTime": "Inactieve tijd aftrekken"
+  "timerIdleTrimTime": "Inactieve tijd aftrekken",
+  "commonCancel": "Annuleren",
+  "commonSave": "Opslaan",
+  "entriesEmpty": "Nog geen invoer.",
+  "entriesNoDescription": "Zonder beschrijving",
+  "entriesError": "Fout: {error}",
+  "entriesManualEntryTitle": "Handmatige invoer",
+  "entriesEditEntryTitle": "Invoer bewerken",
+  "entriesDescriptionLabel": "Beschrijving",
+  "entriesProjectLabel": "Project",
+  "entriesStartLabel": "Start",
+  "entriesEndLabel": "Einde",
+  "entriesEndBeforeStartError": "Het einde moet na het begin liggen.",
+  "projectsNewProjectTitle": "Nieuw project",
+  "projectsNameLabel": "Naam",
+  "projectsCreateButton": "Aanmaken"
 }

@@ -126,4 +126,51 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get timerIdleTrimTime => 'Inaktive Zeit abziehen';
+
+  @override
+  String get commonCancel => 'Abbrechen';
+
+  @override
+  String get commonSave => 'Speichern';
+
+  @override
+  String get entriesEmpty => 'Noch keine Einträge.';
+
+  @override
+  String get entriesNoDescription => 'Ohne Beschreibung';
+
+  @override
+  String entriesError(String error) {
+    return 'Fehler: $error';
+  }
+
+  @override
+  String get entriesManualEntryTitle => 'Manueller Eintrag';
+
+  @override
+  String get entriesEditEntryTitle => 'Eintrag bearbeiten';
+
+  @override
+  String get entriesDescriptionLabel => 'Beschreibung';
+
+  @override
+  String get entriesProjectLabel => 'Projekt';
+
+  @override
+  String get entriesStartLabel => 'Start';
+
+  @override
+  String get entriesEndLabel => 'Ende';
+
+  @override
+  String get entriesEndBeforeStartError => 'Ende muss nach dem Start liegen.';
+
+  @override
+  String get projectsNewProjectTitle => 'Neues Projekt';
+
+  @override
+  String get projectsNameLabel => 'Name';
+
+  @override
+  String get projectsCreateButton => 'Erstellen';
 }

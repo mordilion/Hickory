@@ -315,6 +315,96 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Inaktive Zeit abziehen'**
   String get timerIdleTrimTime;
+
+  /// No description provided for @commonCancel.
+  ///
+  /// In de, this message translates to:
+  /// **'Abbrechen'**
+  String get commonCancel;
+
+  /// No description provided for @commonSave.
+  ///
+  /// In de, this message translates to:
+  /// **'Speichern'**
+  String get commonSave;
+
+  /// No description provided for @entriesEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Einträge.'**
+  String get entriesEmpty;
+
+  /// No description provided for @entriesNoDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Ohne Beschreibung'**
+  String get entriesNoDescription;
+
+  /// No description provided for @entriesError.
+  ///
+  /// In de, this message translates to:
+  /// **'Fehler: {error}'**
+  String entriesError(String error);
+
+  /// No description provided for @entriesManualEntryTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Manueller Eintrag'**
+  String get entriesManualEntryTitle;
+
+  /// No description provided for @entriesEditEntryTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Eintrag bearbeiten'**
+  String get entriesEditEntryTitle;
+
+  /// No description provided for @entriesDescriptionLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Beschreibung'**
+  String get entriesDescriptionLabel;
+
+  /// No description provided for @entriesProjectLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Projekt'**
+  String get entriesProjectLabel;
+
+  /// No description provided for @entriesStartLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Start'**
+  String get entriesStartLabel;
+
+  /// No description provided for @entriesEndLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Ende'**
+  String get entriesEndLabel;
+
+  /// No description provided for @entriesEndBeforeStartError.
+  ///
+  /// In de, this message translates to:
+  /// **'Ende muss nach dem Start liegen.'**
+  String get entriesEndBeforeStartError;
+
+  /// No description provided for @projectsNewProjectTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Neues Projekt'**
+  String get projectsNewProjectTitle;
+
+  /// No description provided for @projectsNameLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Name'**
+  String get projectsNameLabel;
+
+  /// No description provided for @projectsCreateButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Erstellen'**
+  String get projectsCreateButton;
 }
 
 class _AppLocalizationsDelegate

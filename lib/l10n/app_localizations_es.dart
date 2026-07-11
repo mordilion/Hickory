@@ -127,4 +127,52 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get timerIdleTrimTime => 'Restar el tiempo inactivo';
+
+  @override
+  String get commonCancel => 'Cancelar';
+
+  @override
+  String get commonSave => 'Guardar';
+
+  @override
+  String get entriesEmpty => 'Aún no hay entradas.';
+
+  @override
+  String get entriesNoDescription => 'Sin descripción';
+
+  @override
+  String entriesError(String error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String get entriesManualEntryTitle => 'Entrada manual';
+
+  @override
+  String get entriesEditEntryTitle => 'Editar entrada';
+
+  @override
+  String get entriesDescriptionLabel => 'Descripción';
+
+  @override
+  String get entriesProjectLabel => 'Proyecto';
+
+  @override
+  String get entriesStartLabel => 'Inicio';
+
+  @override
+  String get entriesEndLabel => 'Fin';
+
+  @override
+  String get entriesEndBeforeStartError =>
+      'El fin debe ser posterior al inicio.';
+
+  @override
+  String get projectsNewProjectTitle => 'Nuevo proyecto';
+
+  @override
+  String get projectsNameLabel => 'Nombre';
+
+  @override
+  String get projectsCreateButton => 'Crear';
 }

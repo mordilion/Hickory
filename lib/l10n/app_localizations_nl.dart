@@ -127,4 +127,52 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get timerIdleTrimTime => 'Inactieve tijd aftrekken';
+
+  @override
+  String get commonCancel => 'Annuleren';
+
+  @override
+  String get commonSave => 'Opslaan';
+
+  @override
+  String get entriesEmpty => 'Nog geen invoer.';
+
+  @override
+  String get entriesNoDescription => 'Zonder beschrijving';
+
+  @override
+  String entriesError(String error) {
+    return 'Fout: $error';
+  }
+
+  @override
+  String get entriesManualEntryTitle => 'Handmatige invoer';
+
+  @override
+  String get entriesEditEntryTitle => 'Invoer bewerken';
+
+  @override
+  String get entriesDescriptionLabel => 'Beschrijving';
+
+  @override
+  String get entriesProjectLabel => 'Project';
+
+  @override
+  String get entriesStartLabel => 'Start';
+
+  @override
+  String get entriesEndLabel => 'Einde';
+
+  @override
+  String get entriesEndBeforeStartError =>
+      'Het einde moet na het begin liggen.';
+
+  @override
+  String get projectsNewProjectTitle => 'Nieuw project';
+
+  @override
+  String get projectsNameLabel => 'Naam';
+
+  @override
+  String get projectsCreateButton => 'Aanmaken';
 }

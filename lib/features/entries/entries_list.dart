@@ -7,6 +7,7 @@ import '../../core/format/date_format.dart';
 import '../../core/format/duration_format.dart';
 import '../../data/drift/database.dart';
 import '../../data/drift/time_entry_extensions.dart';
+import '../../l10n/app_localizations.dart';
 import '../projects/projects_providers.dart';
 import '../timer/timer_providers.dart';
 import 'manual_entry_dialog.dart';
@@ -21,6 +22,7 @@ class EntriesList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final entriesAsync = ref.watch(allEntriesProvider);
     final projectsAsync = ref.watch(activeProjectsProvider);
     final settings = ref.watch(appSettingsProvider).value;
@@ -31,7 +33,7 @@ class EntriesList extends ConsumerWidget {
       data: (entries) {
         final finished = entries.where((e) => e.endAt != null).toList();
         if (finished.isEmpty) {
-          return const Center(child: Text('Noch keine Einträge.'));
+          return Center(child: Text(l10n.entriesEmpty));
         }
         final projectsById = {
           for (final p in projectsAsync.value ?? const <Project>[]) p.id: p,
@@ -73,9 +75,9 @@ class EntriesList extends ConsumerWidget {
                   ),
                   title: Text(entry.description?.isNotEmpty == true
                       ? entry.description!
-                      : (project?.name ?? 'Ohne Beschreibung')),
+                      : (project?.name ?? l10n.entriesNoDescription)),
                   subtitle: Text(
-                    '${project?.name ?? 'Kein Projekt'} · '
+                    '${project?.name ?? l10n.commonNoProject} · '
                     '${formatDate(entry.startAt, dateStyle, Localizations.localeOf(context).languageCode)} '
                     '${formatTime(entry.startAt, timeStyle)}',
                   ),
@@ -88,7 +90,7 @@ class EntriesList extends ConsumerWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(child: Text('Fehler: $error')),
+      error: (error, stack) => Center(child: Text(l10n.entriesError(error.toString()))),
     );
   }
 }

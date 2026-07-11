@@ -34,5 +34,20 @@
   "timerIdleTitle": "Inattività rilevata",
   "timerIdleMessage": "Sei stato inattivo per {minutes} minuti. Vuoi sottrarre questo tempo dalla voce in corso?",
   "timerIdleKeepTime": "Mantieni il tempo",
-  "timerIdleTrimTime": "Sottrai il tempo inattivo"
+  "timerIdleTrimTime": "Sottrai il tempo inattivo",
+  "commonCancel": "Annulla",
+  "commonSave": "Salva",
+  "entriesEmpty": "Ancora nessuna voce.",
+  "entriesNoDescription": "Senza descrizione",
+  "entriesError": "Errore: {error}",
+  "entriesManualEntryTitle": "Voce manuale",
+  "entriesEditEntryTitle": "Modifica voce",
+  "entriesDescriptionLabel": "Descrizione",
+  "entriesProjectLabel": "Progetto",
+  "entriesStartLabel": "Inizio",
+  "entriesEndLabel": "Fine",
+  "entriesEndBeforeStartError": "La fine deve essere successiva all'inizio.",
+  "projectsNewProjectTitle": "Nuovo progetto",
+  "projectsNameLabel": "Nome",
+  "projectsCreateButton": "Crea"
 }

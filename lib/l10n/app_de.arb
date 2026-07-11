@@ -64,5 +64,25 @@
     }
   },
   "timerIdleKeepTime": "Zeit behalten",
-  "timerIdleTrimTime": "Inaktive Zeit abziehen"
+  "timerIdleTrimTime": "Inaktive Zeit abziehen",
+  "commonCancel": "Abbrechen",
+  "commonSave": "Speichern",
+  "entriesEmpty": "Noch keine Einträge.",
+  "entriesNoDescription": "Ohne Beschreibung",
+  "entriesError": "Fehler: {error}",
+  "@entriesError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "entriesManualEntryTitle": "Manueller Eintrag",
+  "entriesEditEntryTitle": "Eintrag bearbeiten",
+  "entriesDescriptionLabel": "Beschreibung",
+  "entriesProjectLabel": "Projekt",
+  "entriesStartLabel": "Start",
+  "entriesEndLabel": "Ende",
+  "entriesEndBeforeStartError": "Ende muss nach dem Start liegen.",
+  "projectsNewProjectTitle": "Neues Projekt",
+  "projectsNameLabel": "Name",
+  "projectsCreateButton": "Erstellen"
 }

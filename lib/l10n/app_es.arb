@@ -34,5 +34,20 @@
   "timerIdleTitle": "Inactividad detectada",
   "timerIdleMessage": "Has estado inactivo durante {minutes} minutos. ¿Quieres restar este tiempo de la entrada en curso?",
   "timerIdleKeepTime": "Mantener el tiempo",
-  "timerIdleTrimTime": "Restar el tiempo inactivo"
+  "timerIdleTrimTime": "Restar el tiempo inactivo",
+  "commonCancel": "Cancelar",
+  "commonSave": "Guardar",
+  "entriesEmpty": "Aún no hay entradas.",
+  "entriesNoDescription": "Sin descripción",
+  "entriesError": "Error: {error}",
+  "entriesManualEntryTitle": "Entrada manual",
+  "entriesEditEntryTitle": "Editar entrada",
+  "entriesDescriptionLabel": "Descripción",
+  "entriesProjectLabel": "Proyecto",
+  "entriesStartLabel": "Inicio",
+  "entriesEndLabel": "Fin",
+  "entriesEndBeforeStartError": "El fin debe ser posterior al inicio.",
+  "projectsNewProjectTitle": "Nuevo proyecto",
+  "projectsNameLabel": "Nombre",
+  "projectsCreateButton": "Crear"
 }

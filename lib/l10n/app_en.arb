@@ -34,5 +34,20 @@
   "timerIdleTitle": "Idle detected",
   "timerIdleMessage": "You've been idle for {minutes} minutes. Should this time be deducted from the running entry?",
   "timerIdleKeepTime": "Keep time",
-  "timerIdleTrimTime": "Deduct idle time"
+  "timerIdleTrimTime": "Deduct idle time",
+  "commonCancel": "Cancel",
+  "commonSave": "Save",
+  "entriesEmpty": "No entries yet.",
+  "entriesNoDescription": "No description",
+  "entriesError": "Error: {error}",
+  "entriesManualEntryTitle": "Manual entry",
+  "entriesEditEntryTitle": "Edit entry",
+  "entriesDescriptionLabel": "Description",
+  "entriesProjectLabel": "Project",
+  "entriesStartLabel": "Start",
+  "entriesEndLabel": "End",
+  "entriesEndBeforeStartError": "End must be after the start.",
+  "projectsNewProjectTitle": "New project",
+  "projectsNameLabel": "Name",
+  "projectsCreateButton": "Create"
 }
