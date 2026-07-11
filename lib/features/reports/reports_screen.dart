@@ -10,6 +10,7 @@ import '../../core/format/date_format.dart';
 import '../../core/format/duration_format.dart';
 import '../../core/theme/hickory_colors.dart';
 import '../../data/drift/database.dart';
+import '../../l10n/app_localizations.dart';
 import 'csv_export.dart';
 import 'report_calculations.dart';
 import 'reports_providers.dart';
@@ -53,26 +54,29 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   }
 
   Future<void> _exportCsv(List<TimeEntry> entries, List<Project> projects) async {
+    final l10n = AppLocalizations.of(context);
     final settings = ref.read(appSettingsProvider).value;
     final csv = entriesToCsv(
       entries,
       projects,
+      l10n: l10n,
       dateFormatStyle: settings.dateStyle,
       timeFormatStyle: settings.timeStyle,
     );
     final path = await FilePicker.saveFile(
-      dialogTitle: 'CSV exportieren',
+      dialogTitle: l10n.reportsExportCsv,
       fileName: 'hickory-export.csv',
       type: FileType.custom,
       allowedExtensions: ['csv'],
       bytes: Uint8List.fromList(utf8.encode(csv)),
     );
     if (!mounted) return;
-    setState(() => _exportStatus = path == null ? null : 'Exportiert nach: $path');
+    setState(() => _exportStatus = path == null ? null : l10n.reportsExportedTo(path));
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final entriesAsync = ref.watch(reportEntriesProvider);
     final projectsAsync = ref.watch(reportProjectsProvider);
     final tokens = HickoryColors.of(context);
@@ -82,18 +86,18 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Reports', style: Theme.of(context).textTheme.headlineSmall),
+          Text(l10n.reportsTitle, style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
-              _presetChip('Diese Woche', ReportRangePreset.thisWeek, tokens),
-              _presetChip('Dieser Monat', ReportRangePreset.thisMonth, tokens),
-              _presetChip('Letzte 30 Tage', ReportRangePreset.last30Days, tokens),
-              _presetChip('Alle', ReportRangePreset.all, tokens),
+              _presetChip(l10n.reportsThisWeek, ReportRangePreset.thisWeek, tokens),
+              _presetChip(l10n.reportsThisMonth, ReportRangePreset.thisMonth, tokens),
+              _presetChip(l10n.reportsLast30Days, ReportRangePreset.last30Days, tokens),
+              _presetChip(l10n.reportsAll, ReportRangePreset.all, tokens),
               ActionChip(
-                label: const Text('Benutzerdefiniert…'),
+                label: Text(l10n.reportsCustomRange),
                 onPressed: _selectCustomRange,
               ),
             ],
@@ -108,10 +112,10 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                   onExport: () => _exportCsv(entries, projects),
                 ),
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Center(child: Text('Fehler: $e')),
+                error: (e, _) => Center(child: Text(l10n.reportsError(e.toString()))),
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Fehler: $e')),
+              error: (e, _) => Center(child: Text(l10n.reportsError(e.toString()))),
             ),
           ),
           if (_exportStatus != null) ...[
@@ -143,7 +147,8 @@ class _ReportBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final totals = totalsByProject(entries, projects);
+    final l10n = AppLocalizations.of(context);
+    final totals = totalsByProject(entries, projects, noProjectLabel: l10n.commonNoProject);
     final totalDuration = totals.fold<Duration>(Duration.zero, (sum, t) => sum + t.duration);
 
     return Column(
@@ -153,20 +158,20 @@ class _ReportBody extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Gesamt: ${formatDuration(totalDuration)}',
+              l10n.reportsTotal(formatDuration(totalDuration)),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             FilledButton.icon(
               onPressed: entries.isEmpty ? null : onExport,
               icon: const Icon(Icons.download),
-              label: const Text('CSV exportieren'),
+              label: Text(l10n.reportsExportCsv),
             ),
           ],
         ),
         const SizedBox(height: 12),
         Expanded(
           child: totals.isEmpty
-              ? const Center(child: Text('Keine Einträge in diesem Zeitraum.'))
+              ? Center(child: Text(l10n.reportsEmptyRange))
               : ListView.builder(
                   itemCount: totals.length,
                   itemBuilder: (context, index) {

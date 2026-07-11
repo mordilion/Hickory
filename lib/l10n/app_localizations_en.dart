@@ -173,4 +173,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get projectsCreateButton => 'Create';
+
+  @override
+  String get reportsTitle => 'Reports';
+
+  @override
+  String get reportsThisWeek => 'This week';
+
+  @override
+  String get reportsThisMonth => 'This month';
+
+  @override
+  String get reportsLast30Days => 'Last 30 days';
+
+  @override
+  String get reportsAll => 'All';
+
+  @override
+  String get reportsCustomRange => 'Custom…';
+
+  @override
+  String reportsError(String error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String get reportsExportCsv => 'Export CSV';
+
+  @override
+  String reportsExportedTo(String path) {
+    return 'Exported to: $path';
+  }
+
+  @override
+  String reportsTotal(String duration) {
+    return 'Total: $duration';
+  }
+
+  @override
+  String get reportsEmptyRange => 'No entries in this period.';
+
+  @override
+  String get csvHeaderDate => 'Date';
+
+  @override
+  String get csvHeaderStart => 'Start';
+
+  @override
+  String get csvHeaderEnd => 'End';
+
+  @override
+  String get csvHeaderDurationHours => 'Duration (h)';
+
+  @override
+  String get csvHeaderProject => 'Project';
+
+  @override
+  String get csvHeaderDescription => 'Description';
+
+  @override
+  String get csvHeaderBillable => 'Billable';
+
+  @override
+  String get csvHeaderAmount => 'Amount';
+
+  @override
+  String get csvHeaderCurrency => 'Currency';
+
+  @override
+  String get csvYes => 'yes';
+
+  @override
+  String get csvNo => 'no';
 }

@@ -24,10 +24,15 @@ class ProjectTotal {
 }
 
 /// Sums finished entries' durations by project (entries with no project are
-/// grouped under a null key / "Kein Projekt"), computing a billable amount
-/// wherever the project is billable and has an hourly rate. Sorted by
-/// duration, longest first.
-List<ProjectTotal> totalsByProject(List<TimeEntry> entries, List<Project> projects) {
+/// grouped under a null key, named [noProjectLabel] — pass the localized
+/// text; the default keeps today's German for callers that don't care),
+/// computing a billable amount wherever the project is billable and has an
+/// hourly rate. Sorted by duration, longest first.
+List<ProjectTotal> totalsByProject(
+  List<TimeEntry> entries,
+  List<Project> projects, {
+  String noProjectLabel = 'Kein Projekt',
+}) {
   final projectsById = {for (final p in projects) p.id: p};
   final durationByProject = <String?, Duration>{};
 
@@ -51,7 +56,7 @@ List<ProjectTotal> totalsByProject(List<TimeEntry> entries, List<Project> projec
     totals.add(
       ProjectTotal(
         projectId: projectId,
-        projectName: project?.name ?? 'Kein Projekt',
+        projectName: project?.name ?? noProjectLabel,
         duration: duration,
         billable: billable,
         amountCents: amountCents,

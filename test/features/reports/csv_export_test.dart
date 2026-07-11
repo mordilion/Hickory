@@ -1,14 +1,22 @@
+import 'dart:ui';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/core/format/date_format.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/features/reports/csv_export.dart';
+import 'package:hickory/l10n/app_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
+  // German localizations everywhere: the default language must keep producing
+  // byte-identical CSV output so existing consumers don't break.
+  final l10n = lookupAppLocalizations(const Locale('de'));
+
   setUpAll(() async {
     await initializeDateFormatting('de_DE');
     await initializeDateFormatting('en_US');
   });
+
   test('entriesToCsv writes one row per finished entry with a header', () {
     final now = DateTime.utc(2026, 7, 1);
     final project = Project(
@@ -35,11 +43,16 @@ void main() {
       totalPausedSeconds: 0,
     );
 
-    final csv = entriesToCsv([entry], [project]);
+    final csv = entriesToCsv([entry], [project], l10n: l10n);
     final lines = csv.trim().split('\r\n');
 
     expect(lines, hasLength(2));
-    expect(lines[0], contains('Datum'));
+    // Regression guard: the German header row must stay byte-identical to the
+    // pre-localization output.
+    expect(
+      lines[0],
+      'Datum,Start,Ende,Dauer (Std),Projekt,Beschreibung,Abrechenbar,Betrag,Währung',
+    );
     expect(lines[1], contains('Client X'));
     expect(lines[1], contains('Design review'));
     expect(lines[1], contains('1.50')); // 1h30m
@@ -58,7 +71,7 @@ void main() {
       totalPausedSeconds: 0,
     );
 
-    final csv = entriesToCsv([running], const []);
+    final csv = entriesToCsv([running], const [], l10n: l10n);
 
     expect(csv.trim().split('\r\n'), hasLength(1)); // header only
   });
@@ -89,7 +102,7 @@ void main() {
       updatedAt: now,
     );
 
-    final csv = entriesToCsv([entry], [project]);
+    final csv = entriesToCsv([entry], [project], l10n: l10n);
     final lines = csv.trim().split('\r\n');
 
     expect(lines[1], contains('1.50')); // 2h - 30min = 1.5h
@@ -111,6 +124,7 @@ void main() {
     final csv = entriesToCsv(
       [entry],
       const [],
+      l10n: l10n,
       dateFormatStyle: DateFormatStyle.de,
       timeFormatStyle: TimeFormatStyle.h12,
     );
@@ -137,7 +151,7 @@ void main() {
       totalPausedSeconds: 0,
     );
 
-    final csv = entriesToCsv([entry], const []);
+    final csv = entriesToCsv([entry], const [], l10n: l10n);
     final row = csv.trim().split('\r\n')[1];
 
     expect(row, matches(RegExp(r'\d{4}-\d{2}-\d{2}')));

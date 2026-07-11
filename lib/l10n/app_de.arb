@@ -84,5 +84,42 @@
   "entriesEndBeforeStartError": "Ende muss nach dem Start liegen.",
   "projectsNewProjectTitle": "Neues Projekt",
   "projectsNameLabel": "Name",
-  "projectsCreateButton": "Erstellen"
+  "projectsCreateButton": "Erstellen",
+  "reportsTitle": "Reports",
+  "reportsThisWeek": "Diese Woche",
+  "reportsThisMonth": "Dieser Monat",
+  "reportsLast30Days": "Letzte 30 Tage",
+  "reportsAll": "Alle",
+  "reportsCustomRange": "Benutzerdefiniert…",
+  "reportsError": "Fehler: {error}",
+  "@reportsError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "reportsExportCsv": "CSV exportieren",
+  "reportsExportedTo": "Exportiert nach: {path}",
+  "@reportsExportedTo": {
+    "placeholders": {
+      "path": { "type": "String" }
+    }
+  },
+  "reportsTotal": "Gesamt: {duration}",
+  "@reportsTotal": {
+    "placeholders": {
+      "duration": { "type": "String" }
+    }
+  },
+  "reportsEmptyRange": "Keine Einträge in diesem Zeitraum.",
+  "csvHeaderDate": "Datum",
+  "csvHeaderStart": "Start",
+  "csvHeaderEnd": "Ende",
+  "csvHeaderDurationHours": "Dauer (Std)",
+  "csvHeaderProject": "Projekt",
+  "csvHeaderDescription": "Beschreibung",
+  "csvHeaderBillable": "Abrechenbar",
+  "csvHeaderAmount": "Betrag",
+  "csvHeaderCurrency": "Währung",
+  "csvYes": "ja",
+  "csvNo": "nein"
 }

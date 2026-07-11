@@ -405,6 +405,138 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Erstellen'**
   String get projectsCreateButton;
+
+  /// No description provided for @reportsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Reports'**
+  String get reportsTitle;
+
+  /// No description provided for @reportsThisWeek.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Woche'**
+  String get reportsThisWeek;
+
+  /// No description provided for @reportsThisMonth.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Monat'**
+  String get reportsThisMonth;
+
+  /// No description provided for @reportsLast30Days.
+  ///
+  /// In de, this message translates to:
+  /// **'Letzte 30 Tage'**
+  String get reportsLast30Days;
+
+  /// No description provided for @reportsAll.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle'**
+  String get reportsAll;
+
+  /// No description provided for @reportsCustomRange.
+  ///
+  /// In de, this message translates to:
+  /// **'Benutzerdefiniert…'**
+  String get reportsCustomRange;
+
+  /// No description provided for @reportsError.
+  ///
+  /// In de, this message translates to:
+  /// **'Fehler: {error}'**
+  String reportsError(String error);
+
+  /// No description provided for @reportsExportCsv.
+  ///
+  /// In de, this message translates to:
+  /// **'CSV exportieren'**
+  String get reportsExportCsv;
+
+  /// No description provided for @reportsExportedTo.
+  ///
+  /// In de, this message translates to:
+  /// **'Exportiert nach: {path}'**
+  String reportsExportedTo(String path);
+
+  /// No description provided for @reportsTotal.
+  ///
+  /// In de, this message translates to:
+  /// **'Gesamt: {duration}'**
+  String reportsTotal(String duration);
+
+  /// No description provided for @reportsEmptyRange.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Einträge in diesem Zeitraum.'**
+  String get reportsEmptyRange;
+
+  /// No description provided for @csvHeaderDate.
+  ///
+  /// In de, this message translates to:
+  /// **'Datum'**
+  String get csvHeaderDate;
+
+  /// No description provided for @csvHeaderStart.
+  ///
+  /// In de, this message translates to:
+  /// **'Start'**
+  String get csvHeaderStart;
+
+  /// No description provided for @csvHeaderEnd.
+  ///
+  /// In de, this message translates to:
+  /// **'Ende'**
+  String get csvHeaderEnd;
+
+  /// No description provided for @csvHeaderDurationHours.
+  ///
+  /// In de, this message translates to:
+  /// **'Dauer (Std)'**
+  String get csvHeaderDurationHours;
+
+  /// No description provided for @csvHeaderProject.
+  ///
+  /// In de, this message translates to:
+  /// **'Projekt'**
+  String get csvHeaderProject;
+
+  /// No description provided for @csvHeaderDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Beschreibung'**
+  String get csvHeaderDescription;
+
+  /// No description provided for @csvHeaderBillable.
+  ///
+  /// In de, this message translates to:
+  /// **'Abrechenbar'**
+  String get csvHeaderBillable;
+
+  /// No description provided for @csvHeaderAmount.
+  ///
+  /// In de, this message translates to:
+  /// **'Betrag'**
+  String get csvHeaderAmount;
+
+  /// No description provided for @csvHeaderCurrency.
+  ///
+  /// In de, this message translates to:
+  /// **'Währung'**
+  String get csvHeaderCurrency;
+
+  /// No description provided for @csvYes.
+  ///
+  /// In de, this message translates to:
+  /// **'ja'**
+  String get csvYes;
+
+  /// No description provided for @csvNo.
+  ///
+  /// In de, this message translates to:
+  /// **'nein'**
+  String get csvNo;
 }
 
 class _AppLocalizationsDelegate

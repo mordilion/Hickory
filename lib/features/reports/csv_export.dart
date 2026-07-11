@@ -3,27 +3,31 @@ import 'package:csv/csv.dart';
 import '../../core/format/date_format.dart';
 import '../../data/drift/database.dart';
 import '../../data/drift/time_entry_extensions.dart';
+import '../../l10n/app_localizations.dart';
 
 /// One row per finished entry, in chronological order. Amounts follow the
-/// same billable-project-with-hourly-rate rule as [totalsByProject].
+/// same billable-project-with-hourly-rate rule as [totalsByProject]. Column
+/// headers and the billable yes/no values follow [l10n] (callers without a
+/// BuildContext can use `lookupAppLocalizations`).
 String entriesToCsv(
   List<TimeEntry> entries,
   List<Project> projects, {
+  required AppLocalizations l10n,
   DateFormatStyle dateFormatStyle = defaultDateFormatStyle,
   TimeFormatStyle timeFormatStyle = defaultTimeFormatStyle,
 }) {
   final projectsById = {for (final p in projects) p.id: p};
   final rows = <List<dynamic>>[
     [
-      'Datum',
-      'Start',
-      'Ende',
-      'Dauer (Std)',
-      'Projekt',
-      'Beschreibung',
-      'Abrechenbar',
-      'Betrag',
-      'Währung',
+      l10n.csvHeaderDate,
+      l10n.csvHeaderStart,
+      l10n.csvHeaderEnd,
+      l10n.csvHeaderDurationHours,
+      l10n.csvHeaderProject,
+      l10n.csvHeaderDescription,
+      l10n.csvHeaderBillable,
+      l10n.csvHeaderAmount,
+      l10n.csvHeaderCurrency,
     ],
   ];
 
@@ -44,7 +48,7 @@ String entriesToCsv(
       hours.toStringAsFixed(2),
       project?.name ?? '',
       entry.description ?? '',
-      billable ? 'ja' : 'nein',
+      billable ? l10n.csvYes : l10n.csvNo,
       amount?.toStringAsFixed(2) ?? '',
       project?.currency ?? '',
     ]);
