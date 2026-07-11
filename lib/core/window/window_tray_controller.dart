@@ -30,6 +30,12 @@ class WindowTrayController with WindowListener, TrayListener {
   /// deliberately doesn't — see lib/core/window/quit_behavior.dart.
   Future<void> Function()? onBeforeQuit;
 
+  /// Supplies the localized "runs in background" snackbar text. Set by
+  /// `main()` (like [onBeforeQuit]) because localization lookup needs the
+  /// active locale, which lives in the provider container this controller
+  /// deliberately has no access to. Falls back to German when unset.
+  String Function()? backgroundNoticeMessage;
+
   Future<void> initialize() async {
     windowManager.addListener(this);
     trayManager.addListener(this);
@@ -61,12 +67,21 @@ class WindowTrayController with WindowListener, TrayListener {
           : 'assets/tray_icon.png',
     );
     await trayManager.setToolTip('Hickory');
+    await updateContextMenu();
+  }
+
+  /// (Re)builds the tray context menu; called at startup with German
+  /// defaults and again by `main()` whenever the locale changes.
+  Future<void> updateContextMenu({
+    String openLabel = 'Öffnen',
+    String quitLabel = 'Beenden',
+  }) async {
     await trayManager.setContextMenu(
       Menu(
         items: [
-          MenuItem(key: 'open', label: 'Öffnen', onClick: (_) => _restore()),
+          MenuItem(key: 'open', label: openLabel, onClick: (_) => _restore()),
           MenuItem.separator(),
-          MenuItem(key: 'quit', label: 'Beenden', onClick: (_) => _quit()),
+          MenuItem(key: 'quit', label: quitLabel, onClick: (_) => _quit()),
         ],
       ),
     );
@@ -85,7 +100,11 @@ class WindowTrayController with WindowListener, TrayListener {
     if (!await noticeStore.hasBeenShown()) {
       await noticeStore.markShown();
       scaffoldMessengerKey.currentState?.showSnackBar(
-        const SnackBar(content: Text('Hickory läuft im Hintergrund weiter.')),
+        SnackBar(
+          content: Text(
+            backgroundNoticeMessage?.call() ?? 'Hickory läuft im Hintergrund weiter.',
+          ),
+        ),
       );
     }
   }
