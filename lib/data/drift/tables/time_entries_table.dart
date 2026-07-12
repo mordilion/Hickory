@@ -23,6 +23,10 @@ class TimeEntries extends Table {
   BoolColumn get billableOverride => boolean().nullable()();
   TextColumn get source => text().withDefault(const Constant('manual'))();
   TextColumn get deviceId => text()();
+  // Optional Jira issue key this entry books time against (e.g. "PROJ-123"),
+  // independent of projectId. See
+  // docs/superpowers/specs/2026-07-12-jira-ticket-booking-design.md.
+  TextColumn get jiraTicketKey => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
 

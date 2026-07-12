@@ -1353,6 +1353,17 @@ class $TimeEntriesTable extends TimeEntries
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _jiraTicketKeyMeta = const VerificationMeta(
+    'jiraTicketKey',
+  );
+  @override
+  late final GeneratedColumn<String> jiraTicketKey = GeneratedColumn<String>(
+    'jira_ticket_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -1387,6 +1398,7 @@ class $TimeEntriesTable extends TimeEntries
     billableOverride,
     source,
     deviceId,
+    jiraTicketKey,
     createdAt,
     updatedAt,
   ];
@@ -1474,6 +1486,15 @@ class $TimeEntriesTable extends TimeEntries
     } else if (isInserting) {
       context.missing(_deviceIdMeta);
     }
+    if (data.containsKey('jira_ticket_key')) {
+      context.handle(
+        _jiraTicketKeyMeta,
+        jiraTicketKey.isAcceptableOrUnknown(
+          data['jira_ticket_key']!,
+          _jiraTicketKeyMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -1539,6 +1560,10 @@ class $TimeEntriesTable extends TimeEntries
         DriftSqlType.string,
         data['${effectivePrefix}device_id'],
       )!,
+      jiraTicketKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}jira_ticket_key'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -1567,6 +1592,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
   final bool? billableOverride;
   final String source;
   final String deviceId;
+  final String? jiraTicketKey;
   final DateTime createdAt;
   final DateTime updatedAt;
   const TimeEntry({
@@ -1580,6 +1606,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
     this.billableOverride,
     required this.source,
     required this.deviceId,
+    this.jiraTicketKey,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -1606,6 +1633,9 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
     }
     map['source'] = Variable<String>(source);
     map['device_id'] = Variable<String>(deviceId);
+    if (!nullToAbsent || jiraTicketKey != null) {
+      map['jira_ticket_key'] = Variable<String>(jiraTicketKey);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -1633,6 +1663,9 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
           : Value(billableOverride),
       source: Value(source),
       deviceId: Value(deviceId),
+      jiraTicketKey: jiraTicketKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(jiraTicketKey),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -1654,6 +1687,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
       billableOverride: serializer.fromJson<bool?>(json['billableOverride']),
       source: serializer.fromJson<String>(json['source']),
       deviceId: serializer.fromJson<String>(json['deviceId']),
+      jiraTicketKey: serializer.fromJson<String?>(json['jiraTicketKey']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -1672,6 +1706,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
       'billableOverride': serializer.toJson<bool?>(billableOverride),
       'source': serializer.toJson<String>(source),
       'deviceId': serializer.toJson<String>(deviceId),
+      'jiraTicketKey': serializer.toJson<String?>(jiraTicketKey),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -1688,6 +1723,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
     Value<bool?> billableOverride = const Value.absent(),
     String? source,
     String? deviceId,
+    Value<String?> jiraTicketKey = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => TimeEntry(
@@ -1703,6 +1739,9 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
         : this.billableOverride,
     source: source ?? this.source,
     deviceId: deviceId ?? this.deviceId,
+    jiraTicketKey: jiraTicketKey.present
+        ? jiraTicketKey.value
+        : this.jiraTicketKey,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -1724,6 +1763,9 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
           : this.billableOverride,
       source: data.source.present ? data.source.value : this.source,
       deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      jiraTicketKey: data.jiraTicketKey.present
+          ? data.jiraTicketKey.value
+          : this.jiraTicketKey,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -1742,6 +1784,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
           ..write('billableOverride: $billableOverride, ')
           ..write('source: $source, ')
           ..write('deviceId: $deviceId, ')
+          ..write('jiraTicketKey: $jiraTicketKey, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -1760,6 +1803,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
     billableOverride,
     source,
     deviceId,
+    jiraTicketKey,
     createdAt,
     updatedAt,
   );
@@ -1777,6 +1821,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
           other.billableOverride == this.billableOverride &&
           other.source == this.source &&
           other.deviceId == this.deviceId &&
+          other.jiraTicketKey == this.jiraTicketKey &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -1792,6 +1837,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
   final Value<bool?> billableOverride;
   final Value<String> source;
   final Value<String> deviceId;
+  final Value<String?> jiraTicketKey;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -1806,6 +1852,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
     this.billableOverride = const Value.absent(),
     this.source = const Value.absent(),
     this.deviceId = const Value.absent(),
+    this.jiraTicketKey = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1821,6 +1868,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
     this.billableOverride = const Value.absent(),
     this.source = const Value.absent(),
     required String deviceId,
+    this.jiraTicketKey = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
@@ -1840,6 +1888,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
     Expression<bool>? billableOverride,
     Expression<String>? source,
     Expression<String>? deviceId,
+    Expression<String>? jiraTicketKey,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -1856,6 +1905,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
       if (billableOverride != null) 'billable_override': billableOverride,
       if (source != null) 'source': source,
       if (deviceId != null) 'device_id': deviceId,
+      if (jiraTicketKey != null) 'jira_ticket_key': jiraTicketKey,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -1873,6 +1923,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
     Value<bool?>? billableOverride,
     Value<String>? source,
     Value<String>? deviceId,
+    Value<String?>? jiraTicketKey,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
@@ -1888,6 +1939,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
       billableOverride: billableOverride ?? this.billableOverride,
       source: source ?? this.source,
       deviceId: deviceId ?? this.deviceId,
+      jiraTicketKey: jiraTicketKey ?? this.jiraTicketKey,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -1927,6 +1979,9 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
     if (deviceId.present) {
       map['device_id'] = Variable<String>(deviceId.value);
     }
+    if (jiraTicketKey.present) {
+      map['jira_ticket_key'] = Variable<String>(jiraTicketKey.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -1952,6 +2007,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
           ..write('billableOverride: $billableOverride, ')
           ..write('source: $source, ')
           ..write('deviceId: $deviceId, ')
+          ..write('jiraTicketKey: $jiraTicketKey, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -3694,6 +3750,436 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
   }
 }
 
+class $JiraWorklogsTable extends JiraWorklogs
+    with TableInfo<$JiraWorklogsTable, JiraWorklogRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $JiraWorklogsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _syncedTicketKeyMeta = const VerificationMeta(
+    'syncedTicketKey',
+  );
+  @override
+  late final GeneratedColumn<String> syncedTicketKey = GeneratedColumn<String>(
+    'synced_ticket_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _jiraWorklogIdMeta = const VerificationMeta(
+    'jiraWorklogId',
+  );
+  @override
+  late final GeneratedColumn<String> jiraWorklogId = GeneratedColumn<String>(
+    'jira_worklog_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(JiraWorklogStatus.pending),
+  );
+  static const VerificationMeta _lastErrorMeta = const VerificationMeta(
+    'lastError',
+  );
+  @override
+  late final GeneratedColumn<String> lastError = GeneratedColumn<String>(
+    'last_error',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _syncedAtMeta = const VerificationMeta(
+    'syncedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> syncedAt = GeneratedColumn<DateTime>(
+    'synced_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    syncedTicketKey,
+    jiraWorklogId,
+    status,
+    lastError,
+    syncedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'jira_worklogs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<JiraWorklogRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('synced_ticket_key')) {
+      context.handle(
+        _syncedTicketKeyMeta,
+        syncedTicketKey.isAcceptableOrUnknown(
+          data['synced_ticket_key']!,
+          _syncedTicketKeyMeta,
+        ),
+      );
+    }
+    if (data.containsKey('jira_worklog_id')) {
+      context.handle(
+        _jiraWorklogIdMeta,
+        jiraWorklogId.isAcceptableOrUnknown(
+          data['jira_worklog_id']!,
+          _jiraWorklogIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('last_error')) {
+      context.handle(
+        _lastErrorMeta,
+        lastError.isAcceptableOrUnknown(data['last_error']!, _lastErrorMeta),
+      );
+    }
+    if (data.containsKey('synced_at')) {
+      context.handle(
+        _syncedAtMeta,
+        syncedAt.isAcceptableOrUnknown(data['synced_at']!, _syncedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  JiraWorklogRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return JiraWorklogRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      syncedTicketKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}synced_ticket_key'],
+      ),
+      jiraWorklogId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}jira_worklog_id'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      lastError: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_error'],
+      ),
+      syncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}synced_at'],
+      ),
+    );
+  }
+
+  @override
+  $JiraWorklogsTable createAlias(String alias) {
+    return $JiraWorklogsTable(attachedDatabase, alias);
+  }
+}
+
+class JiraWorklogRow extends DataClass implements Insertable<JiraWorklogRow> {
+  final String id;
+  final String? syncedTicketKey;
+  final String? jiraWorklogId;
+  final String status;
+  final String? lastError;
+  final DateTime? syncedAt;
+  const JiraWorklogRow({
+    required this.id,
+    this.syncedTicketKey,
+    this.jiraWorklogId,
+    required this.status,
+    this.lastError,
+    this.syncedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || syncedTicketKey != null) {
+      map['synced_ticket_key'] = Variable<String>(syncedTicketKey);
+    }
+    if (!nullToAbsent || jiraWorklogId != null) {
+      map['jira_worklog_id'] = Variable<String>(jiraWorklogId);
+    }
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || lastError != null) {
+      map['last_error'] = Variable<String>(lastError);
+    }
+    if (!nullToAbsent || syncedAt != null) {
+      map['synced_at'] = Variable<DateTime>(syncedAt);
+    }
+    return map;
+  }
+
+  JiraWorklogsCompanion toCompanion(bool nullToAbsent) {
+    return JiraWorklogsCompanion(
+      id: Value(id),
+      syncedTicketKey: syncedTicketKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(syncedTicketKey),
+      jiraWorklogId: jiraWorklogId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(jiraWorklogId),
+      status: Value(status),
+      lastError: lastError == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastError),
+      syncedAt: syncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(syncedAt),
+    );
+  }
+
+  factory JiraWorklogRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return JiraWorklogRow(
+      id: serializer.fromJson<String>(json['id']),
+      syncedTicketKey: serializer.fromJson<String?>(json['syncedTicketKey']),
+      jiraWorklogId: serializer.fromJson<String?>(json['jiraWorklogId']),
+      status: serializer.fromJson<String>(json['status']),
+      lastError: serializer.fromJson<String?>(json['lastError']),
+      syncedAt: serializer.fromJson<DateTime?>(json['syncedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'syncedTicketKey': serializer.toJson<String?>(syncedTicketKey),
+      'jiraWorklogId': serializer.toJson<String?>(jiraWorklogId),
+      'status': serializer.toJson<String>(status),
+      'lastError': serializer.toJson<String?>(lastError),
+      'syncedAt': serializer.toJson<DateTime?>(syncedAt),
+    };
+  }
+
+  JiraWorklogRow copyWith({
+    String? id,
+    Value<String?> syncedTicketKey = const Value.absent(),
+    Value<String?> jiraWorklogId = const Value.absent(),
+    String? status,
+    Value<String?> lastError = const Value.absent(),
+    Value<DateTime?> syncedAt = const Value.absent(),
+  }) => JiraWorklogRow(
+    id: id ?? this.id,
+    syncedTicketKey: syncedTicketKey.present
+        ? syncedTicketKey.value
+        : this.syncedTicketKey,
+    jiraWorklogId: jiraWorklogId.present
+        ? jiraWorklogId.value
+        : this.jiraWorklogId,
+    status: status ?? this.status,
+    lastError: lastError.present ? lastError.value : this.lastError,
+    syncedAt: syncedAt.present ? syncedAt.value : this.syncedAt,
+  );
+  JiraWorklogRow copyWithCompanion(JiraWorklogsCompanion data) {
+    return JiraWorklogRow(
+      id: data.id.present ? data.id.value : this.id,
+      syncedTicketKey: data.syncedTicketKey.present
+          ? data.syncedTicketKey.value
+          : this.syncedTicketKey,
+      jiraWorklogId: data.jiraWorklogId.present
+          ? data.jiraWorklogId.value
+          : this.jiraWorklogId,
+      status: data.status.present ? data.status.value : this.status,
+      lastError: data.lastError.present ? data.lastError.value : this.lastError,
+      syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JiraWorklogRow(')
+          ..write('id: $id, ')
+          ..write('syncedTicketKey: $syncedTicketKey, ')
+          ..write('jiraWorklogId: $jiraWorklogId, ')
+          ..write('status: $status, ')
+          ..write('lastError: $lastError, ')
+          ..write('syncedAt: $syncedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    syncedTicketKey,
+    jiraWorklogId,
+    status,
+    lastError,
+    syncedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is JiraWorklogRow &&
+          other.id == this.id &&
+          other.syncedTicketKey == this.syncedTicketKey &&
+          other.jiraWorklogId == this.jiraWorklogId &&
+          other.status == this.status &&
+          other.lastError == this.lastError &&
+          other.syncedAt == this.syncedAt);
+}
+
+class JiraWorklogsCompanion extends UpdateCompanion<JiraWorklogRow> {
+  final Value<String> id;
+  final Value<String?> syncedTicketKey;
+  final Value<String?> jiraWorklogId;
+  final Value<String> status;
+  final Value<String?> lastError;
+  final Value<DateTime?> syncedAt;
+  final Value<int> rowid;
+  const JiraWorklogsCompanion({
+    this.id = const Value.absent(),
+    this.syncedTicketKey = const Value.absent(),
+    this.jiraWorklogId = const Value.absent(),
+    this.status = const Value.absent(),
+    this.lastError = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  JiraWorklogsCompanion.insert({
+    required String id,
+    this.syncedTicketKey = const Value.absent(),
+    this.jiraWorklogId = const Value.absent(),
+    this.status = const Value.absent(),
+    this.lastError = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id);
+  static Insertable<JiraWorklogRow> custom({
+    Expression<String>? id,
+    Expression<String>? syncedTicketKey,
+    Expression<String>? jiraWorklogId,
+    Expression<String>? status,
+    Expression<String>? lastError,
+    Expression<DateTime>? syncedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (syncedTicketKey != null) 'synced_ticket_key': syncedTicketKey,
+      if (jiraWorklogId != null) 'jira_worklog_id': jiraWorklogId,
+      if (status != null) 'status': status,
+      if (lastError != null) 'last_error': lastError,
+      if (syncedAt != null) 'synced_at': syncedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  JiraWorklogsCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? syncedTicketKey,
+    Value<String?>? jiraWorklogId,
+    Value<String>? status,
+    Value<String?>? lastError,
+    Value<DateTime?>? syncedAt,
+    Value<int>? rowid,
+  }) {
+    return JiraWorklogsCompanion(
+      id: id ?? this.id,
+      syncedTicketKey: syncedTicketKey ?? this.syncedTicketKey,
+      jiraWorklogId: jiraWorklogId ?? this.jiraWorklogId,
+      status: status ?? this.status,
+      lastError: lastError ?? this.lastError,
+      syncedAt: syncedAt ?? this.syncedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (syncedTicketKey.present) {
+      map['synced_ticket_key'] = Variable<String>(syncedTicketKey.value);
+    }
+    if (jiraWorklogId.present) {
+      map['jira_worklog_id'] = Variable<String>(jiraWorklogId.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (lastError.present) {
+      map['last_error'] = Variable<String>(lastError.value);
+    }
+    if (syncedAt.present) {
+      map['synced_at'] = Variable<DateTime>(syncedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JiraWorklogsCompanion(')
+          ..write('id: $id, ')
+          ..write('syncedTicketKey: $syncedTicketKey, ')
+          ..write('jiraWorklogId: $jiraWorklogId, ')
+          ..write('status: $status, ')
+          ..write('lastError: $lastError, ')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3708,6 +4194,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
+  late final $JiraWorklogsTable jiraWorklogs = $JiraWorklogsTable(this);
   late final Index idxEventsEntityId = Index(
     'idx_events_entity_id',
     'CREATE INDEX idx_events_entity_id ON events (entity_id)',
@@ -3721,6 +4208,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this as AppDatabase,
   );
   late final AppSettingsDao appSettingsDao = AppSettingsDao(
+    this as AppDatabase,
+  );
+  late final JiraWorklogsDao jiraWorklogsDao = JiraWorklogsDao(
     this as AppDatabase,
   );
   @override
@@ -3737,6 +4227,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     syncFileStates,
     activitySamples,
     appSettings,
+    jiraWorklogs,
     idxEventsEntityId,
   ];
 }
@@ -4804,6 +5295,7 @@ typedef $$TimeEntriesTableCreateCompanionBuilder =
       Value<bool?> billableOverride,
       Value<String> source,
       required String deviceId,
+      Value<String?> jiraTicketKey,
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<int> rowid,
@@ -4820,6 +5312,7 @@ typedef $$TimeEntriesTableUpdateCompanionBuilder =
       Value<bool?> billableOverride,
       Value<String> source,
       Value<String> deviceId,
+      Value<String?> jiraTicketKey,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -4916,6 +5409,11 @@ class $$TimeEntriesTableFilterComposer
 
   ColumnFilters<String> get deviceId => $composableBuilder(
     column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get jiraTicketKey => $composableBuilder(
+    column: $table.jiraTicketKey,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5032,6 +5530,11 @@ class $$TimeEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get jiraTicketKey => $composableBuilder(
+    column: $table.jiraTicketKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -5107,6 +5610,11 @@ class $$TimeEntriesTableAnnotationComposer
 
   GeneratedColumn<String> get deviceId =>
       $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<String> get jiraTicketKey => $composableBuilder(
+    column: $table.jiraTicketKey,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -5201,6 +5709,7 @@ class $$TimeEntriesTableTableManager
                 Value<bool?> billableOverride = const Value.absent(),
                 Value<String> source = const Value.absent(),
                 Value<String> deviceId = const Value.absent(),
+                Value<String?> jiraTicketKey = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -5215,6 +5724,7 @@ class $$TimeEntriesTableTableManager
                 billableOverride: billableOverride,
                 source: source,
                 deviceId: deviceId,
+                jiraTicketKey: jiraTicketKey,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -5231,6 +5741,7 @@ class $$TimeEntriesTableTableManager
                 Value<bool?> billableOverride = const Value.absent(),
                 Value<String> source = const Value.absent(),
                 required String deviceId,
+                Value<String?> jiraTicketKey = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<int> rowid = const Value.absent(),
@@ -5245,6 +5756,7 @@ class $$TimeEntriesTableTableManager
                 billableOverride: billableOverride,
                 source: source,
                 deviceId: deviceId,
+                jiraTicketKey: jiraTicketKey,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -6531,6 +7043,229 @@ typedef $$AppSettingsTableProcessedTableManager =
       AppSettingsRow,
       PrefetchHooks Function()
     >;
+typedef $$JiraWorklogsTableCreateCompanionBuilder =
+    JiraWorklogsCompanion Function({
+      required String id,
+      Value<String?> syncedTicketKey,
+      Value<String?> jiraWorklogId,
+      Value<String> status,
+      Value<String?> lastError,
+      Value<DateTime?> syncedAt,
+      Value<int> rowid,
+    });
+typedef $$JiraWorklogsTableUpdateCompanionBuilder =
+    JiraWorklogsCompanion Function({
+      Value<String> id,
+      Value<String?> syncedTicketKey,
+      Value<String?> jiraWorklogId,
+      Value<String> status,
+      Value<String?> lastError,
+      Value<DateTime?> syncedAt,
+      Value<int> rowid,
+    });
+
+class $$JiraWorklogsTableFilterComposer
+    extends Composer<_$AppDatabase, $JiraWorklogsTable> {
+  $$JiraWorklogsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncedTicketKey => $composableBuilder(
+    column: $table.syncedTicketKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get jiraWorklogId => $composableBuilder(
+    column: $table.jiraWorklogId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastError => $composableBuilder(
+    column: $table.lastError,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get syncedAt => $composableBuilder(
+    column: $table.syncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$JiraWorklogsTableOrderingComposer
+    extends Composer<_$AppDatabase, $JiraWorklogsTable> {
+  $$JiraWorklogsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncedTicketKey => $composableBuilder(
+    column: $table.syncedTicketKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get jiraWorklogId => $composableBuilder(
+    column: $table.jiraWorklogId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastError => $composableBuilder(
+    column: $table.lastError,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get syncedAt => $composableBuilder(
+    column: $table.syncedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$JiraWorklogsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $JiraWorklogsTable> {
+  $$JiraWorklogsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get syncedTicketKey => $composableBuilder(
+    column: $table.syncedTicketKey,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get jiraWorklogId => $composableBuilder(
+    column: $table.jiraWorklogId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get lastError =>
+      $composableBuilder(column: $table.lastError, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get syncedAt =>
+      $composableBuilder(column: $table.syncedAt, builder: (column) => column);
+}
+
+class $$JiraWorklogsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $JiraWorklogsTable,
+          JiraWorklogRow,
+          $$JiraWorklogsTableFilterComposer,
+          $$JiraWorklogsTableOrderingComposer,
+          $$JiraWorklogsTableAnnotationComposer,
+          $$JiraWorklogsTableCreateCompanionBuilder,
+          $$JiraWorklogsTableUpdateCompanionBuilder,
+          (
+            JiraWorklogRow,
+            BaseReferences<_$AppDatabase, $JiraWorklogsTable, JiraWorklogRow>,
+          ),
+          JiraWorklogRow,
+          PrefetchHooks Function()
+        > {
+  $$JiraWorklogsTableTableManager(_$AppDatabase db, $JiraWorklogsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$JiraWorklogsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$JiraWorklogsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$JiraWorklogsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> syncedTicketKey = const Value.absent(),
+                Value<String?> jiraWorklogId = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> lastError = const Value.absent(),
+                Value<DateTime?> syncedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => JiraWorklogsCompanion(
+                id: id,
+                syncedTicketKey: syncedTicketKey,
+                jiraWorklogId: jiraWorklogId,
+                status: status,
+                lastError: lastError,
+                syncedAt: syncedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> syncedTicketKey = const Value.absent(),
+                Value<String?> jiraWorklogId = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> lastError = const Value.absent(),
+                Value<DateTime?> syncedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => JiraWorklogsCompanion.insert(
+                id: id,
+                syncedTicketKey: syncedTicketKey,
+                jiraWorklogId: jiraWorklogId,
+                status: status,
+                lastError: lastError,
+                syncedAt: syncedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$JiraWorklogsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $JiraWorklogsTable,
+      JiraWorklogRow,
+      $$JiraWorklogsTableFilterComposer,
+      $$JiraWorklogsTableOrderingComposer,
+      $$JiraWorklogsTableAnnotationComposer,
+      $$JiraWorklogsTableCreateCompanionBuilder,
+      $$JiraWorklogsTableUpdateCompanionBuilder,
+      (
+        JiraWorklogRow,
+        BaseReferences<_$AppDatabase, $JiraWorklogsTable, JiraWorklogRow>,
+      ),
+      JiraWorklogRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6552,4 +7287,6 @@ class $AppDatabaseManager {
       $$ActivitySamplesTableTableManager(_db, _db.activitySamples);
   $$AppSettingsTableTableManager get appSettings =>
       $$AppSettingsTableTableManager(_db, _db.appSettings);
+  $$JiraWorklogsTableTableManager get jiraWorklogs =>
+      $$JiraWorklogsTableTableManager(_db, _db.jiraWorklogs);
 }
