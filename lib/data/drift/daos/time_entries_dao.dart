@@ -100,6 +100,7 @@ class TimeEntriesDao extends DatabaseAccessor<AppDatabase> with _$TimeEntriesDao
     required DateTime endAt,
     String? projectId,
     String? description,
+    String? jiraTicketKey,
   }) async {
     final now = DateTime.now().toUtc();
     final entry = TimeEntriesCompanion.insert(
@@ -111,6 +112,7 @@ class TimeEntriesDao extends DatabaseAccessor<AppDatabase> with _$TimeEntriesDao
       deviceId: deviceId,
       createdAt: now,
       updatedAt: now,
+      jiraTicketKey: Value(jiraTicketKey),
     );
     await into(timeEntries).insert(entry);
     return (select(timeEntries)..where((t) => t.id.equals(entry.id.value))).getSingle();

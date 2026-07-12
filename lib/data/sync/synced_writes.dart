@@ -80,6 +80,7 @@ class SyncedWrites {
     required DateTime endAt,
     String? projectId,
     String? description,
+    String? jiraTicketKey,
   }) async {
     final entry = await db.timeEntriesDao.createManualEntry(
       deviceId: deviceId,
@@ -87,6 +88,7 @@ class SyncedWrites {
       endAt: endAt,
       projectId: projectId,
       description: description,
+      jiraTicketKey: jiraTicketKey,
     );
     await _logCurrentState(entry.id, EventOp.create);
     return entry;
@@ -161,6 +163,32 @@ class SyncedWrites {
       payload: updated.toJson(),
     );
     return updated;
+  }
+
+  /// Writes the given Jira sync-tracking row and logs it, so the state
+  /// (e.g. "this entry now has a Jira worklog") propagates to the user's
+  /// other devices the same way every other entity does.
+  Future<void> upsertJiraWorklogState(JiraWorklogRow row) async {
+    await db.jiraWorklogsDao.upsert(row.toCompanion(true));
+    await logWriter.appendEvent(
+      entityType: EntityTypes.jiraWorklog,
+      entityId: row.id,
+      op: EventOp.update,
+      payload: row.toJson(),
+    );
+  }
+
+  /// Removes a Jira sync-tracking row (used once a pending delete has been
+  /// pushed to Jira, or when a row was never pushed and no longer needs
+  /// tracking) and logs the tombstone.
+  Future<void> deleteJiraWorklogState(String timeEntryId) async {
+    await db.jiraWorklogsDao.deleteForEntry(timeEntryId);
+    await logWriter.appendEvent(
+      entityType: EntityTypes.jiraWorklog,
+      entityId: timeEntryId,
+      op: EventOp.delete,
+      payload: null,
+    );
   }
 
   Future<void> _logCurrentState(String timeEntryId, EventOp op) async {

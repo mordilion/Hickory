@@ -4,6 +4,7 @@ import 'package:drift/drift.dart' show Value, driftRuntimeOptions;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/data/drift/database.dart';
+import 'package:hickory/data/drift/tables/jira_worklogs_table.dart';
 import 'package:hickory/data/sync/sync_ingestor.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
@@ -129,6 +130,53 @@ void main() {
       expect(rows, hasLength(1));
       expect(rows.single.dateFormat, 'de');
       expect(rows.single.timeFormat, '12h');
+    },
+  );
+
+  test(
+    'a jira worklog tracking row syncs to a second device, including a later update',
+    () async {
+      final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(writerDb.close);
+      final writerWrites = SyncedWrites(
+        db: writerDb,
+        logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'dev_a'),
+      );
+
+      final entry = await writerWrites.createManualEntry(
+        deviceId: 'dev_a',
+        startAt: DateTime.utc(2026, 7, 7, 9),
+        endAt: DateTime.utc(2026, 7, 7, 10),
+        jiraTicketKey: 'PROJ-1',
+      );
+      await writerWrites.upsertJiraWorklogState(
+        JiraWorklogRow(
+          id: entry.id,
+          syncedTicketKey: 'PROJ-1',
+          jiraWorklogId: '10001',
+          status: JiraWorklogStatus.synced,
+          lastError: null,
+          syncedAt: DateTime.utc(2026, 7, 7, 10),
+        ),
+      );
+
+      final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(readerDb.close);
+      final ingestor = SyncIngestor(db: readerDb, syncRoot: syncRoot);
+      await ingestor.syncNow();
+
+      final worklogs = await readerDb.jiraWorklogsDao.getAll();
+      expect(worklogs, hasLength(1));
+      expect(worklogs.single.jiraWorklogId, '10001');
+      expect(worklogs.single.status, JiraWorklogStatus.synced);
+
+      // Device B doesn't know the entry was already pushed unless the
+      // tracking row itself synced — this is the correctness property the
+      // design doc calls out as the reason JiraWorklogs must be synced.
+      await writerWrites.deleteJiraWorklogState(entry.id);
+      await ingestor.syncNow();
+
+      expect(await readerDb.jiraWorklogsDao.getAll(), isEmpty);
     },
   );
 }
