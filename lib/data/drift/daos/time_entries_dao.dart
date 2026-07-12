@@ -16,6 +16,11 @@ class TimeEntriesDao extends DatabaseAccessor<AppDatabase> with _$TimeEntriesDao
     return (select(timeEntries)..orderBy([(t) => OrderingTerm.desc(t.startAt)])).watch();
   }
 
+  /// One-shot counterpart to [watchAllEntries], for the Jira sync
+  /// reconciliation pass (JiraSyncService), which needs a plain snapshot
+  /// rather than a live stream.
+  Future<List<TimeEntry>> getAllEntries() => select(timeEntries).get();
+
   /// There should only ever be zero or one running entry (endAt == null) at
   /// a time; that invariant is enforced by app logic (stop-before-start),
   /// not a DB constraint.
@@ -48,12 +53,14 @@ class TimeEntriesDao extends DatabaseAccessor<AppDatabase> with _$TimeEntriesDao
     required String deviceId,
     String? projectId,
     String? description,
+    String? jiraTicketKey,
   }) async {
     final now = DateTime.now().toUtc();
     final entry = TimeEntriesCompanion.insert(
       id: _uuid.v4(),
       projectId: Value(projectId),
       description: Value(description),
+      jiraTicketKey: Value(jiraTicketKey),
       startAt: now,
       deviceId: deviceId,
       createdAt: now,
@@ -122,6 +129,7 @@ class TimeEntriesDao extends DatabaseAccessor<AppDatabase> with _$TimeEntriesDao
     String id, {
     Value<String?> projectId = const Value.absent(),
     Value<String?> description = const Value.absent(),
+    Value<String?> jiraTicketKey = const Value.absent(),
     Value<DateTime> startAt = const Value.absent(),
     Value<DateTime?> endAt = const Value.absent(),
   }) {
@@ -129,6 +137,7 @@ class TimeEntriesDao extends DatabaseAccessor<AppDatabase> with _$TimeEntriesDao
       TimeEntriesCompanion(
         projectId: projectId,
         description: description,
+        jiraTicketKey: jiraTicketKey,
         startAt: startAt,
         endAt: endAt,
         updatedAt: Value(DateTime.now().toUtc()),

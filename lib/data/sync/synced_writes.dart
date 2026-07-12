@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import '../drift/database.dart';
 import '../drift/tables/app_settings_table.dart' show appSettingsRowId;
+import '../drift/tables/jira_worklogs_table.dart' show JiraWorklogStatus;
 import 'entity_types.dart';
 import 'sync_log_writer.dart';
 
@@ -49,11 +50,13 @@ class SyncedWrites {
     required String deviceId,
     String? projectId,
     String? description,
+    String? jiraTicketKey,
   }) async {
     final entry = await db.timeEntriesDao.startEntry(
       deviceId: deviceId,
       projectId: projectId,
       description: description,
+      jiraTicketKey: jiraTicketKey,
     );
     await _logCurrentState(entry.id, EventOp.create);
     return entry;
@@ -98,6 +101,7 @@ class SyncedWrites {
     String id, {
     Value<String?> projectId = const Value.absent(),
     Value<String?> description = const Value.absent(),
+    Value<String?> jiraTicketKey = const Value.absent(),
     Value<DateTime> startAt = const Value.absent(),
     Value<DateTime?> endAt = const Value.absent(),
   }) async {
@@ -105,6 +109,7 @@ class SyncedWrites {
       id,
       projectId: projectId,
       description: description,
+      jiraTicketKey: jiraTicketKey,
       startAt: startAt,
       endAt: endAt,
     );
@@ -112,6 +117,14 @@ class SyncedWrites {
   }
 
   Future<void> deleteEntry(String id) async {
+    final worklog = await db.jiraWorklogsDao.getForEntry(id);
+    if (worklog != null) {
+      if (worklog.jiraWorklogId == null) {
+        await deleteJiraWorklogState(id);
+      } else {
+        await upsertJiraWorklogState(worklog.copyWith(status: JiraWorklogStatus.pendingDelete));
+      }
+    }
     await db.timeEntriesDao.deleteEntry(id);
     await logWriter.appendEvent(
       entityType: EntityTypes.timeEntry,
