@@ -58,6 +58,8 @@ dependencies:
   launch_at_startup: ^0.5.1
   package_info_plus: ^9.0.1
   intl: ^0.20.2
+  http: ^1.6.0
+  flutter_secure_storage: ^10.3.1
 
 dev_dependencies:
   flutter_test:
