@@ -1285,8 +1285,15 @@ class JiraSyncService {
       await writes.deleteJiraWorklogState(worklog.id);
       return _Outcome.deleted;
     } catch (e) {
+      // Deliberately does NOT change status away from pendingDelete: by the
+      // time this row is reconciled, its TimeEntry is already gone (see
+      // SyncedWrites.deleteEntry), so it's only ever revisited by the
+      // pendingDelete branch above, never by _reconcileEntry's entries loop.
+      // Flipping status to `error` here would orphan the row outside both
+      // loops forever, leaking the Jira-side worklog and breaking the
+      // "retried automatically on the next sync" guarantee.
       await writes.upsertJiraWorklogState(
-        worklog.copyWith(status: JiraWorklogStatus.error, lastError: Value('$e')),
+        worklog.copyWith(lastError: Value('$e')),
       );
       return _Outcome.failed;
     }
