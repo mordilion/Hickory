@@ -8,6 +8,7 @@ import '../../core/di/sync_providers.dart';
 import '../../core/format/date_format.dart';
 import '../../data/drift/database.dart';
 import '../../l10n/app_localizations.dart';
+import '../jira/widgets/jira_ticket_field.dart';
 import '../projects/projects_providers.dart';
 
 Future<void> showManualEntryDialog(
@@ -35,6 +36,7 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
   late DateTime _startAt;
   late DateTime _endAt;
   String? _projectId;
+  String? _jiraTicketKey;
 
   @override
   void initState() {
@@ -44,6 +46,7 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
     _startAt = existing?.startAt.toLocal() ?? DateTime.now().subtract(const Duration(hours: 1));
     _endAt = existing?.endAt?.toLocal() ?? DateTime.now();
     _projectId = existing?.projectId;
+    _jiraTicketKey = existing?.jiraTicketKey;
   }
 
   @override
@@ -96,6 +99,7 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
         endAt: _endAt,
         projectId: _projectId,
         description: description,
+        jiraTicketKey: _jiraTicketKey,
       );
     } else {
       await writes.updateEntry(
@@ -104,6 +108,7 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
         endAt: Value(_endAt.toUtc()),
         projectId: Value(_projectId),
         description: Value(description),
+        jiraTicketKey: Value(_jiraTicketKey),
       );
     }
     if (mounted) Navigator.of(context).pop();
@@ -145,6 +150,11 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
               ),
               loading: () => const LinearProgressIndicator(),
               error: (e, _) => Text(l10n.entriesError(e.toString())),
+            ),
+            const SizedBox(height: 12),
+            JiraTicketField(
+              initialValue: _jiraTicketKey,
+              onChanged: (value) => setState(() => _jiraTicketKey = value),
             ),
             const SizedBox(height: 12),
             ListTile(
