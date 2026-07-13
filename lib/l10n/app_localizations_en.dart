@@ -73,6 +73,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncCompleted => 'Sync completed.';
 
   @override
+  String get syncJiraSectionTitle => 'Jira Integration';
+
+  @override
+  String get syncJiraBaseUrlLabel => 'Jira URL';
+
+  @override
+  String get syncJiraEmailLabel => 'Email';
+
+  @override
+  String get syncJiraApiTokenLabel => 'API token';
+
+  @override
+  String get syncJiraSaveCredentialsButton => 'Save credentials';
+
+  @override
+  String get syncJiraCredentialsSaved => 'Credentials saved.';
+
+  @override
+  String get syncJiraTestConnectionButton => 'Test connection';
+
+  @override
+  String get syncJiraTestConnectionSuccess => 'Connection successful.';
+
+  @override
+  String get syncJiraTestConnectionFailure =>
+      'Connection failed. Please check your credentials.';
+
+  @override
+  String get syncJiraSyncButton => 'Sync to Jira now';
+
+  @override
+  String get syncJiraNotConfigured => 'Jira isn\'t configured yet.';
+
+  @override
+  String syncJiraSyncResult(int created, int updated, int deleted, int failed) {
+    return '$created created, $updated updated, $deleted deleted, $failed failed.';
+  }
+
+  @override
   String get navTimer => 'Timer';
 
   @override

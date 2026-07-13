@@ -18,6 +18,26 @@
   "syncChooseFolderButton": "Elegir carpeta",
   "syncFolderChosen": "Carpeta seleccionada: {path}",
   "syncCompleted": "Sincronización completada.",
+  "syncJiraSectionTitle": "Integración con Jira",
+  "syncJiraBaseUrlLabel": "URL de Jira",
+  "syncJiraEmailLabel": "Correo electrónico",
+  "syncJiraApiTokenLabel": "Token de API",
+  "syncJiraSaveCredentialsButton": "Guardar credenciales",
+  "syncJiraCredentialsSaved": "Credenciales guardadas.",
+  "syncJiraTestConnectionButton": "Probar conexión",
+  "syncJiraTestConnectionSuccess": "Conexión correcta.",
+  "syncJiraTestConnectionFailure": "Error de conexión. Comprueba tus credenciales.",
+  "syncJiraSyncButton": "Sincronizar con Jira ahora",
+  "syncJiraNotConfigured": "Jira aún no está configurado.",
+  "syncJiraSyncResult": "{created} creadas, {updated} actualizadas, {deleted} eliminadas, {failed} fallidas.",
+  "@syncJiraSyncResult": {
+    "placeholders": {
+      "created": { "type": "int" },
+      "updated": { "type": "int" },
+      "deleted": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "navTimer": "Temporizador",
   "navReports": "Informes",
   "navSync": "Sincronización",

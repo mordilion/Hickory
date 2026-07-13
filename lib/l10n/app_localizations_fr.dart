@@ -74,6 +74,45 @@ class AppLocalizationsFr extends AppLocalizations {
   String get syncCompleted => 'Synchronisation terminée.';
 
   @override
+  String get syncJiraSectionTitle => 'Intégration Jira';
+
+  @override
+  String get syncJiraBaseUrlLabel => 'URL Jira';
+
+  @override
+  String get syncJiraEmailLabel => 'E-mail';
+
+  @override
+  String get syncJiraApiTokenLabel => 'Jeton API';
+
+  @override
+  String get syncJiraSaveCredentialsButton => 'Enregistrer les identifiants';
+
+  @override
+  String get syncJiraCredentialsSaved => 'Identifiants enregistrés.';
+
+  @override
+  String get syncJiraTestConnectionButton => 'Tester la connexion';
+
+  @override
+  String get syncJiraTestConnectionSuccess => 'Connexion réussie.';
+
+  @override
+  String get syncJiraTestConnectionFailure =>
+      'Échec de la connexion. Vérifiez vos identifiants.';
+
+  @override
+  String get syncJiraSyncButton => 'Synchroniser avec Jira maintenant';
+
+  @override
+  String get syncJiraNotConfigured => 'Jira n\'est pas encore configuré.';
+
+  @override
+  String syncJiraSyncResult(int created, int updated, int deleted, int failed) {
+    return '$created créées, $updated mises à jour, $deleted supprimées, $failed échouées.';
+  }
+
+  @override
   String get navTimer => 'Minuteur';
 
   @override

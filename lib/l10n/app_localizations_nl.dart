@@ -74,6 +74,45 @@ class AppLocalizationsNl extends AppLocalizations {
   String get syncCompleted => 'Synchronisatie voltooid.';
 
   @override
+  String get syncJiraSectionTitle => 'Jira-integratie';
+
+  @override
+  String get syncJiraBaseUrlLabel => 'Jira-URL';
+
+  @override
+  String get syncJiraEmailLabel => 'E-mail';
+
+  @override
+  String get syncJiraApiTokenLabel => 'API-token';
+
+  @override
+  String get syncJiraSaveCredentialsButton => 'Gegevens opslaan';
+
+  @override
+  String get syncJiraCredentialsSaved => 'Gegevens opgeslagen.';
+
+  @override
+  String get syncJiraTestConnectionButton => 'Verbinding testen';
+
+  @override
+  String get syncJiraTestConnectionSuccess => 'Verbinding geslaagd.';
+
+  @override
+  String get syncJiraTestConnectionFailure =>
+      'Verbinding mislukt. Controleer je gegevens.';
+
+  @override
+  String get syncJiraSyncButton => 'Nu synchroniseren met Jira';
+
+  @override
+  String get syncJiraNotConfigured => 'Jira is nog niet geconfigureerd.';
+
+  @override
+  String syncJiraSyncResult(int created, int updated, int deleted, int failed) {
+    return '$created aangemaakt, $updated bijgewerkt, $deleted verwijderd, $failed mislukt.';
+  }
+
+  @override
   String get navTimer => 'Timer';
 
   @override

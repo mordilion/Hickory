@@ -18,6 +18,26 @@
   "syncChooseFolderButton": "Map kiezen",
   "syncFolderChosen": "Map geselecteerd: {path}",
   "syncCompleted": "Synchronisatie voltooid.",
+  "syncJiraSectionTitle": "Jira-integratie",
+  "syncJiraBaseUrlLabel": "Jira-URL",
+  "syncJiraEmailLabel": "E-mail",
+  "syncJiraApiTokenLabel": "API-token",
+  "syncJiraSaveCredentialsButton": "Gegevens opslaan",
+  "syncJiraCredentialsSaved": "Gegevens opgeslagen.",
+  "syncJiraTestConnectionButton": "Verbinding testen",
+  "syncJiraTestConnectionSuccess": "Verbinding geslaagd.",
+  "syncJiraTestConnectionFailure": "Verbinding mislukt. Controleer je gegevens.",
+  "syncJiraSyncButton": "Nu synchroniseren met Jira",
+  "syncJiraNotConfigured": "Jira is nog niet geconfigureerd.",
+  "syncJiraSyncResult": "{created} aangemaakt, {updated} bijgewerkt, {deleted} verwijderd, {failed} mislukt.",
+  "@syncJiraSyncResult": {
+    "placeholders": {
+      "created": { "type": "int" },
+      "updated": { "type": "int" },
+      "deleted": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "navTimer": "Timer",
   "navReports": "Rapporten",
   "navSync": "Synchronisatie",

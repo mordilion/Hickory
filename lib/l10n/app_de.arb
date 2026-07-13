@@ -38,6 +38,26 @@
     }
   },
   "syncCompleted": "Synchronisierung abgeschlossen.",
+  "syncJiraSectionTitle": "Jira-Integration",
+  "syncJiraBaseUrlLabel": "Jira-URL",
+  "syncJiraEmailLabel": "E-Mail",
+  "syncJiraApiTokenLabel": "API-Token",
+  "syncJiraSaveCredentialsButton": "Zugangsdaten speichern",
+  "syncJiraCredentialsSaved": "Zugangsdaten gespeichert.",
+  "syncJiraTestConnectionButton": "Verbindung testen",
+  "syncJiraTestConnectionSuccess": "Verbindung erfolgreich.",
+  "syncJiraTestConnectionFailure": "Verbindung fehlgeschlagen. Bitte Zugangsdaten prüfen.",
+  "syncJiraSyncButton": "Jetzt zu Jira synchronisieren",
+  "syncJiraNotConfigured": "Jira ist noch nicht konfiguriert.",
+  "syncJiraSyncResult": "{created} erstellt, {updated} aktualisiert, {deleted} gelöscht, {failed} fehlgeschlagen.",
+  "@syncJiraSyncResult": {
+    "placeholders": {
+      "created": { "type": "int" },
+      "updated": { "type": "int" },
+      "deleted": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "navTimer": "Timer",
   "navReports": "Reports",
   "navSync": "Sync",
