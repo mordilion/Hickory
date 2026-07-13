@@ -18,6 +18,28 @@
   "syncChooseFolderButton": "Scegli cartella",
   "syncFolderChosen": "Cartella selezionata: {path}",
   "syncCompleted": "Sincronizzazione completata.",
+  "syncJiraSectionTitle": "Integrazione Jira",
+  "syncJiraBaseUrlLabel": "URL Jira",
+  "syncJiraEmailLabel": "Email",
+  "syncJiraApiTokenLabel": "Token API",
+  "syncJiraSaveCredentialsButton": "Salva credenziali",
+  "syncJiraCredentialsSaved": "Credenziali salvate.",
+  "syncJiraTestConnectionButton": "Verifica connessione",
+  "syncJiraTestConnectionSuccess": "Connessione riuscita.",
+  "syncJiraTestConnectionFailure": "Connessione non riuscita. Controlla le credenziali.",
+  "syncJiraSyncButton": "Sincronizza ora con Jira",
+  "syncJiraNotConfigured": "Jira non è ancora configurato.",
+  "syncJiraInvalidCredentials": "Inserisci un URL Jira, un'email e un token API validi.",
+  "syncJiraUnexpectedError": "Si è verificato un errore. Riprova.",
+  "syncJiraSyncResult": "{created} create, {updated} aggiornate, {deleted} eliminate, {failed} non riuscite.",
+  "@syncJiraSyncResult": {
+    "placeholders": {
+      "created": { "type": "int" },
+      "updated": { "type": "int" },
+      "deleted": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "navTimer": "Timer",
   "navReports": "Report",
   "navSync": "Sincronizzazione",
@@ -30,6 +52,7 @@
   "timerDescriptionLabel": "Su cosa stai lavorando?",
   "timerProjectLabel": "Progetto",
   "timerNewProjectTooltip": "Nuovo progetto",
+  "jiraTicketFieldLabel": "Ticket Jira",
   "timerStart": "Avvia",
   "timerIdleTitle": "Inattività rilevata",
   "timerIdleMessage": "Sei stato inattivo per {minutes} minuti. Vuoi sottrarre questo tempo dalla voce in corso?",
@@ -71,5 +94,8 @@
   "csvHeaderAmount": "Importo",
   "csvHeaderCurrency": "Valuta",
   "csvYes": "sì",
-  "csvNo": "no"
+  "csvNo": "no",
+  "entriesJiraStatusSynced": "Registrato su Jira",
+  "entriesJiraStatusPending": "Registrazione Jira in sospeso",
+  "entriesJiraStatusError": "Registrazione Jira non riuscita"
 }

@@ -73,6 +73,53 @@ class AppLocalizationsDe extends AppLocalizations {
   String get syncCompleted => 'Synchronisierung abgeschlossen.';
 
   @override
+  String get syncJiraSectionTitle => 'Jira-Integration';
+
+  @override
+  String get syncJiraBaseUrlLabel => 'Jira-URL';
+
+  @override
+  String get syncJiraEmailLabel => 'E-Mail';
+
+  @override
+  String get syncJiraApiTokenLabel => 'API-Token';
+
+  @override
+  String get syncJiraSaveCredentialsButton => 'Zugangsdaten speichern';
+
+  @override
+  String get syncJiraCredentialsSaved => 'Zugangsdaten gespeichert.';
+
+  @override
+  String get syncJiraTestConnectionButton => 'Verbindung testen';
+
+  @override
+  String get syncJiraTestConnectionSuccess => 'Verbindung erfolgreich.';
+
+  @override
+  String get syncJiraTestConnectionFailure =>
+      'Verbindung fehlgeschlagen. Bitte Zugangsdaten prüfen.';
+
+  @override
+  String get syncJiraSyncButton => 'Jetzt zu Jira synchronisieren';
+
+  @override
+  String get syncJiraNotConfigured => 'Jira ist noch nicht konfiguriert.';
+
+  @override
+  String get syncJiraInvalidCredentials =>
+      'Bitte gib eine gültige Jira-URL sowie E-Mail und API-Token an.';
+
+  @override
+  String get syncJiraUnexpectedError =>
+      'Es ist ein Fehler aufgetreten. Bitte versuche es erneut.';
+
+  @override
+  String syncJiraSyncResult(int created, int updated, int deleted, int failed) {
+    return '$created erstellt, $updated aktualisiert, $deleted gelöscht, $failed fehlgeschlagen.';
+  }
+
+  @override
   String get navTimer => 'Timer';
 
   @override
@@ -109,6 +156,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get timerNewProjectTooltip => 'Neues Projekt';
+
+  @override
+  String get jiraTicketFieldLabel => 'Jira-Ticket';
 
   @override
   String get timerStart => 'Start';
@@ -245,4 +295,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get csvNo => 'nein';
+
+  @override
+  String get entriesJiraStatusSynced => 'In Jira gebucht';
+
+  @override
+  String get entriesJiraStatusPending => 'Jira-Buchung ausstehend';
+
+  @override
+  String get entriesJiraStatusError => 'Jira-Buchung fehlgeschlagen';
 }

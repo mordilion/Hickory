@@ -18,6 +18,28 @@
   "syncChooseFolderButton": "Choisir un dossier",
   "syncFolderChosen": "Dossier sélectionné : {path}",
   "syncCompleted": "Synchronisation terminée.",
+  "syncJiraSectionTitle": "Intégration Jira",
+  "syncJiraBaseUrlLabel": "URL Jira",
+  "syncJiraEmailLabel": "E-mail",
+  "syncJiraApiTokenLabel": "Jeton API",
+  "syncJiraSaveCredentialsButton": "Enregistrer les identifiants",
+  "syncJiraCredentialsSaved": "Identifiants enregistrés.",
+  "syncJiraTestConnectionButton": "Tester la connexion",
+  "syncJiraTestConnectionSuccess": "Connexion réussie.",
+  "syncJiraTestConnectionFailure": "Échec de la connexion. Vérifiez vos identifiants.",
+  "syncJiraSyncButton": "Synchroniser avec Jira maintenant",
+  "syncJiraNotConfigured": "Jira n'est pas encore configuré.",
+  "syncJiraInvalidCredentials": "Veuillez saisir une URL Jira, un e-mail et un jeton API valides.",
+  "syncJiraUnexpectedError": "Une erreur s'est produite. Veuillez réessayer.",
+  "syncJiraSyncResult": "{created} créées, {updated} mises à jour, {deleted} supprimées, {failed} échouées.",
+  "@syncJiraSyncResult": {
+    "placeholders": {
+      "created": { "type": "int" },
+      "updated": { "type": "int" },
+      "deleted": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "navTimer": "Minuteur",
   "navReports": "Rapports",
   "navSync": "Synchronisation",
@@ -30,6 +52,7 @@
   "timerDescriptionLabel": "Sur quoi travaillez-vous ?",
   "timerProjectLabel": "Projet",
   "timerNewProjectTooltip": "Nouveau projet",
+  "jiraTicketFieldLabel": "Ticket Jira",
   "timerStart": "Démarrer",
   "timerIdleTitle": "Inactivité détectée",
   "timerIdleMessage": "Vous êtes inactif(ve) depuis {minutes} minutes. Voulez-vous déduire ce temps de l'entrée en cours ?",
@@ -71,5 +94,8 @@
   "csvHeaderAmount": "Montant",
   "csvHeaderCurrency": "Devise",
   "csvYes": "oui",
-  "csvNo": "non"
+  "csvNo": "non",
+  "entriesJiraStatusSynced": "Enregistré dans Jira",
+  "entriesJiraStatusPending": "Enregistrement Jira en attente",
+  "entriesJiraStatusError": "Échec de l'enregistrement Jira"
 }

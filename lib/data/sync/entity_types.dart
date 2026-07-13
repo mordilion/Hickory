@@ -8,4 +8,5 @@ abstract final class EntityTypes {
   static const tag = 'tag';
   static const activitySample = 'activity_sample';
   static const appSettings = 'app_settings';
+  static const jiraWorklog = 'jira_worklog';
 }

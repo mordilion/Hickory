@@ -74,6 +74,53 @@ class AppLocalizationsEs extends AppLocalizations {
   String get syncCompleted => 'Sincronización completada.';
 
   @override
+  String get syncJiraSectionTitle => 'Integración con Jira';
+
+  @override
+  String get syncJiraBaseUrlLabel => 'URL de Jira';
+
+  @override
+  String get syncJiraEmailLabel => 'Correo electrónico';
+
+  @override
+  String get syncJiraApiTokenLabel => 'Token de API';
+
+  @override
+  String get syncJiraSaveCredentialsButton => 'Guardar credenciales';
+
+  @override
+  String get syncJiraCredentialsSaved => 'Credenciales guardadas.';
+
+  @override
+  String get syncJiraTestConnectionButton => 'Probar conexión';
+
+  @override
+  String get syncJiraTestConnectionSuccess => 'Conexión correcta.';
+
+  @override
+  String get syncJiraTestConnectionFailure =>
+      'Error de conexión. Comprueba tus credenciales.';
+
+  @override
+  String get syncJiraSyncButton => 'Sincronizar con Jira ahora';
+
+  @override
+  String get syncJiraNotConfigured => 'Jira aún no está configurado.';
+
+  @override
+  String get syncJiraInvalidCredentials =>
+      'Introduce una URL de Jira, correo electrónico y token de API válidos.';
+
+  @override
+  String get syncJiraUnexpectedError =>
+      'Se produjo un error. Inténtalo de nuevo.';
+
+  @override
+  String syncJiraSyncResult(int created, int updated, int deleted, int failed) {
+    return '$created creadas, $updated actualizadas, $deleted eliminadas, $failed fallidas.';
+  }
+
+  @override
   String get navTimer => 'Temporizador';
 
   @override
@@ -110,6 +157,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get timerNewProjectTooltip => 'Nuevo proyecto';
+
+  @override
+  String get jiraTicketFieldLabel => 'Ticket de Jira';
 
   @override
   String get timerStart => 'Iniciar';
@@ -247,4 +297,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get csvNo => 'no';
+
+  @override
+  String get entriesJiraStatusSynced => 'Registrado en Jira';
+
+  @override
+  String get entriesJiraStatusPending => 'Registro en Jira pendiente';
+
+  @override
+  String get entriesJiraStatusError => 'Error al registrar en Jira';
 }

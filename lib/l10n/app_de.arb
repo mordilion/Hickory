@@ -38,6 +38,28 @@
     }
   },
   "syncCompleted": "Synchronisierung abgeschlossen.",
+  "syncJiraSectionTitle": "Jira-Integration",
+  "syncJiraBaseUrlLabel": "Jira-URL",
+  "syncJiraEmailLabel": "E-Mail",
+  "syncJiraApiTokenLabel": "API-Token",
+  "syncJiraSaveCredentialsButton": "Zugangsdaten speichern",
+  "syncJiraCredentialsSaved": "Zugangsdaten gespeichert.",
+  "syncJiraTestConnectionButton": "Verbindung testen",
+  "syncJiraTestConnectionSuccess": "Verbindung erfolgreich.",
+  "syncJiraTestConnectionFailure": "Verbindung fehlgeschlagen. Bitte Zugangsdaten prüfen.",
+  "syncJiraSyncButton": "Jetzt zu Jira synchronisieren",
+  "syncJiraNotConfigured": "Jira ist noch nicht konfiguriert.",
+  "syncJiraInvalidCredentials": "Bitte gib eine gültige Jira-URL sowie E-Mail und API-Token an.",
+  "syncJiraUnexpectedError": "Es ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+  "syncJiraSyncResult": "{created} erstellt, {updated} aktualisiert, {deleted} gelöscht, {failed} fehlgeschlagen.",
+  "@syncJiraSyncResult": {
+    "placeholders": {
+      "created": { "type": "int" },
+      "updated": { "type": "int" },
+      "deleted": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "navTimer": "Timer",
   "navReports": "Reports",
   "navSync": "Sync",
@@ -55,6 +77,7 @@
   "timerDescriptionLabel": "Was arbeitest du gerade?",
   "timerProjectLabel": "Projekt",
   "timerNewProjectTooltip": "Neues Projekt",
+  "jiraTicketFieldLabel": "Jira-Ticket",
   "timerStart": "Start",
   "timerIdleTitle": "Inaktiv erkannt",
   "timerIdleMessage": "Du warst seit {minutes} Minuten inaktiv. Soll diese Zeit vom laufenden Eintrag abgezogen werden?",
@@ -121,5 +144,8 @@
   "csvHeaderAmount": "Betrag",
   "csvHeaderCurrency": "Währung",
   "csvYes": "ja",
-  "csvNo": "nein"
+  "csvNo": "nein",
+  "entriesJiraStatusSynced": "In Jira gebucht",
+  "entriesJiraStatusPending": "Jira-Buchung ausstehend",
+  "entriesJiraStatusError": "Jira-Buchung fehlgeschlagen"
 }

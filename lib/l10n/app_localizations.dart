@@ -214,6 +214,90 @@ abstract class AppLocalizations {
   /// **'Synchronisierung abgeschlossen.'**
   String get syncCompleted;
 
+  /// No description provided for @syncJiraSectionTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Jira-Integration'**
+  String get syncJiraSectionTitle;
+
+  /// No description provided for @syncJiraBaseUrlLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Jira-URL'**
+  String get syncJiraBaseUrlLabel;
+
+  /// No description provided for @syncJiraEmailLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'E-Mail'**
+  String get syncJiraEmailLabel;
+
+  /// No description provided for @syncJiraApiTokenLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'API-Token'**
+  String get syncJiraApiTokenLabel;
+
+  /// No description provided for @syncJiraSaveCredentialsButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Zugangsdaten speichern'**
+  String get syncJiraSaveCredentialsButton;
+
+  /// No description provided for @syncJiraCredentialsSaved.
+  ///
+  /// In de, this message translates to:
+  /// **'Zugangsdaten gespeichert.'**
+  String get syncJiraCredentialsSaved;
+
+  /// No description provided for @syncJiraTestConnectionButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Verbindung testen'**
+  String get syncJiraTestConnectionButton;
+
+  /// No description provided for @syncJiraTestConnectionSuccess.
+  ///
+  /// In de, this message translates to:
+  /// **'Verbindung erfolgreich.'**
+  String get syncJiraTestConnectionSuccess;
+
+  /// No description provided for @syncJiraTestConnectionFailure.
+  ///
+  /// In de, this message translates to:
+  /// **'Verbindung fehlgeschlagen. Bitte Zugangsdaten prüfen.'**
+  String get syncJiraTestConnectionFailure;
+
+  /// No description provided for @syncJiraSyncButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Jetzt zu Jira synchronisieren'**
+  String get syncJiraSyncButton;
+
+  /// No description provided for @syncJiraNotConfigured.
+  ///
+  /// In de, this message translates to:
+  /// **'Jira ist noch nicht konfiguriert.'**
+  String get syncJiraNotConfigured;
+
+  /// No description provided for @syncJiraInvalidCredentials.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte gib eine gültige Jira-URL sowie E-Mail und API-Token an.'**
+  String get syncJiraInvalidCredentials;
+
+  /// No description provided for @syncJiraUnexpectedError.
+  ///
+  /// In de, this message translates to:
+  /// **'Es ist ein Fehler aufgetreten. Bitte versuche es erneut.'**
+  String get syncJiraUnexpectedError;
+
+  /// No description provided for @syncJiraSyncResult.
+  ///
+  /// In de, this message translates to:
+  /// **'{created} erstellt, {updated} aktualisiert, {deleted} gelöscht, {failed} fehlgeschlagen.'**
+  String syncJiraSyncResult(int created, int updated, int deleted, int failed);
+
   /// No description provided for @navTimer.
   ///
   /// In de, this message translates to:
@@ -285,6 +369,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Neues Projekt'**
   String get timerNewProjectTooltip;
+
+  /// No description provided for @jiraTicketFieldLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Jira-Ticket'**
+  String get jiraTicketFieldLabel;
 
   /// No description provided for @timerStart.
   ///
@@ -537,6 +627,24 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'nein'**
   String get csvNo;
+
+  /// No description provided for @entriesJiraStatusSynced.
+  ///
+  /// In de, this message translates to:
+  /// **'In Jira gebucht'**
+  String get entriesJiraStatusSynced;
+
+  /// No description provided for @entriesJiraStatusPending.
+  ///
+  /// In de, this message translates to:
+  /// **'Jira-Buchung ausstehend'**
+  String get entriesJiraStatusPending;
+
+  /// No description provided for @entriesJiraStatusError.
+  ///
+  /// In de, this message translates to:
+  /// **'Jira-Buchung fehlgeschlagen'**
+  String get entriesJiraStatusError;
 }
 
 class _AppLocalizationsDelegate

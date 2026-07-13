@@ -18,6 +18,28 @@
   "syncChooseFolderButton": "Choose folder",
   "syncFolderChosen": "Folder selected: {path}",
   "syncCompleted": "Sync completed.",
+  "syncJiraSectionTitle": "Jira Integration",
+  "syncJiraBaseUrlLabel": "Jira URL",
+  "syncJiraEmailLabel": "Email",
+  "syncJiraApiTokenLabel": "API token",
+  "syncJiraSaveCredentialsButton": "Save credentials",
+  "syncJiraCredentialsSaved": "Credentials saved.",
+  "syncJiraTestConnectionButton": "Test connection",
+  "syncJiraTestConnectionSuccess": "Connection successful.",
+  "syncJiraTestConnectionFailure": "Connection failed. Please check your credentials.",
+  "syncJiraSyncButton": "Sync to Jira now",
+  "syncJiraNotConfigured": "Jira isn't configured yet.",
+  "syncJiraInvalidCredentials": "Please enter a valid Jira URL, email, and API token.",
+  "syncJiraUnexpectedError": "Something went wrong. Please try again.",
+  "syncJiraSyncResult": "{created} created, {updated} updated, {deleted} deleted, {failed} failed.",
+  "@syncJiraSyncResult": {
+    "placeholders": {
+      "created": { "type": "int" },
+      "updated": { "type": "int" },
+      "deleted": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "navTimer": "Timer",
   "navReports": "Reports",
   "navSync": "Sync",
@@ -30,6 +52,7 @@
   "timerDescriptionLabel": "What are you working on?",
   "timerProjectLabel": "Project",
   "timerNewProjectTooltip": "New project",
+  "jiraTicketFieldLabel": "Jira ticket",
   "timerStart": "Start",
   "timerIdleTitle": "Idle detected",
   "timerIdleMessage": "You've been idle for {minutes} minutes. Should this time be deducted from the running entry?",
@@ -71,5 +94,8 @@
   "csvHeaderAmount": "Amount",
   "csvHeaderCurrency": "Currency",
   "csvYes": "yes",
-  "csvNo": "no"
+  "csvNo": "no",
+  "entriesJiraStatusSynced": "Booked in Jira",
+  "entriesJiraStatusPending": "Jira booking pending",
+  "entriesJiraStatusError": "Jira booking failed"
 }
