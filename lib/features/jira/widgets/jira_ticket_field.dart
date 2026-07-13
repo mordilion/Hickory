@@ -32,6 +32,10 @@ class _JiraTicketFieldState extends ConsumerState<JiraTicketField> {
     super.dispose();
   }
 
+  /// Guards against redundant searches: RawAutocomplete's optionsBuilder can
+  /// fire again with the same text (e.g. on cursor/selection-only changes,
+  /// not just text edits), which would otherwise restart the debounce timer
+  /// and re-query Jira for a query that hasn't actually changed.
   void _search(String query) {
     if (query == _lastQuery) return;
     _lastQuery = query;
@@ -44,12 +48,14 @@ class _JiraTicketFieldState extends ConsumerState<JiraTicketField> {
   }
 
   Future<void> _runSearch(String query) async {
-    final client = await ref.read(jiraClientProvider.future);
-    if (client == null || !mounted) return;
     try {
+      final client = await ref.read(jiraClientProvider.future);
+      if (client == null || !mounted) return;
       final results = await client.searchIssues(query);
       if (mounted) setState(() => _suggestions = results);
     } catch (_) {
+      // Search failing (network error, provider/credentials error) must
+      // never block manual entry of a ticket key.
       if (mounted) setState(() => _suggestions = const []);
     }
   }
