@@ -6,9 +6,8 @@ import 'jira_client.dart';
 import 'jira_credentials_store.dart';
 
 class HttpJiraClient implements JiraClient {
-  HttpJiraClient({required JiraCredentials credentials, http.Client? httpClient})
-    : _credentials = credentials,
-      _httpClient = httpClient ?? http.Client();
+  HttpJiraClient({required this._credentials, http.Client? httpClient})
+    : _httpClient = httpClient ?? http.Client();
 
   final JiraCredentials _credentials;
   final http.Client _httpClient;
@@ -29,7 +28,13 @@ class HttpJiraClient implements JiraClient {
     final response = await _httpClient.post(
       _uri('/issue/$issueKey/worklog'),
       headers: _headers,
-      body: jsonEncode(_worklogBody(timeSpent: timeSpent, startedAt: startedAt, comment: comment)),
+      body: jsonEncode(
+        _worklogBody(
+          timeSpent: timeSpent,
+          startedAt: startedAt,
+          comment: comment,
+        ),
+      ),
     );
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw JiraApiException(
@@ -51,7 +56,13 @@ class HttpJiraClient implements JiraClient {
     final response = await _httpClient.put(
       _uri('/issue/$issueKey/worklog/$worklogId'),
       headers: _headers,
-      body: jsonEncode(_worklogBody(timeSpent: timeSpent, startedAt: startedAt, comment: comment)),
+      body: jsonEncode(
+        _worklogBody(
+          timeSpent: timeSpent,
+          startedAt: startedAt,
+          comment: comment,
+        ),
+      ),
     );
     if (response.statusCode != 200) {
       throw JiraApiException(
@@ -61,7 +72,10 @@ class HttpJiraClient implements JiraClient {
   }
 
   @override
-  Future<void> deleteWorklog({required String issueKey, required String worklogId}) async {
+  Future<void> deleteWorklog({
+    required String issueKey,
+    required String worklogId,
+  }) async {
     final response = await _httpClient.delete(
       _uri('/issue/$issueKey/worklog/$worklogId'),
       headers: _headers,
@@ -76,15 +90,22 @@ class HttpJiraClient implements JiraClient {
   @override
   Future<List<JiraIssueSuggestion>> searchIssues(String query) async {
     if (query.trim().isEmpty) return const [];
-    final response = await _httpClient.get(_uri('/issue/picker', {'query': query}), headers: _headers);
+    final response = await _httpClient.get(
+      _uri('/issue/picker', {'query': query}),
+      headers: _headers,
+    );
     if (response.statusCode != 200) {
-      throw JiraApiException('Issue search failed (HTTP ${response.statusCode}).');
+      throw JiraApiException(
+        'Issue search failed (HTTP ${response.statusCode}).',
+      );
     }
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;
     final sections = decoded['sections'] as List<dynamic>? ?? const [];
     return [
       for (final section in sections)
-        for (final issue in (section as Map<String, dynamic>)['issues'] as List<dynamic>? ?? const [])
+        for (final issue
+            in (section as Map<String, dynamic>)['issues'] as List<dynamic>? ??
+                const [])
           JiraIssueSuggestion(
             key: (issue as Map<String, dynamic>)['key'] as String,
             summary: (issue['summaryText'] as String?) ?? '',
@@ -100,7 +121,9 @@ class HttpJiraClient implements JiraClient {
   }
 
   Map<String, String> get _headers {
-    final basic = base64Encode(utf8.encode('${_credentials.email}:${_credentials.apiToken}'));
+    final basic = base64Encode(
+      utf8.encode('${_credentials.email}:${_credentials.apiToken}'),
+    );
     return {
       'Authorization': 'Basic $basic',
       'Content-Type': 'application/json',
