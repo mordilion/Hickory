@@ -286,6 +286,12 @@ abstract class AppLocalizations {
   /// **'Neues Projekt'**
   String get timerNewProjectTooltip;
 
+  /// No description provided for @jiraTicketFieldLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Jira-Ticket'**
+  String get jiraTicketFieldLabel;
+
   /// No description provided for @timerStart.
   ///
   /// In de, this message translates to:

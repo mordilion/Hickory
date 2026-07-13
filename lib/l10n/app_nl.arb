@@ -30,6 +30,7 @@
   "timerDescriptionLabel": "Waar werk je aan?",
   "timerProjectLabel": "Project",
   "timerNewProjectTooltip": "Nieuw project",
+  "jiraTicketFieldLabel": "Jira-ticket",
   "timerStart": "Starten",
   "timerIdleTitle": "Inactiviteit gedetecteerd",
   "timerIdleMessage": "Je bent al {minutes} minuten inactief. Wil je deze tijd van de lopende invoer aftrekken?",

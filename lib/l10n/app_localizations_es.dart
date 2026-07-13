@@ -112,6 +112,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get timerNewProjectTooltip => 'Nuevo proyecto';
 
   @override
+  String get jiraTicketFieldLabel => 'Ticket de Jira';
+
+  @override
   String get timerStart => 'Iniciar';
 
   @override

@@ -30,6 +30,7 @@
   "timerDescriptionLabel": "Sur quoi travaillez-vous ?",
   "timerProjectLabel": "Projet",
   "timerNewProjectTooltip": "Nouveau projet",
+  "jiraTicketFieldLabel": "Ticket Jira",
   "timerStart": "Démarrer",
   "timerIdleTitle": "Inactivité détectée",
   "timerIdleMessage": "Vous êtes inactif(ve) depuis {minutes} minutes. Voulez-vous déduire ce temps de l'entrée en cours ?",

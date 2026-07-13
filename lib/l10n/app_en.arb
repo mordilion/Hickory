@@ -30,6 +30,7 @@
   "timerDescriptionLabel": "What are you working on?",
   "timerProjectLabel": "Project",
   "timerNewProjectTooltip": "New project",
+  "jiraTicketFieldLabel": "Jira ticket",
   "timerStart": "Start",
   "timerIdleTitle": "Idle detected",
   "timerIdleMessage": "You've been idle for {minutes} minutes. Should this time be deducted from the running entry?",
