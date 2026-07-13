@@ -2499,7 +2499,7 @@ Add the Jira action methods, next to `_syncNow`:
       final l10n = AppLocalizations.of(context);
       final client = await ref.read(jiraClientProvider.future);
       if (client == null) {
-        setState(() => _jiraStatusMessage = l10n.syncJiraNotConfigured);
+        if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraNotConfigured);
         return;
       }
       final ok = await client.testConnection();
@@ -2523,7 +2523,7 @@ Add the Jira action methods, next to `_syncNow`:
       final l10n = AppLocalizations.of(context);
       final service = await ref.read(jiraSyncServiceProvider.future);
       if (service == null) {
-        setState(() => _jiraStatusMessage = l10n.syncJiraNotConfigured);
+        if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraNotConfigured);
         return;
       }
       final result = await service.syncNow();
