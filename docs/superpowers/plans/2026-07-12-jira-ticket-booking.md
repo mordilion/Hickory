@@ -1274,6 +1274,16 @@ class JiraSyncService {
     );
   }
 
+  /// Reduces any caught error to a message safe for `lastError`, which is
+  /// stored locally AND propagated to every device via the synced event
+  /// log: [JiraApiException]'s message is caller-safe by construction, but
+  /// a raw transport exception's `toString()` (e.g. `SocketException`,
+  /// `http.ClientException`) can embed the request URI — including the
+  /// user's Jira base URL, one of the credential fields that must never
+  /// leave this device (see the design doc's credentials-not-synced rule).
+  String _safeErrorMessage(Object error) =>
+      error is JiraApiException ? error.message : 'Network or connection error';
+
   Future<_Outcome> _reconcilePendingDelete(JiraWorklogRow worklog) async {
     try {
       if (worklog.jiraWorklogId != null && worklog.syncedTicketKey != null) {
@@ -1293,7 +1303,7 @@ class JiraSyncService {
       // loops forever, leaking the Jira-side worklog and breaking the
       // "retried automatically on the next sync" guarantee.
       await writes.upsertJiraWorklogState(
-        worklog.copyWith(lastError: Value('$e')),
+        worklog.copyWith(lastError: Value(_safeErrorMessage(e))),
       );
       return _Outcome.failed;
     }
@@ -1355,7 +1365,7 @@ class JiraSyncService {
           syncedTicketKey: null,
           jiraWorklogId: null,
           status: JiraWorklogStatus.error,
-          lastError: '$e',
+          lastError: _safeErrorMessage(e),
           syncedAt: null,
         ),
       );
@@ -1374,9 +1384,18 @@ class JiraSyncService {
           issueKey: oldWorklog.syncedTicketKey!,
           worklogId: oldWorklog.jiraWorklogId!,
         );
-      } catch (_) {
-        // The old worklog may already be gone; proceed to (re)create on the
-        // new ticket regardless so the entry doesn't get stuck retrying.
+      } catch (e) {
+        // client.deleteWorklog already treats "already gone" (404) as
+        // success, so anything reaching this catch is a genuine failure
+        // (network/auth/500) — proceeding to create on the new ticket
+        // regardless would leave the old worklog booked in Jira forever
+        // with no record of it. Keep the old worklog's tracking as-is
+        // (still `synced` to the OLD ticket) so this move is retried in
+        // full on the next sync, instead of silently losing the old side.
+        await writes.upsertJiraWorklogState(
+          oldWorklog.copyWith(status: JiraWorklogStatus.error, lastError: Value(_safeErrorMessage(e))),
+        );
+        return _Outcome.failed;
       }
     }
     final outcome = await _pushCreate(entry: entry, ticketKey: ticketKey);
@@ -1407,7 +1426,7 @@ class JiraSyncService {
       return _Outcome.updated;
     } catch (e) {
       await writes.upsertJiraWorklogState(
-        worklog.copyWith(status: JiraWorklogStatus.error, lastError: Value('$e')),
+        worklog.copyWith(status: JiraWorklogStatus.error, lastError: Value(_safeErrorMessage(e))),
       );
       return _Outcome.failed;
     }
@@ -1775,8 +1794,6 @@ Expected: completes without errors; `lib/l10n/app_localizations*.dart` now expos
 Create `lib/features/jira/widgets/jira_ticket_field.dart`:
 
 ```dart
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -1799,41 +1816,29 @@ class JiraTicketField extends ConsumerStatefulWidget {
 }
 
 class _JiraTicketFieldState extends ConsumerState<JiraTicketField> {
-  Timer? _debounce;
-  String? _lastQuery;
-  List<JiraIssueSuggestion> _suggestions = const [];
-
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    super.dispose();
-  }
-
-  /// Guards against redundant searches: RawAutocomplete's optionsBuilder can
-  /// fire again with the same text (e.g. on cursor/selection-only changes,
-  /// not just text edits), which would otherwise restart the debounce timer
-  /// and re-query Jira for a query that hasn't actually changed.
-  void _search(String query) {
-    if (query == _lastQuery) return;
-    _lastQuery = query;
-    _debounce?.cancel();
-    if (query.trim().isEmpty) {
-      setState(() => _suggestions = const []);
-      return;
-    }
-    _debounce = Timer(const Duration(milliseconds: 300), () => _runSearch(query));
-  }
-
-  Future<void> _runSearch(String query) async {
+  /// RawAutocomplete's `optionsBuilder` is typed `FutureOr<Iterable<T>>`
+  /// specifically so an async options source is supported natively:
+  /// RawAutocomplete tracks the in-flight call itself and discards a result
+  /// that resolves after a newer call has already started, so returning a
+  /// Future here — rather than kicking off a search as a side effect and
+  /// pushing results back in via a separate `setState`, which does NOT
+  /// cause RawAutocomplete to re-run `optionsBuilder` or redraw the options
+  /// list — is what actually gets fetched results displayed. The debounce
+  /// is a plain delay at the start of the call; a query that goes stale
+  /// during the delay is simply superseded by RawAutocomplete's own
+  /// tracking once the newer call resolves, without extra bookkeeping here.
+  Future<Iterable<JiraIssueSuggestion>> _search(TextEditingValue textValue) async {
+    final query = textValue.text;
+    if (query.trim().isEmpty) return const [];
+    await Future<void>.delayed(const Duration(milliseconds: 300));
     try {
       final client = await ref.read(jiraClientProvider.future);
-      if (client == null || !mounted) return;
-      final results = await client.searchIssues(query);
-      if (mounted) setState(() => _suggestions = results);
+      if (client == null) return const [];
+      return await client.searchIssues(query);
     } catch (_) {
       // Search failing (network error, provider/credentials error) must
       // never block manual entry of a ticket key.
-      if (mounted) setState(() => _suggestions = const []);
+      return const [];
     }
   }
 
@@ -1843,12 +1848,7 @@ class _JiraTicketFieldState extends ConsumerState<JiraTicketField> {
     return RawAutocomplete<JiraIssueSuggestion>(
       initialValue: TextEditingValue(text: widget.initialValue ?? ''),
       displayStringForOption: (option) => option.key,
-      optionsBuilder: (textValue) {
-        _search(textValue.text);
-        return _suggestions.where(
-          (s) => s.key.toLowerCase().contains(textValue.text.toLowerCase()),
-        );
-      },
+      optionsBuilder: _search,
       onSelected: (option) => widget.onChanged(option.key),
       fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
         return TextField(
@@ -2276,6 +2276,8 @@ Add to `lib/l10n/app_de.arb`:
   "syncJiraTestConnectionFailure": "Verbindung fehlgeschlagen. Bitte Zugangsdaten prüfen.",
   "syncJiraSyncButton": "Jetzt zu Jira synchronisieren",
   "syncJiraNotConfigured": "Jira ist noch nicht konfiguriert.",
+  "syncJiraInvalidCredentials": "Bitte gib eine gültige Jira-URL sowie E-Mail und API-Token an.",
+  "syncJiraUnexpectedError": "Es ist ein Fehler aufgetreten. Bitte versuche es erneut.",
   "syncJiraSyncResult": "{created} erstellt, {updated} aktualisiert, {deleted} gelöscht, {failed} fehlgeschlagen.",
   "@syncJiraSyncResult": {
     "placeholders": {
@@ -2302,6 +2304,8 @@ Add the same keys to the other locales (placeholder metadata block is identical 
   "syncJiraTestConnectionFailure": "Connection failed. Please check your credentials.",
   "syncJiraSyncButton": "Sync to Jira now",
   "syncJiraNotConfigured": "Jira isn't configured yet.",
+  "syncJiraInvalidCredentials": "Please enter a valid Jira URL, email, and API token.",
+  "syncJiraUnexpectedError": "Something went wrong. Please try again.",
   "syncJiraSyncResult": "{created} created, {updated} updated, {deleted} deleted, {failed} failed.",
   "@syncJiraSyncResult": {
     "placeholders": {
@@ -2326,6 +2330,8 @@ Add the same keys to the other locales (placeholder metadata block is identical 
   "syncJiraTestConnectionFailure": "Error de conexión. Comprueba tus credenciales.",
   "syncJiraSyncButton": "Sincronizar con Jira ahora",
   "syncJiraNotConfigured": "Jira aún no está configurado.",
+  "syncJiraInvalidCredentials": "Introduce una URL de Jira, correo electrónico y token de API válidos.",
+  "syncJiraUnexpectedError": "Se produjo un error. Inténtalo de nuevo.",
   "syncJiraSyncResult": "{created} creadas, {updated} actualizadas, {deleted} eliminadas, {failed} fallidas.",
   "@syncJiraSyncResult": {
     "placeholders": {
@@ -2350,6 +2356,8 @@ Add the same keys to the other locales (placeholder metadata block is identical 
   "syncJiraTestConnectionFailure": "Échec de la connexion. Vérifiez vos identifiants.",
   "syncJiraSyncButton": "Synchroniser avec Jira maintenant",
   "syncJiraNotConfigured": "Jira n'est pas encore configuré.",
+  "syncJiraInvalidCredentials": "Veuillez saisir une URL Jira, un e-mail et un jeton API valides.",
+  "syncJiraUnexpectedError": "Une erreur s'est produite. Veuillez réessayer.",
   "syncJiraSyncResult": "{created} créées, {updated} mises à jour, {deleted} supprimées, {failed} échouées.",
   "@syncJiraSyncResult": {
     "placeholders": {
@@ -2374,6 +2382,8 @@ Add the same keys to the other locales (placeholder metadata block is identical 
   "syncJiraTestConnectionFailure": "Connessione non riuscita. Controlla le credenziali.",
   "syncJiraSyncButton": "Sincronizza ora con Jira",
   "syncJiraNotConfigured": "Jira non è ancora configurato.",
+  "syncJiraInvalidCredentials": "Inserisci un URL Jira, un'email e un token API validi.",
+  "syncJiraUnexpectedError": "Si è verificato un errore. Riprova.",
   "syncJiraSyncResult": "{created} create, {updated} aggiornate, {deleted} eliminate, {failed} non riuscite.",
   "@syncJiraSyncResult": {
     "placeholders": {
@@ -2398,6 +2408,8 @@ Add the same keys to the other locales (placeholder metadata block is identical 
   "syncJiraTestConnectionFailure": "Verbinding mislukt. Controleer je gegevens.",
   "syncJiraSyncButton": "Nu synchroniseren met Jira",
   "syncJiraNotConfigured": "Jira is nog niet geconfigureerd.",
+  "syncJiraInvalidCredentials": "Voer een geldige Jira-URL, e-mail en API-token in.",
+  "syncJiraUnexpectedError": "Er is een fout opgetreden. Probeer het opnieuw.",
   "syncJiraSyncResult": "{created} aangemaakt, {updated} bijgewerkt, {deleted} verwijderd, {failed} mislukt.",
   "@syncJiraSyncResult": {
     "placeholders": {
@@ -2468,7 +2480,25 @@ Dispose the new controllers — add a `dispose()` override (this widget doesn't 
 Add the Jira action methods, next to `_syncNow`:
 
 ```dart
+  /// Light client-side validation before writing credentials: catches empty
+  /// fields and an obviously-malformed base URL early, so the far more
+  /// common failure mode (a typo right after first setup) surfaces as an
+  /// immediate, specific message instead of a confusing "not configured" or
+  /// unhandled error the first time the URL is actually used.
+  bool _hasValidJiraCredentialsInput() {
+    final email = _jiraEmailController.text.trim();
+    final apiToken = _jiraApiTokenController.text.trim();
+    if (email.isEmpty || apiToken.isEmpty) return false;
+    final uri = Uri.tryParse(_jiraBaseUrlController.text.trim());
+    return uri != null && uri.isAbsolute && (uri.scheme == 'http' || uri.scheme == 'https');
+  }
+
   Future<void> _saveJiraCredentials() async {
+    final l10n = AppLocalizations.of(context);
+    if (!_hasValidJiraCredentialsInput()) {
+      setState(() => _jiraStatusMessage = l10n.syncJiraInvalidCredentials);
+      return;
+    }
     setState(() {
       _jiraBusy = true;
       _jiraStatusMessage = null;
@@ -2483,20 +2513,21 @@ Add the Jira action methods, next to `_syncNow`:
         ),
       );
       ref.invalidate(jiraCredentialsProvider);
-      if (!mounted) return;
-      setState(() => _jiraStatusMessage = AppLocalizations.of(context).syncJiraCredentialsSaved);
+      if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraCredentialsSaved);
+    } catch (_) {
+      if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraUnexpectedError);
     } finally {
       if (mounted) setState(() => _jiraBusy = false);
     }
   }
 
   Future<void> _testJiraConnection() async {
+    final l10n = AppLocalizations.of(context);
     setState(() {
       _jiraBusy = true;
       _jiraStatusMessage = null;
     });
     try {
-      final l10n = AppLocalizations.of(context);
       final client = await ref.read(jiraClientProvider.future);
       if (client == null) {
         if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraNotConfigured);
@@ -2509,18 +2540,24 @@ Add the Jira action methods, next to `_syncNow`:
             ? l10n.syncJiraTestConnectionSuccess
             : l10n.syncJiraTestConnectionFailure,
       );
+    } catch (_) {
+      // testConnection() throws for transport-level errors (e.g. a
+      // malformed URL, DNS failure) — the single most likely error right
+      // after first configuring credentials, so this must not be left to
+      // propagate unhandled.
+      if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraTestConnectionFailure);
     } finally {
       if (mounted) setState(() => _jiraBusy = false);
     }
   }
 
   Future<void> _syncJiraNow() async {
+    final l10n = AppLocalizations.of(context);
     setState(() {
       _jiraBusy = true;
       _jiraStatusMessage = null;
     });
     try {
-      final l10n = AppLocalizations.of(context);
       final service = await ref.read(jiraSyncServiceProvider.future);
       if (service == null) {
         if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraNotConfigured);
@@ -2536,6 +2573,8 @@ Add the Jira action methods, next to `_syncNow`:
           result.failed,
         ),
       );
+    } catch (_) {
+      if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraUnexpectedError);
     } finally {
       if (mounted) setState(() => _jiraBusy = false);
     }
