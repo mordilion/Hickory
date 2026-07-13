@@ -280,6 +280,18 @@ abstract class AppLocalizations {
   /// **'Jira ist noch nicht konfiguriert.'**
   String get syncJiraNotConfigured;
 
+  /// No description provided for @syncJiraInvalidCredentials.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte gib eine gültige Jira-URL sowie E-Mail und API-Token an.'**
+  String get syncJiraInvalidCredentials;
+
+  /// No description provided for @syncJiraUnexpectedError.
+  ///
+  /// In de, this message translates to:
+  /// **'Es ist ein Fehler aufgetreten. Bitte versuche es erneut.'**
+  String get syncJiraUnexpectedError;
+
   /// No description provided for @syncJiraSyncResult.
   ///
   /// In de, this message translates to:

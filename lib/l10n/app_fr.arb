@@ -29,6 +29,8 @@
   "syncJiraTestConnectionFailure": "Échec de la connexion. Vérifiez vos identifiants.",
   "syncJiraSyncButton": "Synchroniser avec Jira maintenant",
   "syncJiraNotConfigured": "Jira n'est pas encore configuré.",
+  "syncJiraInvalidCredentials": "Veuillez saisir une URL Jira, un e-mail et un jeton API valides.",
+  "syncJiraUnexpectedError": "Une erreur s'est produite. Veuillez réessayer.",
   "syncJiraSyncResult": "{created} créées, {updated} mises à jour, {deleted} supprimées, {failed} échouées.",
   "@syncJiraSyncResult": {
     "placeholders": {

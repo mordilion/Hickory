@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,41 +20,29 @@ class JiraTicketField extends ConsumerStatefulWidget {
 }
 
 class _JiraTicketFieldState extends ConsumerState<JiraTicketField> {
-  Timer? _debounce;
-  String? _lastQuery;
-  List<JiraIssueSuggestion> _suggestions = const [];
-
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    super.dispose();
-  }
-
-  /// Guards against redundant searches: RawAutocomplete's optionsBuilder can
-  /// fire again with the same text (e.g. on cursor/selection-only changes,
-  /// not just text edits), which would otherwise restart the debounce timer
-  /// and re-query Jira for a query that hasn't actually changed.
-  void _search(String query) {
-    if (query == _lastQuery) return;
-    _lastQuery = query;
-    _debounce?.cancel();
-    if (query.trim().isEmpty) {
-      setState(() => _suggestions = const []);
-      return;
-    }
-    _debounce = Timer(const Duration(milliseconds: 300), () => _runSearch(query));
-  }
-
-  Future<void> _runSearch(String query) async {
+  /// RawAutocomplete's `optionsBuilder` is typed `FutureOr<Iterable<T>>`
+  /// specifically so an async options source is supported natively:
+  /// RawAutocomplete tracks the in-flight call itself and discards a result
+  /// that resolves after a newer call has already started, so returning a
+  /// Future here — rather than kicking off a search as a side effect and
+  /// pushing results back in via a separate `setState`, which does NOT
+  /// cause RawAutocomplete to re-run `optionsBuilder` or redraw the options
+  /// list — is what actually gets fetched results displayed. The debounce
+  /// is a plain delay at the start of the call; a query that goes stale
+  /// during the delay is simply superseded by RawAutocomplete's own
+  /// tracking once the newer call resolves, without extra bookkeeping here.
+  Future<Iterable<JiraIssueSuggestion>> _search(TextEditingValue textValue) async {
+    final query = textValue.text;
+    if (query.trim().isEmpty) return const [];
+    await Future<void>.delayed(const Duration(milliseconds: 300));
     try {
       final client = await ref.read(jiraClientProvider.future);
-      if (client == null || !mounted) return;
-      final results = await client.searchIssues(query);
-      if (mounted) setState(() => _suggestions = results);
+      if (client == null) return const [];
+      return await client.searchIssues(query);
     } catch (_) {
       // Search failing (network error, provider/credentials error) must
       // never block manual entry of a ticket key.
-      if (mounted) setState(() => _suggestions = const []);
+      return const [];
     }
   }
 
@@ -66,12 +52,7 @@ class _JiraTicketFieldState extends ConsumerState<JiraTicketField> {
     return RawAutocomplete<JiraIssueSuggestion>(
       initialValue: TextEditingValue(text: widget.initialValue ?? ''),
       displayStringForOption: (option) => option.key,
-      optionsBuilder: (textValue) {
-        _search(textValue.text);
-        return _suggestions.where(
-          (s) => s.key.toLowerCase().contains(textValue.text.toLowerCase()),
-        );
-      },
+      optionsBuilder: _search,
       onSelected: (option) => widget.onChanged(option.key),
       fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
         return TextField(

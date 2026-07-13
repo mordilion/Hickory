@@ -29,6 +29,8 @@
   "syncJiraTestConnectionFailure": "Error de conexión. Comprueba tus credenciales.",
   "syncJiraSyncButton": "Sincronizar con Jira ahora",
   "syncJiraNotConfigured": "Jira aún no está configurado.",
+  "syncJiraInvalidCredentials": "Introduce una URL de Jira, correo electrónico y token de API válidos.",
+  "syncJiraUnexpectedError": "Se produjo un error. Inténtalo de nuevo.",
   "syncJiraSyncResult": "{created} creadas, {updated} actualizadas, {deleted} eliminadas, {failed} fallidas.",
   "@syncJiraSyncResult": {
     "placeholders": {

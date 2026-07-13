@@ -63,6 +63,16 @@ class JiraSyncService {
     );
   }
 
+  /// Reduces any caught error to a message safe for `lastError`, which is
+  /// stored locally AND propagated to every device via the synced event
+  /// log: [JiraApiException]'s message is caller-safe by construction, but
+  /// a raw transport exception's `toString()` (e.g. `SocketException`,
+  /// `http.ClientException`) can embed the request URI — including the
+  /// user's Jira base URL, one of the credential fields that must never
+  /// leave this device (see the design doc's credentials-not-synced rule).
+  String _safeErrorMessage(Object error) =>
+      error is JiraApiException ? error.message : 'Network or connection error';
+
   Future<_Outcome> _reconcilePendingDelete(JiraWorklogRow worklog) async {
     try {
       if (worklog.jiraWorklogId != null && worklog.syncedTicketKey != null) {
@@ -81,7 +91,7 @@ class JiraSyncService {
       // Flipping status to `error` here would orphan the row outside both
       // loops forever, leaking the Jira-side worklog and breaking the
       // "retried automatically on the next sync" guarantee.
-      await writes.upsertJiraWorklogState(worklog.copyWith(lastError: Value('$e')));
+      await writes.upsertJiraWorklogState(worklog.copyWith(lastError: Value(_safeErrorMessage(e))));
       return _Outcome.failed;
     }
   }
@@ -142,7 +152,7 @@ class JiraSyncService {
           syncedTicketKey: null,
           jiraWorklogId: null,
           status: JiraWorklogStatus.error,
-          lastError: '$e',
+          lastError: _safeErrorMessage(e),
           syncedAt: null,
         ),
       );
@@ -161,9 +171,18 @@ class JiraSyncService {
           issueKey: oldWorklog.syncedTicketKey!,
           worklogId: oldWorklog.jiraWorklogId!,
         );
-      } catch (_) {
-        // The old worklog may already be gone; proceed to (re)create on the
-        // new ticket regardless so the entry doesn't get stuck retrying.
+      } catch (e) {
+        // client.deleteWorklog already treats "already gone" (404) as
+        // success, so anything reaching this catch is a genuine failure
+        // (network/auth/500) — proceeding to create on the new ticket
+        // regardless would leave the old worklog booked in Jira forever
+        // with no record of it. Keep the old worklog's tracking as-is
+        // (still `synced` to the OLD ticket) so this move is retried in
+        // full on the next sync, instead of silently losing the old side.
+        await writes.upsertJiraWorklogState(
+          oldWorklog.copyWith(status: JiraWorklogStatus.error, lastError: Value(_safeErrorMessage(e))),
+        );
+        return _Outcome.failed;
       }
     }
     final outcome = await _pushCreate(entry: entry, ticketKey: ticketKey);
@@ -194,7 +213,7 @@ class JiraSyncService {
       return _Outcome.updated;
     } catch (e) {
       await writes.upsertJiraWorklogState(
-        worklog.copyWith(status: JiraWorklogStatus.error, lastError: Value('$e')),
+        worklog.copyWith(status: JiraWorklogStatus.error, lastError: Value(_safeErrorMessage(e))),
       );
       return _Outcome.failed;
     }

@@ -107,6 +107,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncJiraNotConfigured => 'Jira isn\'t configured yet.';
 
   @override
+  String get syncJiraInvalidCredentials =>
+      'Please enter a valid Jira URL, email, and API token.';
+
+  @override
+  String get syncJiraUnexpectedError =>
+      'Something went wrong. Please try again.';
+
+  @override
   String syncJiraSyncResult(int created, int updated, int deleted, int failed) {
     return '$created created, $updated updated, $deleted deleted, $failed failed.';
   }

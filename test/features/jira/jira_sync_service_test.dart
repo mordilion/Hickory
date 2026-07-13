@@ -170,6 +170,47 @@ void main() {
     expect(worklog.jiraWorklogId, '10002');
   });
 
+  test(
+    'a move whose old-ticket delete fails leaves the old worklog untouched and does not create on the new ticket',
+    () async {
+      when(
+        () => client.deleteWorklog(issueKey: 'PROJ-1', worklogId: '10001'),
+      ).thenThrow(JiraApiException('boom'));
+
+      final entry = await writes.createManualEntry(
+        deviceId: 'dev_a',
+        startAt: DateTime.utc(2026, 7, 7, 9),
+        endAt: DateTime.utc(2026, 7, 7, 10),
+        jiraTicketKey: 'PROJ-2',
+      );
+      await writes.upsertJiraWorklogState(
+        JiraWorklogRow(
+          id: entry.id,
+          syncedTicketKey: 'PROJ-1',
+          jiraWorklogId: '10001',
+          status: 'synced',
+          lastError: null,
+          syncedAt: DateTime.utc(2020),
+        ),
+      );
+
+      final result = await service.syncNow();
+
+      expect(result.failed, 1);
+      verifyNever(
+        () => client.createWorklog(
+          issueKey: any(named: 'issueKey'),
+          timeSpent: any(named: 'timeSpent'),
+          startedAt: any(named: 'startedAt'),
+          comment: any(named: 'comment'),
+        ),
+      );
+      final worklog = await db.jiraWorklogsDao.getForEntry(entry.id);
+      expect(worklog!.syncedTicketKey, 'PROJ-1');
+      expect(worklog.status, 'error');
+    },
+  );
+
   test('deletes the remote worklog and the tracking row for a pendingDelete entry', () async {
     when(
       () => client.deleteWorklog(issueKey: 'PROJ-1', worklogId: '10001'),

@@ -108,6 +108,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get syncJiraNotConfigured => 'Jira n\'est pas encore configuré.';
 
   @override
+  String get syncJiraInvalidCredentials =>
+      'Veuillez saisir une URL Jira, un e-mail et un jeton API valides.';
+
+  @override
+  String get syncJiraUnexpectedError =>
+      'Une erreur s\'est produite. Veuillez réessayer.';
+
+  @override
   String syncJiraSyncResult(int created, int updated, int deleted, int failed) {
     return '$created créées, $updated mises à jour, $deleted supprimées, $failed échouées.';
   }

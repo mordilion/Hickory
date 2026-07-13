@@ -49,6 +49,8 @@
   "syncJiraTestConnectionFailure": "Verbindung fehlgeschlagen. Bitte Zugangsdaten prüfen.",
   "syncJiraSyncButton": "Jetzt zu Jira synchronisieren",
   "syncJiraNotConfigured": "Jira ist noch nicht konfiguriert.",
+  "syncJiraInvalidCredentials": "Bitte gib eine gültige Jira-URL sowie E-Mail und API-Token an.",
+  "syncJiraUnexpectedError": "Es ist ein Fehler aufgetreten. Bitte versuche es erneut.",
   "syncJiraSyncResult": "{created} erstellt, {updated} aktualisiert, {deleted} gelöscht, {failed} fehlgeschlagen.",
   "@syncJiraSyncResult": {
     "placeholders": {

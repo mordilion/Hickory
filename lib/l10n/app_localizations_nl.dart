@@ -108,6 +108,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get syncJiraNotConfigured => 'Jira is nog niet geconfigureerd.';
 
   @override
+  String get syncJiraInvalidCredentials =>
+      'Voer een geldige Jira-URL, e-mail en API-token in.';
+
+  @override
+  String get syncJiraUnexpectedError =>
+      'Er is een fout opgetreden. Probeer het opnieuw.';
+
+  @override
   String syncJiraSyncResult(int created, int updated, int deleted, int failed) {
     return '$created aangemaakt, $updated bijgewerkt, $deleted verwijderd, $failed mislukt.';
   }

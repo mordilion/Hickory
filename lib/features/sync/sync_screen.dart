@@ -78,7 +78,25 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
     }
   }
 
+  /// Light client-side validation before writing credentials: catches empty
+  /// fields and an obviously-malformed base URL early, so the far more
+  /// common failure mode (a typo right after first setup) surfaces as an
+  /// immediate, specific message instead of a confusing "not configured" or
+  /// unhandled error the first time the URL is actually used.
+  bool _hasValidJiraCredentialsInput() {
+    final email = _jiraEmailController.text.trim();
+    final apiToken = _jiraApiTokenController.text.trim();
+    if (email.isEmpty || apiToken.isEmpty) return false;
+    final uri = Uri.tryParse(_jiraBaseUrlController.text.trim());
+    return uri != null && uri.isAbsolute && (uri.scheme == 'http' || uri.scheme == 'https');
+  }
+
   Future<void> _saveJiraCredentials() async {
+    final l10n = AppLocalizations.of(context);
+    if (!_hasValidJiraCredentialsInput()) {
+      setState(() => _jiraStatusMessage = l10n.syncJiraInvalidCredentials);
+      return;
+    }
     setState(() {
       _jiraBusy = true;
       _jiraStatusMessage = null;
@@ -93,20 +111,21 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
         ),
       );
       ref.invalidate(jiraCredentialsProvider);
-      if (!mounted) return;
-      setState(() => _jiraStatusMessage = AppLocalizations.of(context).syncJiraCredentialsSaved);
+      if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraCredentialsSaved);
+    } catch (_) {
+      if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraUnexpectedError);
     } finally {
       if (mounted) setState(() => _jiraBusy = false);
     }
   }
 
   Future<void> _testJiraConnection() async {
+    final l10n = AppLocalizations.of(context);
     setState(() {
       _jiraBusy = true;
       _jiraStatusMessage = null;
     });
     try {
-      final l10n = AppLocalizations.of(context);
       final client = await ref.read(jiraClientProvider.future);
       if (client == null) {
         if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraNotConfigured);
@@ -119,18 +138,24 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
             ? l10n.syncJiraTestConnectionSuccess
             : l10n.syncJiraTestConnectionFailure,
       );
+    } catch (_) {
+      // testConnection() throws for transport-level errors (e.g. a
+      // malformed URL, DNS failure) — the single most likely error right
+      // after first configuring credentials, so this must not be left to
+      // propagate unhandled.
+      if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraTestConnectionFailure);
     } finally {
       if (mounted) setState(() => _jiraBusy = false);
     }
   }
 
   Future<void> _syncJiraNow() async {
+    final l10n = AppLocalizations.of(context);
     setState(() {
       _jiraBusy = true;
       _jiraStatusMessage = null;
     });
     try {
-      final l10n = AppLocalizations.of(context);
       final service = await ref.read(jiraSyncServiceProvider.future);
       if (service == null) {
         if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraNotConfigured);
@@ -146,6 +171,8 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
           result.failed,
         ),
       );
+    } catch (_) {
+      if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraUnexpectedError);
     } finally {
       if (mounted) setState(() => _jiraBusy = false);
     }

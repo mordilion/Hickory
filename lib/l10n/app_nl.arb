@@ -29,6 +29,8 @@
   "syncJiraTestConnectionFailure": "Verbinding mislukt. Controleer je gegevens.",
   "syncJiraSyncButton": "Nu synchroniseren met Jira",
   "syncJiraNotConfigured": "Jira is nog niet geconfigureerd.",
+  "syncJiraInvalidCredentials": "Voer een geldige Jira-URL, e-mail en API-token in.",
+  "syncJiraUnexpectedError": "Er is een fout opgetreden. Probeer het opnieuw.",
   "syncJiraSyncResult": "{created} aangemaakt, {updated} bijgewerkt, {deleted} verwijderd, {failed} mislukt.",
   "@syncJiraSyncResult": {
     "placeholders": {
