@@ -222,4 +222,46 @@ void main() {
     expect(worklog!.status, 'error');
     expect(worklog.lastError, contains('boom'));
   });
+
+  test(
+    'a failed pendingDelete stays pendingDelete and is retried on the next sync',
+    () async {
+      when(
+        () => client.deleteWorklog(issueKey: 'PROJ-1', worklogId: '10001'),
+      ).thenThrow(JiraApiException('unreachable'));
+
+      final entry = await writes.createManualEntry(
+        deviceId: 'dev_a',
+        startAt: DateTime.utc(2026, 7, 7, 9),
+        endAt: DateTime.utc(2026, 7, 7, 10),
+        jiraTicketKey: 'PROJ-1',
+      );
+      await writes.upsertJiraWorklogState(
+        JiraWorklogRow(
+          id: entry.id,
+          syncedTicketKey: 'PROJ-1',
+          jiraWorklogId: '10001',
+          status: 'pendingDelete',
+          lastError: null,
+          syncedAt: null,
+        ),
+      );
+
+      final firstResult = await service.syncNow();
+
+      expect(firstResult.failed, 1);
+      final worklogAfterFailure = await db.jiraWorklogsDao.getForEntry(entry.id);
+      expect(worklogAfterFailure!.status, 'pendingDelete');
+      expect(worklogAfterFailure.lastError, contains('unreachable'));
+
+      when(
+        () => client.deleteWorklog(issueKey: 'PROJ-1', worklogId: '10001'),
+      ).thenAnswer((_) async {});
+
+      final secondResult = await service.syncNow();
+
+      expect(secondResult.deleted, 1);
+      expect(await db.jiraWorklogsDao.getForEntry(entry.id), isNull);
+    },
+  );
 }
