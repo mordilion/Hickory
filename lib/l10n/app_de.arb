@@ -122,5 +122,8 @@
   "csvHeaderAmount": "Betrag",
   "csvHeaderCurrency": "Währung",
   "csvYes": "ja",
-  "csvNo": "nein"
+  "csvNo": "nein",
+  "entriesJiraStatusSynced": "In Jira gebucht",
+  "entriesJiraStatusPending": "Jira-Buchung ausstehend",
+  "entriesJiraStatusError": "Jira-Buchung fehlgeschlagen"
 }

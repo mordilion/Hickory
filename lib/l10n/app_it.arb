@@ -72,5 +72,8 @@
   "csvHeaderAmount": "Importo",
   "csvHeaderCurrency": "Valuta",
   "csvYes": "sì",
-  "csvNo": "no"
+  "csvNo": "no",
+  "entriesJiraStatusSynced": "Registrato su Jira",
+  "entriesJiraStatusPending": "Registrazione Jira in sospeso",
+  "entriesJiraStatusError": "Registrazione Jira non riuscita"
 }

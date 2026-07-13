@@ -250,4 +250,13 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get csvNo => 'nee';
+
+  @override
+  String get entriesJiraStatusSynced => 'Geboekt in Jira';
+
+  @override
+  String get entriesJiraStatusPending => 'Jira-boeking in behandeling';
+
+  @override
+  String get entriesJiraStatusError => 'Jira-boeking mislukt';
 }

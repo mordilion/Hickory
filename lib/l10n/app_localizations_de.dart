@@ -248,4 +248,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get csvNo => 'nein';
+
+  @override
+  String get entriesJiraStatusSynced => 'In Jira gebucht';
+
+  @override
+  String get entriesJiraStatusPending => 'Jira-Buchung ausstehend';
+
+  @override
+  String get entriesJiraStatusError => 'Jira-Buchung fehlgeschlagen';
 }

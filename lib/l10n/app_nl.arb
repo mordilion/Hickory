@@ -72,5 +72,8 @@
   "csvHeaderAmount": "Bedrag",
   "csvHeaderCurrency": "Valuta",
   "csvYes": "ja",
-  "csvNo": "nee"
+  "csvNo": "nee",
+  "entriesJiraStatusSynced": "Geboekt in Jira",
+  "entriesJiraStatusPending": "Jira-boeking in behandeling",
+  "entriesJiraStatusError": "Jira-boeking mislukt"
 }

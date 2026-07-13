@@ -72,5 +72,8 @@
   "csvHeaderAmount": "Importe",
   "csvHeaderCurrency": "Moneda",
   "csvYes": "sí",
-  "csvNo": "no"
+  "csvNo": "no",
+  "entriesJiraStatusSynced": "Registrado en Jira",
+  "entriesJiraStatusPending": "Registro en Jira pendiente",
+  "entriesJiraStatusError": "Error al registrar en Jira"
 }

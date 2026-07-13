@@ -72,5 +72,8 @@
   "csvHeaderAmount": "Montant",
   "csvHeaderCurrency": "Devise",
   "csvYes": "oui",
-  "csvNo": "non"
+  "csvNo": "non",
+  "entriesJiraStatusSynced": "Enregistré dans Jira",
+  "entriesJiraStatusPending": "Enregistrement Jira en attente",
+  "entriesJiraStatusError": "Échec de l'enregistrement Jira"
 }

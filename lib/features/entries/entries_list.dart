@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/app_settings_provider.dart';
+import '../../core/di/jira_providers.dart';
 import '../../core/di/sync_providers.dart';
 import '../../core/format/date_format.dart';
 import '../../core/format/duration_format.dart';
 import '../../data/drift/database.dart';
+import '../../data/drift/tables/jira_worklogs_table.dart';
 import '../../data/drift/time_entry_extensions.dart';
 import '../../l10n/app_localizations.dart';
 import '../projects/projects_providers.dart';
@@ -25,6 +27,7 @@ class EntriesList extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final entriesAsync = ref.watch(allEntriesProvider);
     final projectsAsync = ref.watch(activeProjectsProvider);
+    final jiraWorklogsAsync = ref.watch(jiraWorklogsByEntryIdProvider);
     final settings = ref.watch(appSettingsProvider).value;
     final dateStyle = settings.dateStyle;
     final timeStyle = settings.timeStyle;
@@ -44,6 +47,8 @@ class EntriesList extends ConsumerWidget {
           itemBuilder: (context, index) {
             final entry = finished[index];
             final project = entry.projectId == null ? null : projectsById[entry.projectId];
+            final jiraWorklog = jiraWorklogsAsync.value?[entry.id];
+            final jiraStatusIcon = _jiraStatusIcon(l10n, entry.jiraTicketKey, jiraWorklog);
             final duration = entry.workedDuration;
             return Dismissible(
               key: ValueKey(entry.id),
@@ -81,7 +86,16 @@ class EntriesList extends ConsumerWidget {
                     '${formatDate(entry.startAt, dateStyle, Localizations.localeOf(context).languageCode)} '
                     '${formatTime(entry.startAt, timeStyle)}',
                   ),
-                  trailing: Text(formatDuration(duration)),
+                  trailing: jiraStatusIcon == null
+                      ? Text(formatDuration(duration))
+                      : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            jiraStatusIcon,
+                            const SizedBox(width: 6),
+                            Text(formatDuration(duration)),
+                          ],
+                        ),
                   onTap: () => showManualEntryDialog(context, ref, existing: entry),
                 ),
               ),
@@ -93,4 +107,23 @@ class EntriesList extends ConsumerWidget {
       error: (error, stack) => Center(child: Text(l10n.entriesError(error.toString()))),
     );
   }
+}
+
+Widget? _jiraStatusIcon(AppLocalizations l10n, String? jiraTicketKey, JiraWorklogRow? worklog) {
+  if (jiraTicketKey == null) return null;
+  final status = worklog?.status;
+  return switch (status) {
+    JiraWorklogStatus.synced => Tooltip(
+        message: l10n.entriesJiraStatusSynced,
+        child: const Icon(Icons.cloud_done_outlined, size: 18, color: Colors.green),
+      ),
+    JiraWorklogStatus.error => Tooltip(
+        message: l10n.entriesJiraStatusError,
+        child: const Icon(Icons.cloud_off_outlined, size: 18, color: Colors.red),
+      ),
+    _ => Tooltip(
+        message: l10n.entriesJiraStatusPending,
+        child: Icon(Icons.cloud_upload_outlined, size: 18, color: Colors.grey.shade600),
+      ),
+  };
 }

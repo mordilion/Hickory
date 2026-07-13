@@ -543,6 +543,24 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'nein'**
   String get csvNo;
+
+  /// No description provided for @entriesJiraStatusSynced.
+  ///
+  /// In de, this message translates to:
+  /// **'In Jira gebucht'**
+  String get entriesJiraStatusSynced;
+
+  /// No description provided for @entriesJiraStatusPending.
+  ///
+  /// In de, this message translates to:
+  /// **'Jira-Buchung ausstehend'**
+  String get entriesJiraStatusPending;
+
+  /// No description provided for @entriesJiraStatusError.
+  ///
+  /// In de, this message translates to:
+  /// **'Jira-Buchung fehlgeschlagen'**
+  String get entriesJiraStatusError;
 }
 
 class _AppLocalizationsDelegate

@@ -250,4 +250,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get csvNo => 'non';
+
+  @override
+  String get entriesJiraStatusSynced => 'Enregistré dans Jira';
+
+  @override
+  String get entriesJiraStatusPending => 'Enregistrement Jira en attente';
+
+  @override
+  String get entriesJiraStatusError => 'Échec de l\'enregistrement Jira';
 }
