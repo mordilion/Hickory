@@ -12,6 +12,7 @@ import '../../data/drift/database.dart';
 import '../../data/drift/time_entry_extensions.dart';
 import '../../l10n/app_localizations.dart';
 import '../entries/entries_list.dart';
+import '../jira/widgets/jira_ticket_field.dart';
 import '../projects/new_project_dialog.dart';
 import '../projects/projects_providers.dart';
 import 'idle_prompt_dialog.dart';
@@ -34,6 +35,7 @@ class TimerScreen extends ConsumerStatefulWidget {
 class _TimerScreenState extends ConsumerState<TimerScreen> {
   final _descriptionController = TextEditingController();
   String? _selectedProjectId;
+  String? _selectedJiraTicketKey;
   bool _idlePromptShowing = false;
 
   @override
@@ -85,8 +87,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
       description: _descriptionController.text.trim().isEmpty
           ? null
           : _descriptionController.text.trim(),
+      jiraTicketKey: _selectedJiraTicketKey,
     );
     _descriptionController.clear();
+    setState(() => _selectedJiraTicketKey = null);
   }
 
   Future<void> _stop(TimeEntry running) async {
@@ -136,6 +140,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                     descriptionController: _descriptionController,
                     selectedProjectId: _selectedProjectId,
                     onProjectChanged: (id) => setState(() => _selectedProjectId = id),
+                    selectedJiraTicketKey: _selectedJiraTicketKey,
+                    onJiraTicketKeyChanged: (key) => setState(() => _selectedJiraTicketKey = key),
                     onStart: _start,
                   ),
             loading: () => const CircularProgressIndicator(),
@@ -238,12 +244,16 @@ class _StartCard extends ConsumerWidget {
     required this.descriptionController,
     required this.selectedProjectId,
     required this.onProjectChanged,
+    required this.selectedJiraTicketKey,
+    required this.onJiraTicketKeyChanged,
     required this.onStart,
   });
 
   final TextEditingController descriptionController;
   final String? selectedProjectId;
   final ValueChanged<String?> onProjectChanged;
+  final String? selectedJiraTicketKey;
+  final ValueChanged<String?> onJiraTicketKeyChanged;
   final VoidCallback onStart;
 
   @override
@@ -286,6 +296,11 @@ class _StartCard extends ConsumerWidget {
                   icon: const Icon(Icons.add_box_outlined),
                 ),
               ],
+            ),
+            const SizedBox(height: 12),
+            JiraTicketField(
+              initialValue: selectedJiraTicketKey,
+              onChanged: onJiraTicketKeyChanged,
             ),
             const SizedBox(height: 12),
             GradientPillButton(
