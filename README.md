@@ -2,6 +2,7 @@
 
 A local-first, privacy-friendly time tracking desktop app with Jira worklog sync, automatic activity tracking, and multi-device sync over your own cloud storage folder (iCloud Drive, Dropbox, Google Drive, OneDrive, ...) — no server or account required.
 
+[![Build Artifacts](https://github.com/mordilion/Hickory/actions/workflows/build.yml/badge.svg)](https://github.com/mordilion/Hickory/actions/workflows/build.yml)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Platform: macOS | Windows](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey.svg)
 ![Flutter](https://img.shields.io/badge/flutter-3.38%2B-02569B.svg?logo=flutter)
@@ -34,6 +35,13 @@ A local-first, privacy-friendly time tracking desktop app with Jira worklog sync
 - [Flutter](https://docs.flutter.dev/get-started/install) 3.38+ (Dart 3.12+), stable channel
 - macOS or Windows for the desktop-only features (activity tracking, folder sync); other platforms are not currently supported
 - A Jira Cloud account with an [API token](https://id.atlassian.com/manage-profile/security/api-tokens) if you want to use the Jira sync feature (optional)
+
+### Pre-built artifacts
+
+Every push to `main` builds macOS, Windows, Android, and iOS artifacts via [GitHub Actions](.github/workflows/build.yml); download them from a workflow run's [Artifacts](https://github.com/mordilion/Hickory/actions/workflows/build.yml) list. There is no signed release yet:
+- macOS and Windows builds are unsigned but runnable.
+- The Android APK is signed with the Flutter debug keystore (not suitable for distribution).
+- The iOS build is unsigned (`--no-codesign`) and needs re-signing before it can be installed on a device.
 
 ### Installation
 
