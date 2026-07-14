@@ -1,3 +1,3 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+- Initial release: macOS/Windows active-window and idle-time tracking plugin for Hickory.

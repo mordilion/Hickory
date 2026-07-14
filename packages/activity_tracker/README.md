@@ -1,15 +1,5 @@
 # activity_tracker
 
-A new Flutter plugin project.
+Desktop-only (macOS/Windows) Flutter plugin for active-window and idle-time tracking, used by [Hickory](../../README.md) for automatic time tracking. Declares only `macos`/`windows` platform keys, so it's excluded from iOS/Android builds entirely.
 
-## Getting Started
-
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/to/develop-plugins),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+This is an internal package (`publish_to: 'none'`) and is not published to pub.dev.
