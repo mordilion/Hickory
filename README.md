@@ -43,6 +43,12 @@ Every push to `main` builds macOS, Windows, Android, and iOS artifacts via [GitH
 - The Android APK is signed with the Flutter debug keystore (not suitable for distribution).
 - The iOS build is unsigned (`--no-codesign`) and needs re-signing before it can be installed on a device.
 
+Because the macOS build is unsigned and not notarized, Gatekeeper quarantines the downloaded `.app` and refuses to open it, reporting it as "damaged" or "can't be opened" (the app itself is fine — this is macOS's quarantine flag on unsigned downloads). Clear the flag before launching:
+
+```bash
+xattr -cr /path/to/hickory.app
+```
+
 ### Installation
 
 ```bash
