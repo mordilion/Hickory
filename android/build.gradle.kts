@@ -21,19 +21,20 @@ subprojects {
 // fails with "cannot find symbol FilePickerPlugin".
 // See https://github.com/miguelpruivo/flutter_file_picker/issues/1942
 //
-// Must be registered before evaluationDependsOn(":app") below: that call forces
-// immediate evaluation of :app for every other subproject that reaches it, so if
-// this afterEvaluate hook were registered afterwards, :app would already be
-// evaluated by the time we tried to attach it, causing
-// "Cannot run Project.afterEvaluate(Action) when the project is already evaluated".
+// Applied eagerly (not from afterEvaluate) and before evaluationDependsOn(":app")
+// below. The Kotlin Gradle Plugin's own KotlinPluginLifecycle tracks each
+// project's configuration stage independently of Gradle's; applying it from an
+// afterEvaluate callback fires too late once evaluationDependsOn(":app") has
+// pulled :app's evaluation forward, causing
+// "KotlinPluginLifecycle cannot be started in ProjectState 'EXECUTING'".
+// Applying it here runs as part of file_picker's normal configuration, before
+// its own build.gradle executes, which is the ordering the lifecycle expects.
 subprojects {
-    afterEvaluate {
-        if (name == "file_picker" && extensions.findByName("kotlin") == null) {
-            pluginManager.apply("org.jetbrains.kotlin.android")
-            extensions.configure(org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension::class.java) {
-                compilerOptions {
-                    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-                }
+    if (name == "file_picker" && extensions.findByName("kotlin") == null) {
+        pluginManager.apply("org.jetbrains.kotlin.android")
+        extensions.configure(org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension::class.java) {
+            compilerOptions {
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
             }
         }
     }
