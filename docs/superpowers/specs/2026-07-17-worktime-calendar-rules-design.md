@@ -159,10 +159,11 @@ cross-device event-log merge, and that merge can happen at arbitrary times.
 - Calculation module: unit tests per rule (day min/max, tiered break rule, weekly/
   monthly target with exception days, balance accumulation across adjustments,
   midnight-split attribution) — pure functions, no widget/DB harness needed.
-- Migration test: `schemaVersion` 4 → 5 preserves existing `AppSettings` row and
-  defaults new columns to `0`/`null` as specified (same pattern as
-  `docs/superpowers/plans/2026-07-08-user-configurable-date-time-format.md`'s
-  migration tests).
+- DAO tests against a freshly created in-memory database (`AppDatabase.forTesting`),
+  the existing convention in this codebase (see `app_settings_dao_test.dart`) — there
+  is no existing infrastructure for testing the `onUpgrade` path itself against an old
+  on-disk schema, so this plan doesn't introduce one either; it only verifies the new
+  columns/tables behave correctly once created.
 - Sync round-trip test for the three new entity types, following the existing
   `TimeEntries` sync test pattern.
 
