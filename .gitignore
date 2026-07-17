@@ -46,3 +46,6 @@ app.*.map.json
 
 # Brainstorming visual companion session files
 .superpowers/
+
+# Local git worktrees
+.worktrees/
