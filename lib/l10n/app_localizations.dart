@@ -532,11 +532,11 @@ abstract class AppLocalizations {
   /// **'Diese Zeitdauern erscheinen als Schnellauswahl im Timer-Tab.'**
   String get settingsQuickAddDescription;
 
-  /// No description provided for @settingsQuickAddAddTooltip.
+  /// No description provided for @settingsQuickAddAddLabel.
   ///
   /// In de, this message translates to:
   /// **'Hinzufügen'**
-  String get settingsQuickAddAddTooltip;
+  String get settingsQuickAddAddLabel;
 
   /// No description provided for @settingsQuickAddRemoveTooltip.
   ///

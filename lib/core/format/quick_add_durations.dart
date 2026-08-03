@@ -7,11 +7,15 @@ const defaultQuickAddDurationsMinutes = [15, 30, 45, 60];
 
 /// Parses the comma-separated minutes list stored in
 /// `AppSettings.quickAddDurationsMinutes`. Invalid, non-positive, and
-/// duplicate entries are dropped; falls back to
-/// [defaultQuickAddDurationsMinutes] if nothing valid remains (including a
-/// null/empty [raw]) so a corrupted value never breaks the quick-add bar.
+/// duplicate entries are dropped. A null [raw] (no settings row exists yet)
+/// falls back to [defaultQuickAddDurationsMinutes]; an explicitly empty
+/// string returns an empty list rather than the defaults, since removing
+/// every preset is a deliberate, supported user choice (see the design
+/// spec's "Removing the last chip is allowed" note) — only a non-empty but
+/// unparseable/corrupted value falls back to defaults.
 List<int> parseQuickAddDurations(String? raw) {
-  if (raw == null || raw.trim().isEmpty) return defaultQuickAddDurationsMinutes;
+  if (raw == null) return defaultQuickAddDurationsMinutes;
+  if (raw.trim().isEmpty) return const [];
   final values = raw
       .split(',')
       .map((s) => int.tryParse(s.trim()))

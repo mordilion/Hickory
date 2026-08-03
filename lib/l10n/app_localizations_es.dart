@@ -250,7 +250,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Estas duraciones aparecen como botones de entrada rápida en la pestaña Timer.';
 
   @override
-  String get settingsQuickAddAddTooltip => 'Añadir';
+  String get settingsQuickAddAddLabel => 'Añadir';
 
   @override
   String get settingsQuickAddRemoveTooltip => 'Eliminar';

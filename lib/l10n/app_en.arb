@@ -90,7 +90,7 @@
   "quickAddSubmitTooltip": "Add entry",
   "settingsQuickAddTitle": "Quick Add",
   "settingsQuickAddDescription": "These durations appear as quick-add buttons on the Timer tab.",
-  "settingsQuickAddAddTooltip": "Add",
+  "settingsQuickAddAddLabel": "Add",
   "settingsQuickAddRemoveTooltip": "Remove",
   "settingsQuickAddNewDurationLabel": "Minutes",
   "projectsNewProjectTitle": "New project",

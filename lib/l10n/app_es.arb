@@ -90,7 +90,7 @@
   "quickAddSubmitTooltip": "Añadir entrada",
   "settingsQuickAddTitle": "Entrada rápida",
   "settingsQuickAddDescription": "Estas duraciones aparecen como botones de entrada rápida en la pestaña Timer.",
-  "settingsQuickAddAddTooltip": "Añadir",
+  "settingsQuickAddAddLabel": "Añadir",
   "settingsQuickAddRemoveTooltip": "Eliminar",
   "settingsQuickAddNewDurationLabel": "Minutos",
   "projectsNewProjectTitle": "Nuevo proyecto",

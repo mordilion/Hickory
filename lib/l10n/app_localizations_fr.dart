@@ -250,7 +250,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ces durées apparaissent comme boutons d\'ajout rapide dans l\'onglet Minuteur.';
 
   @override
-  String get settingsQuickAddAddTooltip => 'Ajouter';
+  String get settingsQuickAddAddLabel => 'Ajouter';
 
   @override
   String get settingsQuickAddRemoveTooltip => 'Supprimer';

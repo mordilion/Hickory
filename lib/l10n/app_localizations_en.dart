@@ -248,7 +248,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'These durations appear as quick-add buttons on the Timer tab.';
 
   @override
-  String get settingsQuickAddAddTooltip => 'Add';
+  String get settingsQuickAddAddLabel => 'Add';
 
   @override
   String get settingsQuickAddRemoveTooltip => 'Remove';

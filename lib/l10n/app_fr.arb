@@ -90,7 +90,7 @@
   "quickAddSubmitTooltip": "Ajouter une entrée",
   "settingsQuickAddTitle": "Ajout rapide",
   "settingsQuickAddDescription": "Ces durées apparaissent comme boutons d'ajout rapide dans l'onglet Minuteur.",
-  "settingsQuickAddAddTooltip": "Ajouter",
+  "settingsQuickAddAddLabel": "Ajouter",
   "settingsQuickAddRemoveTooltip": "Supprimer",
   "settingsQuickAddNewDurationLabel": "Minutes",
   "projectsNewProjectTitle": "Nouveau projet",

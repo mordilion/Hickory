@@ -125,7 +125,7 @@
   "quickAddSubmitTooltip": "Eintrag hinzufügen",
   "settingsQuickAddTitle": "Schnelleingabe",
   "settingsQuickAddDescription": "Diese Zeitdauern erscheinen als Schnellauswahl im Timer-Tab.",
-  "settingsQuickAddAddTooltip": "Hinzufügen",
+  "settingsQuickAddAddLabel": "Hinzufügen",
   "settingsQuickAddRemoveTooltip": "Entfernen",
   "settingsQuickAddNewDurationLabel": "Minuten",
   "projectsNewProjectTitle": "Neues Projekt",

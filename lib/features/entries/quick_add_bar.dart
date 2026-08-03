@@ -32,6 +32,19 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
   bool _jiraExpanded = false;
   late DateTime _startAt;
   late DateTime _endAt;
+  Duration _lastAppliedDuration = const Duration(minutes: 30);
+
+  /// True once the user has explicitly picked a duration chip or nudged a
+  /// time button since the last reset. While false, [_startAt]/[_endAt] are
+  /// a stale snapshot from whenever the bar last reset (e.g. hours ago on a
+  /// desktop app left open) rather than the live default — [_displayStartAt]
+  /// / [_displayEndAt] recompute against "now" instead of trusting them, and
+  /// [_submit] refreshes the stored values before writing.
+  bool _rangeTouched = false;
+
+  DateTime get _displayEndAt => _rangeTouched ? _endAt : DateTime.now();
+  DateTime get _displayStartAt =>
+      _rangeTouched ? _startAt : _displayEndAt.subtract(_lastAppliedDuration);
 
   @override
   void initState() {
@@ -49,28 +62,33 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
     final now = DateTime.now();
     _endAt = now;
     _startAt = now.subtract(duration);
+    _lastAppliedDuration = duration;
   }
 
   void _applyDuration(int minutes) {
-    setState(() => _resetTimeRange(Duration(minutes: minutes)));
+    setState(() {
+      _resetTimeRange(Duration(minutes: minutes));
+      _rangeTouched = true;
+    });
   }
 
   Future<void> _pickTime({required bool isStart}) async {
-    final initial = isStart ? _startAt : _endAt;
+    final initial = isStart ? _displayStartAt : _displayEndAt;
     final time = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(initial));
     if (time == null || !mounted) return;
     final now = DateTime.now();
     final combined = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    final freshStart = _displayStartAt;
+    final freshEnd = _displayEndAt;
     setState(() {
-      if (isStart) {
-        _startAt = combined;
-      } else {
-        _endAt = combined;
-      }
+      _startAt = isStart ? combined : freshStart;
+      _endAt = isStart ? freshEnd : combined;
+      _rangeTouched = true;
     });
   }
 
   Future<void> _submit() async {
+    if (!_rangeTouched) _resetTimeRange(_lastAppliedDuration);
     if (_endAt.isBefore(_startAt)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context).entriesEndBeforeStartError)),
@@ -79,9 +97,8 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
     }
     final deviceId = await ref.read(deviceIdProvider.future);
     final writes = await ref.read(syncedWritesProvider.future);
-    final description = _descriptionController.text.trim().isEmpty
-        ? null
-        : _descriptionController.text.trim();
+    final descriptionText = _descriptionController.text.trim();
+    final description = descriptionText.isEmpty ? null : descriptionText;
     await writes.createManualEntry(
       deviceId: deviceId,
       startAt: _startAt,
@@ -92,7 +109,10 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
     );
     if (!mounted) return;
     _descriptionController.clear();
-    setState(() => _resetTimeRange(const Duration(minutes: 30)));
+    setState(() {
+      _resetTimeRange(const Duration(minutes: 30));
+      _rangeTouched = false;
+    });
   }
 
   void _openFullDialog() {
@@ -163,12 +183,12 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
                   ),
                 TextButton(
                   onPressed: () => _pickTime(isStart: true),
-                  child: Text(formatTime(_startAt, timeStyle)),
+                  child: Text(formatTime(_displayStartAt, timeStyle)),
                 ),
                 const Text('–'),
                 TextButton(
                   onPressed: () => _pickTime(isStart: false),
-                  child: Text(formatTime(_endAt, timeStyle)),
+                  child: Text(formatTime(_displayEndAt, timeStyle)),
                 ),
                 IconButton(
                   tooltip: l10n.quickAddJiraTooltip,

@@ -249,7 +249,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Queste durate compaiono come pulsanti di aggiunta rapida nella scheda Timer.';
 
   @override
-  String get settingsQuickAddAddTooltip => 'Aggiungi';
+  String get settingsQuickAddAddLabel => 'Aggiungi';
 
   @override
   String get settingsQuickAddRemoveTooltip => 'Rimuovi';

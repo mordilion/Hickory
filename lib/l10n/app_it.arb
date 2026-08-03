@@ -90,7 +90,7 @@
   "quickAddSubmitTooltip": "Aggiungi voce",
   "settingsQuickAddTitle": "Aggiunta rapida",
   "settingsQuickAddDescription": "Queste durate compaiono come pulsanti di aggiunta rapida nella scheda Timer.",
-  "settingsQuickAddAddTooltip": "Aggiungi",
+  "settingsQuickAddAddLabel": "Aggiungi",
   "settingsQuickAddRemoveTooltip": "Rimuovi",
   "settingsQuickAddNewDurationLabel": "Minuti",
   "projectsNewProjectTitle": "Nuovo progetto",

@@ -90,7 +90,7 @@
   "quickAddSubmitTooltip": "Invoer toevoegen",
   "settingsQuickAddTitle": "Snel toevoegen",
   "settingsQuickAddDescription": "Deze duren verschijnen als snelkeuzeknoppen op het tabblad Timer.",
-  "settingsQuickAddAddTooltip": "Toevoegen",
+  "settingsQuickAddAddLabel": "Toevoegen",
   "settingsQuickAddRemoveTooltip": "Verwijderen",
   "settingsQuickAddNewDurationLabel": "Minuten",
   "projectsNewProjectTitle": "Nieuw project",

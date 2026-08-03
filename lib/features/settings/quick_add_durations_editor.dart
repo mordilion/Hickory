@@ -71,7 +71,7 @@ class QuickAddDurationsEditor extends ConsumerWidget {
               ),
             ActionChip(
               avatar: const Icon(Icons.add, size: 18),
-              label: Text(l10n.settingsQuickAddAddTooltip),
+              label: Text(l10n.settingsQuickAddAddLabel),
               onPressed: () => _add(context, ref, durations),
             ),
           ],

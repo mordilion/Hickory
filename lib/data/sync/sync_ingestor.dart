@@ -151,9 +151,20 @@ class SyncIngestor {
         // fires for it in practice, but the guard stays for symmetry with
         // every other case here.
         if (!entity.isDeleted) {
+          // A payload written by a peer on an older app version may predate
+          // a column added since (e.g. quickAddDurationsMinutes, added in
+          // schema v5): fromJson's generated deserializer requires every
+          // non-nullable field to be present and throws otherwise, which
+          // would abort this entire sync transaction. Backfill any missing
+          // non-nullable field with its table default before decoding, so
+          // ingesting an older peer's settings event never breaks sync.
+          final payload = {
+            'quickAddDurationsMinutes': '15,30,45,60',
+            ...entity.payload!,
+          };
           await db
               .into(db.appSettings)
-              .insertOnConflictUpdate(AppSettingsRow.fromJson(entity.payload!).toCompanion(true));
+              .insertOnConflictUpdate(AppSettingsRow.fromJson(payload).toCompanion(true));
         }
       case EntityTypes.jiraWorklog:
         if (entity.isDeleted) {

@@ -151,4 +151,35 @@ void main() {
       expect(find.text('90 min'), findsOneWidget);
     },
   );
+
+  testWidgets(
+    'removing the last remaining chip leaves the list empty, not reverting to defaults',
+    (tester) async {
+      await tester.pumpWidget(makeApp(durations: const [15]));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.descendant(
+        of: find.widgetWithText(Chip, '15 min'),
+        matching: find.byIcon(Icons.cancel),
+      ));
+
+      await pumpUntilTrue(
+        tester,
+        () async => await _currentQuickAddDurationsMinutes(db) == '',
+      );
+
+      final quickAddDurationsMinutes = await _currentQuickAddDurationsMinutes(db);
+      expect(quickAddDurationsMinutes, '');
+
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+      await tester.pumpWidget(
+        makeApp(durations: parseQuickAddDurations(quickAddDurationsMinutes)),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Chip), findsNothing);
+      expect(find.text('15 min'), findsNothing);
+    },
+  );
 }

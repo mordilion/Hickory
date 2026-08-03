@@ -7,8 +7,17 @@ void main() {
     expect(parseQuickAddDurations(null), [15, 30, 45, 60]);
   });
 
-  test('parseQuickAddDurations returns the default list when raw is empty', () {
-    expect(parseQuickAddDurations(''), [15, 30, 45, 60]);
+  test(
+    'parseQuickAddDurations returns an empty list for an explicitly empty raw '
+    '(removing every preset is a deliberate, supported choice)',
+    () {
+      expect(parseQuickAddDurations(''), <int>[]);
+      expect(parseQuickAddDurations('   '), <int>[]);
+    },
+  );
+
+  test('formatQuickAddDurations of an empty list round-trips to an empty list', () {
+    expect(parseQuickAddDurations(formatQuickAddDurations(const [])), <int>[]);
   });
 
   test('parseQuickAddDurations parses and sorts a comma-separated list', () {

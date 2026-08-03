@@ -250,7 +250,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Deze duren verschijnen als snelkeuzeknoppen op het tabblad Timer.';
 
   @override
-  String get settingsQuickAddAddTooltip => 'Toevoegen';
+  String get settingsQuickAddAddLabel => 'Toevoegen';
 
   @override
   String get settingsQuickAddRemoveTooltip => 'Verwijderen';
