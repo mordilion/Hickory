@@ -218,6 +218,17 @@ class AppLocalizationsEs extends AppLocalizations {
       'El fin debe ser posterior al inicio.';
 
   @override
+  String get entriesToday => 'Hoy';
+
+  @override
+  String get entriesYesterday => 'Ayer';
+
+  @override
+  String entriesDayHeader(String day, String total) {
+    return '$day · $total';
+  }
+
+  @override
   String get projectsNewProjectTitle => 'Nuevo proyecto';
 
   @override

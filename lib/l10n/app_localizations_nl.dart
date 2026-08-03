@@ -218,6 +218,17 @@ class AppLocalizationsNl extends AppLocalizations {
       'Het einde moet na het begin liggen.';
 
   @override
+  String get entriesToday => 'Vandaag';
+
+  @override
+  String get entriesYesterday => 'Gisteren';
+
+  @override
+  String entriesDayHeader(String day, String total) {
+    return '$day · $total';
+  }
+
+  @override
   String get projectsNewProjectTitle => 'Nieuw project';
 
   @override

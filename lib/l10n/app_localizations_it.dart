@@ -217,6 +217,17 @@ class AppLocalizationsIt extends AppLocalizations {
       'La fine deve essere successiva all\'inizio.';
 
   @override
+  String get entriesToday => 'Oggi';
+
+  @override
+  String get entriesYesterday => 'Ieri';
+
+  @override
+  String entriesDayHeader(String day, String total) {
+    return '$day · $total';
+  }
+
+  @override
   String get projectsNewProjectTitle => 'Nuovo progetto';
 
   @override

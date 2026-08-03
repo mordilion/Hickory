@@ -70,6 +70,15 @@
   "entriesStartLabel": "Début",
   "entriesEndLabel": "Fin",
   "entriesEndBeforeStartError": "La fin doit être postérieure au début.",
+  "entriesToday": "Aujourd'hui",
+  "entriesYesterday": "Hier",
+  "entriesDayHeader": "{day} · {total}",
+  "@entriesDayHeader": {
+    "placeholders": {
+      "day": { "type": "String" },
+      "total": { "type": "String" }
+    }
+  },
   "projectsNewProjectTitle": "Nouveau projet",
   "projectsNameLabel": "Nom",
   "projectsCreateButton": "Créer",

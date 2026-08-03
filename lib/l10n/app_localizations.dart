@@ -478,6 +478,24 @@ abstract class AppLocalizations {
   /// **'Ende muss nach dem Start liegen.'**
   String get entriesEndBeforeStartError;
 
+  /// No description provided for @entriesToday.
+  ///
+  /// In de, this message translates to:
+  /// **'Heute'**
+  String get entriesToday;
+
+  /// No description provided for @entriesYesterday.
+  ///
+  /// In de, this message translates to:
+  /// **'Gestern'**
+  String get entriesYesterday;
+
+  /// No description provided for @entriesDayHeader.
+  ///
+  /// In de, this message translates to:
+  /// **'{day} · {total}'**
+  String entriesDayHeader(String day, String total);
+
   /// No description provided for @projectsNewProjectTitle.
   ///
   /// In de, this message translates to:

@@ -216,6 +216,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get entriesEndBeforeStartError => 'Ende muss nach dem Start liegen.';
 
   @override
+  String get entriesToday => 'Heute';
+
+  @override
+  String get entriesYesterday => 'Gestern';
+
+  @override
+  String entriesDayHeader(String day, String total) {
+    return '$day · $total';
+  }
+
+  @override
   String get projectsNewProjectTitle => 'Neues Projekt';
 
   @override
