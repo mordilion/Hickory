@@ -44,10 +44,14 @@ below):
   resolution during implementation rather than traced from the 120px preview.
 - **Stem**: short straight line, same fill color as the leaf, extending up from the
   leaf's top apex.
-- **Clock glyph**: a filled circle roughly 25% of the leaf's height, centered
-  slightly below the leaf's vertical middle, containing two short accent-colored
-  strokes (hour/minute hands) meeting at the circle's center at a fixed ~45° angle
-  (not live/animated — this is a static mark).
+- **Clock glyph**: a filled circle roughly 40% of the leaf's height (diameter 28
+  units on the 120-unit mockup grid, leaf height 70 units), centered essentially at
+  the leaf's vertical middle, containing two short accent-colored strokes (hour/minute
+  hands) meeting at the circle's center at a fixed 90° angle — a 12-o'clock and a
+  3-o'clock hand, not the "~45°" originally sketched in an earlier iteration of this
+  spec, corrected here to match the geometry actually validated during brainstorming
+  and implemented in `tool/generate_app_icons.dart` (not live/animated — this is a
+  static mark).
 
 ## 4. Colors
 
@@ -72,7 +76,7 @@ gradient.
 | `icon.png` (main/Windows source) | Full composition: rounded-square background gradient (Section 4) + mark, with a soft drop shadow matching the existing icon's presentation style. |
 | `icon_macos.png` | Same composition; macOS's own rendering pipeline expects the pre-rounded/shadowed form, consistent with the current file. |
 | `icon_background.png` | Background gradient only, full-bleed, no mark — same role as today (Android adaptive-icon background layer). |
-| `icon_foreground.png` | Mark only (leaf + stem + clock glyph, transparent background) — same role as today (Android adaptive-icon foreground layer, allows OS-driven parallax/masking). |
+| `icon_foreground.png` | Mark only (leaf + stem + clock glyph, transparent background) — same role as today (Android adaptive-icon foreground layer, allows OS-driven parallax/masking). Scaled to ~82% of the full-size mark so the stem stays inside Android's guaranteed-visible center-66%-diameter safe zone regardless of the launcher's mask shape; `icon.png`/`icon_macos.png`/`tray_icon.png` are not OS-masked, so they keep the mark at full size. |
 | `tray_icon.png` | Small-scale render of the full colored composition (background + mark), **not** a monochrome/template icon — chosen over the OS-auto-recolor convention to keep the brand's amber/green identifiable even at menu-bar/taskbar size. Verified legible at 18px during the design session. |
 
 ## 6. Implementation Note (for the plan)

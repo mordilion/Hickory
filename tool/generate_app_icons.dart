@@ -19,26 +19,69 @@ const _markColor = ui.Color(0xFFF3EFE2);
 const _clockCircleColor = ui.Color(0xFF14342A);
 const _clockHandColor = ui.Color(0xFFE8A548);
 
-/// All drawing happens in a fixed 120x120 logical space (matching the
-/// validated brainstorming mockups); [_renderPng] scales the canvas to the
-/// requested output resolution.
-void _paintBackground(ui.Canvas canvas) {
+/// All drawing happens in a fixed logical space matching the validated
+/// brainstorming mockups; [_renderPng] scales the canvas to the requested
+/// output resolution.
+const _canvasSize = 120.0;
+
+/// Inset for the rounded-square icon body, so its drop shadow has room to
+/// render within the canvas instead of being clipped at the edge (a
+/// full-bleed rrect casts a shadow entirely outside the visible image).
+const _iconPadding = 8.0;
+const _iconCornerRadius = 22.0;
+
+/// Android's adaptive icon system only guarantees the center ~66% (diameter)
+/// of icon_foreground.png stays visible regardless of the launcher's mask
+/// shape (circle, squircle, rounded square, teardrop) -- content outside
+/// that safe circle can be cropped. [_paintMark] is scaled down by this
+/// factor for the foreground-only render so the stem and leaf apex stay
+/// inside it; the full composited icon (icon.png/icon_macos.png/tray_icon.png)
+/// isn't masked by an OS-controlled shape, so it keeps the mark at full size.
+const _foregroundSafeZoneScale = 0.82;
+
+/// Rounded-square gradient body with a drop shadow, used for the complete
+/// icon renders (icon.png/icon_macos.png/tray_icon.png) -- NOT for
+/// icon_background.png, which must stay a full-bleed, unrounded gradient
+/// since Android applies its own mask shape to that layer.
+void _paintIconBody(ui.Canvas canvas) {
   final rrect = ui.RRect.fromRectAndRadius(
-    const ui.Rect.fromLTWH(0, 0, 120, 120),
-    const ui.Radius.circular(26),
+    const ui.Rect.fromLTWH(
+      _iconPadding,
+      _iconPadding,
+      _canvasSize - _iconPadding * 2,
+      _canvasSize - _iconPadding * 2,
+    ),
+    const ui.Radius.circular(_iconCornerRadius),
   );
   final shadowPath = ui.Path()..addRRect(rrect);
   canvas.drawShadow(shadowPath, const ui.Color(0xFF000000), 6, false);
   final paint = ui.Paint()
     ..shader = ui.Gradient.linear(
-      const ui.Offset(0, 0),
-      const ui.Offset(120, 120),
+      const ui.Offset(_iconPadding, _iconPadding),
+      const ui.Offset(_canvasSize - _iconPadding, _canvasSize - _iconPadding),
       [_gradientStart, _gradientEnd],
     );
   canvas.drawRRect(rrect, paint);
 }
 
-void _paintMark(ui.Canvas canvas) {
+/// Full-bleed gradient with no rounding or shadow, for icon_background.png
+/// (see [_paintIconBody]'s doc comment for why it must differ).
+void _paintFullBleedGradient(ui.Canvas canvas) {
+  final paint = ui.Paint()
+    ..shader = ui.Gradient.linear(
+      const ui.Offset(0, 0),
+      const ui.Offset(_canvasSize, _canvasSize),
+      [_gradientStart, _gradientEnd],
+    );
+  canvas.drawRect(const ui.Rect.fromLTWH(0, 0, _canvasSize, _canvasSize), paint);
+}
+
+void _paintMark(ui.Canvas canvas, {double scale = 1}) {
+  canvas.save();
+  canvas.translate(60, 60);
+  canvas.scale(scale);
+  canvas.translate(-60, -60);
+
   final stemPaint = ui.Paint()
     ..color = _markColor
     ..style = ui.PaintingStyle.stroke
@@ -64,25 +107,51 @@ void _paintMark(ui.Canvas canvas) {
     ..strokeCap = ui.StrokeCap.round;
   canvas.drawLine(const ui.Offset(60, 60), const ui.Offset(60, 50), handPaint);
   canvas.drawLine(const ui.Offset(60, 60), const ui.Offset(67, 60), handPaint);
+
+  canvas.restore();
 }
 
-Future<Uint8List> _renderPng({
-  required bool background,
-  required bool mark,
-  required int size,
-}) async {
+enum _Composition {
+  /// icon.png / icon_macos.png / tray_icon.png: rounded body + shadow + mark
+  /// at full scale.
+  fullIcon,
+
+  /// icon_background.png: full-bleed gradient only, no mark.
+  backgroundOnly,
+
+  /// icon_foreground.png: mark only (safe-zone-scaled), transparent
+  /// background, for Android's adaptive icon foreground layer.
+  foregroundOnly,
+}
+
+Future<Uint8List> _renderPng({required _Composition composition, required int size}) async {
   final recorder = ui.PictureRecorder();
   final canvas = ui.Canvas(recorder);
-  canvas.scale(size / 120);
-  if (background) _paintBackground(canvas);
-  if (mark) _paintMark(canvas);
+  canvas.scale(size / _canvasSize);
+  switch (composition) {
+    case _Composition.fullIcon:
+      _paintIconBody(canvas);
+      _paintMark(canvas);
+      break;
+    case _Composition.backgroundOnly:
+      _paintFullBleedGradient(canvas);
+      break;
+    case _Composition.foregroundOnly:
+      _paintMark(canvas, scale: _foregroundSafeZoneScale);
+      break;
+  }
   final picture = recorder.endRecording();
   final image = await picture.toImage(size, size);
-  final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-  if (byteData == null) {
-    throw StateError('Image.toByteData returned null -- PNG encoding failed');
+  try {
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    if (byteData == null) {
+      throw StateError('Image.toByteData returned null -- PNG encoding failed');
+    }
+    return byteData.buffer.asUint8List();
+  } finally {
+    image.dispose();
+    picture.dispose();
   }
-  return byteData.buffer.asUint8List();
 }
 
 Future<void> _write(String path, Uint8List bytes) async {
@@ -91,24 +160,30 @@ Future<void> _write(String path, Uint8List bytes) async {
   await file.writeAsBytes(bytes);
 }
 
+const _mainIconSize = 1024;
+const _trayIconSize = 64;
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test('generate app icon assets', () async {
-    final iconPng = await _renderPng(background: true, mark: true, size: 1024);
+    final iconPng = await _renderPng(
+      composition: _Composition.fullIcon,
+      size: _mainIconSize,
+    );
     await _write('assets/icon/icon.png', iconPng);
     await _write('assets/icon/icon_macos.png', iconPng);
     await _write(
       'assets/icon/icon_background.png',
-      await _renderPng(background: true, mark: false, size: 1024),
+      await _renderPng(composition: _Composition.backgroundOnly, size: _mainIconSize),
     );
     await _write(
       'assets/icon/icon_foreground.png',
-      await _renderPng(background: false, mark: true, size: 1024),
+      await _renderPng(composition: _Composition.foregroundOnly, size: _mainIconSize),
     );
     await _write(
       'assets/tray_icon.png',
-      await _renderPng(background: true, mark: true, size: 64),
+      await _renderPng(composition: _Composition.fullIcon, size: _trayIconSize),
     );
 
     for (final path in [
