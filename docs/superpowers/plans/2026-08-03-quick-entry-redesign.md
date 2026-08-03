@@ -1557,6 +1557,25 @@ Expected: succeeds.
 
 - [ ] **Step 2: Write the failing widget test**
 
+**Note on test design:** do not override `appDatabaseProvider` with a real
+database and mount `QuickAddDurationsEditor` directly against it — that
+makes the widget subscribe to a live drift-backed `appSettingsProvider`
+stream, which hits a known `flutter_test` false positive ("A Timer is still
+pending...", flutter/flutter#144472) at test teardown. This exact bug was
+hit and fixed in Task 4 of this plan (see that task's commit and the
+project's prior documented constraint in
+`docs/superpowers/plans/2026-07-07-electric-violet-redesign.md`). Instead,
+override `appSettingsProvider` itself with a static `Stream.value(...)` (a
+`makeApp({durations})` parameter controls its content), and verify
+add/remove persistence by querying `db.appSettingsDao.watchSettings()`
+directly (a one-shot read, not a live widget-watched stream) — `db` stays a
+real in-memory database only for `syncedWritesProvider` to write through
+(safe: `SyncedWrites.updateAppSettings` is a one-shot `Future`, not a live
+stream). To verify the chip list itself re-renders with the new value,
+cleanly unmount (`pumpWidget(const SizedBox())`) and remount with the
+updated `durations` — never rely on the static `appSettingsProvider`
+override updating a still-mounted widget mid-test.
+
 Create `test/features/settings/quick_add_durations_editor_test.dart`:
 
 ```dart
@@ -1566,20 +1585,23 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hickory/core/di/database_provider.dart';
-import 'package:hickory/core/di/device_id_provider.dart';
+import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/core/di/sync_providers.dart';
+import 'package:hickory/core/format/quick_add_durations.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
 import 'package:hickory/features/settings/quick_add_durations_editor.dart';
 import 'package:hickory/l10n/app_localizations.dart';
 
-Future<void> pumpUntilFound(WidgetTester tester, Finder finder, {int maxTries = 50}) async {
+Future<void> pumpUntilTrue(
+  WidgetTester tester,
+  Future<bool> Function() condition, {
+  int maxTries = 50,
+}) async {
   for (var i = 0; i < maxTries; i++) {
-    if (finder.evaluate().isNotEmpty) return;
-    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
-    await tester.pump();
+    if (await condition()) return;
+    await tester.pump(const Duration(milliseconds: 10));
   }
 }
 
@@ -1597,10 +1619,19 @@ void main() {
     if (syncRoot.existsSync()) syncRoot.deleteSync(recursive: true);
   });
 
-  Widget makeApp() => ProviderScope(
+  Widget makeApp({List<int> durations = const [15, 30, 45, 60]}) => ProviderScope(
         overrides: [
-          appDatabaseProvider.overrideWithValue(db),
-          deviceIdProvider.overrideWith((ref) async => 'device-1'),
+          appSettingsProvider.overrideWith(
+            (ref) => Stream.value(
+              AppSettingsRow(
+                id: 'default',
+                dateFormat: 'iso',
+                timeFormat: '24h',
+                quickAddDurationsMinutes: formatQuickAddDurations(durations),
+                updatedAt: DateTime.utc(2026, 1, 1),
+              ),
+            ),
+          ),
           syncedWritesProvider.overrideWith(
             (ref) async => SyncedWrites(
               db: db,
@@ -1625,41 +1656,73 @@ void main() {
     expect(find.text('60 min'), findsOneWidget);
   });
 
-  testWidgets('removing a chip persists the updated list', (tester) async {
-    await tester.pumpWidget(makeApp());
-    await tester.pumpAndSettle();
+  testWidgets(
+    'removing a chip persists the updated list and re-renders without it',
+    (tester) async {
+      await tester.pumpWidget(makeApp());
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.descendant(
-      of: find.widgetWithText(Chip, '30 min'),
-      matching: find.byIcon(Icons.cancel),
-    ));
+      await tester.tap(find.descendant(
+        of: find.widgetWithText(Chip, '30 min'),
+        matching: find.byIcon(Icons.cancel),
+      ));
 
-    AppSettingsRow? settings;
-    for (var i = 0; i < 50 && settings?.quickAddDurationsMinutes != '15,45,60'; i++) {
-      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+      await pumpUntilTrue(
+        tester,
+        () async =>
+            (await db.appSettingsDao.watchSettings().first).quickAddDurationsMinutes ==
+            '15,45,60',
+      );
+
+      final settings = await db.appSettingsDao.watchSettings().first;
+      expect(settings.quickAddDurationsMinutes, '15,45,60');
+
+      await tester.pumpWidget(const SizedBox());
       await tester.pump();
-      settings = await db.appSettingsDao.watchSettings().first;
-    }
+      await tester.pumpWidget(
+        makeApp(durations: parseQuickAddDurations(settings.quickAddDurationsMinutes)),
+      );
+      await tester.pumpAndSettle();
 
-    expect(settings?.quickAddDurationsMinutes, '15,45,60');
-    expect(find.text('30 min'), findsNothing);
-  });
+      expect(find.text('30 min'), findsNothing);
+      expect(find.text('15 min'), findsOneWidget);
+      expect(find.text('45 min'), findsOneWidget);
+      expect(find.text('60 min'), findsOneWidget);
+    },
+  );
 
-  testWidgets('adding a duration persists the updated list', (tester) async {
-    await tester.pumpWidget(makeApp());
-    await tester.pumpAndSettle();
+  testWidgets(
+    'adding a duration persists the updated list and re-renders with it',
+    (tester) async {
+      await tester.pumpWidget(makeApp());
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Add'));
-    await tester.pumpAndSettle();
-    await tester.enterText(find.byType(TextField), '90');
-    await tester.tap(find.text('Save'));
-    await tester.pump();
-    await pumpUntilFound(tester, find.text('90 min'));
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), '90');
+      await tester.tap(find.text('Save'));
+      await tester.pump();
 
-    expect(find.text('90 min'), findsOneWidget);
-    final settings = await db.appSettingsDao.watchSettings().first;
-    expect(settings.quickAddDurationsMinutes, '15,30,45,60,90');
-  });
+      await pumpUntilTrue(
+        tester,
+        () async =>
+            (await db.appSettingsDao.watchSettings().first).quickAddDurationsMinutes ==
+            '15,30,45,60,90',
+      );
+
+      final settings = await db.appSettingsDao.watchSettings().first;
+      expect(settings.quickAddDurationsMinutes, '15,30,45,60,90');
+
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+      await tester.pumpWidget(
+        makeApp(durations: parseQuickAddDurations(settings.quickAddDurationsMinutes)),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('90 min'), findsOneWidget);
+    },
+  );
 }
 ```
 
