@@ -143,6 +143,40 @@ void main() {
     },
   );
 
+  testWidgets(
+    'submitting without touching a duration chip or time button still writes '
+    'a range ending near now (not a stale initState-time snapshot)',
+    (tester) async {
+      // This does not simulate hours of real wall-clock time passing before
+      // submit (QuickAddBar uses DateTime.now() directly, not an injectable
+      // clock, so flutter_test's fake-async pump clock can't advance it) --
+      // it only guards the default/untouched path stays correct. The
+      // _rangeTouched refresh in _submit() is exercised either way, since
+      // the flag is false here too; a true staleness regression would need
+      // a clock abstraction, out of scope for this fix.
+      await tester.pumpWidget(makeApp());
+      await tester.pumpAndSettle();
+
+      final beforeSubmit = DateTime.now();
+      await tester.enterText(find.byType(TextField).first, 'No chip tapped');
+      await tester.tap(find.byTooltip('Add entry'));
+      await tester.pump();
+
+      await pumpUntilTrue(
+        tester,
+        () async => (await db.select(db.timeEntries).get()).isNotEmpty,
+      );
+
+      final created = (await db.select(db.timeEntries).get()).single;
+      expect(created.description, 'No chip tapped');
+      expect(
+        created.endAt!.difference(beforeSubmit).inSeconds.abs(),
+        lessThan(5),
+        reason: 'end time should be close to submit time, not a stale snapshot',
+      );
+    },
+  );
+
   testWidgets('tapping the Jira icon reveals the Jira ticket field', (tester) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
@@ -164,7 +198,15 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Manual entry'), findsOneWidget);
-      expect(find.text('Retro'), findsWidgets);
+      // Scoped to the dialog, not a bare find.text('Retro') -- the bar's own
+      // description field behind the dialog still reads "Retro" too, so an
+      // unscoped assertion would pass even if the dialog itself were never
+      // actually prefilled.
+      final retroInDialog = find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Retro'),
+      );
+      expect(retroInDialog, findsOneWidget);
     },
   );
 }

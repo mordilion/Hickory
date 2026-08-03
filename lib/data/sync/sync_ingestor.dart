@@ -152,12 +152,15 @@ class SyncIngestor {
         // every other case here.
         if (!entity.isDeleted) {
           // A payload written by a peer on an older app version may predate
-          // a column added since (e.g. quickAddDurationsMinutes, added in
-          // schema v5): fromJson's generated deserializer requires every
-          // non-nullable field to be present and throws otherwise, which
-          // would abort this entire sync transaction. Backfill any missing
-          // non-nullable field with its table default before decoding, so
-          // ingesting an older peer's settings event never breaks sync.
+          // quickAddDurationsMinutes (added in schema v5): fromJson's
+          // generated deserializer requires every non-nullable field to be
+          // present and throws otherwise, which would abort this entire
+          // sync transaction. Backfill this one field's table default
+          // before decoding, so ingesting an older peer's settings event
+          // never breaks sync. (Every other non-nullable column added to an
+          // already-synced entity — e.g. TimeEntries.totalPausedSeconds in
+          // v2 — has the same exposure and isn't guarded; not addressed
+          // here, out of scope for this fix.)
           final payload = {
             'quickAddDurationsMinutes': '15,30,45,60',
             ...entity.payload!,
