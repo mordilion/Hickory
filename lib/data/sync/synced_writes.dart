@@ -164,10 +164,15 @@ class SyncedWrites {
   /// settings row per synced identity, so every device's write targets the
   /// same entity and last-write-wins resolves conflicts the same way it
   /// does for every other synced entity.
-  Future<AppSettingsRow> updateAppSettings({String? dateFormat, String? timeFormat}) async {
+  Future<AppSettingsRow> updateAppSettings({
+    String? dateFormat,
+    String? timeFormat,
+    String? quickAddDurationsMinutes,
+  }) async {
     final updated = await db.appSettingsDao.updateSettings(
       dateFormat: dateFormat,
       timeFormat: timeFormat,
+      quickAddDurationsMinutes: quickAddDurationsMinutes,
     );
     await logWriter.appendEvent(
       entityType: EntityTypes.appSettings,

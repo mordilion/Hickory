@@ -19,7 +19,11 @@ class AppSettingsDao extends DatabaseAccessor<AppDatabase> with _$AppSettingsDao
         .map((row) => row ?? _defaultRow());
   }
 
-  Future<AppSettingsRow> updateSettings({String? dateFormat, String? timeFormat}) async {
+  Future<AppSettingsRow> updateSettings({
+    String? dateFormat,
+    String? timeFormat,
+    String? quickAddDurationsMinutes,
+  }) async {
     final current =
         await (select(appSettings)..where((s) => s.id.equals(appSettingsRowId))).getSingleOrNull() ??
             _defaultRow();
@@ -27,6 +31,7 @@ class AppSettingsDao extends DatabaseAccessor<AppDatabase> with _$AppSettingsDao
       id: appSettingsRowId,
       dateFormat: dateFormat ?? current.dateFormat,
       timeFormat: timeFormat ?? current.timeFormat,
+      quickAddDurationsMinutes: quickAddDurationsMinutes ?? current.quickAddDurationsMinutes,
       updatedAt: DateTime.now().toUtc(),
     );
     await into(appSettings).insertOnConflictUpdate(updated);
@@ -37,6 +42,7 @@ class AppSettingsDao extends DatabaseAccessor<AppDatabase> with _$AppSettingsDao
         id: appSettingsRowId,
         dateFormat: 'iso',
         timeFormat: '24h',
+        quickAddDurationsMinutes: '15,30,45,60',
         updatedAt: DateTime.now().toUtc(),
       );
 }
