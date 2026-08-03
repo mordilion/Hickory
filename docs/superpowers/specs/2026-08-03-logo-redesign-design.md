@@ -73,7 +73,7 @@ gradient.
 
 | File | Treatment |
 |---|---|
-| `icon.png` (main/Windows source) | Full composition: rounded-square background gradient (Section 4) + mark, with a soft drop shadow matching the existing icon's presentation style. |
+| `icon.png` (main/Windows source) | Full composition: rounded-square background gradient (Section 4) + mark, with a shadow behind the rounded-square body. Implemented as a solid, fully-opaque offset shape (not a blurred `Canvas.drawShadow`) — a soft blurred shadow produces a wide semi-transparent edge that `flutter_launcher_icons`' iOS alpha-flattening (`remove_alpha_ios`) blends incorrectly into a visible colored fringe around the whole icon, discovered and fixed during implementation. |
 | `icon_macos.png` | Same composition; macOS's own rendering pipeline expects the pre-rounded/shadowed form, consistent with the current file. |
 | `icon_background.png` | Background gradient only, full-bleed, no mark — same role as today (Android adaptive-icon background layer). |
 | `icon_foreground.png` | Mark only (leaf + stem + clock glyph, transparent background) — same role as today (Android adaptive-icon foreground layer, allows OS-driven parallax/masking). Scaled to ~82% of the full-size mark so the stem stays inside Android's guaranteed-visible center-66%-diameter safe zone regardless of the launcher's mask shape; `icon.png`/`icon_macos.png`/`tray_icon.png` are not OS-masked, so they keep the mark at full size. |

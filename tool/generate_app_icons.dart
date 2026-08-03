@@ -53,8 +53,16 @@ void _paintIconBody(ui.Canvas canvas) {
     ),
     const ui.Radius.circular(_iconCornerRadius),
   );
-  final shadowPath = ui.Path()..addRRect(rrect);
-  canvas.drawShadow(shadowPath, const ui.Color(0xFF000000), 6, false);
+  // A solid, fully-opaque offset shape instead of Canvas.drawShadow's soft
+  // blurred shadow: the blurred version produces a wide band of
+  // semi-transparent pixels which flutter_launcher_icons' iOS alpha-removal
+  // step (remove_alpha_ios) blends incorrectly -- a visible bright-green
+  // fringe around the whole icon, confirmed by generating and visually
+  // inspecting the flattened iOS output. An opaque offset shape has no
+  // meaningful alpha gradient for that step to mishandle, at the cost of a
+  // crisp (not blurred) shadow edge instead of a soft one.
+  final shadowRRect = rrect.shift(const ui.Offset(2, 3));
+  canvas.drawRRect(shadowRRect, ui.Paint()..color = const ui.Color(0xFF0F241A));
   final paint = ui.Paint()
     ..shader = ui.Gradient.linear(
       const ui.Offset(_iconPadding, _iconPadding),
