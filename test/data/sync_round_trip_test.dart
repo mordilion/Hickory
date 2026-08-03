@@ -4,10 +4,13 @@ import 'package:drift/drift.dart' show Value, driftRuntimeOptions;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/data/drift/database.dart';
+import 'package:hickory/data/drift/tables/app_settings_table.dart' show appSettingsRowId;
 import 'package:hickory/data/drift/tables/jira_worklogs_table.dart';
+import 'package:hickory/data/sync/entity_types.dart';
 import 'package:hickory/data/sync/sync_ingestor.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
+import 'package:sync_engine/sync_engine.dart' show EventOp;
 
 // Plain test() (not testWidgets): no widget pumping needed, so this runs as
 // a normal fast Dart VM test rather than spinning up flutter_tester.
@@ -130,6 +133,46 @@ void main() {
       expect(rows, hasLength(1));
       expect(rows.single.dateFormat, 'de');
       expect(rows.single.timeFormat, '12h');
+    },
+  );
+
+  test(
+    'ingesting an app_settings event written before quickAddDurationsMinutes '
+    'existed (an older peer) backfills the default instead of throwing',
+    () async {
+      // Simulates a peer device still on schema v4: its event payload
+      // predates the quickAddDurationsMinutes column entirely, rather than
+      // merely omitting it, since v4 never had it to serialize. Built via a
+      // real row's .toJson() (matching the exact wire format the app
+      // actually produces, including its DateTime encoding) with the new
+      // column removed, rather than hand-writing the payload's shape.
+      final v4Payload = AppSettingsRow(
+        id: appSettingsRowId,
+        dateFormat: 'de',
+        timeFormat: '12h',
+        quickAddDurationsMinutes: '15,30,45,60',
+        updatedAt: DateTime.utc(2026, 1, 1),
+      ).toJson()
+        ..remove('quickAddDurationsMinutes');
+
+      final peerLogWriter = SyncLogWriter(syncRoot: syncRoot, deviceId: 'dev_old');
+      await peerLogWriter.appendEvent(
+        entityType: EntityTypes.appSettings,
+        entityId: appSettingsRowId,
+        op: EventOp.update,
+        payload: v4Payload,
+      );
+
+      final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(readerDb.close);
+      final ingestor = SyncIngestor(db: readerDb, syncRoot: syncRoot);
+
+      await ingestor.syncNow();
+
+      final rows = await readerDb.select(readerDb.appSettings).get();
+      expect(rows, hasLength(1));
+      expect(rows.single.dateFormat, 'de');
+      expect(rows.single.quickAddDurationsMinutes, '15,30,45,60');
     },
   );
 

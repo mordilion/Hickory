@@ -70,6 +70,29 @@
   "entriesStartLabel": "Start",
   "entriesEndLabel": "Einde",
   "entriesEndBeforeStartError": "Het einde moet na het begin liggen.",
+  "entriesToday": "Vandaag",
+  "entriesYesterday": "Gisteren",
+  "entriesDayHeader": "{day} · {total}",
+  "@entriesDayHeader": {
+    "placeholders": {
+      "day": { "type": "String" },
+      "total": { "type": "String" }
+    }
+  },
+  "quickAddDurationChipLabel": "{minutes} min",
+  "@quickAddDurationChipLabel": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "quickAddJiraTooltip": "Jira-ticket koppelen",
+  "quickAddMoreTooltip": "Meer opties",
+  "quickAddSubmitTooltip": "Invoer toevoegen",
+  "settingsQuickAddTitle": "Snel toevoegen",
+  "settingsQuickAddDescription": "Deze duren verschijnen als snelkeuzeknoppen op het tabblad Timer.",
+  "settingsQuickAddAddLabel": "Toevoegen",
+  "settingsQuickAddRemoveTooltip": "Verwijderen",
+  "settingsQuickAddNewDurationLabel": "Minuten",
   "projectsNewProjectTitle": "Nieuw project",
   "projectsNameLabel": "Naam",
   "projectsCreateButton": "Aanmaken",

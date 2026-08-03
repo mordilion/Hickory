@@ -70,6 +70,29 @@
   "entriesStartLabel": "Début",
   "entriesEndLabel": "Fin",
   "entriesEndBeforeStartError": "La fin doit être postérieure au début.",
+  "entriesToday": "Aujourd'hui",
+  "entriesYesterday": "Hier",
+  "entriesDayHeader": "{day} · {total}",
+  "@entriesDayHeader": {
+    "placeholders": {
+      "day": { "type": "String" },
+      "total": { "type": "String" }
+    }
+  },
+  "quickAddDurationChipLabel": "{minutes} min",
+  "@quickAddDurationChipLabel": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "quickAddJiraTooltip": "Lier un ticket Jira",
+  "quickAddMoreTooltip": "Plus d'options",
+  "quickAddSubmitTooltip": "Ajouter une entrée",
+  "settingsQuickAddTitle": "Ajout rapide",
+  "settingsQuickAddDescription": "Ces durées apparaissent comme boutons d'ajout rapide dans l'onglet Minuteur.",
+  "settingsQuickAddAddLabel": "Ajouter",
+  "settingsQuickAddRemoveTooltip": "Supprimer",
+  "settingsQuickAddNewDurationLabel": "Minutes",
   "projectsNewProjectTitle": "Nouveau projet",
   "projectsNameLabel": "Nom",
   "projectsCreateButton": "Créer",

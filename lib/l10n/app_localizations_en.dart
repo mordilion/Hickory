@@ -216,6 +216,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get entriesEndBeforeStartError => 'End must be after the start.';
 
   @override
+  String get entriesToday => 'Today';
+
+  @override
+  String get entriesYesterday => 'Yesterday';
+
+  @override
+  String entriesDayHeader(String day, String total) {
+    return '$day · $total';
+  }
+
+  @override
+  String quickAddDurationChipLabel(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get quickAddJiraTooltip => 'Link Jira ticket';
+
+  @override
+  String get quickAddMoreTooltip => 'More options';
+
+  @override
+  String get quickAddSubmitTooltip => 'Add entry';
+
+  @override
+  String get settingsQuickAddTitle => 'Quick Add';
+
+  @override
+  String get settingsQuickAddDescription =>
+      'These durations appear as quick-add buttons on the Timer tab.';
+
+  @override
+  String get settingsQuickAddAddLabel => 'Add';
+
+  @override
+  String get settingsQuickAddRemoveTooltip => 'Remove';
+
+  @override
+  String get settingsQuickAddNewDurationLabel => 'Minutes';
+
+  @override
   String get projectsNewProjectTitle => 'New project';
 
   @override

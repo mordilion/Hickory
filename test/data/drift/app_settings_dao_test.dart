@@ -40,4 +40,18 @@ void main() {
 
     await expectation;
   });
+
+  test('watchSettings default row includes the default quick-add durations', () async {
+    final settings = await db.appSettingsDao.watchSettings().first;
+    expect(settings.quickAddDurationsMinutes, '15,30,45,60');
+  });
+
+  test('updateSettings updates quickAddDurationsMinutes independently of other fields', () async {
+    final first = await db.appSettingsDao.updateSettings(quickAddDurationsMinutes: '10,20');
+    expect(first.quickAddDurationsMinutes, '10,20');
+    expect(first.dateFormat, 'iso');
+
+    final second = await db.appSettingsDao.updateSettings(dateFormat: 'de');
+    expect(second.quickAddDurationsMinutes, '10,20', reason: 'must not be reset by an unrelated update');
+  });
 }

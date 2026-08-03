@@ -13,6 +13,8 @@ class AppSettings extends Table {
   TextColumn get id => text()();
   TextColumn get dateFormat => text().withDefault(const Constant('iso'))();
   TextColumn get timeFormat => text().withDefault(const Constant('24h'))();
+  TextColumn get quickAddDurationsMinutes =>
+      text().withDefault(const Constant('15,30,45,60'))();
   DateTimeColumn get updatedAt => dateTime()();
 
   @override

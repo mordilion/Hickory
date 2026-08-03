@@ -3479,6 +3479,18 @@ class $AppSettingsTable extends AppSettings
     requiredDuringInsert: false,
     defaultValue: const Constant('24h'),
   );
+  static const VerificationMeta _quickAddDurationsMinutesMeta =
+      const VerificationMeta('quickAddDurationsMinutes');
+  @override
+  late final GeneratedColumn<String> quickAddDurationsMinutes =
+      GeneratedColumn<String>(
+        'quick_add_durations_minutes',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('15,30,45,60'),
+      );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -3491,7 +3503,13 @@ class $AppSettingsTable extends AppSettings
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, dateFormat, timeFormat, updatedAt];
+  List<GeneratedColumn> get $columns => [
+    id,
+    dateFormat,
+    timeFormat,
+    quickAddDurationsMinutes,
+    updatedAt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3519,6 +3537,15 @@ class $AppSettingsTable extends AppSettings
       context.handle(
         _timeFormatMeta,
         timeFormat.isAcceptableOrUnknown(data['time_format']!, _timeFormatMeta),
+      );
+    }
+    if (data.containsKey('quick_add_durations_minutes')) {
+      context.handle(
+        _quickAddDurationsMinutesMeta,
+        quickAddDurationsMinutes.isAcceptableOrUnknown(
+          data['quick_add_durations_minutes']!,
+          _quickAddDurationsMinutesMeta,
+        ),
       );
     }
     if (data.containsKey('updated_at')) {
@@ -3550,6 +3577,10 @@ class $AppSettingsTable extends AppSettings
         DriftSqlType.string,
         data['${effectivePrefix}time_format'],
       )!,
+      quickAddDurationsMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}quick_add_durations_minutes'],
+      )!,
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -3567,11 +3598,13 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
   final String id;
   final String dateFormat;
   final String timeFormat;
+  final String quickAddDurationsMinutes;
   final DateTime updatedAt;
   const AppSettingsRow({
     required this.id,
     required this.dateFormat,
     required this.timeFormat,
+    required this.quickAddDurationsMinutes,
     required this.updatedAt,
   });
   @override
@@ -3580,6 +3613,9 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
     map['id'] = Variable<String>(id);
     map['date_format'] = Variable<String>(dateFormat);
     map['time_format'] = Variable<String>(timeFormat);
+    map['quick_add_durations_minutes'] = Variable<String>(
+      quickAddDurationsMinutes,
+    );
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
@@ -3589,6 +3625,7 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
       id: Value(id),
       dateFormat: Value(dateFormat),
       timeFormat: Value(timeFormat),
+      quickAddDurationsMinutes: Value(quickAddDurationsMinutes),
       updatedAt: Value(updatedAt),
     );
   }
@@ -3602,6 +3639,9 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
       id: serializer.fromJson<String>(json['id']),
       dateFormat: serializer.fromJson<String>(json['dateFormat']),
       timeFormat: serializer.fromJson<String>(json['timeFormat']),
+      quickAddDurationsMinutes: serializer.fromJson<String>(
+        json['quickAddDurationsMinutes'],
+      ),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
@@ -3612,6 +3652,9 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
       'id': serializer.toJson<String>(id),
       'dateFormat': serializer.toJson<String>(dateFormat),
       'timeFormat': serializer.toJson<String>(timeFormat),
+      'quickAddDurationsMinutes': serializer.toJson<String>(
+        quickAddDurationsMinutes,
+      ),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
@@ -3620,11 +3663,14 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
     String? id,
     String? dateFormat,
     String? timeFormat,
+    String? quickAddDurationsMinutes,
     DateTime? updatedAt,
   }) => AppSettingsRow(
     id: id ?? this.id,
     dateFormat: dateFormat ?? this.dateFormat,
     timeFormat: timeFormat ?? this.timeFormat,
+    quickAddDurationsMinutes:
+        quickAddDurationsMinutes ?? this.quickAddDurationsMinutes,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   AppSettingsRow copyWithCompanion(AppSettingsCompanion data) {
@@ -3636,6 +3682,9 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
       timeFormat: data.timeFormat.present
           ? data.timeFormat.value
           : this.timeFormat,
+      quickAddDurationsMinutes: data.quickAddDurationsMinutes.present
+          ? data.quickAddDurationsMinutes.value
+          : this.quickAddDurationsMinutes,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -3646,13 +3695,20 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
           ..write('id: $id, ')
           ..write('dateFormat: $dateFormat, ')
           ..write('timeFormat: $timeFormat, ')
+          ..write('quickAddDurationsMinutes: $quickAddDurationsMinutes, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, dateFormat, timeFormat, updatedAt);
+  int get hashCode => Object.hash(
+    id,
+    dateFormat,
+    timeFormat,
+    quickAddDurationsMinutes,
+    updatedAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3660,6 +3716,7 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
           other.id == this.id &&
           other.dateFormat == this.dateFormat &&
           other.timeFormat == this.timeFormat &&
+          other.quickAddDurationsMinutes == this.quickAddDurationsMinutes &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -3667,12 +3724,14 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
   final Value<String> id;
   final Value<String> dateFormat;
   final Value<String> timeFormat;
+  final Value<String> quickAddDurationsMinutes;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const AppSettingsCompanion({
     this.id = const Value.absent(),
     this.dateFormat = const Value.absent(),
     this.timeFormat = const Value.absent(),
+    this.quickAddDurationsMinutes = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -3680,6 +3739,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
     required String id,
     this.dateFormat = const Value.absent(),
     this.timeFormat = const Value.absent(),
+    this.quickAddDurationsMinutes = const Value.absent(),
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -3688,6 +3748,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
     Expression<String>? id,
     Expression<String>? dateFormat,
     Expression<String>? timeFormat,
+    Expression<String>? quickAddDurationsMinutes,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
@@ -3695,6 +3756,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
       if (id != null) 'id': id,
       if (dateFormat != null) 'date_format': dateFormat,
       if (timeFormat != null) 'time_format': timeFormat,
+      if (quickAddDurationsMinutes != null)
+        'quick_add_durations_minutes': quickAddDurationsMinutes,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -3704,6 +3767,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
     Value<String>? id,
     Value<String>? dateFormat,
     Value<String>? timeFormat,
+    Value<String>? quickAddDurationsMinutes,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
   }) {
@@ -3711,6 +3775,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
       id: id ?? this.id,
       dateFormat: dateFormat ?? this.dateFormat,
       timeFormat: timeFormat ?? this.timeFormat,
+      quickAddDurationsMinutes:
+          quickAddDurationsMinutes ?? this.quickAddDurationsMinutes,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -3728,6 +3794,11 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
     if (timeFormat.present) {
       map['time_format'] = Variable<String>(timeFormat.value);
     }
+    if (quickAddDurationsMinutes.present) {
+      map['quick_add_durations_minutes'] = Variable<String>(
+        quickAddDurationsMinutes.value,
+      );
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -3743,6 +3814,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
           ..write('id: $id, ')
           ..write('dateFormat: $dateFormat, ')
           ..write('timeFormat: $timeFormat, ')
+          ..write('quickAddDurationsMinutes: $quickAddDurationsMinutes, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -6863,6 +6935,7 @@ typedef $$AppSettingsTableCreateCompanionBuilder =
       required String id,
       Value<String> dateFormat,
       Value<String> timeFormat,
+      Value<String> quickAddDurationsMinutes,
       required DateTime updatedAt,
       Value<int> rowid,
     });
@@ -6871,6 +6944,7 @@ typedef $$AppSettingsTableUpdateCompanionBuilder =
       Value<String> id,
       Value<String> dateFormat,
       Value<String> timeFormat,
+      Value<String> quickAddDurationsMinutes,
       Value<DateTime> updatedAt,
       Value<int> rowid,
     });
@@ -6896,6 +6970,11 @@ class $$AppSettingsTableFilterComposer
 
   ColumnFilters<String> get timeFormat => $composableBuilder(
     column: $table.timeFormat,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get quickAddDurationsMinutes => $composableBuilder(
+    column: $table.quickAddDurationsMinutes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6929,6 +7008,11 @@ class $$AppSettingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get quickAddDurationsMinutes => $composableBuilder(
+    column: $table.quickAddDurationsMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -6954,6 +7038,11 @@ class $$AppSettingsTableAnnotationComposer
 
   GeneratedColumn<String> get timeFormat => $composableBuilder(
     column: $table.timeFormat,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get quickAddDurationsMinutes => $composableBuilder(
+    column: $table.quickAddDurationsMinutes,
     builder: (column) => column,
   );
 
@@ -6995,12 +7084,14 @@ class $$AppSettingsTableTableManager
                 Value<String> id = const Value.absent(),
                 Value<String> dateFormat = const Value.absent(),
                 Value<String> timeFormat = const Value.absent(),
+                Value<String> quickAddDurationsMinutes = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => AppSettingsCompanion(
                 id: id,
                 dateFormat: dateFormat,
                 timeFormat: timeFormat,
+                quickAddDurationsMinutes: quickAddDurationsMinutes,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
@@ -7009,12 +7100,14 @@ class $$AppSettingsTableTableManager
                 required String id,
                 Value<String> dateFormat = const Value.absent(),
                 Value<String> timeFormat = const Value.absent(),
+                Value<String> quickAddDurationsMinutes = const Value.absent(),
                 required DateTime updatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => AppSettingsCompanion.insert(
                 id: id,
                 dateFormat: dateFormat,
                 timeFormat: timeFormat,
+                quickAddDurationsMinutes: quickAddDurationsMinutes,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),

@@ -216,6 +216,47 @@ class AppLocalizationsDe extends AppLocalizations {
   String get entriesEndBeforeStartError => 'Ende muss nach dem Start liegen.';
 
   @override
+  String get entriesToday => 'Heute';
+
+  @override
+  String get entriesYesterday => 'Gestern';
+
+  @override
+  String entriesDayHeader(String day, String total) {
+    return '$day · $total';
+  }
+
+  @override
+  String quickAddDurationChipLabel(int minutes) {
+    return '$minutes Min';
+  }
+
+  @override
+  String get quickAddJiraTooltip => 'Jira-Ticket verknüpfen';
+
+  @override
+  String get quickAddMoreTooltip => 'Weitere Optionen';
+
+  @override
+  String get quickAddSubmitTooltip => 'Eintrag hinzufügen';
+
+  @override
+  String get settingsQuickAddTitle => 'Schnelleingabe';
+
+  @override
+  String get settingsQuickAddDescription =>
+      'Diese Zeitdauern erscheinen als Schnellauswahl im Timer-Tab.';
+
+  @override
+  String get settingsQuickAddAddLabel => 'Hinzufügen';
+
+  @override
+  String get settingsQuickAddRemoveTooltip => 'Entfernen';
+
+  @override
+  String get settingsQuickAddNewDurationLabel => 'Minuten';
+
+  @override
   String get projectsNewProjectTitle => 'Neues Projekt';
 
   @override

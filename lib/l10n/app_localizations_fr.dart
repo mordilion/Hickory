@@ -218,6 +218,47 @@ class AppLocalizationsFr extends AppLocalizations {
       'La fin doit être postérieure au début.';
 
   @override
+  String get entriesToday => 'Aujourd\'hui';
+
+  @override
+  String get entriesYesterday => 'Hier';
+
+  @override
+  String entriesDayHeader(String day, String total) {
+    return '$day · $total';
+  }
+
+  @override
+  String quickAddDurationChipLabel(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get quickAddJiraTooltip => 'Lier un ticket Jira';
+
+  @override
+  String get quickAddMoreTooltip => 'Plus d\'options';
+
+  @override
+  String get quickAddSubmitTooltip => 'Ajouter une entrée';
+
+  @override
+  String get settingsQuickAddTitle => 'Ajout rapide';
+
+  @override
+  String get settingsQuickAddDescription =>
+      'Ces durées apparaissent comme boutons d\'ajout rapide dans l\'onglet Minuteur.';
+
+  @override
+  String get settingsQuickAddAddLabel => 'Ajouter';
+
+  @override
+  String get settingsQuickAddRemoveTooltip => 'Supprimer';
+
+  @override
+  String get settingsQuickAddNewDurationLabel => 'Minutes';
+
+  @override
   String get projectsNewProjectTitle => 'Nouveau projet';
 
   @override

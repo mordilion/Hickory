@@ -478,6 +478,78 @@ abstract class AppLocalizations {
   /// **'Ende muss nach dem Start liegen.'**
   String get entriesEndBeforeStartError;
 
+  /// No description provided for @entriesToday.
+  ///
+  /// In de, this message translates to:
+  /// **'Heute'**
+  String get entriesToday;
+
+  /// No description provided for @entriesYesterday.
+  ///
+  /// In de, this message translates to:
+  /// **'Gestern'**
+  String get entriesYesterday;
+
+  /// No description provided for @entriesDayHeader.
+  ///
+  /// In de, this message translates to:
+  /// **'{day} · {total}'**
+  String entriesDayHeader(String day, String total);
+
+  /// No description provided for @quickAddDurationChipLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'{minutes} Min'**
+  String quickAddDurationChipLabel(int minutes);
+
+  /// No description provided for @quickAddJiraTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Jira-Ticket verknüpfen'**
+  String get quickAddJiraTooltip;
+
+  /// No description provided for @quickAddMoreTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Weitere Optionen'**
+  String get quickAddMoreTooltip;
+
+  /// No description provided for @quickAddSubmitTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Eintrag hinzufügen'**
+  String get quickAddSubmitTooltip;
+
+  /// No description provided for @settingsQuickAddTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Schnelleingabe'**
+  String get settingsQuickAddTitle;
+
+  /// No description provided for @settingsQuickAddDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Zeitdauern erscheinen als Schnellauswahl im Timer-Tab.'**
+  String get settingsQuickAddDescription;
+
+  /// No description provided for @settingsQuickAddAddLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Hinzufügen'**
+  String get settingsQuickAddAddLabel;
+
+  /// No description provided for @settingsQuickAddRemoveTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Entfernen'**
+  String get settingsQuickAddRemoveTooltip;
+
+  /// No description provided for @settingsQuickAddNewDurationLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Minuten'**
+  String get settingsQuickAddNewDurationLabel;
+
   /// No description provided for @projectsNewProjectTitle.
   ///
   /// In de, this message translates to:

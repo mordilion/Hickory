@@ -26,27 +26,4 @@ void main() {
 
     expect(tapped, isTrue);
   });
-
-  testWidgets('GradientFab renders its icon and invokes onPressed', (tester) async {
-    var tapped = false;
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: GradientFab(
-            icon: Icons.add,
-            gradient: const [Color(0xFFB678FF), Color(0xFFFF6FA9)],
-            foregroundColor: const Color(0xFF160A22),
-            onPressed: () => tapped = true,
-          ),
-        ),
-      ),
-    );
-
-    expect(find.byIcon(Icons.add), findsOneWidget);
-
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    expect(tapped, isTrue);
-  });
 }

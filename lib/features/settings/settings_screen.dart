@@ -7,6 +7,7 @@ import '../../core/di/sync_providers.dart';
 import '../../core/format/date_format.dart';
 import '../../l10n/app_localizations.dart';
 import 'language_dropdown.dart';
+import 'quick_add_durations_editor.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -116,6 +117,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   const LanguageDropdown(),
                 ],
               ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Card(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: QuickAddDurationsEditor(),
             ),
           ),
         ],

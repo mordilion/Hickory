@@ -218,6 +218,47 @@ class AppLocalizationsEs extends AppLocalizations {
       'El fin debe ser posterior al inicio.';
 
   @override
+  String get entriesToday => 'Hoy';
+
+  @override
+  String get entriesYesterday => 'Ayer';
+
+  @override
+  String entriesDayHeader(String day, String total) {
+    return '$day · $total';
+  }
+
+  @override
+  String quickAddDurationChipLabel(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get quickAddJiraTooltip => 'Vincular ticket de Jira';
+
+  @override
+  String get quickAddMoreTooltip => 'Más opciones';
+
+  @override
+  String get quickAddSubmitTooltip => 'Añadir entrada';
+
+  @override
+  String get settingsQuickAddTitle => 'Entrada rápida';
+
+  @override
+  String get settingsQuickAddDescription =>
+      'Estas duraciones aparecen como botones de entrada rápida en la pestaña Timer.';
+
+  @override
+  String get settingsQuickAddAddLabel => 'Añadir';
+
+  @override
+  String get settingsQuickAddRemoveTooltip => 'Eliminar';
+
+  @override
+  String get settingsQuickAddNewDurationLabel => 'Minutos';
+
+  @override
   String get projectsNewProjectTitle => 'Nuevo proyecto';
 
   @override

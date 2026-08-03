@@ -105,6 +105,29 @@
   "entriesStartLabel": "Start",
   "entriesEndLabel": "Ende",
   "entriesEndBeforeStartError": "Ende muss nach dem Start liegen.",
+  "entriesToday": "Heute",
+  "entriesYesterday": "Gestern",
+  "entriesDayHeader": "{day} · {total}",
+  "@entriesDayHeader": {
+    "placeholders": {
+      "day": { "type": "String" },
+      "total": { "type": "String" }
+    }
+  },
+  "quickAddDurationChipLabel": "{minutes} Min",
+  "@quickAddDurationChipLabel": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "quickAddJiraTooltip": "Jira-Ticket verknüpfen",
+  "quickAddMoreTooltip": "Weitere Optionen",
+  "quickAddSubmitTooltip": "Eintrag hinzufügen",
+  "settingsQuickAddTitle": "Schnelleingabe",
+  "settingsQuickAddDescription": "Diese Zeitdauern erscheinen als Schnellauswahl im Timer-Tab.",
+  "settingsQuickAddAddLabel": "Hinzufügen",
+  "settingsQuickAddRemoveTooltip": "Entfernen",
+  "settingsQuickAddNewDurationLabel": "Minuten",
   "projectsNewProjectTitle": "Neues Projekt",
   "projectsNameLabel": "Name",
   "projectsCreateButton": "Erstellen",

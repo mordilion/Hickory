@@ -218,6 +218,47 @@ class AppLocalizationsNl extends AppLocalizations {
       'Het einde moet na het begin liggen.';
 
   @override
+  String get entriesToday => 'Vandaag';
+
+  @override
+  String get entriesYesterday => 'Gisteren';
+
+  @override
+  String entriesDayHeader(String day, String total) {
+    return '$day · $total';
+  }
+
+  @override
+  String quickAddDurationChipLabel(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get quickAddJiraTooltip => 'Jira-ticket koppelen';
+
+  @override
+  String get quickAddMoreTooltip => 'Meer opties';
+
+  @override
+  String get quickAddSubmitTooltip => 'Invoer toevoegen';
+
+  @override
+  String get settingsQuickAddTitle => 'Snel toevoegen';
+
+  @override
+  String get settingsQuickAddDescription =>
+      'Deze duren verschijnen als snelkeuzeknoppen op het tabblad Timer.';
+
+  @override
+  String get settingsQuickAddAddLabel => 'Toevoegen';
+
+  @override
+  String get settingsQuickAddRemoveTooltip => 'Verwijderen';
+
+  @override
+  String get settingsQuickAddNewDurationLabel => 'Minuten';
+
+  @override
   String get projectsNewProjectTitle => 'Nieuw project';
 
   @override
