@@ -496,6 +496,30 @@ abstract class AppLocalizations {
   /// **'{day} · {total}'**
   String entriesDayHeader(String day, String total);
 
+  /// No description provided for @quickAddDurationChipLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'{minutes} Min'**
+  String quickAddDurationChipLabel(int minutes);
+
+  /// No description provided for @quickAddJiraTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Jira-Ticket verknüpfen'**
+  String get quickAddJiraTooltip;
+
+  /// No description provided for @quickAddMoreTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Weitere Optionen'**
+  String get quickAddMoreTooltip;
+
+  /// No description provided for @quickAddSubmitTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Eintrag hinzufügen'**
+  String get quickAddSubmitTooltip;
+
   /// No description provided for @projectsNewProjectTitle.
   ///
   /// In de, this message translates to:

@@ -15,17 +15,25 @@ Future<void> showManualEntryDialog(
   BuildContext context,
   WidgetRef ref, {
   TimeEntry? existing,
+  String? initialDescription,
+  String? initialProjectId,
 }) {
   return showDialog<void>(
     context: context,
-    builder: (context) => _ManualEntryDialog(existing: existing),
+    builder: (context) => _ManualEntryDialog(
+      existing: existing,
+      initialDescription: initialDescription,
+      initialProjectId: initialProjectId,
+    ),
   );
 }
 
 class _ManualEntryDialog extends ConsumerStatefulWidget {
-  const _ManualEntryDialog({this.existing});
+  const _ManualEntryDialog({this.existing, this.initialDescription, this.initialProjectId});
 
   final TimeEntry? existing;
+  final String? initialDescription;
+  final String? initialProjectId;
 
   @override
   ConsumerState<_ManualEntryDialog> createState() => _ManualEntryDialogState();
@@ -42,10 +50,12 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
   void initState() {
     super.initState();
     final existing = widget.existing;
-    _descriptionController = TextEditingController(text: existing?.description ?? '');
+    _descriptionController = TextEditingController(
+      text: existing?.description ?? widget.initialDescription ?? '',
+    );
     _startAt = existing?.startAt.toLocal() ?? DateTime.now().subtract(const Duration(hours: 1));
     _endAt = existing?.endAt?.toLocal() ?? DateTime.now();
-    _projectId = existing?.projectId;
+    _projectId = existing?.projectId ?? widget.initialProjectId;
     _jiraTicketKey = existing?.jiraTicketKey;
   }
 

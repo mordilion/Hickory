@@ -79,6 +79,15 @@
       "total": { "type": "String" }
     }
   },
+  "quickAddDurationChipLabel": "{minutes} min",
+  "@quickAddDurationChipLabel": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "quickAddJiraTooltip": "Jira-ticket koppelen",
+  "quickAddMoreTooltip": "Meer opties",
+  "quickAddSubmitTooltip": "Invoer toevoegen",
   "projectsNewProjectTitle": "Nieuw project",
   "projectsNameLabel": "Naam",
   "projectsCreateButton": "Aanmaken",

@@ -12,6 +12,7 @@ import '../../data/drift/database.dart';
 import '../../data/drift/time_entry_extensions.dart';
 import '../../l10n/app_localizations.dart';
 import '../entries/entries_list.dart';
+import '../entries/quick_add_bar.dart';
 import '../jira/widgets/jira_ticket_field.dart';
 import '../projects/new_project_dialog.dart';
 import '../projects/projects_providers.dart';
@@ -24,7 +25,8 @@ import 'timer_providers.dart';
 const _idleThresholdSeconds = 5 * 60;
 
 /// Timer tab content — hosted by the app shell (features/shell/app_shell.dart),
-/// which owns the Scaffold, AppBar, bottom nav, and the manual-entry FAB.
+/// which owns the Scaffold, AppBar, and bottom nav. Manual-entry creation
+/// lives in QuickAddBar, pinned above the entries list below.
 class TimerScreen extends ConsumerStatefulWidget {
   const TimerScreen({super.key});
 
@@ -147,6 +149,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
             loading: () => const CircularProgressIndicator(),
             error: (e, _) => Text(l10n.timerError('$e')),
           ),
+          const SizedBox(height: 16),
+          const QuickAddBar(),
           const SizedBox(height: 16),
           const Expanded(child: EntriesList()),
         ],

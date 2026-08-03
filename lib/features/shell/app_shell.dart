@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/theme/hickory_colors.dart';
-import '../../core/widgets/gradient_buttons.dart';
 import '../../l10n/app_localizations.dart';
-import '../entries/manual_entry_dialog.dart';
 import '../reports/reports_screen.dart';
 import '../settings/settings_screen.dart';
 import '../sync/sync_screen.dart';
 import '../timer/timer_screen.dart';
 import 'nav_shell.dart';
 
-/// Wires the real Timer/Reports/Sync screens and the manual-entry FAB into
-/// NavShell. This is Hickory's app-level navigation root (used as
-/// MaterialApp.home in lib/app.dart).
-class AppShell extends ConsumerWidget {
+/// Wires the real Timer/Reports/Sync/Settings screens into NavShell. This
+/// is Hickory's app-level navigation root (used as MaterialApp.home in
+/// lib/app.dart). Manual-entry creation lives in QuickAddBar (pinned to
+/// the Timer tab), not a shell-level FAB — see
+/// docs/superpowers/specs/2026-08-03-quick-entry-redesign-design.md.
+class AppShell extends StatelessWidget {
   const AppShell({super.key});
 
   static List<NavigationDestination> _destinations(AppLocalizations l10n) => [
@@ -41,19 +39,11 @@ class AppShell extends ConsumerWidget {
   ];
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return NavShell(
       destinations: _destinations(l10n),
       children: const [TimerScreen(), ReportsScreen(), SyncScreen(), SettingsScreen()],
-      fabBuilder: (selectedIndex) => selectedIndex == 0
-          ? GradientFab(
-              icon: Icons.add,
-              gradient: HickoryColors.of(context).primaryGradient,
-              foregroundColor: HickoryColors.of(context).onPrimaryGradient,
-              onPressed: () => showManualEntryDialog(context, ref),
-            )
-          : null,
     );
   }
 }

@@ -79,6 +79,15 @@
       "total": { "type": "String" }
     }
   },
+  "quickAddDurationChipLabel": "{minutes} min",
+  "@quickAddDurationChipLabel": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "quickAddJiraTooltip": "Lier un ticket Jira",
+  "quickAddMoreTooltip": "Plus d'options",
+  "quickAddSubmitTooltip": "Ajouter une entrée",
   "projectsNewProjectTitle": "Nouveau projet",
   "projectsNameLabel": "Nom",
   "projectsCreateButton": "Créer",

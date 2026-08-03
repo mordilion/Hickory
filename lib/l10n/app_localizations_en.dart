@@ -227,6 +227,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String quickAddDurationChipLabel(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get quickAddJiraTooltip => 'Link Jira ticket';
+
+  @override
+  String get quickAddMoreTooltip => 'More options';
+
+  @override
+  String get quickAddSubmitTooltip => 'Add entry';
+
+  @override
   String get projectsNewProjectTitle => 'New project';
 
   @override

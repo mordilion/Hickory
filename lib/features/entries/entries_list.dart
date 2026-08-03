@@ -15,11 +15,6 @@ import '../timer/timer_providers.dart';
 import 'day_grouping.dart';
 import 'manual_entry_dialog.dart';
 
-/// Reserves space so the shell's floating action button (56px + margin)
-/// never overlaps the last entry — caught during design review, when an
-/// early mockup had the FAB sitting on top of list content.
-const _bottomPaddingForFab = 88.0;
-
 class EntriesList extends ConsumerWidget {
   const EntriesList({super.key});
 
@@ -51,7 +46,6 @@ class EntriesList extends ConsumerWidget {
         ];
         final localeName = Localizations.localeOf(context).languageCode;
         return ListView.builder(
-          padding: const EdgeInsets.only(bottom: _bottomPaddingForFab),
           itemCount: rows.length,
           itemBuilder: (context, index) {
             final row = rows[index];
