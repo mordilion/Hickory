@@ -243,6 +243,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get quickAddSubmitTooltip => 'Ajouter une entrée';
 
   @override
+  String get settingsQuickAddTitle => 'Ajout rapide';
+
+  @override
+  String get settingsQuickAddDescription =>
+      'Ces durées apparaissent comme boutons d\'ajout rapide dans l\'onglet Minuteur.';
+
+  @override
+  String get settingsQuickAddAddTooltip => 'Ajouter';
+
+  @override
+  String get settingsQuickAddRemoveTooltip => 'Supprimer';
+
+  @override
+  String get settingsQuickAddNewDurationLabel => 'Minutes';
+
+  @override
   String get projectsNewProjectTitle => 'Nouveau projet';
 
   @override

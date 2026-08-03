@@ -243,6 +243,22 @@ class AppLocalizationsNl extends AppLocalizations {
   String get quickAddSubmitTooltip => 'Invoer toevoegen';
 
   @override
+  String get settingsQuickAddTitle => 'Snel toevoegen';
+
+  @override
+  String get settingsQuickAddDescription =>
+      'Deze duren verschijnen als snelkeuzeknoppen op het tabblad Timer.';
+
+  @override
+  String get settingsQuickAddAddTooltip => 'Toevoegen';
+
+  @override
+  String get settingsQuickAddRemoveTooltip => 'Verwijderen';
+
+  @override
+  String get settingsQuickAddNewDurationLabel => 'Minuten';
+
+  @override
   String get projectsNewProjectTitle => 'Nieuw project';
 
   @override

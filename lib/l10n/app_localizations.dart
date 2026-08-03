@@ -520,6 +520,36 @@ abstract class AppLocalizations {
   /// **'Eintrag hinzufügen'**
   String get quickAddSubmitTooltip;
 
+  /// No description provided for @settingsQuickAddTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Schnelleingabe'**
+  String get settingsQuickAddTitle;
+
+  /// No description provided for @settingsQuickAddDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Zeitdauern erscheinen als Schnellauswahl im Timer-Tab.'**
+  String get settingsQuickAddDescription;
+
+  /// No description provided for @settingsQuickAddAddTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Hinzufügen'**
+  String get settingsQuickAddAddTooltip;
+
+  /// No description provided for @settingsQuickAddRemoveTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Entfernen'**
+  String get settingsQuickAddRemoveTooltip;
+
+  /// No description provided for @settingsQuickAddNewDurationLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Minuten'**
+  String get settingsQuickAddNewDurationLabel;
+
   /// No description provided for @projectsNewProjectTitle.
   ///
   /// In de, this message translates to:

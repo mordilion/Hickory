@@ -242,6 +242,22 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quickAddSubmitTooltip => 'Aggiungi voce';
 
   @override
+  String get settingsQuickAddTitle => 'Aggiunta rapida';
+
+  @override
+  String get settingsQuickAddDescription =>
+      'Queste durate compaiono come pulsanti di aggiunta rapida nella scheda Timer.';
+
+  @override
+  String get settingsQuickAddAddTooltip => 'Aggiungi';
+
+  @override
+  String get settingsQuickAddRemoveTooltip => 'Rimuovi';
+
+  @override
+  String get settingsQuickAddNewDurationLabel => 'Minuti';
+
+  @override
   String get projectsNewProjectTitle => 'Nuovo progetto';
 
   @override

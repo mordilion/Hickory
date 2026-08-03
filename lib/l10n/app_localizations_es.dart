@@ -243,6 +243,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get quickAddSubmitTooltip => 'Añadir entrada';
 
   @override
+  String get settingsQuickAddTitle => 'Entrada rápida';
+
+  @override
+  String get settingsQuickAddDescription =>
+      'Estas duraciones aparecen como botones de entrada rápida en la pestaña Timer.';
+
+  @override
+  String get settingsQuickAddAddTooltip => 'Añadir';
+
+  @override
+  String get settingsQuickAddRemoveTooltip => 'Eliminar';
+
+  @override
+  String get settingsQuickAddNewDurationLabel => 'Minutos';
+
+  @override
   String get projectsNewProjectTitle => 'Nuevo proyecto';
 
   @override
