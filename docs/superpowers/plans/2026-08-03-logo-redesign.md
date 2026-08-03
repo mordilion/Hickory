@@ -13,7 +13,7 @@
 - No new pub dependencies — `dart:ui`, `dart:io`, and `flutter_test` are already available.
 - Exact colors and geometry come from `docs/superpowers/specs/2026-08-03-logo-redesign-design.md` (Sections 3–4) — don't improvise different values.
 - `assets/tray_icon.png` gets the full colored composition (not a monochrome/template icon) per that spec.
-- `flutter_launcher_icons.yaml` itself does not change — same four source file paths/roles as today.
+- `flutter_launcher_icons.yaml`'s four source file paths/roles don't change. (Deviation during implementation: `background_color_ios` was added — the icon's padding, needed for the round-1 shadow fix, leaves transparent corners that iOS's `remove_alpha_ios` flattening would otherwise fill with the default white instead of the icon's own dark tone. See the design spec's Section 5 and the `fix(icon)` commits for the full reasoning.)
 - Commit messages follow Conventional Commits: `type(scope): imperative, lowercase, no period, <72 chars`.
 
 ---

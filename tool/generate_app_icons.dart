@@ -39,6 +39,11 @@ const _iconCornerRadius = 22.0;
 /// isn't masked by an OS-controlled shape, so it keeps the mark at full size.
 const _foregroundSafeZoneScale = 0.82;
 
+/// Opaque offset-shadow shape's color and offset -- see [_paintIconBody]'s
+/// inline comment for why it's a solid shape rather than a blurred one.
+const _shadowColor = ui.Color(0xFF0F241A);
+const _shadowOffset = ui.Offset(2, 3);
+
 /// Rounded-square gradient body with a drop shadow, used for the complete
 /// icon renders (icon.png/icon_macos.png/tray_icon.png) -- NOT for
 /// icon_background.png, which must stay a full-bleed, unrounded gradient
@@ -61,8 +66,8 @@ void _paintIconBody(ui.Canvas canvas) {
   // inspecting the flattened iOS output. An opaque offset shape has no
   // meaningful alpha gradient for that step to mishandle, at the cost of a
   // crisp (not blurred) shadow edge instead of a soft one.
-  final shadowRRect = rrect.shift(const ui.Offset(2, 3));
-  canvas.drawRRect(shadowRRect, ui.Paint()..color = const ui.Color(0xFF0F241A));
+  final shadowRRect = rrect.shift(_shadowOffset);
+  canvas.drawRRect(shadowRRect, ui.Paint()..color = _shadowColor);
   final paint = ui.Paint()
     ..shader = ui.Gradient.linear(
       const ui.Offset(_iconPadding, _iconPadding),
