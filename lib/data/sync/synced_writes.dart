@@ -179,11 +179,13 @@ class SyncedWrites {
     String? dateFormat,
     String? timeFormat,
     String? quickAddDurationsMinutes,
+    bool? countPausedTimeAsBreak,
   }) async {
     final updated = await db.appSettingsDao.updateSettings(
       dateFormat: dateFormat,
       timeFormat: timeFormat,
       quickAddDurationsMinutes: quickAddDurationsMinutes,
+      countPausedTimeAsBreak: countPausedTimeAsBreak,
     );
     await logWriter.appendEvent(
       entityType: EntityTypes.appSettings,
@@ -215,6 +217,9 @@ class SyncedWrites {
     return tier;
   }
 
+  /// Deletes a break-rule tier and logs the tombstone, so the deletion
+  /// propagates to the user's other devices the same way every other
+  /// entity's deletion does.
   Future<void> deleteBreakRuleTier(String id) async {
     await db.breakRuleTiersDao.deleteTier(id);
     await logWriter.appendEvent(

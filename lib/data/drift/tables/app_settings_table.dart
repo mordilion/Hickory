@@ -15,6 +15,13 @@ class AppSettings extends Table {
   TextColumn get timeFormat => text().withDefault(const Constant('24h'))();
   TextColumn get quickAddDurationsMinutes =>
       text().withDefault(const Constant('15,30,45,60'))();
+  // Whether a running entry's explicit Timer-pause time (see
+  // TimeEntries.totalPausedSeconds) counts toward a day's break time for
+  // the break-rule-tiers feature. Off by default: the feature's original
+  // definition of "break" is gaps between entries only, and this setting
+  // is an opt-in for users who track lunch via the pause button instead of
+  // stop/restart. See break_rule_calculations.dart's dayBreakDuration.
+  BoolColumn get countPausedTimeAsBreak => boolean().withDefault(const Constant(false))();
   DateTimeColumn get updatedAt => dateTime()();
 
   @override

@@ -25,8 +25,12 @@ class EntryDayGroup {
 /// group's [EntryDayGroup.totalDuration] is the sum of
 /// [TimeEntryDuration.workedDuration] across that day's entries, and
 /// [EntryDayGroup.breakDuration] is [dayBreakDuration] applied to that
-/// day's entries.
-List<EntryDayGroup> groupEntriesByDay(List<TimeEntry> entries) {
+/// day's entries -- [includePausedTimeInBreak] forwards to that function's
+/// `includePausedTime` (see its doc comment).
+List<EntryDayGroup> groupEntriesByDay(
+  List<TimeEntry> entries, {
+  bool includePausedTimeInBreak = false,
+}) {
   final entriesByDay = <DateTime, List<TimeEntry>>{};
   for (final entry in entries) {
     final local = entry.startAt.toLocal();
@@ -43,7 +47,10 @@ List<EntryDayGroup> groupEntriesByDay(List<TimeEntry> entries) {
           Duration.zero,
           (sum, entry) => sum + entry.workedDuration,
         ),
-        breakDuration: dayBreakDuration(entriesByDay[day]!),
+        breakDuration: dayBreakDuration(
+          entriesByDay[day]!,
+          includePausedTime: includePausedTimeInBreak,
+        ),
       ),
   ];
 }

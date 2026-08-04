@@ -65,6 +65,7 @@ void main() {
         dateFormat: 'de',
         timeFormat: '12h_sec',
         quickAddDurationsMinutes: '15,30,45,60',
+                countPausedTimeAsBreak: false,
         updatedAt: DateTime(2026, 1, 1),
       );
       expect(settings.dateStyle, DateFormatStyle.de);

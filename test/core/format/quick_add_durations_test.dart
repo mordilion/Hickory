@@ -46,6 +46,7 @@ void main() {
       dateFormat: 'iso',
       timeFormat: '24h',
       quickAddDurationsMinutes: '20,40',
+      countPausedTimeAsBreak: false,
       updatedAt: DateTime.utc(2026, 1, 1),
     );
     expect(row.quickAddDurations, [20, 40]);

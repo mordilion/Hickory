@@ -2,7 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/features/entries/day_grouping.dart';
 
-TimeEntry _entry({required String id, required DateTime startAt, required DateTime endAt}) {
+TimeEntry _entry({
+  required String id,
+  required DateTime startAt,
+  required DateTime endAt,
+  int totalPausedSeconds = 0,
+}) {
   final now = DateTime.utc(2026, 1, 1);
   return TimeEntry(
     id: id,
@@ -11,7 +16,7 @@ TimeEntry _entry({required String id, required DateTime startAt, required DateTi
     startAt: startAt,
     endAt: endAt,
     pausedAt: null,
-    totalPausedSeconds: 0,
+    totalPausedSeconds: totalPausedSeconds,
     billableOverride: null,
     source: 'manual',
     deviceId: 'device-1',
@@ -66,5 +71,23 @@ void main() {
 
   test('returns an empty list for no entries', () {
     expect(groupEntriesByDay(const []), isEmpty);
+  });
+
+  test('forwards includePausedTimeInBreak to breakDuration', () {
+    final entries = [
+      _entry(
+        id: '1',
+        startAt: DateTime(2026, 8, 1, 9),
+        endAt: DateTime(2026, 8, 1, 12),
+        totalPausedSeconds: 600,
+      ),
+      _entry(id: '2', startAt: DateTime(2026, 8, 1, 13), endAt: DateTime(2026, 8, 1, 17)),
+    ];
+
+    final withoutPaused = groupEntriesByDay(entries);
+    expect(withoutPaused.single.breakDuration, const Duration(hours: 1));
+
+    final withPaused = groupEntriesByDay(entries, includePausedTimeInBreak: true);
+    expect(withPaused.single.breakDuration, const Duration(hours: 1, minutes: 10));
   });
 }

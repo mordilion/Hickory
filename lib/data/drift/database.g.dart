@@ -3491,6 +3491,21 @@ class $AppSettingsTable extends AppSettings
         requiredDuringInsert: false,
         defaultValue: const Constant('15,30,45,60'),
       );
+  static const VerificationMeta _countPausedTimeAsBreakMeta =
+      const VerificationMeta('countPausedTimeAsBreak');
+  @override
+  late final GeneratedColumn<bool> countPausedTimeAsBreak =
+      GeneratedColumn<bool>(
+        'count_paused_time_as_break',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("count_paused_time_as_break" IN (0, 1))',
+        ),
+        defaultValue: const Constant(false),
+      );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -3508,6 +3523,7 @@ class $AppSettingsTable extends AppSettings
     dateFormat,
     timeFormat,
     quickAddDurationsMinutes,
+    countPausedTimeAsBreak,
     updatedAt,
   ];
   @override
@@ -3548,6 +3564,15 @@ class $AppSettingsTable extends AppSettings
         ),
       );
     }
+    if (data.containsKey('count_paused_time_as_break')) {
+      context.handle(
+        _countPausedTimeAsBreakMeta,
+        countPausedTimeAsBreak.isAcceptableOrUnknown(
+          data['count_paused_time_as_break']!,
+          _countPausedTimeAsBreakMeta,
+        ),
+      );
+    }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
@@ -3581,6 +3606,10 @@ class $AppSettingsTable extends AppSettings
         DriftSqlType.string,
         data['${effectivePrefix}quick_add_durations_minutes'],
       )!,
+      countPausedTimeAsBreak: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}count_paused_time_as_break'],
+      )!,
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -3599,12 +3628,14 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
   final String dateFormat;
   final String timeFormat;
   final String quickAddDurationsMinutes;
+  final bool countPausedTimeAsBreak;
   final DateTime updatedAt;
   const AppSettingsRow({
     required this.id,
     required this.dateFormat,
     required this.timeFormat,
     required this.quickAddDurationsMinutes,
+    required this.countPausedTimeAsBreak,
     required this.updatedAt,
   });
   @override
@@ -3616,6 +3647,7 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
     map['quick_add_durations_minutes'] = Variable<String>(
       quickAddDurationsMinutes,
     );
+    map['count_paused_time_as_break'] = Variable<bool>(countPausedTimeAsBreak);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
@@ -3626,6 +3658,7 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
       dateFormat: Value(dateFormat),
       timeFormat: Value(timeFormat),
       quickAddDurationsMinutes: Value(quickAddDurationsMinutes),
+      countPausedTimeAsBreak: Value(countPausedTimeAsBreak),
       updatedAt: Value(updatedAt),
     );
   }
@@ -3642,6 +3675,9 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
       quickAddDurationsMinutes: serializer.fromJson<String>(
         json['quickAddDurationsMinutes'],
       ),
+      countPausedTimeAsBreak: serializer.fromJson<bool>(
+        json['countPausedTimeAsBreak'],
+      ),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
@@ -3655,6 +3691,7 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
       'quickAddDurationsMinutes': serializer.toJson<String>(
         quickAddDurationsMinutes,
       ),
+      'countPausedTimeAsBreak': serializer.toJson<bool>(countPausedTimeAsBreak),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
@@ -3664,6 +3701,7 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
     String? dateFormat,
     String? timeFormat,
     String? quickAddDurationsMinutes,
+    bool? countPausedTimeAsBreak,
     DateTime? updatedAt,
   }) => AppSettingsRow(
     id: id ?? this.id,
@@ -3671,6 +3709,8 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
     timeFormat: timeFormat ?? this.timeFormat,
     quickAddDurationsMinutes:
         quickAddDurationsMinutes ?? this.quickAddDurationsMinutes,
+    countPausedTimeAsBreak:
+        countPausedTimeAsBreak ?? this.countPausedTimeAsBreak,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   AppSettingsRow copyWithCompanion(AppSettingsCompanion data) {
@@ -3685,6 +3725,9 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
       quickAddDurationsMinutes: data.quickAddDurationsMinutes.present
           ? data.quickAddDurationsMinutes.value
           : this.quickAddDurationsMinutes,
+      countPausedTimeAsBreak: data.countPausedTimeAsBreak.present
+          ? data.countPausedTimeAsBreak.value
+          : this.countPausedTimeAsBreak,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -3696,6 +3739,7 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
           ..write('dateFormat: $dateFormat, ')
           ..write('timeFormat: $timeFormat, ')
           ..write('quickAddDurationsMinutes: $quickAddDurationsMinutes, ')
+          ..write('countPausedTimeAsBreak: $countPausedTimeAsBreak, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -3707,6 +3751,7 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
     dateFormat,
     timeFormat,
     quickAddDurationsMinutes,
+    countPausedTimeAsBreak,
     updatedAt,
   );
   @override
@@ -3717,6 +3762,7 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
           other.dateFormat == this.dateFormat &&
           other.timeFormat == this.timeFormat &&
           other.quickAddDurationsMinutes == this.quickAddDurationsMinutes &&
+          other.countPausedTimeAsBreak == this.countPausedTimeAsBreak &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -3725,6 +3771,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
   final Value<String> dateFormat;
   final Value<String> timeFormat;
   final Value<String> quickAddDurationsMinutes;
+  final Value<bool> countPausedTimeAsBreak;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const AppSettingsCompanion({
@@ -3732,6 +3779,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
     this.dateFormat = const Value.absent(),
     this.timeFormat = const Value.absent(),
     this.quickAddDurationsMinutes = const Value.absent(),
+    this.countPausedTimeAsBreak = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -3740,6 +3788,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
     this.dateFormat = const Value.absent(),
     this.timeFormat = const Value.absent(),
     this.quickAddDurationsMinutes = const Value.absent(),
+    this.countPausedTimeAsBreak = const Value.absent(),
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -3749,6 +3798,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
     Expression<String>? dateFormat,
     Expression<String>? timeFormat,
     Expression<String>? quickAddDurationsMinutes,
+    Expression<bool>? countPausedTimeAsBreak,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
@@ -3758,6 +3808,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
       if (timeFormat != null) 'time_format': timeFormat,
       if (quickAddDurationsMinutes != null)
         'quick_add_durations_minutes': quickAddDurationsMinutes,
+      if (countPausedTimeAsBreak != null)
+        'count_paused_time_as_break': countPausedTimeAsBreak,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -3768,6 +3820,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
     Value<String>? dateFormat,
     Value<String>? timeFormat,
     Value<String>? quickAddDurationsMinutes,
+    Value<bool>? countPausedTimeAsBreak,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
   }) {
@@ -3777,6 +3830,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
       timeFormat: timeFormat ?? this.timeFormat,
       quickAddDurationsMinutes:
           quickAddDurationsMinutes ?? this.quickAddDurationsMinutes,
+      countPausedTimeAsBreak:
+          countPausedTimeAsBreak ?? this.countPausedTimeAsBreak,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -3799,6 +3854,11 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
         quickAddDurationsMinutes.value,
       );
     }
+    if (countPausedTimeAsBreak.present) {
+      map['count_paused_time_as_break'] = Variable<bool>(
+        countPausedTimeAsBreak.value,
+      );
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -3815,6 +3875,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
           ..write('dateFormat: $dateFormat, ')
           ..write('timeFormat: $timeFormat, ')
           ..write('quickAddDurationsMinutes: $quickAddDurationsMinutes, ')
+          ..write('countPausedTimeAsBreak: $countPausedTimeAsBreak, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -7369,6 +7430,7 @@ typedef $$AppSettingsTableCreateCompanionBuilder =
       Value<String> dateFormat,
       Value<String> timeFormat,
       Value<String> quickAddDurationsMinutes,
+      Value<bool> countPausedTimeAsBreak,
       required DateTime updatedAt,
       Value<int> rowid,
     });
@@ -7378,6 +7440,7 @@ typedef $$AppSettingsTableUpdateCompanionBuilder =
       Value<String> dateFormat,
       Value<String> timeFormat,
       Value<String> quickAddDurationsMinutes,
+      Value<bool> countPausedTimeAsBreak,
       Value<DateTime> updatedAt,
       Value<int> rowid,
     });
@@ -7408,6 +7471,11 @@ class $$AppSettingsTableFilterComposer
 
   ColumnFilters<String> get quickAddDurationsMinutes => $composableBuilder(
     column: $table.quickAddDurationsMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get countPausedTimeAsBreak => $composableBuilder(
+    column: $table.countPausedTimeAsBreak,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7446,6 +7514,11 @@ class $$AppSettingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get countPausedTimeAsBreak => $composableBuilder(
+    column: $table.countPausedTimeAsBreak,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -7476,6 +7549,11 @@ class $$AppSettingsTableAnnotationComposer
 
   GeneratedColumn<String> get quickAddDurationsMinutes => $composableBuilder(
     column: $table.quickAddDurationsMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get countPausedTimeAsBreak => $composableBuilder(
+    column: $table.countPausedTimeAsBreak,
     builder: (column) => column,
   );
 
@@ -7518,6 +7596,7 @@ class $$AppSettingsTableTableManager
                 Value<String> dateFormat = const Value.absent(),
                 Value<String> timeFormat = const Value.absent(),
                 Value<String> quickAddDurationsMinutes = const Value.absent(),
+                Value<bool> countPausedTimeAsBreak = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => AppSettingsCompanion(
@@ -7525,6 +7604,7 @@ class $$AppSettingsTableTableManager
                 dateFormat: dateFormat,
                 timeFormat: timeFormat,
                 quickAddDurationsMinutes: quickAddDurationsMinutes,
+                countPausedTimeAsBreak: countPausedTimeAsBreak,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
@@ -7534,6 +7614,7 @@ class $$AppSettingsTableTableManager
                 Value<String> dateFormat = const Value.absent(),
                 Value<String> timeFormat = const Value.absent(),
                 Value<String> quickAddDurationsMinutes = const Value.absent(),
+                Value<bool> countPausedTimeAsBreak = const Value.absent(),
                 required DateTime updatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => AppSettingsCompanion.insert(
@@ -7541,6 +7622,7 @@ class $$AppSettingsTableTableManager
                 dateFormat: dateFormat,
                 timeFormat: timeFormat,
                 quickAddDurationsMinutes: quickAddDurationsMinutes,
+                countPausedTimeAsBreak: countPausedTimeAsBreak,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),

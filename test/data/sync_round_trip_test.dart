@@ -151,6 +151,7 @@ void main() {
         dateFormat: 'de',
         timeFormat: '12h',
         quickAddDurationsMinutes: '15,30,45,60',
+                countPausedTimeAsBreak: false,
         updatedAt: DateTime.utc(2026, 1, 1),
       ).toJson()
         ..remove('quickAddDurationsMinutes');

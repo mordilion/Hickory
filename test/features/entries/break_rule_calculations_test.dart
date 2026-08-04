@@ -2,7 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/features/entries/break_rule_calculations.dart';
 
-TimeEntry _entry({required String id, required DateTime startAt, required DateTime endAt}) {
+TimeEntry _entry({
+  required String id,
+  required DateTime startAt,
+  required DateTime endAt,
+  int totalPausedSeconds = 0,
+}) {
   final now = DateTime.utc(2026, 1, 1);
   return TimeEntry(
     id: id,
@@ -11,7 +16,7 @@ TimeEntry _entry({required String id, required DateTime startAt, required DateTi
     startAt: startAt,
     endAt: endAt,
     pausedAt: null,
-    totalPausedSeconds: 0,
+    totalPausedSeconds: totalPausedSeconds,
     billableOverride: null,
     source: 'manual',
     deviceId: 'device-1',
@@ -71,6 +76,55 @@ void main() {
         _entry(id: '2', startAt: DateTime(2026, 8, 1, 12), endAt: DateTime(2026, 8, 1, 17)),
       ];
       expect(dayBreakDuration(entries), Duration.zero);
+    });
+
+    test('ignores totalPausedSeconds by default', () {
+      final entries = [
+        _entry(
+          id: '1',
+          startAt: DateTime(2026, 8, 1, 9),
+          endAt: DateTime(2026, 8, 1, 12),
+          totalPausedSeconds: 600,
+        ),
+      ];
+      expect(dayBreakDuration(entries), Duration.zero);
+    });
+
+    test('adds totalPausedSeconds across all entries when includePausedTime is true', () {
+      final entries = [
+        _entry(
+          id: '1',
+          startAt: DateTime(2026, 8, 1, 9),
+          endAt: DateTime(2026, 8, 1, 12),
+          totalPausedSeconds: 300,
+        ),
+        _entry(
+          id: '2',
+          startAt: DateTime(2026, 8, 1, 13),
+          endAt: DateTime(2026, 8, 1, 17),
+          totalPausedSeconds: 120,
+        ),
+      ];
+      // Gap 1->2: 1h, plus 300s + 120s of paused time.
+      expect(
+        dayBreakDuration(entries, includePausedTime: true),
+        const Duration(hours: 1, minutes: 7),
+      );
+    });
+
+    test('includePausedTime still counts paused time for a single entry', () {
+      final entries = [
+        _entry(
+          id: '1',
+          startAt: DateTime(2026, 8, 1, 9),
+          endAt: DateTime(2026, 8, 1, 12),
+          totalPausedSeconds: 90,
+        ),
+      ];
+      expect(
+        dayBreakDuration(entries, includePausedTime: true),
+        const Duration(seconds: 90),
+      );
     });
   });
 
