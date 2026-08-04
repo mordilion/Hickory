@@ -41,93 +41,38 @@ class EntriesList extends ConsumerWidget {
         final projectsById = {
           for (final p in projectsAsync.value ?? const <Project>[]) p.id: p,
         };
+        final jiraWorklogsById = jiraWorklogsAsync.value ?? const <String, JiraWorklogRow>{};
         final tiers = tiersAsync.value ?? const <BreakRuleTier>[];
         final groups = groupEntriesByDay(
           finished,
           includePausedTimeInBreak: countPausedTimeAsBreak,
         );
-        final rows = <_ListRow>[
-          for (final group in groups) ...[
-            _HeaderRow(
-              day: group.day,
-              total: group.totalDuration,
-              breakDuration: group.breakDuration,
-              requiredBreak: requiredBreakForWorked(group.totalDuration, tiers),
-            ),
-            for (final entry in group.entries) _EntryRow(entry),
-          ],
-        ];
         final localeName = Localizations.localeOf(context).languageCode;
         return ListView.builder(
-          itemCount: rows.length,
+          itemCount: groups.length,
           itemBuilder: (context, index) {
-            final row = rows[index];
-            if (row is _HeaderRow) {
-              return _DayHeader(
-                day: row.day,
-                total: row.total,
-                breakDuration: row.breakDuration,
-                requiredBreak: row.requiredBreak,
-                l10n: l10n,
-                dateStyle: dateStyle,
-                timeStyle: timeStyle,
-                localeName: localeName,
-              );
-            }
-            final entry = (row as _EntryRow).entry;
-            final project = entry.projectId == null ? null : projectsById[entry.projectId];
-            final jiraWorklog = jiraWorklogsAsync.value?[entry.id];
-            final jiraStatusIcon = _jiraStatusIcon(l10n, entry.jiraTicketKey, jiraWorklog);
-            final duration = entry.workedDuration;
-            return Dismissible(
-              key: ValueKey(entry.id),
-              direction: DismissDirection.endToStart,
-              background: Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.errorContainer,
-                  borderRadius: BorderRadius.circular(999),
+            final group = groups[index];
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _DayHeader(
+                  day: group.day,
+                  total: group.totalDuration,
+                  breakDuration: group.breakDuration,
+                  requiredBreak: requiredBreakForWorked(group.totalDuration, tiers),
+                  l10n: l10n,
+                  dateStyle: dateStyle,
+                  timeStyle: timeStyle,
+                  localeName: localeName,
                 ),
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: const Icon(Icons.delete_outline),
-              ),
-              onDismissed: (_) {
-                ref.read(syncedWritesProvider.future).then((w) => w.deleteEntry(entry.id));
-              },
-              child: Card(
-                margin: const EdgeInsets.only(bottom: 8),
-                shape: const StadiumBorder(),
-                child: ListTile(
-                  shape: const StadiumBorder(),
-                  leading: CircleAvatar(
-                    backgroundColor: project != null
-                        ? Color(int.parse(project.colorHex.replaceFirst('#', '0xFF')))
-                        : Colors.grey,
-                    radius: 8,
-                    child: const SizedBox.shrink(),
-                  ),
-                  title: Text(entry.description?.isNotEmpty == true
-                      ? entry.description!
-                      : (project?.name ?? l10n.entriesNoDescription)),
-                  subtitle: Text(
-                    '${project?.name ?? l10n.commonNoProject} · '
-                    '${formatTime(entry.startAt, timeStyle)} – '
-                    '${formatTime(entry.endAt!, timeStyle)}',
-                  ),
-                  trailing: jiraStatusIcon == null
-                      ? Text(formatDuration(duration, timeStyle))
-                      : Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            jiraStatusIcon,
-                            const SizedBox(width: 6),
-                            Text(formatDuration(duration, timeStyle)),
-                          ],
-                        ),
-                  onTap: () => showManualEntryDialog(context, ref, existing: entry),
+                _DayEntriesBlock(
+                  entries: group.entries,
+                  projectsById: projectsById,
+                  jiraWorklogsById: jiraWorklogsById,
+                  timeStyle: timeStyle,
+                  l10n: l10n,
                 ),
-              ),
+              ],
             );
           },
         );
@@ -157,24 +102,124 @@ Widget? _jiraStatusIcon(AppLocalizations l10n, String? jiraTicketKey, JiraWorklo
   };
 }
 
-sealed class _ListRow {}
-
-class _HeaderRow extends _ListRow {
-  _HeaderRow({
-    required this.day,
-    required this.total,
-    required this.breakDuration,
-    required this.requiredBreak,
+/// One day's entries rendered as a single rounded card: rows separated by
+/// 1px dividers (no divider after the last row), with
+/// `clipBehavior: Clip.antiAlias` so each row -- including the
+/// swipe-to-delete background -- is clipped to the card's rounded corners.
+/// See docs/superpowers/specs/2026-08-04-entries-grouped-block-design.md.
+class _DayEntriesBlock extends ConsumerWidget {
+  const _DayEntriesBlock({
+    required this.entries,
+    required this.projectsById,
+    required this.jiraWorklogsById,
+    required this.timeStyle,
+    required this.l10n,
   });
-  final DateTime day;
-  final Duration total;
-  final Duration breakDuration;
-  final Duration? requiredBreak;
+
+  final List<TimeEntry> entries;
+  final Map<String, Project> projectsById;
+  final Map<String, JiraWorklogRow> jiraWorklogsById;
+  final TimeFormatStyle timeStyle;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Column(
+        children: [
+          for (var index = 0; index < entries.length; index++) ...[
+            _EntryTile(
+              entry: entries[index],
+              project: entries[index].projectId == null
+                  ? null
+                  : projectsById[entries[index].projectId],
+              jiraWorklog: jiraWorklogsById[entries[index].id],
+              timeStyle: timeStyle,
+              l10n: l10n,
+              onTap: () => showManualEntryDialog(context, ref, existing: entries[index]),
+              onDismissed: () {
+                final entryId = entries[index].id;
+                ref.read(syncedWritesProvider.future).then((w) => w.deleteEntry(entryId));
+              },
+            ),
+            if (index != entries.length - 1) const Divider(height: 1),
+          ],
+        ],
+      ),
+    );
+  }
 }
 
-class _EntryRow extends _ListRow {
-  _EntryRow(this.entry);
+/// A single time entry row inside a [_DayEntriesBlock]. Presentational only
+/// -- [onTap] and [onDismissed] carry the Riverpod-dependent behavior so
+/// this widget stays a plain [StatelessWidget].
+class _EntryTile extends StatelessWidget {
+  const _EntryTile({
+    required this.entry,
+    required this.project,
+    required this.jiraWorklog,
+    required this.timeStyle,
+    required this.l10n,
+    required this.onTap,
+    required this.onDismissed,
+  });
+
   final TimeEntry entry;
+  final Project? project;
+  final JiraWorklogRow? jiraWorklog;
+  final TimeFormatStyle timeStyle;
+  final AppLocalizations l10n;
+  final VoidCallback onTap;
+  final VoidCallback onDismissed;
+
+  @override
+  Widget build(BuildContext context) {
+    final jiraStatusIcon = _jiraStatusIcon(l10n, entry.jiraTicketKey, jiraWorklog);
+    final duration = entry.workedDuration;
+    return Dismissible(
+      key: ValueKey(entry.id),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        color: Theme.of(context).colorScheme.errorContainer,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Icon(Icons.delete_outline),
+      ),
+      onDismissed: (_) => onDismissed(),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: project != null
+              ? Color(int.parse(project!.colorHex.replaceFirst('#', '0xFF')))
+              : Colors.grey,
+          radius: 8,
+          child: const SizedBox.shrink(),
+        ),
+        title: Text(
+          entry.description?.isNotEmpty == true
+              ? entry.description!
+              : (project?.name ?? l10n.entriesNoDescription),
+        ),
+        subtitle: Text(
+          '${project?.name ?? l10n.commonNoProject} · '
+          '${formatTime(entry.startAt, timeStyle)} – '
+          '${formatTime(entry.endAt!, timeStyle)}',
+        ),
+        trailing: jiraStatusIcon == null
+            ? Text(formatDuration(duration, timeStyle))
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  jiraStatusIcon,
+                  const SizedBox(width: 6),
+                  Text(formatDuration(duration, timeStyle)),
+                ],
+              ),
+        onTap: onTap,
+      ),
+    );
+  }
 }
 
 class _DayHeader extends StatelessWidget {
