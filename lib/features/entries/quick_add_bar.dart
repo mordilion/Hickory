@@ -8,6 +8,7 @@ import '../../core/format/date_format.dart';
 import '../../core/format/quick_add_durations.dart';
 import '../../l10n/app_localizations.dart';
 import '../jira/widgets/jira_ticket_field.dart';
+import '../projects/new_project_dialog.dart';
 import '../projects/projects_providers.dart';
 import 'manual_entry_dialog.dart';
 
@@ -139,22 +140,18 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            TextField(
+              controller: _descriptionController,
+              decoration: InputDecoration(labelText: l10n.entriesDescriptionLabel, isDense: true),
+            ),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: _descriptionController,
-                    decoration: InputDecoration(labelText: l10n.entriesDescriptionLabel, isDense: true),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                SizedBox(
-                  width: 140,
                   child: projectsAsync.when(
                     data: (projects) => DropdownButtonFormField<String?>(
                       initialValue: _projectId,
                       isDense: true,
-                      isExpanded: true,
                       decoration: InputDecoration(labelText: l10n.entriesProjectLabel, isDense: true),
                       items: [
                         DropdownMenuItem<String?>(value: null, child: Text(l10n.commonNoProject)),
@@ -168,9 +165,14 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
                     error: (e, _) => Text(l10n.entriesError(e.toString())),
                   ),
                 ),
+                IconButton(
+                  tooltip: l10n.timerNewProjectTooltip,
+                  onPressed: () => showNewProjectDialog(context, ref),
+                  icon: const Icon(Icons.add_box_outlined),
+                ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Wrap(
               spacing: 8,
               runSpacing: 8,

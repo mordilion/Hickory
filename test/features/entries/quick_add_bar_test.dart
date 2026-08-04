@@ -187,6 +187,16 @@ void main() {
     expect(find.text('Jira ticket'), findsOneWidget);
   });
 
+  testWidgets('tapping the new-project icon opens the new-project dialog', (tester) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('New project'), findsNothing);
+    await tester.tap(find.byTooltip('New project'));
+    await tester.pumpAndSettle();
+    expect(find.text('New project'), findsOneWidget);
+  });
+
   testWidgets(
     'tapping the more icon opens the full dialog prefilled with the current description',
     (tester) async {
