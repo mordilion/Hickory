@@ -217,6 +217,7 @@ class _DayHeader extends StatelessWidget {
       child: Wrap(
         crossAxisAlignment: WrapCrossAlignment.center,
         spacing: 8,
+        runSpacing: 4,
         children: [
           Text(
             l10n.entriesDayHeader(_label(), formatDuration(total, timeStyle)),

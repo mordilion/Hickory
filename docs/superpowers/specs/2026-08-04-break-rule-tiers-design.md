@@ -68,8 +68,13 @@ dependency beyond the drift row types — mirrors `report_calculations.dart`.
   when positive — overlapping/back-to-back entries contribute zero). A day with 0 or 1
   entries has 0 break time. This mirrors the 2026-07-17 spec's "gaps between entries
   within the same calendar day" definition exactly — the overnight gap into the next
-  day is never counted, and explicit Timer-pause time (`totalPausedSeconds`) is
-  unrelated and not part of this calculation.
+  day is never counted.
+- **Explicit Timer-pause time** (`totalPausedSeconds`): excluded from break time by
+  default, since a user who never touches the pause button shouldn't see phantom break
+  minutes appear. A synced, opt-in `countPausedTimeAsBreak` app setting (default off,
+  toggle in the break-rule editor) lets users who track lunch via the Timer's pause
+  button instead of stop/restart include that paused time on top of the gap-based sum
+  — see `dayBreakDuration`'s `includePausedTime` parameter.
 - **Required break for a day**: given the day's worked minutes (already computed as
   `EntryDayGroup.totalDuration`, see `day_grouping.dart`) and the active tier list,
   pick the tier with the highest `afterMinutes` that is `<=` worked minutes. Returns

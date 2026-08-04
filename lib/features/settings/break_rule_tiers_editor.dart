@@ -80,7 +80,8 @@ class _BreakRuleTiersEditorState extends ConsumerState<BreakRuleTiersEditor> {
     setState(() => _busy = true);
     try {
       await write();
-    } catch (_) {
+    } catch (error) {
+      debugPrint('Failed to save break-rule setting: $error');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context).settingsBreakRuleSaveError)),
@@ -111,50 +112,59 @@ class _BreakRuleTiersEditorState extends ConsumerState<BreakRuleTiersEditor> {
     final l10n = AppLocalizations.of(context);
     final afterController = TextEditingController();
     final requiredController = TextEditingController();
+    String? errorText;
     try {
       final result = await showDialog<BreakRuleTierValues>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text(l10n.settingsBreakRuleAddTitle),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: afterController,
-                keyboardType: TextInputType.number,
-                autofocus: true,
-                decoration: InputDecoration(labelText: l10n.settingsBreakRuleAfterMinutesLabel),
+        builder: (context) => StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text(l10n.settingsBreakRuleAddTitle),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: afterController,
+                    keyboardType: TextInputType.number,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      labelText: l10n.settingsBreakRuleAfterMinutesLabel,
+                      errorText: errorText,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: requiredController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: l10n.settingsBreakRuleRequiredMinutesLabel,
+                      errorText: errorText,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: requiredController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: l10n.settingsBreakRuleRequiredMinutesLabel),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l10n.commonCancel),
-            ),
-            FilledButton(
-              onPressed: () {
-                final after = int.tryParse(afterController.text.trim());
-                final required = int.tryParse(requiredController.text.trim());
-                if (after == null || required == null || after <= 0 || required <= 0) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.settingsBreakRuleInvalidTierError)),
-                  );
-                  return;
-                }
-                Navigator.of(context).pop(
-                  BreakRuleTierValues(afterMinutes: after, requiredBreakMinutes: required),
-                );
-              },
-              child: Text(l10n.commonSave),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(l10n.commonCancel),
+                ),
+                FilledButton(
+                  onPressed: () {
+                    final after = int.tryParse(afterController.text.trim());
+                    final required = int.tryParse(requiredController.text.trim());
+                    if (after == null || required == null || after <= 0 || required <= 0) {
+                      setDialogState(() => errorText = l10n.settingsBreakRuleInvalidTierError);
+                      return;
+                    }
+                    Navigator.of(context).pop(
+                      BreakRuleTierValues(afterMinutes: after, requiredBreakMinutes: required),
+                    );
+                  },
+                  child: Text(l10n.commonSave),
+                ),
+              ],
+            );
+          },
         ),
       );
       if (result == null) return;

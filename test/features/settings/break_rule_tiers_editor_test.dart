@@ -71,7 +71,10 @@ void main() {
     }
   });
 
-  Widget makeApp({List<BreakRuleTier> tiers = const []}) => ProviderScope(
+  Widget makeApp({
+    List<BreakRuleTier> tiers = const [],
+    bool countPausedTimeAsBreak = false,
+  }) => ProviderScope(
         overrides: [
           breakRuleTiersProvider.overrideWith((ref) => Stream.value(tiers)),
           appSettingsProvider.overrideWith(
@@ -81,7 +84,7 @@ void main() {
                 dateFormat: 'iso',
                 timeFormat: '24h',
                 quickAddDurationsMinutes: '15,30,45,60',
-                countPausedTimeAsBreak: false,
+                countPausedTimeAsBreak: countPausedTimeAsBreak,
                 updatedAt: DateTime.utc(2026, 1, 1),
               ),
             ),
@@ -176,6 +179,30 @@ void main() {
     expect(await db.select(db.breakRuleTiers).get(), isEmpty);
   });
 
+  testWidgets('renders tier thresholds as hours/minutes, not a clock time', (tester) async {
+    final now = DateTime.utc(2026, 1, 1);
+    await tester.pumpWidget(
+      makeApp(
+        tiers: [
+          BreakRuleTier(
+            id: 'tier-1',
+            afterMinutes: 390, // 6h 30m
+            requiredBreakMinutes: 45,
+            deviceId: 'device-1',
+            createdAt: now,
+            updatedAt: now,
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('6h 30m'), findsOneWidget);
+    expect(find.textContaining('45m'), findsOneWidget);
+    // A clock-time rendering of 390 worked minutes would read "06:30".
+    expect(find.textContaining('06:30'), findsNothing);
+  });
+
   testWidgets('removing a tier deletes it', (tester) async {
     final now = DateTime.utc(2026, 1, 1);
     await tester.pumpWidget(
@@ -224,6 +251,38 @@ void main() {
     expect(tiers, hasLength(1));
     expect(tiers.single.afterMinutes, 300);
     expect(tiers.single.requiredBreakMinutes, 20);
+  });
+
+  testWidgets('entering a non-numeric value shows an inline error and keeps the dialog open', (
+    tester,
+  ) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Add rule'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, 'abc');
+    await tester.enterText(find.byType(TextField).last, '20');
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    // The dialog is still open (Save didn't pop it) and shows the error
+    // as the field's own errorText, not a SnackBar hidden behind the
+    // modal barrier.
+    expect(find.text('Add rule'), findsOneWidget);
+    expect(find.text('Please enter valid minute values.'), findsWidgets);
+    expect(await db.select(db.breakRuleTiers).get(), isEmpty);
+  });
+
+  testWidgets('renders the switch already on when countPausedTimeAsBreak is true', (tester) async {
+    await tester.pumpWidget(makeApp(countPausedTimeAsBreak: true));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
+      isTrue,
+    );
   });
 
   testWidgets('toggling "Include pause-button time" persists the setting', (tester) async {
