@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'app.dart';
@@ -10,12 +11,20 @@ import 'core/di/database_provider.dart';
 import 'core/di/locale_provider.dart';
 import 'core/di/sync_providers.dart';
 import 'core/locale/locale_resolution.dart';
+import 'core/theme/app_text_theme.dart';
 import 'core/window/quit_behavior.dart';
 import 'core/window/window_tray_controller.dart';
 import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // google_fonts loads Unbounded/Manrope from disk cache or network on first
+  // use; without this, the first frame paints with a fallback font and
+  // reflows once the real font arrives (visible as e.g. the Timer/Manual
+  // toggle's label wrapping until the next rebuild). Triggering the same
+  // TextTheme build main() will later use, then awaiting it, closes that gap.
+  buildAppTextTheme(Brightness.light);
+  await GoogleFonts.pendingFonts();
   for (final localeName in ['de_DE', 'en_US', 'de', 'en', 'fr', 'es', 'it', 'nl']) {
     await initializeDateFormatting(localeName);
   }
