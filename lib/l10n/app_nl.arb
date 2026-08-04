@@ -54,6 +54,7 @@
   "timerNewProjectTooltip": "Nieuw project",
   "jiraTicketFieldLabel": "Jira-ticket",
   "timerStart": "Starten",
+  "timerModeManual": "Handmatig",
   "timerIdleTitle": "Inactiviteit gedetecteerd",
   "timerIdleMessage": "Je bent al {minutes} minuten inactief. Wil je deze tijd van de lopende invoer aftrekken?",
   "timerIdleKeepTime": "Tijd behouden",

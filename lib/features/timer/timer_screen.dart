@@ -24,6 +24,8 @@ import 'timer_providers.dart';
 /// only (see [isDesktopTrackingSupported]).
 const _idleThresholdSeconds = 5 * 60;
 
+enum _TimerTabMode { timer, manual }
+
 /// Timer tab content — hosted by the app shell (features/shell/app_shell.dart),
 /// which owns the Scaffold, AppBar, and bottom nav. Manual-entry creation
 /// lives in QuickAddBar, pinned above the entries list below.
@@ -39,6 +41,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
   String? _selectedProjectId;
   String? _selectedJiraTicketKey;
   bool _idlePromptShowing = false;
+  _TimerTabMode _mode = _TimerTabMode.timer;
 
   @override
   void dispose() {
@@ -126,31 +129,51 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
       if (sample != null) _recordActivitySample(sample);
     });
 
+    final isRunning = runningAsync.value != null;
+    if (isRunning) _mode = _TimerTabMode.timer;
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          runningAsync.when(
-            data: (running) => running != null
-                ? _RunningCard(
-                    running: running,
-                    onPause: () => _pause(running),
-                    onResume: () => _resume(running),
-                    onStop: () => _stop(running),
-                  )
-                : _StartCard(
-                    descriptionController: _descriptionController,
-                    selectedProjectId: _selectedProjectId,
-                    onProjectChanged: (id) => setState(() => _selectedProjectId = id),
-                    selectedJiraTicketKey: _selectedJiraTicketKey,
-                    onJiraTicketKeyChanged: (key) => setState(() => _selectedJiraTicketKey = key),
-                    onStart: _start,
-                  ),
-            loading: () => const CircularProgressIndicator(),
-            error: (e, _) => Text(l10n.timerError('$e')),
+          SegmentedButton<_TimerTabMode>(
+            segments: [
+              ButtonSegment(
+                value: _TimerTabMode.timer,
+                label: Text(l10n.navTimer),
+              ),
+              ButtonSegment(
+                value: _TimerTabMode.manual,
+                label: Text(l10n.timerModeManual),
+                enabled: !isRunning,
+              ),
+            ],
+            selected: {_mode},
+            onSelectionChanged: (selection) => setState(() => _mode = selection.first),
           ),
           const SizedBox(height: 16),
-          const QuickAddBar(),
+          if (_mode == _TimerTabMode.timer)
+            runningAsync.when(
+              data: (running) => running != null
+                  ? _RunningCard(
+                      running: running,
+                      onPause: () => _pause(running),
+                      onResume: () => _resume(running),
+                      onStop: () => _stop(running),
+                    )
+                  : _StartCard(
+                      descriptionController: _descriptionController,
+                      selectedProjectId: _selectedProjectId,
+                      onProjectChanged: (id) => setState(() => _selectedProjectId = id),
+                      selectedJiraTicketKey: _selectedJiraTicketKey,
+                      onJiraTicketKeyChanged: (key) => setState(() => _selectedJiraTicketKey = key),
+                      onStart: _start,
+                    ),
+              loading: () => const CircularProgressIndicator(),
+              error: (e, _) => Text(l10n.timerError('$e')),
+            )
+          else
+            const QuickAddBar(),
           const SizedBox(height: 16),
           const Expanded(child: EntriesList()),
         ],

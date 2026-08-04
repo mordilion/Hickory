@@ -54,6 +54,7 @@
   "timerNewProjectTooltip": "Nouveau projet",
   "jiraTicketFieldLabel": "Ticket Jira",
   "timerStart": "Démarrer",
+  "timerModeManual": "Manuel",
   "timerIdleTitle": "Inactivité détectée",
   "timerIdleMessage": "Vous êtes inactif(ve) depuis {minutes} minutes. Voulez-vous déduire ce temps de l'entrée en cours ?",
   "timerIdleKeepTime": "Conserver le temps",

@@ -165,6 +165,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get timerStart => 'Démarrer';
 
   @override
+  String get timerModeManual => 'Manuel';
+
+  @override
   String get timerIdleTitle => 'Inactivité détectée';
 
   @override

@@ -165,6 +165,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get timerStart => 'Starten';
 
   @override
+  String get timerModeManual => 'Handmatig';
+
+  @override
   String get timerIdleTitle => 'Inactiviteit gedetecteerd';
 
   @override

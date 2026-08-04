@@ -79,6 +79,7 @@
   "timerNewProjectTooltip": "Neues Projekt",
   "jiraTicketFieldLabel": "Jira-Ticket",
   "timerStart": "Start",
+  "timerModeManual": "Manuell",
   "timerIdleTitle": "Inaktiv erkannt",
   "timerIdleMessage": "Du warst seit {minutes} Minuten inaktiv. Soll diese Zeit vom laufenden Eintrag abgezogen werden?",
   "@timerIdleMessage": {

@@ -382,6 +382,12 @@ abstract class AppLocalizations {
   /// **'Start'**
   String get timerStart;
 
+  /// No description provided for @timerModeManual.
+  ///
+  /// In de, this message translates to:
+  /// **'Manuell'**
+  String get timerModeManual;
+
   /// No description provided for @timerIdleTitle.
   ///
   /// In de, this message translates to:
