@@ -89,6 +89,31 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
     });
   }
 
+  Future<void> _delete() async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.entriesDeleteConfirmTitle),
+        content: Text(l10n.entriesDeleteConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.commonDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final writes = await ref.read(syncedWritesProvider.future);
+    await writes.deleteEntry(widget.existing!.id);
+    if (mounted) Navigator.of(context).pop();
+  }
+
   Future<void> _save() async {
     if (_endAt.isBefore(_startAt)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -188,12 +213,27 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
           ],
         ),
       ),
+      actionsAlignment: MainAxisAlignment.spaceBetween,
       actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.commonCancel),
+        if (widget.existing != null)
+          TextButton(
+            onPressed: _delete,
+            style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
+            child: Text(l10n.commonDelete),
+          )
+        else
+          const SizedBox.shrink(),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.commonCancel),
+            ),
+            const SizedBox(width: 8),
+            FilledButton(onPressed: _save, child: Text(l10n.commonSave)),
+          ],
         ),
-        FilledButton(onPressed: _save, child: Text(l10n.commonSave)),
       ],
     );
   }

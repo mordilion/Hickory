@@ -187,6 +187,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get commonSave => 'Salva';
 
   @override
+  String get commonDelete => 'Elimina';
+
+  @override
   String get entriesEmpty => 'Ancora nessuna voce.';
 
   @override
@@ -218,6 +221,13 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get entriesEndBeforeStartError =>
       'La fine deve essere successiva all\'inizio.';
+
+  @override
+  String get entriesDeleteConfirmTitle => 'Eliminare la voce?';
+
+  @override
+  String get entriesDeleteConfirmMessage =>
+      'Questa voce verrà eliminata definitivamente. Questa azione non può essere annullata.';
 
   @override
   String get entriesToday => 'Oggi';

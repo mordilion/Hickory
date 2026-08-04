@@ -188,6 +188,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get commonSave => 'Opslaan';
 
   @override
+  String get commonDelete => 'Verwijderen';
+
+  @override
   String get entriesEmpty => 'Nog geen invoer.';
 
   @override
@@ -219,6 +222,13 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get entriesEndBeforeStartError =>
       'Het einde moet na het begin liggen.';
+
+  @override
+  String get entriesDeleteConfirmTitle => 'Item verwijderen?';
+
+  @override
+  String get entriesDeleteConfirmMessage =>
+      'Dit item wordt permanent verwijderd. Dit kan niet ongedaan worden gemaakt.';
 
   @override
   String get entriesToday => 'Vandaag';

@@ -187,6 +187,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonSave => 'Save';
 
   @override
+  String get commonDelete => 'Delete';
+
+  @override
   String get entriesEmpty => 'No entries yet.';
 
   @override
@@ -217,6 +220,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get entriesEndBeforeStartError => 'End must be after the start.';
+
+  @override
+  String get entriesDeleteConfirmTitle => 'Delete entry?';
+
+  @override
+  String get entriesDeleteConfirmMessage =>
+      'This entry will be permanently deleted. This cannot be undone.';
 
   @override
   String get entriesToday => 'Today';

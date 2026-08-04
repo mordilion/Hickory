@@ -187,6 +187,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get commonSave => 'Speichern';
 
   @override
+  String get commonDelete => 'Löschen';
+
+  @override
   String get entriesEmpty => 'Noch keine Einträge.';
 
   @override
@@ -217,6 +220,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get entriesEndBeforeStartError => 'Ende muss nach dem Start liegen.';
+
+  @override
+  String get entriesDeleteConfirmTitle => 'Eintrag löschen?';
+
+  @override
+  String get entriesDeleteConfirmMessage =>
+      'Dieser Eintrag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.';
 
   @override
   String get entriesToday => 'Heute';

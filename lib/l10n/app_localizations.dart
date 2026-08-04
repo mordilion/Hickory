@@ -424,6 +424,12 @@ abstract class AppLocalizations {
   /// **'Speichern'**
   String get commonSave;
 
+  /// No description provided for @commonDelete.
+  ///
+  /// In de, this message translates to:
+  /// **'Löschen'**
+  String get commonDelete;
+
   /// No description provided for @entriesEmpty.
   ///
   /// In de, this message translates to:
@@ -483,6 +489,18 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Ende muss nach dem Start liegen.'**
   String get entriesEndBeforeStartError;
+
+  /// No description provided for @entriesDeleteConfirmTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Eintrag löschen?'**
+  String get entriesDeleteConfirmTitle;
+
+  /// No description provided for @entriesDeleteConfirmMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Eintrag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.'**
+  String get entriesDeleteConfirmMessage;
 
   /// No description provided for @entriesToday.
   ///
