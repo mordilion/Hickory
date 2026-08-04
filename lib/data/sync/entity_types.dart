@@ -9,4 +9,5 @@ abstract final class EntityTypes {
   static const activitySample = 'activity_sample';
   static const appSettings = 'app_settings';
   static const jiraWorklog = 'jira_worklog';
+  static const breakRuleTier = 'break_rule_tier';
 }

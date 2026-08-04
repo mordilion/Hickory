@@ -222,4 +222,71 @@ void main() {
       expect(await readerDb.jiraWorklogsDao.getAll(), isEmpty);
     },
   );
+
+  test(
+    'a break rule tier syncs to a second device, including deletion',
+    () async {
+      final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(writerDb.close);
+      final writerWrites = SyncedWrites(
+        db: writerDb,
+        logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'dev_a'),
+      );
+
+      final tier = await writerWrites.createBreakRuleTier(
+        deviceId: 'dev_a',
+        afterMinutes: 360,
+        requiredBreakMinutes: 30,
+      );
+
+      final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(readerDb.close);
+      final ingestor = SyncIngestor(db: readerDb, syncRoot: syncRoot);
+      await ingestor.syncNow();
+
+      final tiers = await readerDb.breakRuleTiersDao.getAllTiers();
+      expect(tiers, hasLength(1));
+      expect(tiers.single.afterMinutes, 360);
+
+      await writerWrites.deleteBreakRuleTier(tier.id);
+      await ingestor.syncNow();
+
+      expect(await readerDb.breakRuleTiersDao.getAllTiers(), isEmpty);
+    },
+  );
+
+  test(
+    'replaceBreakRuleTiers swaps the whole tier set and syncs the result',
+    () async {
+      final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(writerDb.close);
+      final writerWrites = SyncedWrites(
+        db: writerDb,
+        logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'dev_a'),
+      );
+
+      await writerWrites.createBreakRuleTier(
+        deviceId: 'dev_a',
+        afterMinutes: 120,
+        requiredBreakMinutes: 10,
+      );
+
+      await writerWrites.replaceBreakRuleTiers(
+        deviceId: 'dev_a',
+        tiers: const [
+          BreakRuleTierValues(afterMinutes: 360, requiredBreakMinutes: 30),
+          BreakRuleTierValues(afterMinutes: 540, requiredBreakMinutes: 45),
+        ],
+      );
+
+      final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(readerDb.close);
+      final ingestor = SyncIngestor(db: readerDb, syncRoot: syncRoot);
+      await ingestor.syncNow();
+
+      final tiers = await readerDb.breakRuleTiersDao.getAllTiers();
+      expect(tiers, hasLength(2));
+      expect(tiers.map((t) => t.afterMinutes), [360, 540]);
+    },
+  );
 }

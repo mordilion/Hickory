@@ -50,6 +50,7 @@ class SyncIngestor {
       await db.delete(db.timeEntries).go();
       await db.delete(db.projects).go();
       await db.delete(db.jiraWorklogs).go();
+      await db.delete(db.breakRuleTiers).go();
     });
     await syncNow();
   }
@@ -176,6 +177,14 @@ class SyncIngestor {
           await db
               .into(db.jiraWorklogs)
               .insertOnConflictUpdate(JiraWorklogRow.fromJson(entity.payload!).toCompanion(true));
+        }
+      case EntityTypes.breakRuleTier:
+        if (entity.isDeleted) {
+          await (db.delete(db.breakRuleTiers)..where((t) => t.id.equals(entity.entityId))).go();
+        } else {
+          await db
+              .into(db.breakRuleTiers)
+              .insertOnConflictUpdate(BreakRuleTier.fromJson(entity.payload!).toCompanion(true));
         }
       default:
         // Client/Tag aren't wired into the app yet (no DAO to apply them

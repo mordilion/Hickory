@@ -8,6 +8,17 @@ import '../drift/tables/jira_worklogs_table.dart' show JiraWorklogStatus;
 import 'entity_types.dart';
 import 'sync_log_writer.dart';
 
+/// A single break-rule tier's editable values, used when applying a preset
+/// (see [SyncedWrites.replaceBreakRuleTiers]) or creating one manually. Not
+/// a Dart record: the codebase has no existing record-type usage, and a
+/// plain immutable class matches house style.
+class BreakRuleTierValues {
+  const BreakRuleTierValues({required this.afterMinutes, required this.requiredBreakMinutes});
+
+  final int afterMinutes;
+  final int requiredBreakMinutes;
+}
+
 /// Thin write-through wrapper around the DAOs: every mutation is applied to
 /// the local drift cache immediately (via the DAO, for instant UI feedback)
 /// and also appended to the device's own event log, per the architecture
@@ -181,6 +192,60 @@ class SyncedWrites {
       payload: updated.toJson(),
     );
     return updated;
+  }
+
+  /// Creates a break-rule tier and logs it, so it propagates to the user's
+  /// other devices the same way every other entity does.
+  Future<BreakRuleTier> createBreakRuleTier({
+    required String deviceId,
+    required int afterMinutes,
+    required int requiredBreakMinutes,
+  }) async {
+    final tier = await db.breakRuleTiersDao.createTier(
+      deviceId: deviceId,
+      afterMinutes: afterMinutes,
+      requiredBreakMinutes: requiredBreakMinutes,
+    );
+    await logWriter.appendEvent(
+      entityType: EntityTypes.breakRuleTier,
+      entityId: tier.id,
+      op: EventOp.create,
+      payload: tier.toJson(),
+    );
+    return tier;
+  }
+
+  Future<void> deleteBreakRuleTier(String id) async {
+    await db.breakRuleTiersDao.deleteTier(id);
+    await logWriter.appendEvent(
+      entityType: EntityTypes.breakRuleTier,
+      entityId: id,
+      op: EventOp.delete,
+      payload: null,
+    );
+  }
+
+  /// Replaces the entire tier list with [tiers] -- used when applying a
+  /// preset in Settings. Deletes every existing tier, then creates the new
+  /// set; each step is logged individually via [deleteBreakRuleTier] /
+  /// [createBreakRuleTier], matching how every other multi-step write in
+  /// this codebase logs one event per DAO call rather than inventing a
+  /// batch-event concept.
+  Future<void> replaceBreakRuleTiers({
+    required String deviceId,
+    required List<BreakRuleTierValues> tiers,
+  }) async {
+    final existing = await db.breakRuleTiersDao.getAllTiers();
+    for (final tier in existing) {
+      await deleteBreakRuleTier(tier.id);
+    }
+    for (final values in tiers) {
+      await createBreakRuleTier(
+        deviceId: deviceId,
+        afterMinutes: values.afterMinutes,
+        requiredBreakMinutes: values.requiredBreakMinutes,
+      );
+    }
   }
 
   /// Writes the given Jira sync-tracking row and logs it, so the state
