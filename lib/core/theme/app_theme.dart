@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'app_text_theme.dart';
 import 'hickory_colors.dart';
 
-/// Builds Hickory's light/dark ThemeData from the Electric Violet tokens in
-/// docs/superpowers/specs/2026-07-07-electric-violet-redesign-design.md.
+/// Builds Hickory's light/dark ThemeData from the Forest & Amber tokens in
+/// docs/superpowers/specs/2026-08-04-forest-amber-retheme-design.md (the
+/// shape/typography/navigation decisions from the original Electric Violet
+/// redesign, docs/superpowers/specs/2026-07-07-electric-violet-redesign-design.md,
+/// are unchanged — only the color tokens were re-themed).
 ///
 /// Starts from ColorScheme.fromSeed (so any Material component we haven't
 /// explicitly themed still gets a reasonable, harmonious color) and then
@@ -21,12 +24,12 @@ abstract final class AppTheme {
   static ThemeData _build(Brightness brightness) {
     final isDark = brightness == Brightness.dark;
     final tokens = isDark ? HickoryColors.dark : HickoryColors.light;
-    final surface = isDark ? const Color(0xFF150F1E) : const Color(0xFFFBF7FF);
-    final cardSurface = isDark ? const Color(0xFF1F1729) : Colors.white;
-    final onSurface = isDark ? const Color(0xFFF1ECF7) : const Color(0xFF241A30);
+    final surface = isDark ? const Color(0xFF0E1712) : const Color(0xFFF5FAF6);
+    final cardSurface = isDark ? const Color(0xFF182620) : Colors.white;
+    final onSurface = isDark ? const Color(0xFFF3EFE2) : const Color(0xFF152A1F);
 
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFFB678FF),
+      seedColor: const Color(0xFF5FBF8F),
       brightness: brightness,
     ).copyWith(
       primary: tokens.timerNumeral,

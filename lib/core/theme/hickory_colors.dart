@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Design tokens from docs/superpowers/specs/2026-07-07-electric-violet-redesign-design.md
+/// Design tokens from docs/superpowers/specs/2026-08-04-forest-amber-retheme-design.md
 /// that don't map onto Flutter's built-in ColorScheme roles: gradients,
 /// chip colors, nav-bar colors, and the hero timer-numeral color.
 /// `background`/`surface`/`onSurface`/text-primary are pinned directly on
@@ -36,33 +36,33 @@ class HickoryColors extends ThemeExtension<HickoryColors> {
   final Color navActiveIcon;
 
   static const light = HickoryColors(
-    surfaceGradient: [Color(0xFFF1E4FF), Color(0xFFFDE6F1)],
-    primaryGradient: [Color(0xFF8B4FE0), Color(0xFFE0568F)],
+    surfaceGradient: [Color(0xFFE3F2E8), Color(0xFFFDEEDD)],
+    primaryGradient: [Color(0xFF2F6B4F), Color(0xFFC97D1E)],
     onPrimaryGradient: Color(0xFFFFFFFF),
-    textMuted: Color(0x99241A30),
+    textMuted: Color(0x99152A1F),
     chipBackground: Color(0xFFFFFFFF),
-    chipText: Color(0xFFC0287A),
-    timerNumeral: Color(0xFF7C3AED),
+    chipText: Color(0xFF8A5810),
+    timerNumeral: Color(0xFF1E7A4F),
     navBackground: Color(0xFFFFFFFF),
-    navBorder: Color(0xFFEEE3FA),
-    navInactive: Color(0xFFA99BB8),
-    navActiveLabel: Color(0xFF4C1D95),
-    navActiveIcon: Color(0xFF7C3AED),
+    navBorder: Color(0xFFDCEEE0),
+    navInactive: Color(0xFF8FA89A),
+    navActiveLabel: Color(0xFF153D28),
+    navActiveIcon: Color(0xFF1E7A4F),
   );
 
   static const dark = HickoryColors(
-    surfaceGradient: [Color(0xFF241A30), Color(0xFF2E1B38)],
-    primaryGradient: [Color(0xFFB678FF), Color(0xFFFF6FA9)],
-    onPrimaryGradient: Color(0xFF160A22),
-    textMuted: Color(0x99F1ECF7),
-    chipBackground: Color(0xFF3A2A4A),
-    chipText: Color(0xFFFF9ED6),
-    timerNumeral: Color(0xFFC89BFF),
-    navBackground: Color(0xFF1A1420),
-    navBorder: Color(0xFF2A2033),
-    navInactive: Color(0xFF6E6478),
-    navActiveLabel: Color(0xFFE4D5FF),
-    navActiveIcon: Color(0xFFC89BFF),
+    surfaceGradient: [Color(0xFF1B2E22), Color(0xFF20362A)],
+    primaryGradient: [Color(0xFF5FBF8F), Color(0xFFE8A548)],
+    onPrimaryGradient: Color(0xFF12241A),
+    textMuted: Color(0x99F3EFE2),
+    chipBackground: Color(0xFF26402F),
+    chipText: Color(0xFFF2BD7A),
+    timerNumeral: Color(0xFF7DDBA8),
+    navBackground: Color(0xFF0F1912),
+    navBorder: Color(0xFF1E3226),
+    navInactive: Color(0xFF6B7A70),
+    navActiveLabel: Color(0xFFD7EDDF),
+    navActiveIcon: Color(0xFF7DDBA8),
   );
 
   @override
