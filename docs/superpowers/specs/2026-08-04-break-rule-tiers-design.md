@@ -109,9 +109,10 @@ New widget `lib/features/settings/break_rule_tiers_editor.dart`, added to
   break", delete icon), plus an "add tier" action opening a small dialog with two
   number fields (after-minutes, required-minutes) — mirrors
   `QuickAddDurationsEditor._add`'s single-field dialog, just with two fields.
-- Presets are a hardcoded `const` list of `(String labelKey, List<(int, int)> tiers)`
-  in the new editor file — not a database concept (Section 2) — so adding a country
-  later is a one-line addition, no schema/sync change needed.
+- Presets are a hardcoded `const` list of `BreakRulePreset` (a small immutable class:
+  `labelKey` + `List<BreakRuleTierValues> tiers`) in the new editor file — not a
+  database concept (Section 2) — so adding a country later is a one-line addition, no
+  schema/sync change needed.
 
 ### Riverpod
 
