@@ -276,6 +276,46 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsQuickAddNewDurationLabel => 'Minuti';
 
   @override
+  String get settingsBreakRuleTitle => 'Regole sulla pausa';
+
+  @override
+  String get settingsBreakRuleDescription =>
+      'Definisce quanta pausa è necessaria in base al tempo lavorato. Il riepilogo giornaliero avvisa se la pausa è stata troppo breve.';
+
+  @override
+  String get settingsBreakRulePresetGermany => 'Germania';
+
+  @override
+  String get settingsBreakRulePresetAustria => 'Austria';
+
+  @override
+  String get settingsBreakRulePresetSwitzerland => 'Svizzera';
+
+  @override
+  String get settingsBreakRuleNone => 'Nessuna';
+
+  @override
+  String settingsBreakRuleTierLabel(String worked, String breakTime) {
+    return 'Dopo $worked → $breakTime di pausa';
+  }
+
+  @override
+  String get settingsBreakRuleRemoveTooltip => 'Rimuovi';
+
+  @override
+  String get settingsBreakRuleAddLabel => 'Aggiungi regola';
+
+  @override
+  String get settingsBreakRuleAddTitle => 'Nuova regola di pausa';
+
+  @override
+  String get settingsBreakRuleAfterMinutesLabel => 'Dopo minuti lavorati';
+
+  @override
+  String get settingsBreakRuleRequiredMinutesLabel =>
+      'Minuti di pausa richiesti';
+
+  @override
   String get projectsNewProjectTitle => 'Nuovo progetto';
 
   @override

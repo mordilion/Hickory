@@ -277,6 +277,45 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsQuickAddNewDurationLabel => 'Minuten';
 
   @override
+  String get settingsBreakRuleTitle => 'Pauzeregels';
+
+  @override
+  String get settingsBreakRuleDescription =>
+      'Bepaalt hoeveel pauze nodig is na hoeveel werktijd. Het dagoverzicht waarschuwt als de pauze te kort was.';
+
+  @override
+  String get settingsBreakRulePresetGermany => 'Duitsland';
+
+  @override
+  String get settingsBreakRulePresetAustria => 'Oostenrijk';
+
+  @override
+  String get settingsBreakRulePresetSwitzerland => 'Zwitserland';
+
+  @override
+  String get settingsBreakRuleNone => 'Geen';
+
+  @override
+  String settingsBreakRuleTierLabel(String worked, String breakTime) {
+    return 'Na $worked → $breakTime pauze';
+  }
+
+  @override
+  String get settingsBreakRuleRemoveTooltip => 'Verwijderen';
+
+  @override
+  String get settingsBreakRuleAddLabel => 'Regel toevoegen';
+
+  @override
+  String get settingsBreakRuleAddTitle => 'Nieuwe pauzeregel';
+
+  @override
+  String get settingsBreakRuleAfterMinutesLabel => 'Na minuten gewerkt';
+
+  @override
+  String get settingsBreakRuleRequiredMinutesLabel => 'Minuten pauze nodig';
+
+  @override
   String get projectsNewProjectTitle => 'Nieuw project';
 
   @override

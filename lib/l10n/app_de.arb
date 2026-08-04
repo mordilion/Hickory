@@ -138,6 +138,24 @@
   "settingsQuickAddAddLabel": "Hinzufügen",
   "settingsQuickAddRemoveTooltip": "Entfernen",
   "settingsQuickAddNewDurationLabel": "Minuten",
+  "settingsBreakRuleTitle": "Pausenregeln",
+  "settingsBreakRuleDescription": "Legt fest, ab wie viel Arbeitszeit wie viel Pause nötig ist. Die Tagesübersicht warnt, wenn die Pause zu kurz war.",
+  "settingsBreakRulePresetGermany": "Deutschland",
+  "settingsBreakRulePresetAustria": "Österreich",
+  "settingsBreakRulePresetSwitzerland": "Schweiz",
+  "settingsBreakRuleNone": "Keine",
+  "settingsBreakRuleTierLabel": "Ab {worked} → {breakTime} Pause",
+  "@settingsBreakRuleTierLabel": {
+    "placeholders": {
+      "worked": { "type": "String" },
+      "breakTime": { "type": "String" }
+    }
+  },
+  "settingsBreakRuleRemoveTooltip": "Entfernen",
+  "settingsBreakRuleAddLabel": "Regel hinzufügen",
+  "settingsBreakRuleAddTitle": "Neue Pausenregel",
+  "settingsBreakRuleAfterMinutesLabel": "Ab Minuten Arbeit",
+  "settingsBreakRuleRequiredMinutesLabel": "Minuten Pause nötig",
   "projectsNewProjectTitle": "Neues Projekt",
   "projectsNameLabel": "Name",
   "projectsCreateButton": "Erstellen",

@@ -580,6 +580,78 @@ abstract class AppLocalizations {
   /// **'Minuten'**
   String get settingsQuickAddNewDurationLabel;
 
+  /// No description provided for @settingsBreakRuleTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Pausenregeln'**
+  String get settingsBreakRuleTitle;
+
+  /// No description provided for @settingsBreakRuleDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Legt fest, ab wie viel Arbeitszeit wie viel Pause nötig ist. Die Tagesübersicht warnt, wenn die Pause zu kurz war.'**
+  String get settingsBreakRuleDescription;
+
+  /// No description provided for @settingsBreakRulePresetGermany.
+  ///
+  /// In de, this message translates to:
+  /// **'Deutschland'**
+  String get settingsBreakRulePresetGermany;
+
+  /// No description provided for @settingsBreakRulePresetAustria.
+  ///
+  /// In de, this message translates to:
+  /// **'Österreich'**
+  String get settingsBreakRulePresetAustria;
+
+  /// No description provided for @settingsBreakRulePresetSwitzerland.
+  ///
+  /// In de, this message translates to:
+  /// **'Schweiz'**
+  String get settingsBreakRulePresetSwitzerland;
+
+  /// No description provided for @settingsBreakRuleNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine'**
+  String get settingsBreakRuleNone;
+
+  /// No description provided for @settingsBreakRuleTierLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Ab {worked} → {breakTime} Pause'**
+  String settingsBreakRuleTierLabel(String worked, String breakTime);
+
+  /// No description provided for @settingsBreakRuleRemoveTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Entfernen'**
+  String get settingsBreakRuleRemoveTooltip;
+
+  /// No description provided for @settingsBreakRuleAddLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Regel hinzufügen'**
+  String get settingsBreakRuleAddLabel;
+
+  /// No description provided for @settingsBreakRuleAddTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Pausenregel'**
+  String get settingsBreakRuleAddTitle;
+
+  /// No description provided for @settingsBreakRuleAfterMinutesLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Ab Minuten Arbeit'**
+  String get settingsBreakRuleAfterMinutesLabel;
+
+  /// No description provided for @settingsBreakRuleRequiredMinutesLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Minuten Pause nötig'**
+  String get settingsBreakRuleRequiredMinutesLabel;
+
   /// No description provided for @projectsNewProjectTitle.
   ///
   /// In de, this message translates to:

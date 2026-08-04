@@ -275,6 +275,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsQuickAddNewDurationLabel => 'Minutes';
 
   @override
+  String get settingsBreakRuleTitle => 'Break rules';
+
+  @override
+  String get settingsBreakRuleDescription =>
+      'Sets how much break time is required after how much work. The day overview warns when the break was too short.';
+
+  @override
+  String get settingsBreakRulePresetGermany => 'Germany';
+
+  @override
+  String get settingsBreakRulePresetAustria => 'Austria';
+
+  @override
+  String get settingsBreakRulePresetSwitzerland => 'Switzerland';
+
+  @override
+  String get settingsBreakRuleNone => 'None';
+
+  @override
+  String settingsBreakRuleTierLabel(String worked, String breakTime) {
+    return 'After $worked → $breakTime break';
+  }
+
+  @override
+  String get settingsBreakRuleRemoveTooltip => 'Remove';
+
+  @override
+  String get settingsBreakRuleAddLabel => 'Add rule';
+
+  @override
+  String get settingsBreakRuleAddTitle => 'New break rule';
+
+  @override
+  String get settingsBreakRuleAfterMinutesLabel => 'After minutes worked';
+
+  @override
+  String get settingsBreakRuleRequiredMinutesLabel => 'Minutes break required';
+
+  @override
   String get projectsNewProjectTitle => 'New project';
 
   @override
