@@ -23,8 +23,15 @@ Future<void> main() async {
   // reflows once the real font arrives (visible as e.g. the Timer/Manual
   // toggle's label wrapping until the next rebuild). Triggering the same
   // TextTheme build main() will later use, then awaiting it, closes that gap.
-  buildAppTextTheme(Brightness.light);
-  await GoogleFonts.pendingFonts();
+  // Best-effort only: on a sandboxed macOS build without network access the
+  // fetch throws (google_fonts rethrows), which must not block runApp() —
+  // that would leave the native window showing with nothing ever painted.
+  try {
+    buildAppTextTheme(Brightness.light);
+    await GoogleFonts.pendingFonts();
+  } catch (e) {
+    debugPrint('Font preload failed, continuing with fallback fonts: $e');
+  }
   for (final localeName in ['de_DE', 'en_US', 'de', 'en', 'fr', 'es', 'it', 'nl']) {
     await initializeDateFormatting(localeName);
   }
