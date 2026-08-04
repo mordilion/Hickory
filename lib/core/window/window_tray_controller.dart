@@ -14,7 +14,7 @@ import 'background_notice_store.dart';
 /// instead of exiting — Hickory keeps tracking in the background. Call
 /// [initialize] once from `main()`, before `runApp`.
 class WindowTrayController with WindowListener, TrayListener {
-  static const _windowSize = Size(400, 800);
+  static const _windowSize = Size(480, 960);
 
   /// Shown via a SnackBar the first time the window is hidden to the tray,
   /// so the app doesn't seem to have silently vanished. A [GlobalKey] is

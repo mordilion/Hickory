@@ -84,34 +84,48 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  DropdownButtonFormField<DateFormatStyle>(
-                    initialValue: dateStyle,
-                    decoration: InputDecoration(labelText: l10n.settingsDateFormat),
-                    items: DateFormatStyle.values
-                        .map(
-                          (style) => DropdownMenuItem(
-                            value: style,
-                            child: Text(
-                              formatDate(now, style, Localizations.localeOf(context).languageCode),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (style) => style == null ? null : _setDateFormat(style),
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<TimeFormatStyle>(
-                    initialValue: timeStyle,
-                    decoration: InputDecoration(labelText: l10n.settingsTimeFormat),
-                    items: TimeFormatStyle.values
-                        .map(
-                          (style) => DropdownMenuItem(
-                            value: style,
-                            child: Text(formatTime(now, style)),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (style) => style == null ? null : _setTimeFormat(style),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<DateFormatStyle>(
+                          initialValue: dateStyle,
+                          isDense: true,
+                          decoration: InputDecoration(labelText: l10n.settingsDateFormat),
+                          items: DateFormatStyle.values
+                              .map(
+                                (style) => DropdownMenuItem(
+                                  value: style,
+                                  child: Text(
+                                    formatDate(
+                                      now,
+                                      style,
+                                      Localizations.localeOf(context).languageCode,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (style) => style == null ? null : _setDateFormat(style),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: DropdownButtonFormField<TimeFormatStyle>(
+                          initialValue: timeStyle,
+                          isDense: true,
+                          decoration: InputDecoration(labelText: l10n.settingsTimeFormat),
+                          items: TimeFormatStyle.values
+                              .map(
+                                (style) => DropdownMenuItem(
+                                  value: style,
+                                  child: Text(formatTime(now, style)),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (style) => style == null ? null : _setTimeFormat(style),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   const LanguageDropdown(),
