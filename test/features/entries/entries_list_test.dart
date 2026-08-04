@@ -66,12 +66,14 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Match the full header text ("Today · 01:00:00") rather than just the
+    // Match the full header text ("Today · 01:00") rather than just the
     // duration substring: with a single entry per day, the day total equals
     // that entry's own duration, so a substring match on the duration alone
-    // would also match the entry row's trailing duration text.
-    expect(find.text('Today · 01:00:00'), findsOneWidget);
-    expect(find.text('Yesterday · 00:30:00'), findsOneWidget);
+    // would also match the entry row's trailing duration text. The '24h'
+    // settings override above maps to TimeFormatStyle.h24, which hides
+    // seconds in both the header total and the entry row's own duration.
+    expect(find.text('Today · 01:00'), findsOneWidget);
+    expect(find.text('Yesterday · 00:30'), findsOneWidget);
   });
 
   testWidgets('shows the empty state when there are no finished entries', (tester) async {

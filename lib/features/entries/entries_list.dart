@@ -55,6 +55,7 @@ class EntriesList extends ConsumerWidget {
                 total: row.total,
                 l10n: l10n,
                 dateStyle: dateStyle,
+                timeStyle: timeStyle,
                 localeName: localeName,
               );
             }
@@ -96,17 +97,17 @@ class EntriesList extends ConsumerWidget {
                       : (project?.name ?? l10n.entriesNoDescription)),
                   subtitle: Text(
                     '${project?.name ?? l10n.commonNoProject} · '
-                    '${formatDate(entry.startAt, dateStyle, localeName)} '
-                    '${formatTime(entry.startAt, timeStyle)}',
+                    '${formatTime(entry.startAt, timeStyle)} – '
+                    '${formatTime(entry.endAt!, timeStyle)}',
                   ),
                   trailing: jiraStatusIcon == null
-                      ? Text(formatDuration(duration))
+                      ? Text(formatDuration(duration, timeStyle))
                       : Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             jiraStatusIcon,
                             const SizedBox(width: 6),
-                            Text(formatDuration(duration)),
+                            Text(formatDuration(duration, timeStyle)),
                           ],
                         ),
                   onTap: () => showManualEntryDialog(context, ref, existing: entry),
@@ -160,6 +161,7 @@ class _DayHeader extends StatelessWidget {
     required this.total,
     required this.l10n,
     required this.dateStyle,
+    required this.timeStyle,
     required this.localeName,
   });
 
@@ -167,6 +169,7 @@ class _DayHeader extends StatelessWidget {
   final Duration total;
   final AppLocalizations l10n;
   final DateFormatStyle dateStyle;
+  final TimeFormatStyle timeStyle;
   final String localeName;
 
   String _label() {
@@ -183,7 +186,7 @@ class _DayHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 12, bottom: 8),
       child: Text(
-        l10n.entriesDayHeader(_label(), formatDuration(total)),
+        l10n.entriesDayHeader(_label(), formatDuration(total, timeStyle)),
         style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
       ),
     );
