@@ -74,6 +74,8 @@
   "entriesEndBeforeStartError": "El fin debe ser posterior al inicio.",
   "entriesDeleteConfirmTitle": "¿Eliminar entrada?",
   "entriesDeleteConfirmMessage": "Esta entrada se eliminará permanentemente. Esta acción no se puede deshacer.",
+  "entriesBreakLabel": "Pausa: {duration}",
+  "entriesBreakInsufficientTooltip": "Pausa demasiado corta",
   "entriesToday": "Hoy",
   "entriesYesterday": "Ayer",
   "entriesDayHeader": "{day} · {total}",

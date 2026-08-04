@@ -231,6 +231,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Esta entrada se eliminará permanentemente. Esta acción no se puede deshacer.';
 
   @override
+  String entriesBreakLabel(String duration) {
+    return 'Pausa: $duration';
+  }
+
+  @override
+  String get entriesBreakInsufficientTooltip => 'Pausa demasiado corta';
+
+  @override
   String get entriesToday => 'Hoy';
 
   @override

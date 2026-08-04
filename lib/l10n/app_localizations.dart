@@ -502,6 +502,18 @@ abstract class AppLocalizations {
   /// **'Dieser Eintrag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.'**
   String get entriesDeleteConfirmMessage;
 
+  /// No description provided for @entriesBreakLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Pause: {duration}'**
+  String entriesBreakLabel(String duration);
+
+  /// No description provided for @entriesBreakInsufficientTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Pause zu kurz'**
+  String get entriesBreakInsufficientTooltip;
+
   /// No description provided for @entriesToday.
   ///
   /// In de, this message translates to:

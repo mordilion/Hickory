@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/app_settings_provider.dart';
+import '../../core/di/break_rule_tiers_provider.dart';
 import '../../core/di/jira_providers.dart';
 import '../../core/di/sync_providers.dart';
 import '../../core/format/date_format.dart';
@@ -12,6 +13,7 @@ import '../../data/drift/time_entry_extensions.dart';
 import '../../l10n/app_localizations.dart';
 import '../projects/projects_providers.dart';
 import '../timer/timer_providers.dart';
+import 'break_rule_calculations.dart';
 import 'day_grouping.dart';
 import 'manual_entry_dialog.dart';
 
@@ -24,6 +26,7 @@ class EntriesList extends ConsumerWidget {
     final entriesAsync = ref.watch(allEntriesProvider);
     final projectsAsync = ref.watch(activeProjectsProvider);
     final jiraWorklogsAsync = ref.watch(jiraWorklogsByEntryIdProvider);
+    final tiersAsync = ref.watch(breakRuleTiersProvider);
     final settings = ref.watch(appSettingsProvider).value;
     final dateStyle = settings.dateStyle;
     final timeStyle = settings.timeStyle;
@@ -37,10 +40,16 @@ class EntriesList extends ConsumerWidget {
         final projectsById = {
           for (final p in projectsAsync.value ?? const <Project>[]) p.id: p,
         };
+        final tiers = tiersAsync.value ?? const <BreakRuleTier>[];
         final groups = groupEntriesByDay(finished);
         final rows = <_ListRow>[
           for (final group in groups) ...[
-            _HeaderRow(group.day, group.totalDuration),
+            _HeaderRow(
+              group.day,
+              group.totalDuration,
+              group.breakDuration,
+              requiredBreakForWorked(group.totalDuration, tiers),
+            ),
             for (final entry in group.entries) _EntryRow(entry),
           ],
         ];
@@ -53,6 +62,8 @@ class EntriesList extends ConsumerWidget {
               return _DayHeader(
                 day: row.day,
                 total: row.total,
+                breakDuration: row.breakDuration,
+                requiredBreak: row.requiredBreak,
                 l10n: l10n,
                 dateStyle: dateStyle,
                 timeStyle: timeStyle,
@@ -145,9 +156,11 @@ Widget? _jiraStatusIcon(AppLocalizations l10n, String? jiraTicketKey, JiraWorklo
 sealed class _ListRow {}
 
 class _HeaderRow extends _ListRow {
-  _HeaderRow(this.day, this.total);
+  _HeaderRow(this.day, this.total, this.breakDuration, this.requiredBreak);
   final DateTime day;
   final Duration total;
+  final Duration breakDuration;
+  final Duration? requiredBreak;
 }
 
 class _EntryRow extends _ListRow {
@@ -159,6 +172,8 @@ class _DayHeader extends StatelessWidget {
   const _DayHeader({
     required this.day,
     required this.total,
+    required this.breakDuration,
+    required this.requiredBreak,
     required this.l10n,
     required this.dateStyle,
     required this.timeStyle,
@@ -167,6 +182,8 @@ class _DayHeader extends StatelessWidget {
 
   final DateTime day;
   final Duration total;
+  final Duration breakDuration;
+  final Duration? requiredBreak;
   final AppLocalizations l10n;
   final DateFormatStyle dateStyle;
   final TimeFormatStyle timeStyle;
@@ -183,11 +200,31 @@ class _DayHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final requiredBreak = this.requiredBreak;
+    final isInsufficient = requiredBreak != null && breakDuration < requiredBreak;
     return Padding(
       padding: const EdgeInsets.only(top: 12, bottom: 8),
-      child: Text(
-        l10n.entriesDayHeader(_label(), formatDuration(total, timeStyle)),
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 8,
+        children: [
+          Text(
+            l10n.entriesDayHeader(_label(), formatDuration(total, timeStyle)),
+            style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          if (isInsufficient)
+            Tooltip(
+              message: l10n.entriesBreakInsufficientTooltip,
+              child: Icon(Icons.warning_amber_rounded, size: 16, color: theme.colorScheme.error),
+            ),
+          Text(
+            l10n.entriesBreakLabel(formatDuration(breakDuration, timeStyle)),
+            style: isInsufficient
+                ? theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.error)
+                : theme.textTheme.bodySmall,
+          ),
+        ],
       ),
     );
   }

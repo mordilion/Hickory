@@ -74,6 +74,8 @@
   "entriesEndBeforeStartError": "La fin doit être postérieure au début.",
   "entriesDeleteConfirmTitle": "Supprimer l'entrée ?",
   "entriesDeleteConfirmMessage": "Cette entrée sera définitivement supprimée. Cette action est irréversible.",
+  "entriesBreakLabel": "Pause : {duration}",
+  "entriesBreakInsufficientTooltip": "Pause trop courte",
   "entriesToday": "Aujourd'hui",
   "entriesYesterday": "Hier",
   "entriesDayHeader": "{day} · {total}",

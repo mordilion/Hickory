@@ -229,6 +229,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dieser Eintrag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.';
 
   @override
+  String entriesBreakLabel(String duration) {
+    return 'Pause: $duration';
+  }
+
+  @override
+  String get entriesBreakInsufficientTooltip => 'Pause zu kurz';
+
+  @override
   String get entriesToday => 'Heute';
 
   @override

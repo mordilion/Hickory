@@ -74,6 +74,8 @@
   "entriesEndBeforeStartError": "End must be after the start.",
   "entriesDeleteConfirmTitle": "Delete entry?",
   "entriesDeleteConfirmMessage": "This entry will be permanently deleted. This cannot be undone.",
+  "entriesBreakLabel": "Break: {duration}",
+  "entriesBreakInsufficientTooltip": "Break too short",
   "entriesToday": "Today",
   "entriesYesterday": "Yesterday",
   "entriesDayHeader": "{day} · {total}",

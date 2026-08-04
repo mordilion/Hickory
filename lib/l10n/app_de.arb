@@ -109,6 +109,13 @@
   "entriesEndBeforeStartError": "Ende muss nach dem Start liegen.",
   "entriesDeleteConfirmTitle": "Eintrag löschen?",
   "entriesDeleteConfirmMessage": "Dieser Eintrag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.",
+  "entriesBreakLabel": "Pause: {duration}",
+  "@entriesBreakLabel": {
+    "placeholders": {
+      "duration": { "type": "String" }
+    }
+  },
+  "entriesBreakInsufficientTooltip": "Pause zu kurz",
   "entriesToday": "Heute",
   "entriesYesterday": "Gestern",
   "entriesDayHeader": "{day} · {total}",

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/core/di/app_settings_provider.dart';
+import 'package:hickory/core/di/break_rule_tiers_provider.dart';
 import 'package:hickory/core/di/device_id_provider.dart';
 import 'package:hickory/core/di/jira_providers.dart';
 import 'package:hickory/core/di/sync_providers.dart';
@@ -65,6 +66,7 @@ void main() {
           activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
           allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
           jiraWorklogsByEntryIdProvider.overrideWith((ref) => Stream.value(const {})),
+          breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),
           appSettingsProvider.overrideWith(
             (ref) => Stream.value(
               AppSettingsRow(

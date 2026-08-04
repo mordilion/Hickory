@@ -74,6 +74,8 @@
   "entriesEndBeforeStartError": "Het einde moet na het begin liggen.",
   "entriesDeleteConfirmTitle": "Item verwijderen?",
   "entriesDeleteConfirmMessage": "Dit item wordt permanent verwijderd. Dit kan niet ongedaan worden gemaakt.",
+  "entriesBreakLabel": "Pauze: {duration}",
+  "entriesBreakInsufficientTooltip": "Pauze te kort",
   "entriesToday": "Vandaag",
   "entriesYesterday": "Gisteren",
   "entriesDayHeader": "{day} · {total}",

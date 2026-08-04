@@ -231,6 +231,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Cette entrée sera définitivement supprimée. Cette action est irréversible.';
 
   @override
+  String entriesBreakLabel(String duration) {
+    return 'Pause : $duration';
+  }
+
+  @override
+  String get entriesBreakInsufficientTooltip => 'Pause trop courte';
+
+  @override
   String get entriesToday => 'Aujourd\'hui';
 
   @override

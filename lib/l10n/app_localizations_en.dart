@@ -229,6 +229,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'This entry will be permanently deleted. This cannot be undone.';
 
   @override
+  String entriesBreakLabel(String duration) {
+    return 'Break: $duration';
+  }
+
+  @override
+  String get entriesBreakInsufficientTooltip => 'Break too short';
+
+  @override
   String get entriesToday => 'Today';
 
   @override

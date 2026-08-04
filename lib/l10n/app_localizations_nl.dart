@@ -231,6 +231,14 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dit item wordt permanent verwijderd. Dit kan niet ongedaan worden gemaakt.';
 
   @override
+  String entriesBreakLabel(String duration) {
+    return 'Pauze: $duration';
+  }
+
+  @override
+  String get entriesBreakInsufficientTooltip => 'Pauze te kort';
+
+  @override
   String get entriesToday => 'Vandaag';
 
   @override

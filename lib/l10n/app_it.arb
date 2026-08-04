@@ -74,6 +74,8 @@
   "entriesEndBeforeStartError": "La fine deve essere successiva all'inizio.",
   "entriesDeleteConfirmTitle": "Eliminare la voce?",
   "entriesDeleteConfirmMessage": "Questa voce verrà eliminata definitivamente. Questa azione non può essere annullata.",
+  "entriesBreakLabel": "Pausa: {duration}",
+  "entriesBreakInsufficientTooltip": "Pausa troppo breve",
   "entriesToday": "Oggi",
   "entriesYesterday": "Ieri",
   "entriesDayHeader": "{day} · {total}",

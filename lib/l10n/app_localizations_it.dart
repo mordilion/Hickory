@@ -230,6 +230,14 @@ class AppLocalizationsIt extends AppLocalizations {
       'Questa voce verrà eliminata definitivamente. Questa azione non può essere annullata.';
 
   @override
+  String entriesBreakLabel(String duration) {
+    return 'Pausa: $duration';
+  }
+
+  @override
+  String get entriesBreakInsufficientTooltip => 'Pausa troppo breve';
+
+  @override
   String get entriesToday => 'Oggi';
 
   @override
