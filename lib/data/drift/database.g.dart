@@ -4252,6 +4252,434 @@ class JiraWorklogsCompanion extends UpdateCompanion<JiraWorklogRow> {
   }
 }
 
+class $BreakRuleTiersTable extends BreakRuleTiers
+    with TableInfo<$BreakRuleTiersTable, BreakRuleTier> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BreakRuleTiersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _afterMinutesMeta = const VerificationMeta(
+    'afterMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> afterMinutes = GeneratedColumn<int>(
+    'after_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _requiredBreakMinutesMeta =
+      const VerificationMeta('requiredBreakMinutes');
+  @override
+  late final GeneratedColumn<int> requiredBreakMinutes = GeneratedColumn<int>(
+    'required_break_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    afterMinutes,
+    requiredBreakMinutes,
+    deviceId,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'break_rule_tiers';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BreakRuleTier> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('after_minutes')) {
+      context.handle(
+        _afterMinutesMeta,
+        afterMinutes.isAcceptableOrUnknown(
+          data['after_minutes']!,
+          _afterMinutesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_afterMinutesMeta);
+    }
+    if (data.containsKey('required_break_minutes')) {
+      context.handle(
+        _requiredBreakMinutesMeta,
+        requiredBreakMinutes.isAcceptableOrUnknown(
+          data['required_break_minutes']!,
+          _requiredBreakMinutesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_requiredBreakMinutesMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BreakRuleTier map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BreakRuleTier(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      afterMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}after_minutes'],
+      )!,
+      requiredBreakMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}required_break_minutes'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BreakRuleTiersTable createAlias(String alias) {
+    return $BreakRuleTiersTable(attachedDatabase, alias);
+  }
+}
+
+class BreakRuleTier extends DataClass implements Insertable<BreakRuleTier> {
+  final String id;
+  final int afterMinutes;
+  final int requiredBreakMinutes;
+  final String deviceId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const BreakRuleTier({
+    required this.id,
+    required this.afterMinutes,
+    required this.requiredBreakMinutes,
+    required this.deviceId,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['after_minutes'] = Variable<int>(afterMinutes);
+    map['required_break_minutes'] = Variable<int>(requiredBreakMinutes);
+    map['device_id'] = Variable<String>(deviceId);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  BreakRuleTiersCompanion toCompanion(bool nullToAbsent) {
+    return BreakRuleTiersCompanion(
+      id: Value(id),
+      afterMinutes: Value(afterMinutes),
+      requiredBreakMinutes: Value(requiredBreakMinutes),
+      deviceId: Value(deviceId),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory BreakRuleTier.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BreakRuleTier(
+      id: serializer.fromJson<String>(json['id']),
+      afterMinutes: serializer.fromJson<int>(json['afterMinutes']),
+      requiredBreakMinutes: serializer.fromJson<int>(
+        json['requiredBreakMinutes'],
+      ),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'afterMinutes': serializer.toJson<int>(afterMinutes),
+      'requiredBreakMinutes': serializer.toJson<int>(requiredBreakMinutes),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  BreakRuleTier copyWith({
+    String? id,
+    int? afterMinutes,
+    int? requiredBreakMinutes,
+    String? deviceId,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => BreakRuleTier(
+    id: id ?? this.id,
+    afterMinutes: afterMinutes ?? this.afterMinutes,
+    requiredBreakMinutes: requiredBreakMinutes ?? this.requiredBreakMinutes,
+    deviceId: deviceId ?? this.deviceId,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  BreakRuleTier copyWithCompanion(BreakRuleTiersCompanion data) {
+    return BreakRuleTier(
+      id: data.id.present ? data.id.value : this.id,
+      afterMinutes: data.afterMinutes.present
+          ? data.afterMinutes.value
+          : this.afterMinutes,
+      requiredBreakMinutes: data.requiredBreakMinutes.present
+          ? data.requiredBreakMinutes.value
+          : this.requiredBreakMinutes,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BreakRuleTier(')
+          ..write('id: $id, ')
+          ..write('afterMinutes: $afterMinutes, ')
+          ..write('requiredBreakMinutes: $requiredBreakMinutes, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    afterMinutes,
+    requiredBreakMinutes,
+    deviceId,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BreakRuleTier &&
+          other.id == this.id &&
+          other.afterMinutes == this.afterMinutes &&
+          other.requiredBreakMinutes == this.requiredBreakMinutes &&
+          other.deviceId == this.deviceId &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class BreakRuleTiersCompanion extends UpdateCompanion<BreakRuleTier> {
+  final Value<String> id;
+  final Value<int> afterMinutes;
+  final Value<int> requiredBreakMinutes;
+  final Value<String> deviceId;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const BreakRuleTiersCompanion({
+    this.id = const Value.absent(),
+    this.afterMinutes = const Value.absent(),
+    this.requiredBreakMinutes = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BreakRuleTiersCompanion.insert({
+    required String id,
+    required int afterMinutes,
+    required int requiredBreakMinutes,
+    required String deviceId,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       afterMinutes = Value(afterMinutes),
+       requiredBreakMinutes = Value(requiredBreakMinutes),
+       deviceId = Value(deviceId),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<BreakRuleTier> custom({
+    Expression<String>? id,
+    Expression<int>? afterMinutes,
+    Expression<int>? requiredBreakMinutes,
+    Expression<String>? deviceId,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (afterMinutes != null) 'after_minutes': afterMinutes,
+      if (requiredBreakMinutes != null)
+        'required_break_minutes': requiredBreakMinutes,
+      if (deviceId != null) 'device_id': deviceId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BreakRuleTiersCompanion copyWith({
+    Value<String>? id,
+    Value<int>? afterMinutes,
+    Value<int>? requiredBreakMinutes,
+    Value<String>? deviceId,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return BreakRuleTiersCompanion(
+      id: id ?? this.id,
+      afterMinutes: afterMinutes ?? this.afterMinutes,
+      requiredBreakMinutes: requiredBreakMinutes ?? this.requiredBreakMinutes,
+      deviceId: deviceId ?? this.deviceId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (afterMinutes.present) {
+      map['after_minutes'] = Variable<int>(afterMinutes.value);
+    }
+    if (requiredBreakMinutes.present) {
+      map['required_break_minutes'] = Variable<int>(requiredBreakMinutes.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BreakRuleTiersCompanion(')
+          ..write('id: $id, ')
+          ..write('afterMinutes: $afterMinutes, ')
+          ..write('requiredBreakMinutes: $requiredBreakMinutes, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4267,6 +4695,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
   late final $JiraWorklogsTable jiraWorklogs = $JiraWorklogsTable(this);
+  late final $BreakRuleTiersTable breakRuleTiers = $BreakRuleTiersTable(this);
   late final Index idxEventsEntityId = Index(
     'idx_events_entity_id',
     'CREATE INDEX idx_events_entity_id ON events (entity_id)',
@@ -4285,6 +4714,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final JiraWorklogsDao jiraWorklogsDao = JiraWorklogsDao(
     this as AppDatabase,
   );
+  late final BreakRuleTiersDao breakRuleTiersDao = BreakRuleTiersDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4300,6 +4732,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     activitySamples,
     appSettings,
     jiraWorklogs,
+    breakRuleTiers,
     idxEventsEntityId,
   ];
 }
@@ -7359,6 +7792,231 @@ typedef $$JiraWorklogsTableProcessedTableManager =
       JiraWorklogRow,
       PrefetchHooks Function()
     >;
+typedef $$BreakRuleTiersTableCreateCompanionBuilder =
+    BreakRuleTiersCompanion Function({
+      required String id,
+      required int afterMinutes,
+      required int requiredBreakMinutes,
+      required String deviceId,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$BreakRuleTiersTableUpdateCompanionBuilder =
+    BreakRuleTiersCompanion Function({
+      Value<String> id,
+      Value<int> afterMinutes,
+      Value<int> requiredBreakMinutes,
+      Value<String> deviceId,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$BreakRuleTiersTableFilterComposer
+    extends Composer<_$AppDatabase, $BreakRuleTiersTable> {
+  $$BreakRuleTiersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get afterMinutes => $composableBuilder(
+    column: $table.afterMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get requiredBreakMinutes => $composableBuilder(
+    column: $table.requiredBreakMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BreakRuleTiersTableOrderingComposer
+    extends Composer<_$AppDatabase, $BreakRuleTiersTable> {
+  $$BreakRuleTiersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get afterMinutes => $composableBuilder(
+    column: $table.afterMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get requiredBreakMinutes => $composableBuilder(
+    column: $table.requiredBreakMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BreakRuleTiersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BreakRuleTiersTable> {
+  $$BreakRuleTiersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get afterMinutes => $composableBuilder(
+    column: $table.afterMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get requiredBreakMinutes => $composableBuilder(
+    column: $table.requiredBreakMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$BreakRuleTiersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BreakRuleTiersTable,
+          BreakRuleTier,
+          $$BreakRuleTiersTableFilterComposer,
+          $$BreakRuleTiersTableOrderingComposer,
+          $$BreakRuleTiersTableAnnotationComposer,
+          $$BreakRuleTiersTableCreateCompanionBuilder,
+          $$BreakRuleTiersTableUpdateCompanionBuilder,
+          (
+            BreakRuleTier,
+            BaseReferences<_$AppDatabase, $BreakRuleTiersTable, BreakRuleTier>,
+          ),
+          BreakRuleTier,
+          PrefetchHooks Function()
+        > {
+  $$BreakRuleTiersTableTableManager(
+    _$AppDatabase db,
+    $BreakRuleTiersTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BreakRuleTiersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BreakRuleTiersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BreakRuleTiersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<int> afterMinutes = const Value.absent(),
+                Value<int> requiredBreakMinutes = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BreakRuleTiersCompanion(
+                id: id,
+                afterMinutes: afterMinutes,
+                requiredBreakMinutes: requiredBreakMinutes,
+                deviceId: deviceId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required int afterMinutes,
+                required int requiredBreakMinutes,
+                required String deviceId,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => BreakRuleTiersCompanion.insert(
+                id: id,
+                afterMinutes: afterMinutes,
+                requiredBreakMinutes: requiredBreakMinutes,
+                deviceId: deviceId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BreakRuleTiersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BreakRuleTiersTable,
+      BreakRuleTier,
+      $$BreakRuleTiersTableFilterComposer,
+      $$BreakRuleTiersTableOrderingComposer,
+      $$BreakRuleTiersTableAnnotationComposer,
+      $$BreakRuleTiersTableCreateCompanionBuilder,
+      $$BreakRuleTiersTableUpdateCompanionBuilder,
+      (
+        BreakRuleTier,
+        BaseReferences<_$AppDatabase, $BreakRuleTiersTable, BreakRuleTier>,
+      ),
+      BreakRuleTier,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7382,4 +8040,6 @@ class $AppDatabaseManager {
       $$AppSettingsTableTableManager(_db, _db.appSettings);
   $$JiraWorklogsTableTableManager get jiraWorklogs =>
       $$JiraWorklogsTableTableManager(_db, _db.jiraWorklogs);
+  $$BreakRuleTiersTableTableManager get breakRuleTiers =>
+      $$BreakRuleTiersTableTableManager(_db, _db.breakRuleTiers);
 }

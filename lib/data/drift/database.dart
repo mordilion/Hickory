@@ -7,12 +7,14 @@ import 'package:path_provider/path_provider.dart';
 
 import 'daos/activity_samples_dao.dart';
 import 'daos/app_settings_dao.dart';
+import 'daos/break_rule_tiers_dao.dart';
 import 'daos/events_dao.dart';
 import 'daos/jira_worklogs_dao.dart';
 import 'daos/projects_dao.dart';
 import 'daos/time_entries_dao.dart';
 import 'tables/activity_samples_table.dart';
 import 'tables/app_settings_table.dart';
+import 'tables/break_rule_tiers_table.dart';
 import 'tables/clients_table.dart';
 import 'tables/events_table.dart';
 import 'tables/jira_worklogs_table.dart';
@@ -36,8 +38,17 @@ part 'database.g.dart';
     ActivitySamples,
     AppSettings,
     JiraWorklogs,
+    BreakRuleTiers,
   ],
-  daos: [ProjectsDao, TimeEntriesDao, EventsDao, ActivitySamplesDao, AppSettingsDao, JiraWorklogsDao],
+  daos: [
+    ProjectsDao,
+    TimeEntriesDao,
+    EventsDao,
+    ActivitySamplesDao,
+    AppSettingsDao,
+    JiraWorklogsDao,
+    BreakRuleTiersDao,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -45,7 +56,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.connection);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -64,6 +75,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 5) {
         await m.addColumn(appSettings, appSettings.quickAddDurationsMinutes);
+      }
+      if (from < 6) {
+        await m.createTable(breakRuleTiers);
       }
     },
   );
