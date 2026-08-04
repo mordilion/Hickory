@@ -55,13 +55,17 @@ void main() {
     // On Windows the OS can transiently keep the sync-log file handle open
     // for a moment after SyncLogWriter's real write completes (observed
     // with antivirus/indexing); retry briefly rather than fail the test on
-    // an unrelated cleanup race.
-    for (var attempt = 0; attempt < 5; attempt++) {
+    // an unrelated cleanup race. The final attempt is unguarded: if the
+    // lock genuinely never clears, that's worth surfacing as a real test
+    // failure instead of silently leaving the temp directory behind.
+    const maxRetries = 5;
+    for (var attempt = 0; attempt < maxRetries; attempt++) {
       if (!syncRoot.existsSync()) return;
       try {
         syncRoot.deleteSync(recursive: true);
         return;
       } on FileSystemException {
+        if (attempt == maxRetries - 1) rethrow;
         await Future.delayed(const Duration(milliseconds: 100));
       }
     }
@@ -77,6 +81,7 @@ void main() {
                 dateFormat: 'iso',
                 timeFormat: '24h',
                 quickAddDurationsMinutes: '15,30,45,60',
+                countPausedTimeAsBreak: false,
                 updatedAt: DateTime.utc(2026, 1, 1),
               ),
             ),
@@ -219,5 +224,26 @@ void main() {
     expect(tiers, hasLength(1));
     expect(tiers.single.afterMinutes, 300);
     expect(tiers.single.requiredBreakMinutes, 20);
+  });
+
+  testWidgets('toggling "Include pause-button time" persists the setting', (tester) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
+      isFalse,
+    );
+
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Include pause-button time'));
+      await pumpUntilTrue(() async {
+        final rows = await db.select(db.appSettings).get();
+        return rows.isNotEmpty && rows.single.countPausedTimeAsBreak;
+      });
+    });
+
+    final rows = await db.select(db.appSettings).get();
+    expect(rows.single.countPausedTimeAsBreak, isTrue);
   });
 }

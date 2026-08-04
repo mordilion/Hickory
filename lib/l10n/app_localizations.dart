@@ -652,6 +652,30 @@ abstract class AppLocalizations {
   /// **'Minuten Pause nötig'**
   String get settingsBreakRuleRequiredMinutesLabel;
 
+  /// No description provided for @settingsBreakRuleSaveError.
+  ///
+  /// In de, this message translates to:
+  /// **'Änderung konnte nicht gespeichert werden.'**
+  String get settingsBreakRuleSaveError;
+
+  /// No description provided for @settingsBreakRuleInvalidTierError.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte gültige Minutenwerte eingeben.'**
+  String get settingsBreakRuleInvalidTierError;
+
+  /// No description provided for @settingsBreakRuleIncludePausedTime.
+  ///
+  /// In de, this message translates to:
+  /// **'Pause-Button-Zeit einbeziehen'**
+  String get settingsBreakRuleIncludePausedTime;
+
+  /// No description provided for @settingsBreakRuleIncludePausedTimeDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Zählt die über den Pause-Button pausierte Zeit zusätzlich zu Lücken zwischen Einträgen als Pause.'**
+  String get settingsBreakRuleIncludePausedTimeDescription;
+
   /// No description provided for @projectsNewProjectTitle.
   ///
   /// In de, this message translates to:

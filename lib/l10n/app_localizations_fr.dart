@@ -317,6 +317,22 @@ class AppLocalizationsFr extends AppLocalizations {
       'Minutes de pause requises';
 
   @override
+  String get settingsBreakRuleSaveError =>
+      'Impossible d\'enregistrer la modification.';
+
+  @override
+  String get settingsBreakRuleInvalidTierError =>
+      'Veuillez saisir des valeurs de minutes valides.';
+
+  @override
+  String get settingsBreakRuleIncludePausedTime =>
+      'Inclure le temps du bouton pause';
+
+  @override
+  String get settingsBreakRuleIncludePausedTimeDescription =>
+      'Compte le temps mis en pause via le bouton pause comme pause, en plus des écarts entre les entrées.';
+
+  @override
   String get projectsNewProjectTitle => 'Nouveau projet';
 
   @override

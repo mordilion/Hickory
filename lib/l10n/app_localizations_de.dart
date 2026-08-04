@@ -314,6 +314,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsBreakRuleRequiredMinutesLabel => 'Minuten Pause nötig';
 
   @override
+  String get settingsBreakRuleSaveError =>
+      'Änderung konnte nicht gespeichert werden.';
+
+  @override
+  String get settingsBreakRuleInvalidTierError =>
+      'Bitte gültige Minutenwerte eingeben.';
+
+  @override
+  String get settingsBreakRuleIncludePausedTime =>
+      'Pause-Button-Zeit einbeziehen';
+
+  @override
+  String get settingsBreakRuleIncludePausedTimeDescription =>
+      'Zählt die über den Pause-Button pausierte Zeit zusätzlich zu Lücken zwischen Einträgen als Pause.';
+
+  @override
   String get projectsNewProjectTitle => 'Neues Projekt';
 
   @override

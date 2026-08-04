@@ -316,6 +316,21 @@ class AppLocalizationsIt extends AppLocalizations {
       'Minuti di pausa richiesti';
 
   @override
+  String get settingsBreakRuleSaveError => 'Impossibile salvare la modifica.';
+
+  @override
+  String get settingsBreakRuleInvalidTierError =>
+      'Inserisci valori validi in minuti.';
+
+  @override
+  String get settingsBreakRuleIncludePausedTime =>
+      'Includi il tempo del pulsante pausa';
+
+  @override
+  String get settingsBreakRuleIncludePausedTimeDescription =>
+      'Conta il tempo in pausa tramite il pulsante pausa come pausa, oltre agli intervalli tra le voci.';
+
+  @override
   String get projectsNewProjectTitle => 'Nuovo progetto';
 
   @override

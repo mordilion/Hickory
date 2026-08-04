@@ -10,7 +10,12 @@ import 'package:hickory/features/projects/projects_providers.dart';
 import 'package:hickory/features/timer/timer_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
 
-TimeEntry _entry({required String id, required DateTime startAt, required DateTime endAt}) {
+TimeEntry _entry({
+  required String id,
+  required DateTime startAt,
+  required DateTime endAt,
+  int totalPausedSeconds = 0,
+}) {
   final now = DateTime.utc(2026, 1, 1);
   return TimeEntry(
     id: id,
@@ -19,7 +24,7 @@ TimeEntry _entry({required String id, required DateTime startAt, required DateTi
     startAt: startAt,
     endAt: endAt,
     pausedAt: null,
-    totalPausedSeconds: 0,
+    totalPausedSeconds: totalPausedSeconds,
     billableOverride: null,
     source: 'manual',
     deviceId: 'device-1',
@@ -42,7 +47,11 @@ BreakRuleTier _tier({required int afterMinutes, required int requiredBreakMinute
 }
 
 void main() {
-  Widget makeApp(List<TimeEntry> entries, {List<BreakRuleTier> tiers = const []}) => ProviderScope(
+  Widget makeApp(
+    List<TimeEntry> entries, {
+    List<BreakRuleTier> tiers = const [],
+    bool countPausedTimeAsBreak = false,
+  }) => ProviderScope(
         overrides: [
           allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
           activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
@@ -55,6 +64,7 @@ void main() {
                 dateFormat: 'iso',
                 timeFormat: '24h',
                 quickAddDurationsMinutes: '15,30,45,60',
+                countPausedTimeAsBreak: countPausedTimeAsBreak,
                 updatedAt: DateTime.utc(2026, 1, 1),
               ),
             ),
@@ -162,4 +172,51 @@ void main() {
     expect(find.text('Break: 00:30'), findsOneWidget);
     expect(find.byIcon(Icons.warning_amber_rounded), findsNothing);
   });
+
+  testWidgets(
+    'includes pause-button time in the displayed break when countPausedTimeAsBreak is on',
+    (tester) async {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day, 9);
+      await tester.pumpWidget(
+        makeApp(
+          [
+            _entry(
+              id: '1',
+              startAt: today,
+              endAt: today.add(const Duration(hours: 2)),
+              totalPausedSeconds: 600,
+            ),
+          ],
+          countPausedTimeAsBreak: true,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Break: 00:10'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'excludes pause-button time from the displayed break when countPausedTimeAsBreak is off',
+    (tester) async {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day, 9);
+      await tester.pumpWidget(
+        makeApp(
+          [
+            _entry(
+              id: '1',
+              startAt: today,
+              endAt: today.add(const Duration(hours: 2)),
+              totalPausedSeconds: 600,
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Break: 00:00'), findsOneWidget);
+    },
+  );
 }

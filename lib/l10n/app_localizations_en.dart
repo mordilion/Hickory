@@ -314,6 +314,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsBreakRuleRequiredMinutesLabel => 'Minutes break required';
 
   @override
+  String get settingsBreakRuleSaveError => 'Could not save the change.';
+
+  @override
+  String get settingsBreakRuleInvalidTierError =>
+      'Please enter valid minute values.';
+
+  @override
+  String get settingsBreakRuleIncludePausedTime => 'Include pause-button time';
+
+  @override
+  String get settingsBreakRuleIncludePausedTimeDescription =>
+      'Counts time paused via the Timer\'s pause button toward break time, in addition to gaps between entries.';
+
+  @override
   String get projectsNewProjectTitle => 'New project';
 
   @override

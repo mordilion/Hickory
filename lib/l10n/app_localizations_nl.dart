@@ -316,6 +316,21 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsBreakRuleRequiredMinutesLabel => 'Minuten pauze nodig';
 
   @override
+  String get settingsBreakRuleSaveError =>
+      'Wijziging kon niet worden opgeslagen.';
+
+  @override
+  String get settingsBreakRuleInvalidTierError =>
+      'Voer geldige minutenwaarden in.';
+
+  @override
+  String get settingsBreakRuleIncludePausedTime => 'Pauzeknoptijd meetellen';
+
+  @override
+  String get settingsBreakRuleIncludePausedTimeDescription =>
+      'Telt de tijd die via de pauzeknop is gepauzeerd mee als pauze, naast de hiaten tussen items.';
+
+  @override
   String get projectsNewProjectTitle => 'Nieuw project';
 
   @override

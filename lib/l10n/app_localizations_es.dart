@@ -317,6 +317,21 @@ class AppLocalizationsEs extends AppLocalizations {
       'Minutos de descanso necesarios';
 
   @override
+  String get settingsBreakRuleSaveError => 'No se pudo guardar el cambio.';
+
+  @override
+  String get settingsBreakRuleInvalidTierError =>
+      'Introduce valores de minutos válidos.';
+
+  @override
+  String get settingsBreakRuleIncludePausedTime =>
+      'Incluir el tiempo del botón de pausa';
+
+  @override
+  String get settingsBreakRuleIncludePausedTimeDescription =>
+      'Cuenta el tiempo pausado con el botón de pausa como descanso, además de los huecos entre entradas.';
+
+  @override
   String get projectsNewProjectTitle => 'Nuevo proyecto';
 
   @override

@@ -30,6 +30,7 @@ class EntriesList extends ConsumerWidget {
     final settings = ref.watch(appSettingsProvider).value;
     final dateStyle = settings.dateStyle;
     final timeStyle = settings.timeStyle;
+    final countPausedTimeAsBreak = settings?.countPausedTimeAsBreak ?? false;
 
     return entriesAsync.when(
       data: (entries) {
@@ -41,14 +42,17 @@ class EntriesList extends ConsumerWidget {
           for (final p in projectsAsync.value ?? const <Project>[]) p.id: p,
         };
         final tiers = tiersAsync.value ?? const <BreakRuleTier>[];
-        final groups = groupEntriesByDay(finished);
+        final groups = groupEntriesByDay(
+          finished,
+          includePausedTimeInBreak: countPausedTimeAsBreak,
+        );
         final rows = <_ListRow>[
           for (final group in groups) ...[
             _HeaderRow(
-              group.day,
-              group.totalDuration,
-              group.breakDuration,
-              requiredBreakForWorked(group.totalDuration, tiers),
+              day: group.day,
+              total: group.totalDuration,
+              breakDuration: group.breakDuration,
+              requiredBreak: requiredBreakForWorked(group.totalDuration, tiers),
             ),
             for (final entry in group.entries) _EntryRow(entry),
           ],
@@ -156,7 +160,12 @@ Widget? _jiraStatusIcon(AppLocalizations l10n, String? jiraTicketKey, JiraWorklo
 sealed class _ListRow {}
 
 class _HeaderRow extends _ListRow {
-  _HeaderRow(this.day, this.total, this.breakDuration, this.requiredBreak);
+  _HeaderRow({
+    required this.day,
+    required this.total,
+    required this.breakDuration,
+    required this.requiredBreak,
+  });
   final DateTime day;
   final Duration total;
   final Duration breakDuration;
@@ -220,9 +229,9 @@ class _DayHeader extends StatelessWidget {
             ),
           Text(
             l10n.entriesBreakLabel(formatDuration(breakDuration, timeStyle)),
-            style: isInsufficient
-                ? theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.error)
-                : theme.textTheme.bodySmall,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: isInsufficient ? theme.colorScheme.error : null,
+            ),
           ),
         ],
       ),

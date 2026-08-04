@@ -5,8 +5,6 @@ import '../../core/di/app_settings_provider.dart';
 import '../../core/di/break_rule_tiers_provider.dart';
 import '../../core/di/device_id_provider.dart';
 import '../../core/di/sync_providers.dart';
-import '../../core/format/date_format.dart';
-import '../../core/format/duration_format.dart';
 import '../../data/drift/database.dart';
 import '../../data/sync/synced_writes.dart';
 import '../../l10n/app_localizations.dart';
@@ -47,88 +45,141 @@ String _presetLabel(AppLocalizations l10n, _PresetCountry country) => switch (co
       _PresetCountry.switzerland => l10n.settingsBreakRulePresetSwitzerland,
     };
 
+/// "6h 30m" / "6h" / "45m" -- deliberately not the app's clock-style
+/// `formatDuration` (which reads like a time of day, e.g. "06:00", and
+/// shows seconds under a "*_sec" time style): these values are always
+/// whole minutes, and the design spec calls for an hours+minutes phrasing
+/// here specifically.
+String _formatHoursMinutes(Duration d) {
+  final hours = d.inHours;
+  final minutes = d.inMinutes.remainder(60);
+  if (hours == 0) return '${minutes}m';
+  if (minutes == 0) return '${hours}h';
+  return '${hours}h ${minutes}m';
+}
+
 /// Settings-screen editor for the day header's break-time rule (see
 /// EntriesList). Persists through the synced BreakRuleTiers table, so the
 /// rule follows the user across devices, same as every other setting. See
 /// docs/superpowers/specs/2026-08-04-break-rule-tiers-design.md.
-class BreakRuleTiersEditor extends ConsumerWidget {
+class BreakRuleTiersEditor extends ConsumerStatefulWidget {
   const BreakRuleTiersEditor({super.key});
 
-  Future<void> _applyPreset(WidgetRef ref, List<BreakRuleTierValues> tiers) async {
-    final deviceId = await ref.read(deviceIdProvider.future);
-    final writes = await ref.read(syncedWritesProvider.future);
-    await writes.replaceBreakRuleTiers(deviceId: deviceId, tiers: tiers);
+  @override
+  ConsumerState<BreakRuleTiersEditor> createState() => _BreakRuleTiersEditorState();
+}
+
+class _BreakRuleTiersEditorState extends ConsumerState<BreakRuleTiersEditor> {
+  /// True while a write is in flight -- disables every action in this
+  /// editor so a fast double-tap (e.g. on a preset chip) can't interleave
+  /// two delete/create loops and produce duplicated tiers.
+  bool _busy = false;
+
+  Future<void> _guardedWrite(Future<void> Function() write) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      await write();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).settingsBreakRuleSaveError)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
   }
 
-  Future<void> _remove(WidgetRef ref, String id) async {
-    final writes = await ref.read(syncedWritesProvider.future);
-    await writes.deleteBreakRuleTier(id);
-  }
+  Future<void> _applyPreset(List<BreakRuleTierValues> tiers) => _guardedWrite(() async {
+        final deviceId = await ref.read(deviceIdProvider.future);
+        final writes = await ref.read(syncedWritesProvider.future);
+        await writes.replaceBreakRuleTiers(deviceId: deviceId, tiers: tiers);
+      });
 
-  Future<void> _add(BuildContext context, WidgetRef ref) async {
+  Future<void> _remove(String id) => _guardedWrite(() async {
+        final writes = await ref.read(syncedWritesProvider.future);
+        await writes.deleteBreakRuleTier(id);
+      });
+
+  Future<void> _setCountPausedTimeAsBreak(bool value) => _guardedWrite(() async {
+        final writes = await ref.read(syncedWritesProvider.future);
+        await writes.updateAppSettings(countPausedTimeAsBreak: value);
+      });
+
+  Future<void> _add() async {
     final l10n = AppLocalizations.of(context);
     final afterController = TextEditingController();
     final requiredController = TextEditingController();
-    final result = await showDialog<BreakRuleTierValues>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.settingsBreakRuleAddTitle),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: afterController,
-              keyboardType: TextInputType.number,
-              autofocus: true,
-              decoration: InputDecoration(labelText: l10n.settingsBreakRuleAfterMinutesLabel),
+    try {
+      final result = await showDialog<BreakRuleTierValues>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n.settingsBreakRuleAddTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: afterController,
+                keyboardType: TextInputType.number,
+                autofocus: true,
+                decoration: InputDecoration(labelText: l10n.settingsBreakRuleAfterMinutesLabel),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: requiredController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: l10n.settingsBreakRuleRequiredMinutesLabel),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.commonCancel),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: requiredController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: l10n.settingsBreakRuleRequiredMinutesLabel),
+            FilledButton(
+              onPressed: () {
+                final after = int.tryParse(afterController.text.trim());
+                final required = int.tryParse(requiredController.text.trim());
+                if (after == null || required == null || after <= 0 || required <= 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.settingsBreakRuleInvalidTierError)),
+                  );
+                  return;
+                }
+                Navigator.of(context).pop(
+                  BreakRuleTierValues(afterMinutes: after, requiredBreakMinutes: required),
+                );
+              },
+              child: Text(l10n.commonSave),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              final after = int.tryParse(afterController.text.trim());
-              final required = int.tryParse(requiredController.text.trim());
-              if (after == null || required == null || after <= 0 || required <= 0) {
-                Navigator.of(context).pop();
-                return;
-              }
-              Navigator.of(context).pop(
-                BreakRuleTierValues(afterMinutes: after, requiredBreakMinutes: required),
-              );
-            },
-            child: Text(l10n.commonSave),
-          ),
-        ],
-      ),
-    );
-    if (result == null) return;
-    final deviceId = await ref.read(deviceIdProvider.future);
-    final writes = await ref.read(syncedWritesProvider.future);
-    await writes.createBreakRuleTier(
-      deviceId: deviceId,
-      afterMinutes: result.afterMinutes,
-      requiredBreakMinutes: result.requiredBreakMinutes,
-    );
+      );
+      if (result == null) return;
+      await _guardedWrite(() async {
+        final deviceId = await ref.read(deviceIdProvider.future);
+        final writes = await ref.read(syncedWritesProvider.future);
+        await writes.createBreakRuleTier(
+          deviceId: deviceId,
+          afterMinutes: result.afterMinutes,
+          requiredBreakMinutes: result.requiredBreakMinutes,
+        );
+      });
+    } finally {
+      afterController.dispose();
+      requiredController.dispose();
+    }
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final tiersAsync = ref.watch(breakRuleTiersProvider);
     final tiers = tiersAsync.value ?? const <BreakRuleTier>[];
     final settings = ref.watch(appSettingsProvider).value;
-    final timeStyle = settings.timeStyle;
+    final countPausedTimeAsBreak = settings?.countPausedTimeAsBreak ?? false;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,11 +195,11 @@ class BreakRuleTiersEditor extends ConsumerWidget {
             for (final preset in _presets)
               ActionChip(
                 label: Text(_presetLabel(l10n, preset.country)),
-                onPressed: () => _applyPreset(ref, preset.tiers),
+                onPressed: _busy ? null : () => _applyPreset(preset.tiers),
               ),
             ActionChip(
               label: Text(l10n.settingsBreakRuleNone),
-              onPressed: () => _applyPreset(ref, const []),
+              onPressed: _busy ? null : () => _applyPreset(const []),
             ),
           ],
         ),
@@ -158,20 +209,28 @@ class BreakRuleTiersEditor extends ConsumerWidget {
             contentPadding: EdgeInsets.zero,
             title: Text(
               l10n.settingsBreakRuleTierLabel(
-                formatDuration(Duration(minutes: tier.afterMinutes), timeStyle),
-                formatDuration(Duration(minutes: tier.requiredBreakMinutes), timeStyle),
+                _formatHoursMinutes(Duration(minutes: tier.afterMinutes)),
+                _formatHoursMinutes(Duration(minutes: tier.requiredBreakMinutes)),
               ),
             ),
             trailing: IconButton(
               icon: const Icon(Icons.delete_outline),
               tooltip: l10n.settingsBreakRuleRemoveTooltip,
-              onPressed: () => _remove(ref, tier.id),
+              onPressed: _busy ? null : () => _remove(tier.id),
             ),
           ),
         ActionChip(
           avatar: const Icon(Icons.add, size: 18),
           label: Text(l10n.settingsBreakRuleAddLabel),
-          onPressed: () => _add(context, ref),
+          onPressed: _busy ? null : _add,
+        ),
+        const SizedBox(height: 12),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.settingsBreakRuleIncludePausedTime),
+          subtitle: Text(l10n.settingsBreakRuleIncludePausedTimeDescription),
+          value: countPausedTimeAsBreak,
+          onChanged: _busy ? null : _setCountPausedTimeAsBreak,
         ),
       ],
     );

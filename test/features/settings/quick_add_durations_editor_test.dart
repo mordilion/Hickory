@@ -60,6 +60,7 @@ void main() {
                 dateFormat: 'iso',
                 timeFormat: '24h',
                 quickAddDurationsMinutes: formatQuickAddDurations(durations),
+                countPausedTimeAsBreak: false,
                 updatedAt: DateTime.utc(2026, 1, 1),
               ),
             ),
