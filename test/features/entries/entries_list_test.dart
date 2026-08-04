@@ -100,6 +100,58 @@ void main() {
     expect(find.text('Yesterday · 00:30'), findsOneWidget);
   });
 
+  testWidgets(
+    "groups a single day's entries into one card with a divider between rows",
+    (tester) async {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day, 9);
+      await tester.pumpWidget(
+        makeApp([
+          _entry(id: '1', startAt: today, endAt: today.add(const Duration(hours: 1))),
+          _entry(
+            id: '2',
+            startAt: today.add(const Duration(hours: 2)),
+            endAt: today.add(const Duration(hours: 3)),
+          ),
+        ]),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Card), findsOneWidget);
+      expect(find.byType(Divider), findsOneWidget);
+      final dismissibles = tester.widgetList<Dismissible>(find.byType(Dismissible));
+      expect(
+        dismissibles.map((d) => d.key),
+        containsAll(const [ValueKey('1'), ValueKey('2')]),
+      );
+    },
+  );
+
+  testWidgets(
+    'renders one card per day and omits the divider after the last entry in each block',
+    (tester) async {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day, 9);
+      final yesterday = today.subtract(const Duration(days: 1));
+      await tester.pumpWidget(
+        makeApp([
+          _entry(id: '1', startAt: today, endAt: today.add(const Duration(hours: 1))),
+          _entry(
+            id: '2',
+            startAt: today.add(const Duration(hours: 2)),
+            endAt: today.add(const Duration(hours: 3)),
+          ),
+          _entry(id: '3', startAt: yesterday, endAt: yesterday.add(const Duration(minutes: 30))),
+        ]),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Card), findsNWidgets(2));
+      expect(find.byType(Divider), findsOneWidget);
+      expect(find.byType(Dismissible), findsNWidgets(3));
+    },
+  );
+
   testWidgets('shows the empty state when there are no finished entries', (tester) async {
     await tester.pumpWidget(makeApp(const []));
     await tester.pumpAndSettle();
