@@ -236,9 +236,6 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get quickAddJiraTooltip => 'Collega ticket Jira';
-
-  @override
   String get quickAddMoreTooltip => 'Altre opzioni';
 
   @override

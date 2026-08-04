@@ -237,9 +237,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get quickAddJiraTooltip => 'Vincular ticket de Jira';
-
-  @override
   String get quickAddMoreTooltip => 'Más opciones';
 
   @override

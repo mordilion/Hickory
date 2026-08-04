@@ -121,7 +121,6 @@
       "minutes": { "type": "int" }
     }
   },
-  "quickAddJiraTooltip": "Jira-Ticket verknüpfen",
   "quickAddMoreTooltip": "Weitere Optionen",
   "quickAddSubmitTooltip": "Eintrag hinzufügen",
   "settingsQuickAddTitle": "Schnelleingabe",

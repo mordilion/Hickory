@@ -86,7 +86,6 @@
       "minutes": { "type": "int" }
     }
   },
-  "quickAddJiraTooltip": "Jira-ticket koppelen",
   "quickAddMoreTooltip": "Meer opties",
   "quickAddSubmitTooltip": "Invoer toevoegen",
   "settingsQuickAddTitle": "Snel toevoegen",

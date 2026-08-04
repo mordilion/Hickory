@@ -508,12 +508,6 @@ abstract class AppLocalizations {
   /// **'{minutes} Min'**
   String quickAddDurationChipLabel(int minutes);
 
-  /// No description provided for @quickAddJiraTooltip.
-  ///
-  /// In de, this message translates to:
-  /// **'Jira-Ticket verknüpfen'**
-  String get quickAddJiraTooltip;
-
   /// No description provided for @quickAddMoreTooltip.
   ///
   /// In de, this message translates to:

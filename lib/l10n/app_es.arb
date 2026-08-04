@@ -86,7 +86,6 @@
       "minutes": { "type": "int" }
     }
   },
-  "quickAddJiraTooltip": "Vincular ticket de Jira",
   "quickAddMoreTooltip": "Más opciones",
   "quickAddSubmitTooltip": "Añadir entrada",
   "settingsQuickAddTitle": "Entrada rápida",

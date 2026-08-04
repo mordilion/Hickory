@@ -235,9 +235,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get quickAddJiraTooltip => 'Jira-Ticket verknüpfen';
-
-  @override
   String get quickAddMoreTooltip => 'Weitere Optionen';
 
   @override

@@ -30,7 +30,6 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
   final _descriptionController = TextEditingController();
   String? _projectId;
   String? _jiraTicketKey;
-  bool _jiraExpanded = false;
   late DateTime _startAt;
   late DateTime _endAt;
   Duration _lastAppliedDuration = const Duration(minutes: 30);
@@ -136,13 +135,12 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: _descriptionController,
-              decoration: InputDecoration(labelText: l10n.entriesDescriptionLabel, isDense: true),
+              decoration: InputDecoration(labelText: l10n.entriesDescriptionLabel),
             ),
             const SizedBox(height: 12),
             Row(
@@ -151,8 +149,7 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
                   child: projectsAsync.when(
                     data: (projects) => DropdownButtonFormField<String?>(
                       initialValue: _projectId,
-                      isDense: true,
-                      decoration: InputDecoration(labelText: l10n.entriesProjectLabel, isDense: true),
+                      decoration: InputDecoration(labelText: l10n.entriesProjectLabel),
                       items: [
                         DropdownMenuItem<String?>(value: null, child: Text(l10n.commonNoProject)),
                         ...projects.map(
@@ -173,16 +170,28 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
               ],
             ),
             const SizedBox(height: 12),
+            JiraTicketField(
+              initialValue: _jiraTicketKey,
+              onChanged: (value) => setState(() => _jiraTicketKey = value),
+            ),
+            const SizedBox(height: 12),
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 for (final minutes in durations)
                   ActionChip(
                     label: Text(l10n.quickAddDurationChipLabel(minutes)),
                     onPressed: () => _applyDuration(minutes),
                   ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
                 TextButton(
                   onPressed: () => _pickTime(isStart: true),
                   child: Text(formatTime(_displayStartAt, timeStyle)),
@@ -191,11 +200,6 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
                 TextButton(
                   onPressed: () => _pickTime(isStart: false),
                   child: Text(formatTime(_displayEndAt, timeStyle)),
-                ),
-                IconButton(
-                  tooltip: l10n.quickAddJiraTooltip,
-                  onPressed: () => setState(() => _jiraExpanded = !_jiraExpanded),
-                  icon: const Icon(Icons.confirmation_number_outlined),
                 ),
                 IconButton(
                   tooltip: l10n.quickAddMoreTooltip,
@@ -209,13 +213,6 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
                 ),
               ],
             ),
-            if (_jiraExpanded) ...[
-              const SizedBox(height: 8),
-              JiraTicketField(
-                initialValue: _jiraTicketKey,
-                onChanged: (value) => setState(() => _jiraTicketKey = value),
-              ),
-            ],
           ],
         ),
       ),

@@ -177,13 +177,10 @@ void main() {
     },
   );
 
-  testWidgets('tapping the Jira icon reveals the Jira ticket field', (tester) async {
+  testWidgets('the Jira ticket field is visible without extra taps', (tester) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('Jira ticket'), findsNothing);
-    await tester.tap(find.byTooltip('Link Jira ticket'));
-    await tester.pumpAndSettle();
     expect(find.text('Jira ticket'), findsOneWidget);
   });
 

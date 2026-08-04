@@ -237,9 +237,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get quickAddJiraTooltip => 'Jira-ticket koppelen';
-
-  @override
   String get quickAddMoreTooltip => 'Meer opties';
 
   @override
