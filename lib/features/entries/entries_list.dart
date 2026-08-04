@@ -129,19 +129,17 @@ class _DayEntriesBlock extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: Column(
         children: [
-          for (var index = 0; index < entries.length; index++) ...[
+          for (final (index, entry) in entries.indexed) ...[
             _EntryTile(
-              entry: entries[index],
-              project: entries[index].projectId == null
-                  ? null
-                  : projectsById[entries[index].projectId],
-              jiraWorklog: jiraWorklogsById[entries[index].id],
+              key: ValueKey(entry.id),
+              entry: entry,
+              project: entry.projectId == null ? null : projectsById[entry.projectId],
+              jiraWorklog: jiraWorklogsById[entry.id],
               timeStyle: timeStyle,
               l10n: l10n,
-              onTap: () => showManualEntryDialog(context, ref, existing: entries[index]),
+              onTap: () => showManualEntryDialog(context, ref, existing: entry),
               onDismissed: () {
-                final entryId = entries[index].id;
-                ref.read(syncedWritesProvider.future).then((w) => w.deleteEntry(entryId));
+                ref.read(syncedWritesProvider.future).then((w) => w.deleteEntry(entry.id));
               },
             ),
             if (index != entries.length - 1) const Divider(height: 1),
@@ -157,6 +155,7 @@ class _DayEntriesBlock extends ConsumerWidget {
 /// this widget stays a plain [StatelessWidget].
 class _EntryTile extends StatelessWidget {
   const _EntryTile({
+    super.key,
     required this.entry,
     required this.project,
     required this.jiraWorklog,

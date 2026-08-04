@@ -118,6 +118,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(Card), findsOneWidget);
+      expect(tester.widget<Card>(find.byType(Card)).clipBehavior, Clip.antiAlias);
       expect(find.byType(Divider), findsOneWidget);
       final dismissibles = tester.widgetList<Dismissible>(find.byType(Dismissible));
       expect(
