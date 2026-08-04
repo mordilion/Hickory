@@ -45,6 +45,16 @@ void main() {
     expect(groups.single.totalDuration, const Duration(hours: 1, minutes: 30));
   });
 
+  test("computes breakDuration from gaps between a day's entries", () {
+    final entries = [
+      _entry(id: '1', startAt: DateTime(2026, 8, 1, 9), endAt: DateTime(2026, 8, 1, 12)),
+      _entry(id: '2', startAt: DateTime(2026, 8, 1, 13), endAt: DateTime(2026, 8, 1, 17)),
+    ];
+    final groups = groupEntriesByDay(entries);
+    expect(groups, hasLength(1));
+    expect(groups.single.breakDuration, const Duration(hours: 1));
+  });
+
   test('keeps multiple entries on the same day together and in input order', () {
     final entries = [
       _entry(id: 'a', startAt: DateTime(2026, 8, 1, 14), endAt: DateTime(2026, 8, 1, 15)),
