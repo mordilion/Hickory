@@ -476,6 +476,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get projectsEditTooltip => 'Bearbeiten';
 
   @override
+  String get projectsDeleteTooltip => 'Löschen';
+
+  @override
+  String get projectsDeleteConfirmTitle => 'Projekt löschen?';
+
+  @override
+  String get projectsDeleteConfirmMessage =>
+      'Dieses Projekt wird endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get projectsDeleteHasEntriesError =>
+      'Dieses Projekt hat noch zugewiesene Zeiteinträge und kann nicht gelöscht werden.';
+
+  @override
   String get projectsInvalidRateError =>
       'Bitte einen gültigen Betrag eingeben.';
 

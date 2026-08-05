@@ -472,6 +472,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get projectsEditTooltip => 'Edit';
 
   @override
+  String get projectsDeleteTooltip => 'Delete';
+
+  @override
+  String get projectsDeleteConfirmTitle => 'Delete project?';
+
+  @override
+  String get projectsDeleteConfirmMessage =>
+      'This project will be permanently deleted. This cannot be undone.';
+
+  @override
+  String get projectsDeleteHasEntriesError =>
+      'This project still has time entries assigned and can\'t be deleted.';
+
+  @override
   String get projectsInvalidRateError => 'Please enter a valid amount.';
 
   @override

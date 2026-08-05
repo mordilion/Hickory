@@ -933,6 +933,30 @@ abstract class AppLocalizations {
   /// **'Bearbeiten'**
   String get projectsEditTooltip;
 
+  /// No description provided for @projectsDeleteTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Löschen'**
+  String get projectsDeleteTooltip;
+
+  /// No description provided for @projectsDeleteConfirmTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Projekt löschen?'**
+  String get projectsDeleteConfirmTitle;
+
+  /// No description provided for @projectsDeleteConfirmMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieses Projekt wird endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.'**
+  String get projectsDeleteConfirmMessage;
+
+  /// No description provided for @projectsDeleteHasEntriesError.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieses Projekt hat noch zugewiesene Zeiteinträge und kann nicht gelöscht werden.'**
+  String get projectsDeleteHasEntriesError;
+
   /// No description provided for @projectsInvalidRateError.
   ///
   /// In de, this message translates to:

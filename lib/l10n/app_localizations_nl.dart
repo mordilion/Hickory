@@ -477,6 +477,20 @@ class AppLocalizationsNl extends AppLocalizations {
   String get projectsEditTooltip => 'Bewerken';
 
   @override
+  String get projectsDeleteTooltip => 'Verwijderen';
+
+  @override
+  String get projectsDeleteConfirmTitle => 'Project verwijderen?';
+
+  @override
+  String get projectsDeleteConfirmMessage =>
+      'Dit project wordt permanent verwijderd. Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String get projectsDeleteHasEntriesError =>
+      'Dit project heeft nog gekoppelde tijdregistraties en kan niet worden verwijderd.';
+
+  @override
   String get projectsInvalidRateError => 'Voer een geldig bedrag in.';
 
   @override

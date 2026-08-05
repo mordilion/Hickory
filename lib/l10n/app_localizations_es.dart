@@ -475,6 +475,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String get projectsEditTooltip => 'Editar';
 
   @override
+  String get projectsDeleteTooltip => 'Eliminar';
+
+  @override
+  String get projectsDeleteConfirmTitle => '¿Eliminar proyecto?';
+
+  @override
+  String get projectsDeleteConfirmMessage =>
+      'Este proyecto se eliminará permanentemente. Esta acción no se puede deshacer.';
+
+  @override
+  String get projectsDeleteHasEntriesError =>
+      'Este proyecto todavía tiene entradas de tiempo asignadas y no se puede eliminar.';
+
+  @override
   String get projectsInvalidRateError => 'Introduce un importe válido.';
 
   @override

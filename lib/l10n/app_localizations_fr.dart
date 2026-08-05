@@ -480,6 +480,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String get projectsEditTooltip => 'Modifier';
 
   @override
+  String get projectsDeleteTooltip => 'Supprimer';
+
+  @override
+  String get projectsDeleteConfirmTitle => 'Supprimer le projet ?';
+
+  @override
+  String get projectsDeleteConfirmMessage =>
+      'Ce projet sera définitivement supprimé. Cette action est irréversible.';
+
+  @override
+  String get projectsDeleteHasEntriesError =>
+      'Ce projet a encore des saisies de temps associées et ne peut pas être supprimé.';
+
+  @override
   String get projectsInvalidRateError => 'Veuillez saisir un montant valide.';
 
   @override
