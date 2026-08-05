@@ -7,10 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-08-05
+
 ### Added
 
 - Add a GitHub Actions workflow that analyzes, tests, and builds macOS, Windows, Android, and iOS artifacts on every push to `main` and on demand.
 - Add a tag-triggered release pipeline that publishes SHA256-checksummed macOS and Windows builds as GitHub Releases, plus an in-app updater that checks for new releases on startup and via a manual "Check for updates" button in Settings, and can download, verify, and install them automatically.
+
+### Fixed
+
+- Fix the Settings screen not being scrollable when its content overflows the window.
 
 ## [1.0.0] - 2026-07-14
 
@@ -25,5 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add localized UI in German, English, Spanish, French, Italian, and Dutch, with a user-configurable date/time display format.
 - Add the Electric Violet visual theme.
 
-[Unreleased]: https://github.com/mordilion/Hickory/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/mordilion/Hickory/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/mordilion/Hickory/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/mordilion/Hickory/releases/tag/v1.0.0
