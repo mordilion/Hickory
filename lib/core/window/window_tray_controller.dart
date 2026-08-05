@@ -8,13 +8,19 @@ import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'background_notice_store.dart';
+import 'window_bounds_store.dart';
 
-/// Locks the desktop window to a fixed, slim "phone-like" size and routes
-/// both minimize and close (the window's X button) to the system tray
-/// instead of exiting — Hickory keeps tracking in the background. Call
-/// [initialize] once from `main()`, before `runApp`.
+/// Manages the desktop window (resizable, with a slim "phone-like" minimum
+/// size) and routes both minimize and close (the window's X button) to the
+/// system tray instead of exiting — Hickory keeps tracking in the
+/// background. Call [initialize] once from `main()`, before `runApp`.
 class WindowTrayController with WindowListener, TrayListener {
-  static const _windowSize = Size(480, 960);
+  static const _minimumSize = Size(480, 960);
+
+  /// Set once [initialize] resolves the app's support directory, then
+  /// reused by the resize/move listeners so they don't re-resolve it on
+  /// every event. Null only in the brief window before [initialize] runs.
+  WindowBoundsStore? _boundsStore;
 
   /// Shown via a SnackBar the first time the window is hidden to the tray,
   /// so the app doesn't seem to have silently vanished. A [GlobalKey] is
@@ -41,6 +47,12 @@ class WindowTrayController with WindowListener, TrayListener {
     trayManager.addListener(this);
 
     await windowManager.ensureInitialized();
+
+    final supportDir = await getApplicationSupportDirectory();
+    final boundsStore = WindowBoundsStore(supportDirectory: supportDir);
+    _boundsStore = boundsStore;
+    final savedBounds = await boundsStore.read();
+
     // Deliberately not awaited: per window_manager's documented pattern,
     // this runs concurrently with Flutter building its first frame (which
     // only starts once `runApp` is called back in `main()`, after this
@@ -49,11 +61,19 @@ class WindowTrayController with WindowListener, TrayListener {
     // producing a blank white window until the next paint is triggered.
     unawaited(
       windowManager.waitUntilReadyToShow(
-        const WindowOptions(size: _windowSize, center: true, title: 'Hickory'),
+        WindowOptions(
+          size: savedBounds == null
+              ? _minimumSize
+              : Size(savedBounds.width, savedBounds.height),
+          center: savedBounds == null,
+          title: 'Hickory',
+        ),
         () async {
-          await windowManager.setResizable(false);
-          await windowManager.setMinimumSize(_windowSize);
-          await windowManager.setMaximumSize(_windowSize);
+          await windowManager.setResizable(true);
+          await windowManager.setMinimumSize(_minimumSize);
+          if (savedBounds != null) {
+            await windowManager.setPosition(savedBounds.topLeft);
+          }
           await windowManager.setPreventClose(true);
           await windowManager.show();
           await windowManager.focus();
@@ -133,6 +153,27 @@ class WindowTrayController with WindowListener, TrayListener {
   @override
   void onWindowMinimize() async {
     await _hideToTray();
+  }
+
+  @override
+  void onWindowResized() async {
+    await _persistBounds();
+  }
+
+  @override
+  void onWindowMoved() async {
+    await _persistBounds();
+  }
+
+  /// Best-effort: a failed write (e.g. disk full) isn't user-visible and
+  /// doesn't block anything else, matching this controller's existing
+  /// best-effort handling elsewhere (e.g. [_quit]'s swallowed
+  /// [onBeforeQuit] failure).
+  Future<void> _persistBounds() async {
+    final store = _boundsStore;
+    if (store == null) return;
+    final bounds = await windowManager.getBounds();
+    await store.write(bounds);
   }
 
   @override
