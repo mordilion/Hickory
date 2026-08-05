@@ -172,8 +172,12 @@ class WindowTrayController with WindowListener, TrayListener {
   Future<void> _persistBounds() async {
     final store = _boundsStore;
     if (store == null) return;
-    final bounds = await windowManager.getBounds();
-    await store.write(bounds);
+    try {
+      final bounds = await windowManager.getBounds();
+      await store.write(bounds);
+    } catch (_) {
+      // Best-effort -- see doc comment above.
+    }
   }
 
   @override
