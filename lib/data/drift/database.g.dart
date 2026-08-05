@@ -4741,6 +4741,382 @@ class BreakRuleTiersCompanion extends UpdateCompanion<BreakRuleTier> {
   }
 }
 
+class $PersonioAttendancesTable extends PersonioAttendances
+    with TableInfo<$PersonioAttendancesTable, PersonioAttendanceRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PersonioAttendancesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _personioAttendanceIdMeta =
+      const VerificationMeta('personioAttendanceId');
+  @override
+  late final GeneratedColumn<String> personioAttendanceId =
+      GeneratedColumn<String>(
+        'personio_attendance_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(PersonioAttendanceStatus.pending),
+  );
+  static const VerificationMeta _lastErrorMeta = const VerificationMeta(
+    'lastError',
+  );
+  @override
+  late final GeneratedColumn<String> lastError = GeneratedColumn<String>(
+    'last_error',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _syncedAtMeta = const VerificationMeta(
+    'syncedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> syncedAt = GeneratedColumn<DateTime>(
+    'synced_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    personioAttendanceId,
+    status,
+    lastError,
+    syncedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'personio_attendances';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PersonioAttendanceRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('personio_attendance_id')) {
+      context.handle(
+        _personioAttendanceIdMeta,
+        personioAttendanceId.isAcceptableOrUnknown(
+          data['personio_attendance_id']!,
+          _personioAttendanceIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('last_error')) {
+      context.handle(
+        _lastErrorMeta,
+        lastError.isAcceptableOrUnknown(data['last_error']!, _lastErrorMeta),
+      );
+    }
+    if (data.containsKey('synced_at')) {
+      context.handle(
+        _syncedAtMeta,
+        syncedAt.isAcceptableOrUnknown(data['synced_at']!, _syncedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PersonioAttendanceRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PersonioAttendanceRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      personioAttendanceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}personio_attendance_id'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      lastError: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_error'],
+      ),
+      syncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}synced_at'],
+      ),
+    );
+  }
+
+  @override
+  $PersonioAttendancesTable createAlias(String alias) {
+    return $PersonioAttendancesTable(attachedDatabase, alias);
+  }
+}
+
+class PersonioAttendanceRow extends DataClass
+    implements Insertable<PersonioAttendanceRow> {
+  final String id;
+  final String? personioAttendanceId;
+  final String status;
+  final String? lastError;
+  final DateTime? syncedAt;
+  const PersonioAttendanceRow({
+    required this.id,
+    this.personioAttendanceId,
+    required this.status,
+    this.lastError,
+    this.syncedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || personioAttendanceId != null) {
+      map['personio_attendance_id'] = Variable<String>(personioAttendanceId);
+    }
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || lastError != null) {
+      map['last_error'] = Variable<String>(lastError);
+    }
+    if (!nullToAbsent || syncedAt != null) {
+      map['synced_at'] = Variable<DateTime>(syncedAt);
+    }
+    return map;
+  }
+
+  PersonioAttendancesCompanion toCompanion(bool nullToAbsent) {
+    return PersonioAttendancesCompanion(
+      id: Value(id),
+      personioAttendanceId: personioAttendanceId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(personioAttendanceId),
+      status: Value(status),
+      lastError: lastError == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastError),
+      syncedAt: syncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(syncedAt),
+    );
+  }
+
+  factory PersonioAttendanceRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PersonioAttendanceRow(
+      id: serializer.fromJson<String>(json['id']),
+      personioAttendanceId: serializer.fromJson<String?>(
+        json['personioAttendanceId'],
+      ),
+      status: serializer.fromJson<String>(json['status']),
+      lastError: serializer.fromJson<String?>(json['lastError']),
+      syncedAt: serializer.fromJson<DateTime?>(json['syncedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'personioAttendanceId': serializer.toJson<String?>(personioAttendanceId),
+      'status': serializer.toJson<String>(status),
+      'lastError': serializer.toJson<String?>(lastError),
+      'syncedAt': serializer.toJson<DateTime?>(syncedAt),
+    };
+  }
+
+  PersonioAttendanceRow copyWith({
+    String? id,
+    Value<String?> personioAttendanceId = const Value.absent(),
+    String? status,
+    Value<String?> lastError = const Value.absent(),
+    Value<DateTime?> syncedAt = const Value.absent(),
+  }) => PersonioAttendanceRow(
+    id: id ?? this.id,
+    personioAttendanceId: personioAttendanceId.present
+        ? personioAttendanceId.value
+        : this.personioAttendanceId,
+    status: status ?? this.status,
+    lastError: lastError.present ? lastError.value : this.lastError,
+    syncedAt: syncedAt.present ? syncedAt.value : this.syncedAt,
+  );
+  PersonioAttendanceRow copyWithCompanion(PersonioAttendancesCompanion data) {
+    return PersonioAttendanceRow(
+      id: data.id.present ? data.id.value : this.id,
+      personioAttendanceId: data.personioAttendanceId.present
+          ? data.personioAttendanceId.value
+          : this.personioAttendanceId,
+      status: data.status.present ? data.status.value : this.status,
+      lastError: data.lastError.present ? data.lastError.value : this.lastError,
+      syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PersonioAttendanceRow(')
+          ..write('id: $id, ')
+          ..write('personioAttendanceId: $personioAttendanceId, ')
+          ..write('status: $status, ')
+          ..write('lastError: $lastError, ')
+          ..write('syncedAt: $syncedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, personioAttendanceId, status, lastError, syncedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PersonioAttendanceRow &&
+          other.id == this.id &&
+          other.personioAttendanceId == this.personioAttendanceId &&
+          other.status == this.status &&
+          other.lastError == this.lastError &&
+          other.syncedAt == this.syncedAt);
+}
+
+class PersonioAttendancesCompanion
+    extends UpdateCompanion<PersonioAttendanceRow> {
+  final Value<String> id;
+  final Value<String?> personioAttendanceId;
+  final Value<String> status;
+  final Value<String?> lastError;
+  final Value<DateTime?> syncedAt;
+  final Value<int> rowid;
+  const PersonioAttendancesCompanion({
+    this.id = const Value.absent(),
+    this.personioAttendanceId = const Value.absent(),
+    this.status = const Value.absent(),
+    this.lastError = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PersonioAttendancesCompanion.insert({
+    required String id,
+    this.personioAttendanceId = const Value.absent(),
+    this.status = const Value.absent(),
+    this.lastError = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id);
+  static Insertable<PersonioAttendanceRow> custom({
+    Expression<String>? id,
+    Expression<String>? personioAttendanceId,
+    Expression<String>? status,
+    Expression<String>? lastError,
+    Expression<DateTime>? syncedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (personioAttendanceId != null)
+        'personio_attendance_id': personioAttendanceId,
+      if (status != null) 'status': status,
+      if (lastError != null) 'last_error': lastError,
+      if (syncedAt != null) 'synced_at': syncedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PersonioAttendancesCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? personioAttendanceId,
+    Value<String>? status,
+    Value<String?>? lastError,
+    Value<DateTime?>? syncedAt,
+    Value<int>? rowid,
+  }) {
+    return PersonioAttendancesCompanion(
+      id: id ?? this.id,
+      personioAttendanceId: personioAttendanceId ?? this.personioAttendanceId,
+      status: status ?? this.status,
+      lastError: lastError ?? this.lastError,
+      syncedAt: syncedAt ?? this.syncedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (personioAttendanceId.present) {
+      map['personio_attendance_id'] = Variable<String>(
+        personioAttendanceId.value,
+      );
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (lastError.present) {
+      map['last_error'] = Variable<String>(lastError.value);
+    }
+    if (syncedAt.present) {
+      map['synced_at'] = Variable<DateTime>(syncedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PersonioAttendancesCompanion(')
+          ..write('id: $id, ')
+          ..write('personioAttendanceId: $personioAttendanceId, ')
+          ..write('status: $status, ')
+          ..write('lastError: $lastError, ')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4757,6 +5133,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
   late final $JiraWorklogsTable jiraWorklogs = $JiraWorklogsTable(this);
   late final $BreakRuleTiersTable breakRuleTiers = $BreakRuleTiersTable(this);
+  late final $PersonioAttendancesTable personioAttendances =
+      $PersonioAttendancesTable(this);
   late final Index idxEventsEntityId = Index(
     'idx_events_entity_id',
     'CREATE INDEX idx_events_entity_id ON events (entity_id)',
@@ -4778,6 +5156,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final BreakRuleTiersDao breakRuleTiersDao = BreakRuleTiersDao(
     this as AppDatabase,
   );
+  late final PersonioAttendancesDao personioAttendancesDao =
+      PersonioAttendancesDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4794,6 +5174,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     appSettings,
     jiraWorklogs,
     breakRuleTiers,
+    personioAttendances,
     idxEventsEntityId,
   ];
 }
@@ -8099,6 +8480,224 @@ typedef $$BreakRuleTiersTableProcessedTableManager =
       BreakRuleTier,
       PrefetchHooks Function()
     >;
+typedef $$PersonioAttendancesTableCreateCompanionBuilder =
+    PersonioAttendancesCompanion Function({
+      required String id,
+      Value<String?> personioAttendanceId,
+      Value<String> status,
+      Value<String?> lastError,
+      Value<DateTime?> syncedAt,
+      Value<int> rowid,
+    });
+typedef $$PersonioAttendancesTableUpdateCompanionBuilder =
+    PersonioAttendancesCompanion Function({
+      Value<String> id,
+      Value<String?> personioAttendanceId,
+      Value<String> status,
+      Value<String?> lastError,
+      Value<DateTime?> syncedAt,
+      Value<int> rowid,
+    });
+
+class $$PersonioAttendancesTableFilterComposer
+    extends Composer<_$AppDatabase, $PersonioAttendancesTable> {
+  $$PersonioAttendancesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get personioAttendanceId => $composableBuilder(
+    column: $table.personioAttendanceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastError => $composableBuilder(
+    column: $table.lastError,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get syncedAt => $composableBuilder(
+    column: $table.syncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PersonioAttendancesTableOrderingComposer
+    extends Composer<_$AppDatabase, $PersonioAttendancesTable> {
+  $$PersonioAttendancesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get personioAttendanceId => $composableBuilder(
+    column: $table.personioAttendanceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastError => $composableBuilder(
+    column: $table.lastError,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get syncedAt => $composableBuilder(
+    column: $table.syncedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PersonioAttendancesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PersonioAttendancesTable> {
+  $$PersonioAttendancesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get personioAttendanceId => $composableBuilder(
+    column: $table.personioAttendanceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get lastError =>
+      $composableBuilder(column: $table.lastError, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get syncedAt =>
+      $composableBuilder(column: $table.syncedAt, builder: (column) => column);
+}
+
+class $$PersonioAttendancesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PersonioAttendancesTable,
+          PersonioAttendanceRow,
+          $$PersonioAttendancesTableFilterComposer,
+          $$PersonioAttendancesTableOrderingComposer,
+          $$PersonioAttendancesTableAnnotationComposer,
+          $$PersonioAttendancesTableCreateCompanionBuilder,
+          $$PersonioAttendancesTableUpdateCompanionBuilder,
+          (
+            PersonioAttendanceRow,
+            BaseReferences<
+              _$AppDatabase,
+              $PersonioAttendancesTable,
+              PersonioAttendanceRow
+            >,
+          ),
+          PersonioAttendanceRow,
+          PrefetchHooks Function()
+        > {
+  $$PersonioAttendancesTableTableManager(
+    _$AppDatabase db,
+    $PersonioAttendancesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PersonioAttendancesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PersonioAttendancesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PersonioAttendancesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> personioAttendanceId = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> lastError = const Value.absent(),
+                Value<DateTime?> syncedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PersonioAttendancesCompanion(
+                id: id,
+                personioAttendanceId: personioAttendanceId,
+                status: status,
+                lastError: lastError,
+                syncedAt: syncedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> personioAttendanceId = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> lastError = const Value.absent(),
+                Value<DateTime?> syncedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PersonioAttendancesCompanion.insert(
+                id: id,
+                personioAttendanceId: personioAttendanceId,
+                status: status,
+                lastError: lastError,
+                syncedAt: syncedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PersonioAttendancesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PersonioAttendancesTable,
+      PersonioAttendanceRow,
+      $$PersonioAttendancesTableFilterComposer,
+      $$PersonioAttendancesTableOrderingComposer,
+      $$PersonioAttendancesTableAnnotationComposer,
+      $$PersonioAttendancesTableCreateCompanionBuilder,
+      $$PersonioAttendancesTableUpdateCompanionBuilder,
+      (
+        PersonioAttendanceRow,
+        BaseReferences<
+          _$AppDatabase,
+          $PersonioAttendancesTable,
+          PersonioAttendanceRow
+        >,
+      ),
+      PersonioAttendanceRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8124,4 +8723,6 @@ class $AppDatabaseManager {
       $$JiraWorklogsTableTableManager(_db, _db.jiraWorklogs);
   $$BreakRuleTiersTableTableManager get breakRuleTiers =>
       $$BreakRuleTiersTableTableManager(_db, _db.breakRuleTiers);
+  $$PersonioAttendancesTableTableManager get personioAttendances =>
+      $$PersonioAttendancesTableTableManager(_db, _db.personioAttendances);
 }

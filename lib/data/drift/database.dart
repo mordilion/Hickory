@@ -10,6 +10,7 @@ import 'daos/app_settings_dao.dart';
 import 'daos/break_rule_tiers_dao.dart';
 import 'daos/events_dao.dart';
 import 'daos/jira_worklogs_dao.dart';
+import 'daos/personio_attendances_dao.dart';
 import 'daos/projects_dao.dart';
 import 'daos/time_entries_dao.dart';
 import 'tables/activity_samples_table.dart';
@@ -18,6 +19,7 @@ import 'tables/break_rule_tiers_table.dart';
 import 'tables/clients_table.dart';
 import 'tables/events_table.dart';
 import 'tables/jira_worklogs_table.dart';
+import 'tables/personio_attendances_table.dart';
 import 'tables/projects_table.dart';
 import 'tables/sync_file_states_table.dart';
 import 'tables/tags_table.dart';
@@ -39,6 +41,7 @@ part 'database.g.dart';
     AppSettings,
     JiraWorklogs,
     BreakRuleTiers,
+    PersonioAttendances,
   ],
   daos: [
     ProjectsDao,
@@ -48,6 +51,7 @@ part 'database.g.dart';
     AppSettingsDao,
     JiraWorklogsDao,
     BreakRuleTiersDao,
+    PersonioAttendancesDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -56,7 +60,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.connection);
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -81,6 +85,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 7) {
         await m.addColumn(appSettings, appSettings.countPausedTimeAsBreak);
+      }
+      if (from < 8) {
+        await m.createTable(personioAttendances);
       }
     },
   );
