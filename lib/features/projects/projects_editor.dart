@@ -79,6 +79,7 @@ class _ProjectsEditorState extends ConsumerState<ProjectsEditor> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.edit_outlined),
+                  tooltip: l10n.projectsEditTooltip,
                   onPressed:
                       _busy ? null : () => showProjectFormDialog(context, ref, project: project),
                 ),

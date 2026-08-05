@@ -22,7 +22,7 @@ const projectColorPalette = [
 int? _parseRateCents(String raw) {
   if (raw.isEmpty) return null;
   final value = double.tryParse(raw.replaceAll(',', '.'));
-  if (value == null) return null;
+  if (value == null || value < 0) return null;
   return (value * 100).round();
 }
 
@@ -43,13 +43,18 @@ Future<void> showProjectFormDialog(
     text: initialRateCents == null ? '' : (initialRateCents / 100).toStringAsFixed(2),
   );
   final currencyController = TextEditingController(text: project?.currency ?? '');
+  // Declared here (not inside `builder:`) so a route rebuild -- e.g. the
+  // app's locale changing while this dialog is open -- can't silently
+  // reset the user's in-progress color/billable choice back to the
+  // project's original values. See break_rule_tiers_editor.dart's `_add`
+  // for the same precaution.
+  var selectedColor = project?.colorHex ?? projectColorPalette.first;
+  var billable = project?.billable ?? true;
+  String? rateError;
   return showDialog<void>(
     context: context,
     builder: (dialogContext) {
       final l10n = AppLocalizations.of(dialogContext);
-      var selectedColor = project?.colorHex ?? projectColorPalette.first;
-      var billable = project?.billable ?? true;
-      String? rateError;
       return StatefulBuilder(
         builder: (context, setDialogState) {
           return AlertDialog(

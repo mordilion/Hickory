@@ -128,6 +128,7 @@
   "projectsCurrencyLabel": "Valuta",
   "projectsArchiveTooltip": "Archiveren",
   "projectsUnarchiveTooltip": "Heractiveren",
+  "projectsEditTooltip": "Bewerken",
   "projectsInvalidRateError": "Voer een geldig bedrag in.",
   "reportsTitle": "Rapporten",
   "reportsThisWeek": "Deze week",

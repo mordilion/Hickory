@@ -79,6 +79,7 @@ void main() {
     expect(find.text('Website Relaunch'), findsOneWidget);
     expect(find.byIcon(Icons.edit_outlined), findsOneWidget);
     expect(find.byIcon(Icons.archive_outlined), findsOneWidget);
+    expect(find.byTooltip('Edit'), findsOneWidget);
   });
 
   testWidgets('archived section is hidden when there are no archived projects', (tester) async {

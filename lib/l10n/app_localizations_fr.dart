@@ -377,6 +377,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get projectsUnarchiveTooltip => 'Réactiver';
 
   @override
+  String get projectsEditTooltip => 'Modifier';
+
+  @override
   String get projectsInvalidRateError => 'Veuillez saisir un montant valide.';
 
   @override

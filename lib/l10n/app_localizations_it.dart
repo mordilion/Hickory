@@ -374,6 +374,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get projectsUnarchiveTooltip => 'Riattiva';
 
   @override
+  String get projectsEditTooltip => 'Modifica';
+
+  @override
   String get projectsInvalidRateError => 'Inserisci un importo valido.';
 
   @override

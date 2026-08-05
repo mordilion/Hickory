@@ -760,6 +760,12 @@ abstract class AppLocalizations {
   /// **'Reaktivieren'**
   String get projectsUnarchiveTooltip;
 
+  /// No description provided for @projectsEditTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Bearbeiten'**
+  String get projectsEditTooltip;
+
   /// No description provided for @projectsInvalidRateError.
   ///
   /// In de, this message translates to:

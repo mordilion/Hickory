@@ -128,6 +128,7 @@
   "projectsCurrencyLabel": "Devise",
   "projectsArchiveTooltip": "Archiver",
   "projectsUnarchiveTooltip": "Réactiver",
+  "projectsEditTooltip": "Modifier",
   "projectsInvalidRateError": "Veuillez saisir un montant valide.",
   "reportsTitle": "Rapports",
   "reportsThisWeek": "Cette semaine",

@@ -128,6 +128,7 @@
   "projectsCurrencyLabel": "Moneda",
   "projectsArchiveTooltip": "Archivar",
   "projectsUnarchiveTooltip": "Reactivar",
+  "projectsEditTooltip": "Editar",
   "projectsInvalidRateError": "Introduce un importe válido.",
   "reportsTitle": "Informes",
   "reportsThisWeek": "Esta semana",

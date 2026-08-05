@@ -128,6 +128,7 @@
   "projectsCurrencyLabel": "Valuta",
   "projectsArchiveTooltip": "Archivia",
   "projectsUnarchiveTooltip": "Riattiva",
+  "projectsEditTooltip": "Modifica",
   "projectsInvalidRateError": "Inserisci un importo valido.",
   "reportsTitle": "Report",
   "reportsThisWeek": "Questa settimana",

@@ -161,4 +161,23 @@ void main() {
     expect(find.text('Please enter a valid amount.'), findsWidgets);
     expect(await db.select(db.projects).get(), isEmpty);
   });
+
+  testWidgets('entering a negative hourly rate shows an inline error and does not submit', (
+    tester,
+  ) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, 'Website Relaunch');
+    await tester.enterText(find.byType(TextField).at(1), '-50');
+    await tester.tap(find.text('Create'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('New project'), findsOneWidget);
+    expect(find.text('Please enter a valid amount.'), findsWidgets);
+    expect(await db.select(db.projects).get(), isEmpty);
+  });
 }

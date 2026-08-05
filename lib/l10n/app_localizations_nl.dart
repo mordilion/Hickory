@@ -375,6 +375,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get projectsUnarchiveTooltip => 'Heractiveren';
 
   @override
+  String get projectsEditTooltip => 'Bewerken';
+
+  @override
   String get projectsInvalidRateError => 'Voer een geldig bedrag in.';
 
   @override
