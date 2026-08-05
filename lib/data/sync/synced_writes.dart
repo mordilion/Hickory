@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../drift/database.dart';
 import '../drift/tables/app_settings_table.dart' show appSettingsRowId;
 import '../drift/tables/jira_worklogs_table.dart' show JiraWorklogStatus;
+import '../drift/tables/personio_attendances_table.dart' show PersonioAttendanceStatus;
 import 'entity_types.dart';
 import 'sync_log_writer.dart';
 
@@ -183,6 +184,16 @@ class SyncedWrites {
         await upsertJiraWorklogState(worklog.copyWith(status: JiraWorklogStatus.pendingDelete));
       }
     }
+    final attendance = await db.personioAttendancesDao.getForEntry(id);
+    if (attendance != null) {
+      if (attendance.personioAttendanceId == null) {
+        await deletePersonioAttendanceState(id);
+      } else {
+        await upsertPersonioAttendanceState(
+          attendance.copyWith(status: PersonioAttendanceStatus.pendingDelete),
+        );
+      }
+    }
     await db.timeEntriesDao.deleteEntry(id);
     await logWriter.appendEvent(
       entityType: EntityTypes.timeEntry,
@@ -320,6 +331,33 @@ class SyncedWrites {
     await db.jiraWorklogsDao.deleteForEntry(timeEntryId);
     await logWriter.appendEvent(
       entityType: EntityTypes.jiraWorklog,
+      entityId: timeEntryId,
+      op: EventOp.delete,
+      payload: null,
+    );
+  }
+
+  /// Writes the given Personio attendance sync-tracking row and logs it, so
+  /// the state (e.g. "this entry now has a Personio attendance period")
+  /// propagates to the user's other devices the same way every other entity
+  /// does.
+  Future<void> upsertPersonioAttendanceState(PersonioAttendanceRow row) async {
+    await db.personioAttendancesDao.upsert(row.toCompanion(true));
+    await logWriter.appendEvent(
+      entityType: EntityTypes.personioAttendance,
+      entityId: row.id,
+      op: EventOp.update,
+      payload: row.toJson(),
+    );
+  }
+
+  /// Removes a Personio attendance sync-tracking row (used once a pending
+  /// delete has been pushed to Personio, or when a row was never pushed and
+  /// no longer needs tracking) and logs the tombstone.
+  Future<void> deletePersonioAttendanceState(String timeEntryId) async {
+    await db.personioAttendancesDao.deleteForEntry(timeEntryId);
+    await logWriter.appendEvent(
+      entityType: EntityTypes.personioAttendance,
       entityId: timeEntryId,
       op: EventOp.delete,
       payload: null,

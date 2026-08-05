@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/drift/tables/app_settings_table.dart' show appSettingsRowId;
 import 'package:hickory/data/drift/tables/jira_worklogs_table.dart';
+import 'package:hickory/data/drift/tables/personio_attendances_table.dart';
 import 'package:hickory/data/sync/entity_types.dart';
 import 'package:hickory/data/sync/sync_ingestor.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
@@ -221,6 +222,51 @@ void main() {
       await ingestor.syncNow();
 
       expect(await readerDb.jiraWorklogsDao.getAll(), isEmpty);
+    },
+  );
+
+  test(
+    'a personio attendance tracking row syncs to a second device, including a later update',
+    () async {
+      final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(writerDb.close);
+      final writerWrites = SyncedWrites(
+        db: writerDb,
+        logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'dev_a'),
+      );
+
+      final entry = await writerWrites.createManualEntry(
+        deviceId: 'dev_a',
+        startAt: DateTime.utc(2026, 7, 7, 9),
+        endAt: DateTime.utc(2026, 7, 7, 10),
+      );
+      await writerWrites.upsertPersonioAttendanceState(
+        PersonioAttendanceRow(
+          id: entry.id,
+          personioAttendanceId: 'period-1',
+          status: PersonioAttendanceStatus.synced,
+          lastError: null,
+          syncedAt: DateTime.utc(2026, 7, 7, 10),
+        ),
+      );
+
+      final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(readerDb.close);
+      final ingestor = SyncIngestor(db: readerDb, syncRoot: syncRoot);
+      await ingestor.syncNow();
+
+      final attendances = await readerDb.personioAttendancesDao.getAll();
+      expect(attendances, hasLength(1));
+      expect(attendances.single.personioAttendanceId, 'period-1');
+      expect(attendances.single.status, PersonioAttendanceStatus.synced);
+
+      // Same correctness property as the Jira worklog case above: a second
+      // device only knows an entry was already pushed if the tracking row
+      // itself synced.
+      await writerWrites.deletePersonioAttendanceState(entry.id);
+      await ingestor.syncNow();
+
+      expect(await readerDb.personioAttendancesDao.getAll(), isEmpty);
     },
   );
 
