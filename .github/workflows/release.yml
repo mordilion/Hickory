@@ -40,7 +40,7 @@ jobs:
         run: ditto -c -k --sequesterRsrc --keepParent hickory.app hickory-macos.zip
       - name: Compute checksum
         working-directory: build/macos/Build/Products/Release
-        run: shasum -a 256 hickory-macos.zip | cut -d' ' -f1 > hickory-macos.zip.sha256
+        run: shasum -a 256 hickory-macos.zip | cut -d' ' -f1 | tr -d '\n' > hickory-macos.zip.sha256
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: hickory-macos-release
@@ -95,6 +95,9 @@ jobs:
             /^## \[/ {
               if (found) exit
               if ($0 ~ "\\[" ver "\\]") { found=1; next }
+            }
+            /^\[.+\]:/ {
+              if (found) exit
             }
             found { print }
           ' CHANGELOG.md > release_notes.md
