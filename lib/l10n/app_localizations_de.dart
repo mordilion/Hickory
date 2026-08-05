@@ -74,6 +74,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Installation fehlgeschlagen. Bitte versuche es erneut oder lade die neue Version manuell von GitHub herunter.';
 
   @override
+  String get settingsUpdateInstallErrorPermission =>
+      'Hickory hat keinen Schreibzugriff auf den Installationsordner. Verschiebe die App an einen Ort mit Schreibzugriff oder aktualisiere manuell über GitHub.';
+
+  @override
   String get syncTitle => 'Sync-Einstellungen';
 
   @override

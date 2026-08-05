@@ -10,6 +10,7 @@ import '../../core/di/sync_providers.dart';
 import '../../core/di/update_providers.dart';
 import '../../core/format/date_format.dart';
 import '../../core/update/update_checker.dart';
+import '../../core/update/update_installer.dart';
 import '../../l10n/app_localizations.dart';
 import '../projects/projects_editor.dart';
 import 'break_rule_tiers_editor.dart';
@@ -90,6 +91,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final db = ref.read(appDatabaseProvider);
       final writes = await ref.read(syncedWritesProvider.future);
       await installer.quitAndSwap(extracted, db: db, writes: writes);
+    } on UpdateInstallPermissionException {
+      if (mounted) {
+        setState(() => _updateStatusMessage = l10n.settingsUpdateInstallErrorPermission);
+      }
     } catch (_) {
       if (mounted) setState(() => _updateStatusMessage = l10n.settingsUpdateInstallError);
     } finally {

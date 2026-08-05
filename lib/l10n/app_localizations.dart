@@ -220,6 +220,12 @@ abstract class AppLocalizations {
   /// **'Installation fehlgeschlagen. Bitte versuche es erneut oder lade die neue Version manuell von GitHub herunter.'**
   String get settingsUpdateInstallError;
 
+  /// No description provided for @settingsUpdateInstallErrorPermission.
+  ///
+  /// In de, this message translates to:
+  /// **'Hickory hat keinen Schreibzugriff auf den Installationsordner. Verschiebe die App an einen Ort mit Schreibzugriff oder aktualisiere manuell über GitHub.'**
+  String get settingsUpdateInstallErrorPermission;
+
   /// No description provided for @syncTitle.
   ///
   /// In de, this message translates to:

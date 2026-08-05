@@ -19,6 +19,7 @@
   "settingsUpdateInstallButton": "Installa ora",
   "settingsUpdateInstalling": "Installazione aggiornamento...",
   "settingsUpdateInstallError": "Installazione non riuscita. Riprova o scarica la nuova versione manualmente da GitHub.",
+  "settingsUpdateInstallErrorPermission": "Hickory non ha accesso in scrittura alla cartella di installazione. Spostala in una posizione con accesso in scrittura oppure aggiornala manualmente da GitHub.",
   "syncTitle": "Impostazioni di sincronizzazione",
   "syncNoFolderSelected": "Nessuna cartella selezionata: i dati restano solo su questo dispositivo.",
   "syncFolderPath": "Cartella di sincronizzazione: {path}",

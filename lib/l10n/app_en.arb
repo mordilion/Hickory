@@ -19,6 +19,7 @@
   "settingsUpdateInstallButton": "Install now",
   "settingsUpdateInstalling": "Installing update...",
   "settingsUpdateInstallError": "Installation failed. Please try again or download the new version manually from GitHub.",
+  "settingsUpdateInstallErrorPermission": "Hickory doesn't have write access to its installation folder. Move it somewhere you can write to, or update manually from GitHub.",
   "syncTitle": "Sync settings",
   "syncNoFolderSelected": "No folder selected – data stays only on this device.",
   "syncFolderPath": "Sync folder: {path}",

@@ -21,6 +21,16 @@ class UpdateInstallException implements Exception {
   String toString() => message;
 }
 
+/// Raised when the install directory's parent can't be written to -- e.g.
+/// the app lives in a location the current OS user account doesn't have
+/// write access to (the common case: /Applications on a macOS account
+/// that isn't in the `admin` group). Distinct from [UpdateInstallException]
+/// so the Settings UI can show a specific, actionable message instead of
+/// the generic install-failed one.
+class UpdateInstallPermissionException extends UpdateInstallException {
+  UpdateInstallPermissionException(super.message);
+}
+
 /// Downloads, verifies, extracts, and installs an [UpdateInfo] on macOS/
 /// Windows, then relaunches. See
 /// docs/superpowers/specs/2026-08-05-github-auto-update-design.md section 4
@@ -29,10 +39,21 @@ class UpdateInstallException implements Exception {
 /// [quitAndSwap]'s detached script touches the real install, and only after
 /// this process has fully exited.
 class UpdateInstaller {
-  UpdateInstaller({http.Client? httpClient})
-    : _httpClient = httpClient ?? http.Client();
+  // installDirOverride must stay a public parameter name, so it can't use
+  // `this._installDirOverride` -- the field is private and tests (a
+  // different library) need to pass it by name.
+  UpdateInstaller({http.Client? httpClient, Directory? installDirOverride})
+    : _httpClient = httpClient ?? http.Client(),
+      // ignore: prefer_initializing_formals
+      _installDirOverride = installDirOverride;
 
   final http.Client _httpClient;
+
+  /// Set by tests so [_currentInstallDir] doesn't resolve to the real
+  /// [Platform.resolvedExecutable] (the test runner's own binary, whose
+  /// parent directories are unrelated to any real install and shouldn't be
+  /// probed for writability).
+  final Directory? _installDirOverride;
 
   /// Downloads, verifies, and extracts [update], returning the archive's
   /// single top-level directory (the install root on Windows, the .app
@@ -43,6 +64,13 @@ class UpdateInstaller {
         'Automatic updates are only supported on macOS and Windows.',
       );
     }
+
+    // Fail fast, before downloading anything or quitting the app: the
+    // swap in quitAndSwap() runs from a detached script after this process
+    // has already exited, with no way to report a failure back to the UI,
+    // so a permission problem must be caught here while it's still
+    // recoverable.
+    _ensureInstallDirWritable(_currentInstallDir());
 
     final tempDir = await getTemporaryDirectory();
     final workDir = Directory(
@@ -154,10 +182,32 @@ class UpdateInstaller {
   /// path segments above `Contents/MacOS/<executable>` -- a stable,
   /// well-known bundle-layout convention.
   Directory _currentInstallDir() {
+    final override = _installDirOverride;
+    if (override != null) return override;
     final executable = File(Platform.resolvedExecutable);
     return Platform.isWindows
         ? executable.parent
         : executable.parent.parent.parent;
+  }
+
+  /// Probes whether [installDir]'s parent can be written to by creating and
+  /// immediately removing a throwaway directory entry there -- exactly the
+  /// operation quitAndSwap's relaunch script needs (renaming installDir out
+  /// of the way, then moving the new bundle in). Throws
+  /// [UpdateInstallPermissionException] if it can't.
+  void _ensureInstallDirWritable(Directory installDir) {
+    final probe = Directory(
+      p.join(installDir.parent.path, '.hickory_update_write_test_$pid'),
+    );
+    try {
+      probe.createSync();
+      probe.deleteSync();
+    } catch (_) {
+      throw UpdateInstallPermissionException(
+        "Hickory can't write to its installation folder "
+        '(${installDir.parent.path}).',
+      );
+    }
   }
 
   File _executableInside(Directory topLevel) {

@@ -75,6 +75,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'La instalación falló. Inténtalo de nuevo o descarga la nueva versión manualmente desde GitHub.';
 
   @override
+  String get settingsUpdateInstallErrorPermission =>
+      'Hickory no tiene acceso de escritura a su carpeta de instalación. Muévela a una ubicación con permisos de escritura o actualízala manualmente desde GitHub.';
+
+  @override
   String get syncTitle => 'Ajustes de sincronización';
 
   @override

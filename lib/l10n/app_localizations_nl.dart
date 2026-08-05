@@ -75,6 +75,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Installatie mislukt. Probeer het opnieuw of download de nieuwe versie handmatig van GitHub.';
 
   @override
+  String get settingsUpdateInstallErrorPermission =>
+      'Hickory heeft geen schrijftoegang tot de installatiemap. Verplaats de app naar een locatie waar je wel kunt schrijven, of werk handmatig bij via GitHub.';
+
+  @override
   String get syncTitle => 'Synchronisatie-instellingen';
 
   @override

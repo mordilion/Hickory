@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix the Settings screen not being scrollable when its content overflows the window.
+- Fix the in-app updater silently relaunching the unchanged app on macOS/Windows when it can't write to the install directory; it now fails with a clear, actionable message before quitting instead.
 
 ## [1.0.0] - 2026-07-14
 

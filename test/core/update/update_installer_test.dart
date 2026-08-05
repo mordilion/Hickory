@@ -76,6 +76,8 @@ void main() {
     () async {
       final zipBytes = buildFixtureZip();
       final checksum = sha256.convert(zipBytes).toString();
+      final installParent = Directory(p.join(fakeTempDir.path, 'installed'))
+        ..createSync(recursive: true);
       final installer = UpdateInstaller(
         httpClient: MockClient((request) async {
           if (request.url.path.endsWith('.sha256')) {
@@ -83,6 +85,7 @@ void main() {
           }
           return http.Response.bytes(zipBytes, 200);
         }),
+        installDirOverride: Directory(p.join(installParent.path, 'Hickory.app')),
       );
 
       final topLevel = await installer.prepareUpdate(update);
@@ -150,4 +153,35 @@ void main() {
       throwsA(isA<UpdateInstallException>()),
     );
   });
+
+  test(
+    'prepareUpdate throws UpdateInstallPermissionException when the install '
+    "directory's parent can't be written to",
+    () async {
+      final zipBytes = buildFixtureZip();
+      final checksum = sha256.convert(zipBytes).toString();
+      // A parent that doesn't exist on disk can never accept the write
+      // probe -- a deterministic, cross-platform stand-in for the real
+      // trigger (e.g. /Applications without admin rights), which can't be
+      // simulated portably since CI often runs as root/admin and bypasses
+      // permission bits entirely.
+      final missingParent = Directory(
+        p.join(fakeTempDir.path, 'missing_parent', 'nested'),
+      );
+      final installer = UpdateInstaller(
+        httpClient: MockClient((request) async {
+          if (request.url.path.endsWith('.sha256')) {
+            return http.Response(checksum, 200);
+          }
+          return http.Response.bytes(zipBytes, 200);
+        }),
+        installDirOverride: Directory(p.join(missingParent.path, 'Hickory.app')),
+      );
+
+      expect(
+        () => installer.prepareUpdate(update),
+        throwsA(isA<UpdateInstallPermissionException>()),
+      );
+    },
+  );
 }
