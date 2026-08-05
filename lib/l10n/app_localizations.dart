@@ -676,6 +676,36 @@ abstract class AppLocalizations {
   /// **'Zählt die über den Pause-Button pausierte Zeit zusätzlich zu Lücken zwischen Einträgen als Pause.'**
   String get settingsBreakRuleIncludePausedTimeDescription;
 
+  /// No description provided for @settingsProjectsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Projekte'**
+  String get settingsProjectsTitle;
+
+  /// No description provided for @settingsProjectsDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Projekte anlegen, bearbeiten und archivieren.'**
+  String get settingsProjectsDescription;
+
+  /// No description provided for @settingsProjectsAddLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Projekt hinzufügen'**
+  String get settingsProjectsAddLabel;
+
+  /// No description provided for @settingsProjectsArchivedSection.
+  ///
+  /// In de, this message translates to:
+  /// **'Archivierte Projekte'**
+  String get settingsProjectsArchivedSection;
+
+  /// No description provided for @settingsProjectsSaveError.
+  ///
+  /// In de, this message translates to:
+  /// **'Änderung konnte nicht gespeichert werden.'**
+  String get settingsProjectsSaveError;
+
   /// No description provided for @projectsNewProjectTitle.
   ///
   /// In de, this message translates to:
@@ -693,6 +723,48 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Erstellen'**
   String get projectsCreateButton;
+
+  /// No description provided for @projectsEditTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Projekt bearbeiten'**
+  String get projectsEditTitle;
+
+  /// No description provided for @projectsBillableLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Abrechenbar'**
+  String get projectsBillableLabel;
+
+  /// No description provided for @projectsHourlyRateLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Stundensatz'**
+  String get projectsHourlyRateLabel;
+
+  /// No description provided for @projectsCurrencyLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Währung'**
+  String get projectsCurrencyLabel;
+
+  /// No description provided for @projectsArchiveTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Archivieren'**
+  String get projectsArchiveTooltip;
+
+  /// No description provided for @projectsUnarchiveTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Reaktivieren'**
+  String get projectsUnarchiveTooltip;
+
+  /// No description provided for @projectsInvalidRateError.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte einen gültigen Betrag eingeben.'**
+  String get projectsInvalidRateError;
 
   /// No description provided for @reportsTitle.
   ///

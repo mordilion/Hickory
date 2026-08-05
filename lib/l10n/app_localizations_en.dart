@@ -328,6 +328,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'Counts time paused via the Timer\'s pause button toward break time, in addition to gaps between entries.';
 
   @override
+  String get settingsProjectsTitle => 'Projects';
+
+  @override
+  String get settingsProjectsDescription =>
+      'Create, edit, and archive projects.';
+
+  @override
+  String get settingsProjectsAddLabel => 'Add project';
+
+  @override
+  String get settingsProjectsArchivedSection => 'Archived projects';
+
+  @override
+  String get settingsProjectsSaveError => 'Could not save the change.';
+
+  @override
   String get projectsNewProjectTitle => 'New project';
 
   @override
@@ -335,6 +351,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get projectsCreateButton => 'Create';
+
+  @override
+  String get projectsEditTitle => 'Edit project';
+
+  @override
+  String get projectsBillableLabel => 'Billable';
+
+  @override
+  String get projectsHourlyRateLabel => 'Hourly rate';
+
+  @override
+  String get projectsCurrencyLabel => 'Currency';
+
+  @override
+  String get projectsArchiveTooltip => 'Archive';
+
+  @override
+  String get projectsUnarchiveTooltip => 'Reactivate';
+
+  @override
+  String get projectsInvalidRateError => 'Please enter a valid amount.';
 
   @override
   String get reportsTitle => 'Reports';

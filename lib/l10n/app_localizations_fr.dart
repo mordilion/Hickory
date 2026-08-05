@@ -333,6 +333,23 @@ class AppLocalizationsFr extends AppLocalizations {
       'Compte le temps mis en pause via le bouton pause comme pause, en plus des écarts entre les entrées.';
 
   @override
+  String get settingsProjectsTitle => 'Projets';
+
+  @override
+  String get settingsProjectsDescription =>
+      'Créer, modifier et archiver des projets.';
+
+  @override
+  String get settingsProjectsAddLabel => 'Ajouter un projet';
+
+  @override
+  String get settingsProjectsArchivedSection => 'Projets archivés';
+
+  @override
+  String get settingsProjectsSaveError =>
+      'Impossible d\'enregistrer la modification.';
+
+  @override
   String get projectsNewProjectTitle => 'Nouveau projet';
 
   @override
@@ -340,6 +357,27 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get projectsCreateButton => 'Créer';
+
+  @override
+  String get projectsEditTitle => 'Modifier le projet';
+
+  @override
+  String get projectsBillableLabel => 'Facturable';
+
+  @override
+  String get projectsHourlyRateLabel => 'Taux horaire';
+
+  @override
+  String get projectsCurrencyLabel => 'Devise';
+
+  @override
+  String get projectsArchiveTooltip => 'Archiver';
+
+  @override
+  String get projectsUnarchiveTooltip => 'Réactiver';
+
+  @override
+  String get projectsInvalidRateError => 'Veuillez saisir un montant valide.';
 
   @override
   String get reportsTitle => 'Rapports';

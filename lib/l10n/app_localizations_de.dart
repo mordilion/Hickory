@@ -330,6 +330,23 @@ class AppLocalizationsDe extends AppLocalizations {
       'Zählt die über den Pause-Button pausierte Zeit zusätzlich zu Lücken zwischen Einträgen als Pause.';
 
   @override
+  String get settingsProjectsTitle => 'Projekte';
+
+  @override
+  String get settingsProjectsDescription =>
+      'Projekte anlegen, bearbeiten und archivieren.';
+
+  @override
+  String get settingsProjectsAddLabel => 'Projekt hinzufügen';
+
+  @override
+  String get settingsProjectsArchivedSection => 'Archivierte Projekte';
+
+  @override
+  String get settingsProjectsSaveError =>
+      'Änderung konnte nicht gespeichert werden.';
+
+  @override
   String get projectsNewProjectTitle => 'Neues Projekt';
 
   @override
@@ -337,6 +354,28 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get projectsCreateButton => 'Erstellen';
+
+  @override
+  String get projectsEditTitle => 'Projekt bearbeiten';
+
+  @override
+  String get projectsBillableLabel => 'Abrechenbar';
+
+  @override
+  String get projectsHourlyRateLabel => 'Stundensatz';
+
+  @override
+  String get projectsCurrencyLabel => 'Währung';
+
+  @override
+  String get projectsArchiveTooltip => 'Archivieren';
+
+  @override
+  String get projectsUnarchiveTooltip => 'Reaktivieren';
+
+  @override
+  String get projectsInvalidRateError =>
+      'Bitte einen gültigen Betrag eingeben.';
 
   @override
   String get reportsTitle => 'Reports';

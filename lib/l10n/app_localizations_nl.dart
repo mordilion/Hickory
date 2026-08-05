@@ -331,6 +331,23 @@ class AppLocalizationsNl extends AppLocalizations {
       'Telt de tijd die via de pauzeknop is gepauzeerd mee als pauze, naast de hiaten tussen items.';
 
   @override
+  String get settingsProjectsTitle => 'Projecten';
+
+  @override
+  String get settingsProjectsDescription =>
+      'Projecten aanmaken, bewerken en archiveren.';
+
+  @override
+  String get settingsProjectsAddLabel => 'Project toevoegen';
+
+  @override
+  String get settingsProjectsArchivedSection => 'Gearchiveerde projecten';
+
+  @override
+  String get settingsProjectsSaveError =>
+      'Wijziging kon niet worden opgeslagen.';
+
+  @override
   String get projectsNewProjectTitle => 'Nieuw project';
 
   @override
@@ -338,6 +355,27 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get projectsCreateButton => 'Aanmaken';
+
+  @override
+  String get projectsEditTitle => 'Project bewerken';
+
+  @override
+  String get projectsBillableLabel => 'Factureerbaar';
+
+  @override
+  String get projectsHourlyRateLabel => 'Uurtarief';
+
+  @override
+  String get projectsCurrencyLabel => 'Valuta';
+
+  @override
+  String get projectsArchiveTooltip => 'Archiveren';
+
+  @override
+  String get projectsUnarchiveTooltip => 'Heractiveren';
+
+  @override
+  String get projectsInvalidRateError => 'Voer een geldig bedrag in.';
 
   @override
   String get reportsTitle => 'Rapporten';
