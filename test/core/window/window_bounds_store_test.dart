@@ -40,4 +40,12 @@ void main() {
     final store = WindowBoundsStore(supportDirectory: tempDir);
     expect(await store.read(), isNull);
   });
+
+  test('read returns null for structurally-valid JSON with a non-positive size', () async {
+    final file = File('${tempDir.path}/window_bounds.json');
+    await file.writeAsString('{"x":0,"y":0,"width":0,"height":0}');
+
+    final store = WindowBoundsStore(supportDirectory: tempDir);
+    expect(await store.read(), isNull);
+  });
 }

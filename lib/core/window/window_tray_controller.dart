@@ -48,10 +48,18 @@ class WindowTrayController with WindowListener, TrayListener {
 
     await windowManager.ensureInitialized();
 
-    final supportDir = await getApplicationSupportDirectory();
-    final boundsStore = WindowBoundsStore(supportDirectory: supportDir);
-    _boundsStore = boundsStore;
-    final savedBounds = await boundsStore.read();
+    Rect? savedBounds;
+    try {
+      final supportDir = await getApplicationSupportDirectory();
+      final boundsStore = WindowBoundsStore(supportDirectory: supportDir);
+      _boundsStore = boundsStore;
+      savedBounds = await boundsStore.read();
+    } catch (e) {
+      // Best-effort, same reasoning as _persistBounds below: startup must
+      // never block on this. _boundsStore stays null, so later resize/move
+      // events also no-op instead of retrying a broken path repeatedly.
+      debugPrint('Window bounds unavailable, using defaults: $e');
+    }
 
     // Deliberately not awaited: per window_manager's documented pattern,
     // this runs concurrently with Flutter building its first frame (which

@@ -18,18 +18,27 @@ class WindowBoundsStore {
 
   File get _boundsFile => File(p.join(supportDirectory.path, 'window_bounds.json'));
 
-  /// Returns null if no bounds have been saved yet, or the file can't be
-  /// read/parsed (e.g. a partial write) -- callers fall back to defaults.
+  /// Returns null if no bounds have been saved yet, the file can't be
+  /// read/parsed (e.g. a partial write), or the saved width/height aren't
+  /// usable (non-finite or non-positive) -- callers fall back to defaults
+  /// in every case rather than applying a broken size to the real window.
   Future<Rect?> read() async {
     try {
       final content = await _boundsFile.readAsString();
       final json = jsonDecode(content) as Map<String, dynamic>;
-      return Rect.fromLTWH(
+      final rect = Rect.fromLTWH(
         (json['x'] as num).toDouble(),
         (json['y'] as num).toDouble(),
         (json['width'] as num).toDouble(),
         (json['height'] as num).toDouble(),
       );
+      final isUsable = rect.width.isFinite &&
+          rect.height.isFinite &&
+          rect.width > 0 &&
+          rect.height > 0 &&
+          rect.left.isFinite &&
+          rect.top.isFinite;
+      return isUsable ? rect : null;
     } on Object {
       return null;
     }
