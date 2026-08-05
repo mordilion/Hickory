@@ -298,6 +298,107 @@ abstract class AppLocalizations {
   /// **'{created} erstellt, {updated} aktualisiert, {deleted} gelöscht, {failed} fehlgeschlagen.'**
   String syncJiraSyncResult(int created, int updated, int deleted, int failed);
 
+  /// No description provided for @syncPersonioSectionTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Personio-Integration'**
+  String get syncPersonioSectionTitle;
+
+  /// No description provided for @syncPersonioClientIdLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Client ID'**
+  String get syncPersonioClientIdLabel;
+
+  /// No description provided for @syncPersonioClientSecretLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Client Secret'**
+  String get syncPersonioClientSecretLabel;
+
+  /// No description provided for @syncPersonioEmployeeIdLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Mitarbeiter-ID'**
+  String get syncPersonioEmployeeIdLabel;
+
+  /// No description provided for @syncPersonioSaveCredentialsButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Zugangsdaten speichern'**
+  String get syncPersonioSaveCredentialsButton;
+
+  /// No description provided for @syncPersonioCredentialsSaved.
+  ///
+  /// In de, this message translates to:
+  /// **'Zugangsdaten gespeichert.'**
+  String get syncPersonioCredentialsSaved;
+
+  /// No description provided for @syncPersonioTestConnectionButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Verbindung testen'**
+  String get syncPersonioTestConnectionButton;
+
+  /// No description provided for @syncPersonioTestConnectionSuccess.
+  ///
+  /// In de, this message translates to:
+  /// **'Verbindung erfolgreich.'**
+  String get syncPersonioTestConnectionSuccess;
+
+  /// No description provided for @syncPersonioTestConnectionFailure.
+  ///
+  /// In de, this message translates to:
+  /// **'Verbindung fehlgeschlagen. Bitte Zugangsdaten prüfen.'**
+  String get syncPersonioTestConnectionFailure;
+
+  /// No description provided for @syncPersonioNotConfigured.
+  ///
+  /// In de, this message translates to:
+  /// **'Personio ist noch nicht konfiguriert.'**
+  String get syncPersonioNotConfigured;
+
+  /// No description provided for @syncPersonioInvalidCredentials.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte gib Client ID, Client Secret und Mitarbeiter-ID an.'**
+  String get syncPersonioInvalidCredentials;
+
+  /// No description provided for @syncPersonioUnexpectedError.
+  ///
+  /// In de, this message translates to:
+  /// **'Es ist ein Fehler aufgetreten. Bitte versuche es erneut.'**
+  String get syncPersonioUnexpectedError;
+
+  /// No description provided for @syncPersonioFromLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Von'**
+  String get syncPersonioFromLabel;
+
+  /// No description provided for @syncPersonioToLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Bis'**
+  String get syncPersonioToLabel;
+
+  /// No description provided for @syncPersonioPushButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeiten nach Personio pushen'**
+  String get syncPersonioPushButton;
+
+  /// No description provided for @syncPersonioPushResult.
+  ///
+  /// In de, this message translates to:
+  /// **'{created} erstellt, {updated} aktualisiert, {deleted} gelöscht, {failed} fehlgeschlagen.'**
+  String syncPersonioPushResult(
+    int created,
+    int updated,
+    int deleted,
+    int failed,
+  );
+
   /// No description provided for @navTimer.
   ///
   /// In de, this message translates to:

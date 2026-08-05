@@ -121,6 +121,65 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get syncPersonioSectionTitle => 'Personio-integratie';
+
+  @override
+  String get syncPersonioClientIdLabel => 'Client ID';
+
+  @override
+  String get syncPersonioClientSecretLabel => 'Client Secret';
+
+  @override
+  String get syncPersonioEmployeeIdLabel => 'Werknemers-ID';
+
+  @override
+  String get syncPersonioSaveCredentialsButton => 'Gegevens opslaan';
+
+  @override
+  String get syncPersonioCredentialsSaved => 'Gegevens opgeslagen.';
+
+  @override
+  String get syncPersonioTestConnectionButton => 'Verbinding testen';
+
+  @override
+  String get syncPersonioTestConnectionSuccess => 'Verbinding gelukt.';
+
+  @override
+  String get syncPersonioTestConnectionFailure =>
+      'Verbinding mislukt. Controleer je gegevens.';
+
+  @override
+  String get syncPersonioNotConfigured =>
+      'Personio is nog niet geconfigureerd.';
+
+  @override
+  String get syncPersonioInvalidCredentials =>
+      'Voer Client ID, Client Secret en werknemers-ID in.';
+
+  @override
+  String get syncPersonioUnexpectedError =>
+      'Er is iets misgegaan. Probeer het opnieuw.';
+
+  @override
+  String get syncPersonioFromLabel => 'Van';
+
+  @override
+  String get syncPersonioToLabel => 'Tot';
+
+  @override
+  String get syncPersonioPushButton => 'Naar Personio pushen';
+
+  @override
+  String syncPersonioPushResult(
+    int created,
+    int updated,
+    int deleted,
+    int failed,
+  ) {
+    return '$created aangemaakt, $updated bijgewerkt, $deleted verwijderd, $failed mislukt.';
+  }
+
+  @override
   String get navTimer => 'Timer';
 
   @override

@@ -60,6 +60,30 @@
       "failed": { "type": "int" }
     }
   },
+  "syncPersonioSectionTitle": "Personio-Integration",
+  "syncPersonioClientIdLabel": "Client ID",
+  "syncPersonioClientSecretLabel": "Client Secret",
+  "syncPersonioEmployeeIdLabel": "Mitarbeiter-ID",
+  "syncPersonioSaveCredentialsButton": "Zugangsdaten speichern",
+  "syncPersonioCredentialsSaved": "Zugangsdaten gespeichert.",
+  "syncPersonioTestConnectionButton": "Verbindung testen",
+  "syncPersonioTestConnectionSuccess": "Verbindung erfolgreich.",
+  "syncPersonioTestConnectionFailure": "Verbindung fehlgeschlagen. Bitte Zugangsdaten prüfen.",
+  "syncPersonioNotConfigured": "Personio ist noch nicht konfiguriert.",
+  "syncPersonioInvalidCredentials": "Bitte gib Client ID, Client Secret und Mitarbeiter-ID an.",
+  "syncPersonioUnexpectedError": "Es ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+  "syncPersonioFromLabel": "Von",
+  "syncPersonioToLabel": "Bis",
+  "syncPersonioPushButton": "Zeiten nach Personio pushen",
+  "syncPersonioPushResult": "{created} erstellt, {updated} aktualisiert, {deleted} gelöscht, {failed} fehlgeschlagen.",
+  "@syncPersonioPushResult": {
+    "placeholders": {
+      "created": { "type": "int" },
+      "updated": { "type": "int" },
+      "deleted": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "navTimer": "Timer",
   "navReports": "Reports",
   "navSync": "Sync",

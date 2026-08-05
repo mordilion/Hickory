@@ -120,6 +120,65 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get syncPersonioSectionTitle => 'Personio-Integration';
+
+  @override
+  String get syncPersonioClientIdLabel => 'Client ID';
+
+  @override
+  String get syncPersonioClientSecretLabel => 'Client Secret';
+
+  @override
+  String get syncPersonioEmployeeIdLabel => 'Mitarbeiter-ID';
+
+  @override
+  String get syncPersonioSaveCredentialsButton => 'Zugangsdaten speichern';
+
+  @override
+  String get syncPersonioCredentialsSaved => 'Zugangsdaten gespeichert.';
+
+  @override
+  String get syncPersonioTestConnectionButton => 'Verbindung testen';
+
+  @override
+  String get syncPersonioTestConnectionSuccess => 'Verbindung erfolgreich.';
+
+  @override
+  String get syncPersonioTestConnectionFailure =>
+      'Verbindung fehlgeschlagen. Bitte Zugangsdaten prüfen.';
+
+  @override
+  String get syncPersonioNotConfigured =>
+      'Personio ist noch nicht konfiguriert.';
+
+  @override
+  String get syncPersonioInvalidCredentials =>
+      'Bitte gib Client ID, Client Secret und Mitarbeiter-ID an.';
+
+  @override
+  String get syncPersonioUnexpectedError =>
+      'Es ist ein Fehler aufgetreten. Bitte versuche es erneut.';
+
+  @override
+  String get syncPersonioFromLabel => 'Von';
+
+  @override
+  String get syncPersonioToLabel => 'Bis';
+
+  @override
+  String get syncPersonioPushButton => 'Zeiten nach Personio pushen';
+
+  @override
+  String syncPersonioPushResult(
+    int created,
+    int updated,
+    int deleted,
+    int failed,
+  ) {
+    return '$created erstellt, $updated aktualisiert, $deleted gelöscht, $failed fehlgeschlagen.';
+  }
+
+  @override
   String get navTimer => 'Timer';
 
   @override

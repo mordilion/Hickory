@@ -40,6 +40,30 @@
       "failed": { "type": "int" }
     }
   },
+  "syncPersonioSectionTitle": "Integrazione Personio",
+  "syncPersonioClientIdLabel": "Client ID",
+  "syncPersonioClientSecretLabel": "Client Secret",
+  "syncPersonioEmployeeIdLabel": "ID dipendente",
+  "syncPersonioSaveCredentialsButton": "Salva credenziali",
+  "syncPersonioCredentialsSaved": "Credenziali salvate.",
+  "syncPersonioTestConnectionButton": "Verifica connessione",
+  "syncPersonioTestConnectionSuccess": "Connessione riuscita.",
+  "syncPersonioTestConnectionFailure": "Connessione fallita. Controlla le credenziali.",
+  "syncPersonioNotConfigured": "Personio non è ancora configurato.",
+  "syncPersonioInvalidCredentials": "Inserisci Client ID, Client Secret e ID dipendente.",
+  "syncPersonioUnexpectedError": "Si è verificato un errore. Riprova.",
+  "syncPersonioFromLabel": "Da",
+  "syncPersonioToLabel": "A",
+  "syncPersonioPushButton": "Invia a Personio",
+  "syncPersonioPushResult": "{created} creati, {updated} aggiornati, {deleted} eliminati, {failed} falliti.",
+  "@syncPersonioPushResult": {
+    "placeholders": {
+      "created": { "type": "int" },
+      "updated": { "type": "int" },
+      "deleted": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "navTimer": "Timer",
   "navReports": "Report",
   "navSync": "Sincronizzazione",

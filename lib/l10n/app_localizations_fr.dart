@@ -121,6 +121,66 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get syncPersonioSectionTitle => 'Intégration Personio';
+
+  @override
+  String get syncPersonioClientIdLabel => 'Client ID';
+
+  @override
+  String get syncPersonioClientSecretLabel => 'Client Secret';
+
+  @override
+  String get syncPersonioEmployeeIdLabel => 'ID employé';
+
+  @override
+  String get syncPersonioSaveCredentialsButton =>
+      'Enregistrer les identifiants';
+
+  @override
+  String get syncPersonioCredentialsSaved => 'Identifiants enregistrés.';
+
+  @override
+  String get syncPersonioTestConnectionButton => 'Tester la connexion';
+
+  @override
+  String get syncPersonioTestConnectionSuccess => 'Connexion réussie.';
+
+  @override
+  String get syncPersonioTestConnectionFailure =>
+      'Échec de la connexion. Veuillez vérifier vos identifiants.';
+
+  @override
+  String get syncPersonioNotConfigured =>
+      'Personio n\'est pas encore configuré.';
+
+  @override
+  String get syncPersonioInvalidCredentials =>
+      'Veuillez saisir le Client ID, le Client Secret et l\'ID employé.';
+
+  @override
+  String get syncPersonioUnexpectedError =>
+      'Une erreur s\'est produite. Veuillez réessayer.';
+
+  @override
+  String get syncPersonioFromLabel => 'Du';
+
+  @override
+  String get syncPersonioToLabel => 'Au';
+
+  @override
+  String get syncPersonioPushButton => 'Envoyer vers Personio';
+
+  @override
+  String syncPersonioPushResult(
+    int created,
+    int updated,
+    int deleted,
+    int failed,
+  ) {
+    return '$created créé(s), $updated mis à jour, $deleted supprimé(s), $failed échoué(s).';
+  }
+
+  @override
   String get navTimer => 'Minuteur';
 
   @override

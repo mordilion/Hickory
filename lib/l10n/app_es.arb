@@ -40,6 +40,30 @@
       "failed": { "type": "int" }
     }
   },
+  "syncPersonioSectionTitle": "Integración con Personio",
+  "syncPersonioClientIdLabel": "Client ID",
+  "syncPersonioClientSecretLabel": "Client Secret",
+  "syncPersonioEmployeeIdLabel": "ID de empleado",
+  "syncPersonioSaveCredentialsButton": "Guardar credenciales",
+  "syncPersonioCredentialsSaved": "Credenciales guardadas.",
+  "syncPersonioTestConnectionButton": "Probar conexión",
+  "syncPersonioTestConnectionSuccess": "Conexión exitosa.",
+  "syncPersonioTestConnectionFailure": "Conexión fallida. Por favor, verifica tus credenciales.",
+  "syncPersonioNotConfigured": "Personio aún no está configurado.",
+  "syncPersonioInvalidCredentials": "Introduce el Client ID, el Client Secret y el ID de empleado.",
+  "syncPersonioUnexpectedError": "Algo salió mal. Por favor, inténtalo de nuevo.",
+  "syncPersonioFromLabel": "Desde",
+  "syncPersonioToLabel": "Hasta",
+  "syncPersonioPushButton": "Enviar a Personio",
+  "syncPersonioPushResult": "{created} creado(s), {updated} actualizado(s), {deleted} eliminado(s), {failed} fallido(s).",
+  "@syncPersonioPushResult": {
+    "placeholders": {
+      "created": { "type": "int" },
+      "updated": { "type": "int" },
+      "deleted": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "navTimer": "Temporizador",
   "navReports": "Informes",
   "navSync": "Sincronización",
