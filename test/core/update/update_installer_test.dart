@@ -157,6 +157,11 @@ void main() {
   test(
     'prepareUpdate throws UpdateInstallPermissionException when the install '
     "directory's parent can't be written to",
+    skip: Platform.isMacOS || Platform.isWindows
+        ? null
+        : 'prepareUpdate only supports macOS and Windows; the CI test job '
+              'runs on ubuntu-latest, where it throws before reaching this '
+              'behavior.',
     () async {
       final zipBytes = buildFixtureZip();
       final checksum = sha256.convert(zipBytes).toString();
