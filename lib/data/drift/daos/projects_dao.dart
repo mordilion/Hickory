@@ -54,4 +54,41 @@ class ProjectsDao extends DatabaseAccessor<AppDatabase> with _$ProjectsDaoMixin 
       ProjectsCompanion(archived: const Value(true), updatedAt: Value(DateTime.now().toUtc())),
     );
   }
+
+  Future<void> unarchiveProject(String id) {
+    return (update(projects)..where((p) => p.id.equals(id))).write(
+      ProjectsCompanion(archived: const Value(false), updatedAt: Value(DateTime.now().toUtc())),
+    );
+  }
+
+  /// Partial update: every parameter left as [Value.absent] keeps that
+  /// column's current value -- same shape as [TimeEntriesDao.updateEntry].
+  Future<void> updateProject(
+    String id, {
+    Value<String> name = const Value.absent(),
+    Value<String> colorHex = const Value.absent(),
+    Value<bool> billable = const Value.absent(),
+    Value<int?> hourlyRateCents = const Value.absent(),
+    Value<String?> currency = const Value.absent(),
+  }) {
+    return (update(projects)..where((p) => p.id.equals(id))).write(
+      ProjectsCompanion(
+        name: name,
+        colorHex: colorHex,
+        billable: billable,
+        hourlyRateCents: hourlyRateCents,
+        currency: currency,
+        updatedAt: Value(DateTime.now().toUtc()),
+      ),
+    );
+  }
+
+  /// Same shape as [watchActiveProjects] but the inverse filter -- backs the
+  /// Settings project manager's "Archived projects" section.
+  Stream<List<Project>> watchArchivedProjects() {
+    return (select(projects)
+          ..where((p) => p.archived.equals(true))
+          ..orderBy([(p) => OrderingTerm.asc(p.name)]))
+        .watch();
+  }
 }
