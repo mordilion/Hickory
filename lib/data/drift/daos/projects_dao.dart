@@ -91,4 +91,6 @@ class ProjectsDao extends DatabaseAccessor<AppDatabase> with _$ProjectsDaoMixin 
           ..orderBy([(p) => OrderingTerm.asc(p.name)]))
         .watch();
   }
+
+  Future<void> deleteProject(String id) => (delete(projects)..where((p) => p.id.equals(id))).go();
 }

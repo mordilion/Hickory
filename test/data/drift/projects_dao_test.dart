@@ -86,4 +86,13 @@ void main() {
     expect(archived.map((p) => p.name), ['Alpha', 'Zeta']);
     expect(archived.any((p) => p.id == active.id), isFalse);
   });
+
+  test('deleteProject removes the row', () async {
+    final project = await db.projectsDao.createProject(name: 'Website Relaunch', colorHex: '#5B8DEF');
+
+    await db.projectsDao.deleteProject(project.id);
+
+    final remaining = await (db.select(db.projects)..where((p) => p.id.equals(project.id))).get();
+    expect(remaining, isEmpty);
+  });
 }
