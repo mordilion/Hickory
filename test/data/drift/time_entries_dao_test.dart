@@ -92,4 +92,28 @@ void main() {
 
     expect(running?.id, entry.id);
   });
+
+  test('hasEntriesForProject returns true when an entry references the project', () async {
+    final project = await db.projectsDao.createProject(name: 'Website Relaunch', colorHex: '#5B8DEF');
+    await db.timeEntriesDao.startEntry(deviceId: 'dev_a', projectId: project.id);
+
+    final result = await db.timeEntriesDao.hasEntriesForProject(project.id);
+
+    expect(result, isTrue);
+  });
+
+  test('hasEntriesForProject returns false when no entry references the project', () async {
+    final project = await db.projectsDao.createProject(name: 'Website Relaunch', colorHex: '#5B8DEF');
+    await db.timeEntriesDao.startEntry(deviceId: 'dev_a', projectId: null);
+
+    final result = await db.timeEntriesDao.hasEntriesForProject(project.id);
+
+    expect(result, isFalse);
+  });
+
+  test('hasEntriesForProject returns false for a project id that has no rows at all', () async {
+    final result = await db.timeEntriesDao.hasEntriesForProject('missing-project-id');
+
+    expect(result, isFalse);
+  });
 }

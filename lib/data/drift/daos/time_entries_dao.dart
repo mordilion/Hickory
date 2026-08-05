@@ -148,4 +148,15 @@ class TimeEntriesDao extends DatabaseAccessor<AppDatabase> with _$TimeEntriesDao
   Future<void> deleteEntry(String id) {
     return (delete(timeEntries)..where((t) => t.id.equals(id))).go();
   }
+
+  /// Used by [SyncedWrites.deleteProject] to block hard-deleting a project
+  /// that still has history -- archiving is the removal path once a
+  /// project has entries.
+  Future<bool> hasEntriesForProject(String projectId) async {
+    final row = await (select(timeEntries)
+          ..where((t) => t.projectId.equals(projectId))
+          ..limit(1))
+        .getSingleOrNull();
+    return row != null;
+  }
 }
