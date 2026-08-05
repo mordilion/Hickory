@@ -6,6 +6,7 @@ import '../../core/di/autostart_service.dart';
 import '../../core/di/sync_providers.dart';
 import '../../core/format/date_format.dart';
 import '../../l10n/app_localizations.dart';
+import '../projects/projects_editor.dart';
 import 'break_rule_tiers_editor.dart';
 import 'language_dropdown.dart';
 import 'quick_add_durations_editor.dart';
@@ -146,6 +147,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             child: Padding(
               padding: EdgeInsets.all(16),
               child: BreakRuleTiersEditor(),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Card(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: ProjectsEditor(),
             ),
           ),
         ],

@@ -10,3 +10,7 @@ import '../../data/drift/database.dart';
 final activeProjectsProvider = StreamProvider<List<Project>>((ref) {
   return ref.watch(appDatabaseProvider).projectsDao.watchActiveProjects();
 });
+
+final archivedProjectsProvider = StreamProvider<List<Project>>((ref) {
+  return ref.watch(appDatabaseProvider).projectsDao.watchArchivedProjects();
+});
