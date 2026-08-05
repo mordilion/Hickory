@@ -8,6 +8,7 @@ import 'package:hickory/core/update/update_checker.dart';
 import 'package:hickory/core/update/update_installer.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:path/path.dart' as p;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -34,26 +35,25 @@ void main() {
     if (fakeTempDir.existsSync()) fakeTempDir.deleteSync(recursive: true);
   });
 
-  /// Builds a zip containing a single top-level "Hickory" directory with a
-  /// fake executable at the platform-appropriate relative path -- the same
-  /// shape ditto/Compress-Archive produce in CI, so prepareUpdate's
-  /// extraction/executable-lookup logic can be tested without a real
-  /// release artifact.
+  /// Builds a fixture zip matching each platform's actual CI archive shape:
+  /// flat on Windows (Compress-Archive globs the release folder's
+  /// *contents*, no wrapping directory), wrapped in a `hickory.app` bundle
+  /// on macOS (ditto --keepParent) -- so prepareUpdate's extraction/
+  /// executable-lookup logic can be tested without a real release artifact.
   List<int> buildFixtureZip({bool withExecutable = true}) {
-    final relativePath = Platform.isWindows
-        ? 'hickory.exe'
-        : 'Contents/MacOS/hickory';
     final archive = Archive();
-    if (withExecutable) {
-      final content = 'fake executable'.codeUnits;
-      archive.addFile(
-        ArchiveFile('Hickory/$relativePath', content.length, content),
-      );
+    if (Platform.isWindows) {
+      final content =
+          (withExecutable ? 'fake executable' : 'unrelated file').codeUnits;
+      final name = withExecutable ? 'hickory.exe' : 'readme.txt';
+      archive.addFile(ArchiveFile(name, content.length, content));
     } else {
-      final content = 'unrelated file'.codeUnits;
-      archive.addFile(
-        ArchiveFile('Hickory/readme.txt', content.length, content),
-      );
+      final content =
+          (withExecutable ? 'fake executable' : 'unrelated file').codeUnits;
+      final name = withExecutable
+          ? 'hickory.app/Contents/MacOS/hickory'
+          : 'hickory.app/readme.txt';
+      archive.addFile(ArchiveFile(name, content.length, content));
     }
     return ZipEncoder().encode(archive);
   }
@@ -83,9 +83,15 @@ void main() {
       final topLevel = await installer.prepareUpdate(update);
 
       expect(topLevel.existsSync(), isTrue);
-      expect(topLevel.path, endsWith('Hickory'));
+      if (Platform.isWindows) {
+        expect(File(p.join(topLevel.path, 'hickory.exe')).existsSync(), isTrue);
+      } else {
+        expect(topLevel.path, endsWith('hickory.app'));
+      }
       addTearDown(() {
-        final workDir = topLevel.parent.parent;
+        final workDir = Platform.isWindows
+            ? topLevel.parent
+            : topLevel.parent.parent;
         if (workDir.existsSync()) workDir.deleteSync(recursive: true);
       });
     },

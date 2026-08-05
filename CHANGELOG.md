@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add a GitHub Actions workflow that analyzes, tests, and builds macOS, Windows, Android, and iOS artifacts on every push to `main` and on demand.
+- Add a tag-triggered release pipeline that publishes SHA256-checksummed macOS and Windows builds as GitHub Releases, plus an in-app updater that checks for new releases on startup and via a manual "Check for updates" button in Settings, and can download, verify, and install them automatically.
 
 ## [1.0.0] - 2026-07-14
 

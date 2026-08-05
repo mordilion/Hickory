@@ -72,7 +72,7 @@ class UpdateInstaller {
     await extractedDir.create(recursive: true);
     await extractFileToDisk(zipFile.path, extractedDir.path);
 
-    final topLevel = _firstSubdirectory(extractedDir);
+    final topLevel = _installRootInside(extractedDir);
     if (topLevel == null) {
       throw UpdateInstallException(
         'Downloaded update archive has an unexpected layout.',
@@ -130,12 +130,20 @@ class UpdateInstaller {
     return response.body;
   }
 
-  /// The zip's single top-level directory -- matches exactly what
-  /// ditto/Compress-Archive produced in CI. Returns null if the archive
-  /// doesn't have that shape.
-  Directory? _firstSubdirectory(Directory parent) {
-    for (final entity in parent.listSync()) {
-      if (entity is Directory) return entity;
+  /// The install root inside the extracted archive. Windows zips are flat
+  /// (Compress-Archive globs the release folder's *contents*, so the
+  /// extraction root itself is the install root); macOS zips wrap the .app
+  /// bundle in a single top-level directory (ditto --keepParent), so it must
+  /// be located by name rather than by listing order -- ditto
+  /// --sequesterRsrc can also emit a sibling __MACOSX/ directory that must
+  /// not be mistaken for the bundle. Returns null if the archive doesn't
+  /// have the expected shape.
+  Directory? _installRootInside(Directory extractedDir) {
+    if (Platform.isWindows) return extractedDir;
+    for (final entity in extractedDir.listSync()) {
+      if (entity is Directory && p.basename(entity.path).endsWith('.app')) {
+        return entity;
+      }
     }
     return null;
   }
@@ -169,12 +177,18 @@ class UpdateInstaller {
       final scriptFile = File(p.join(tempDir.path, 'hickory_update.ps1'));
       final exePath = p.join(installDir.path, 'hickory.exe');
       await scriptFile.writeAsString('''
-Wait-Process -Id $currentPid -Timeout 30 -ErrorAction SilentlyContinue
+Wait-Process -Id $currentPid -ErrorAction SilentlyContinue
 \$backup = "${installDir.path}_old"
 if (Test-Path \$backup) { Remove-Item \$backup -Recurse -Force }
-Rename-Item -Path "${installDir.path}" -NewName (Split-Path \$backup -Leaf)
-Move-Item -Path "${extractedTopLevel.path}" -Destination "${installDir.path}"
-Remove-Item \$backup -Recurse -Force
+try {
+    Rename-Item -Path "${installDir.path}" -NewName (Split-Path \$backup -Leaf) -ErrorAction Stop
+    Move-Item -Path "${extractedTopLevel.path}" -Destination "${installDir.path}" -ErrorAction Stop
+    Remove-Item \$backup -Recurse -Force
+} catch {
+    if (-not (Test-Path "${installDir.path}") -and (Test-Path \$backup)) {
+        Rename-Item -Path \$backup -NewName (Split-Path "${installDir.path}" -Leaf)
+    }
+}
 Start-Process -FilePath "$exePath"
 Remove-Item -Path \$MyInvocation.MyCommand.Path -Force
 ''');
@@ -187,9 +201,13 @@ Remove-Item -Path \$MyInvocation.MyCommand.Path -Force
 while kill -0 $currentPid 2>/dev/null; do sleep 0.5; done
 BACKUP="${installDir.path}_old"
 rm -rf "\$BACKUP"
-mv "${installDir.path}" "\$BACKUP"
-mv "${extractedTopLevel.path}" "${installDir.path}"
-rm -rf "\$BACKUP"
+if mv "${installDir.path}" "\$BACKUP" && mv "${extractedTopLevel.path}" "${installDir.path}"; then
+  rm -rf "\$BACKUP"
+else
+  if [ ! -e "${installDir.path}" ] && [ -e "\$BACKUP" ]; then
+    mv "\$BACKUP" "${installDir.path}"
+  fi
+fi
 open "${installDir.path}"
 rm -- "\$0"
 ''');
