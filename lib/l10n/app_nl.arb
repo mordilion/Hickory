@@ -193,5 +193,13 @@
   "csvNo": "nee",
   "entriesJiraStatusSynced": "Geboekt in Jira",
   "entriesJiraStatusPending": "Jira-boeking in behandeling",
-  "entriesJiraStatusError": "Jira-boeking mislukt"
+  "entriesJiraStatusError": "Jira-boeking mislukt",
+  "settingsResetTitle": "Resetten",
+  "settingsResetDescription": "Verwijdert alle lokale gegevens van dit apparaat (projecten, klanten, tijdregistraties, instellingen, Jira-/Personio-koppelingen) en koppelt het los van de synchronisatiemap. Andere apparaten worden niet beïnvloed.",
+  "settingsResetButton": "Alles resetten",
+  "settingsResetConfirmTitle": "Alles echt resetten?",
+  "settingsResetConfirmMessage": "Projecten, klanten, tijdregistraties, instellingen en Jira-/Personio-koppelingen op dit apparaat worden permanent verwijderd, en de verbinding met de synchronisatiemap wordt verwijderd. Dit kan niet ongedaan worden gemaakt.",
+  "settingsResetConfirmButton": "Ja, alles resetten",
+  "settingsResetSuccess": "De app is gereset.",
+  "settingsResetError": "Resetten is mislukt."
 }

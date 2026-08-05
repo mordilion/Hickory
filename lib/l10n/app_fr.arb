@@ -193,5 +193,13 @@
   "csvNo": "non",
   "entriesJiraStatusSynced": "Enregistré dans Jira",
   "entriesJiraStatusPending": "Enregistrement Jira en attente",
-  "entriesJiraStatusError": "Échec de l'enregistrement Jira"
+  "entriesJiraStatusError": "Échec de l'enregistrement Jira",
+  "settingsResetTitle": "Réinitialiser",
+  "settingsResetDescription": "Supprime toutes les données locales de cet appareil (projets, clients, saisies de temps, paramètres, liens Jira/Personio) et le déconnecte du dossier de synchronisation. Les autres appareils ne sont pas concernés.",
+  "settingsResetButton": "Tout réinitialiser",
+  "settingsResetConfirmTitle": "Vraiment tout réinitialiser ?",
+  "settingsResetConfirmMessage": "Les projets, clients, saisies de temps, paramètres et liens Jira/Personio de cet appareil seront définitivement supprimés, et la connexion au dossier de synchronisation sera supprimée. Cette action est irréversible.",
+  "settingsResetConfirmButton": "Oui, tout réinitialiser",
+  "settingsResetSuccess": "L'application a été réinitialisée.",
+  "settingsResetError": "La réinitialisation a échoué."
 }

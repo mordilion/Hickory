@@ -573,4 +573,30 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get entriesJiraStatusError => 'Jira-Buchung fehlgeschlagen';
+
+  @override
+  String get settingsResetTitle => 'Zurücksetzen';
+
+  @override
+  String get settingsResetDescription =>
+      'Löscht alle lokalen Daten dieses Geräts (Projekte, Kunden, Zeiteinträge, Einstellungen, Jira-/Personio-Verknüpfungen) und trennt die Verbindung zum Sync-Ordner. Andere Geräte sind davon nicht betroffen.';
+
+  @override
+  String get settingsResetButton => 'Komplett zurücksetzen';
+
+  @override
+  String get settingsResetConfirmTitle => 'Wirklich alles zurücksetzen?';
+
+  @override
+  String get settingsResetConfirmMessage =>
+      'Projekte, Kunden, Zeiteinträge, Einstellungen und Jira-/Personio-Verknüpfungen auf diesem Gerät werden unwiderruflich gelöscht, und die Verbindung zum Sync-Ordner wird getrennt. Diese Aktion kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get settingsResetConfirmButton => 'Ja, alles zurücksetzen';
+
+  @override
+  String get settingsResetSuccess => 'App wurde zurückgesetzt.';
+
+  @override
+  String get settingsResetError => 'Zurücksetzen fehlgeschlagen.';
 }

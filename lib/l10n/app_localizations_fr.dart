@@ -576,4 +576,30 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get entriesJiraStatusError => 'Échec de l\'enregistrement Jira';
+
+  @override
+  String get settingsResetTitle => 'Réinitialiser';
+
+  @override
+  String get settingsResetDescription =>
+      'Supprime toutes les données locales de cet appareil (projets, clients, saisies de temps, paramètres, liens Jira/Personio) et le déconnecte du dossier de synchronisation. Les autres appareils ne sont pas concernés.';
+
+  @override
+  String get settingsResetButton => 'Tout réinitialiser';
+
+  @override
+  String get settingsResetConfirmTitle => 'Vraiment tout réinitialiser ?';
+
+  @override
+  String get settingsResetConfirmMessage =>
+      'Les projets, clients, saisies de temps, paramètres et liens Jira/Personio de cet appareil seront définitivement supprimés, et la connexion au dossier de synchronisation sera supprimée. Cette action est irréversible.';
+
+  @override
+  String get settingsResetConfirmButton => 'Oui, tout réinitialiser';
+
+  @override
+  String get settingsResetSuccess => 'L\'application a été réinitialisée.';
+
+  @override
+  String get settingsResetError => 'La réinitialisation a échoué.';
 }

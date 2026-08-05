@@ -571,4 +571,30 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get entriesJiraStatusError => 'Registrazione Jira non riuscita';
+
+  @override
+  String get settingsResetTitle => 'Ripristina';
+
+  @override
+  String get settingsResetDescription =>
+      'Elimina tutti i dati locali di questo dispositivo (progetti, clienti, voci di tempo, impostazioni, collegamenti Jira/Personio) e lo disconnette dalla cartella di sincronizzazione. Gli altri dispositivi non vengono interessati.';
+
+  @override
+  String get settingsResetButton => 'Ripristina tutto';
+
+  @override
+  String get settingsResetConfirmTitle => 'Ripristinare davvero tutto?';
+
+  @override
+  String get settingsResetConfirmMessage =>
+      'Progetti, clienti, voci di tempo, impostazioni e collegamenti Jira/Personio su questo dispositivo verranno eliminati definitivamente, e la connessione alla cartella di sincronizzazione verrà rimossa. Questa azione non può essere annullata.';
+
+  @override
+  String get settingsResetConfirmButton => 'Sì, ripristina tutto';
+
+  @override
+  String get settingsResetSuccess => 'L\'app è stata ripristinata.';
+
+  @override
+  String get settingsResetError => 'Ripristino non riuscito.';
 }

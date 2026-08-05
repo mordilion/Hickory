@@ -1112,6 +1112,54 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Jira-Buchung fehlgeschlagen'**
   String get entriesJiraStatusError;
+
+  /// No description provided for @settingsResetTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Zurücksetzen'**
+  String get settingsResetTitle;
+
+  /// No description provided for @settingsResetDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Löscht alle lokalen Daten dieses Geräts (Projekte, Kunden, Zeiteinträge, Einstellungen, Jira-/Personio-Verknüpfungen) und trennt die Verbindung zum Sync-Ordner. Andere Geräte sind davon nicht betroffen.'**
+  String get settingsResetDescription;
+
+  /// No description provided for @settingsResetButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Komplett zurücksetzen'**
+  String get settingsResetButton;
+
+  /// No description provided for @settingsResetConfirmTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Wirklich alles zurücksetzen?'**
+  String get settingsResetConfirmTitle;
+
+  /// No description provided for @settingsResetConfirmMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Projekte, Kunden, Zeiteinträge, Einstellungen und Jira-/Personio-Verknüpfungen auf diesem Gerät werden unwiderruflich gelöscht, und die Verbindung zum Sync-Ordner wird getrennt. Diese Aktion kann nicht rückgängig gemacht werden.'**
+  String get settingsResetConfirmMessage;
+
+  /// No description provided for @settingsResetConfirmButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Ja, alles zurücksetzen'**
+  String get settingsResetConfirmButton;
+
+  /// No description provided for @settingsResetSuccess.
+  ///
+  /// In de, this message translates to:
+  /// **'App wurde zurückgesetzt.'**
+  String get settingsResetSuccess;
+
+  /// No description provided for @settingsResetError.
+  ///
+  /// In de, this message translates to:
+  /// **'Zurücksetzen fehlgeschlagen.'**
+  String get settingsResetError;
 }
 
 class _AppLocalizationsDelegate

@@ -573,4 +573,30 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get entriesJiraStatusError => 'Jira-boeking mislukt';
+
+  @override
+  String get settingsResetTitle => 'Resetten';
+
+  @override
+  String get settingsResetDescription =>
+      'Verwijdert alle lokale gegevens van dit apparaat (projecten, klanten, tijdregistraties, instellingen, Jira-/Personio-koppelingen) en koppelt het los van de synchronisatiemap. Andere apparaten worden niet beïnvloed.';
+
+  @override
+  String get settingsResetButton => 'Alles resetten';
+
+  @override
+  String get settingsResetConfirmTitle => 'Alles echt resetten?';
+
+  @override
+  String get settingsResetConfirmMessage =>
+      'Projecten, klanten, tijdregistraties, instellingen en Jira-/Personio-koppelingen op dit apparaat worden permanent verwijderd, en de verbinding met de synchronisatiemap wordt verwijderd. Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String get settingsResetConfirmButton => 'Ja, alles resetten';
+
+  @override
+  String get settingsResetSuccess => 'De app is gereset.';
+
+  @override
+  String get settingsResetError => 'Resetten is mislukt.';
 }

@@ -568,4 +568,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get entriesJiraStatusError => 'Jira booking failed';
+
+  @override
+  String get settingsResetTitle => 'Reset';
+
+  @override
+  String get settingsResetDescription =>
+      'Deletes all of this device\'s local data (projects, clients, time entries, settings, Jira/Personio links) and disconnects it from the sync folder. Other devices are not affected.';
+
+  @override
+  String get settingsResetButton => 'Reset everything';
+
+  @override
+  String get settingsResetConfirmTitle => 'Really reset everything?';
+
+  @override
+  String get settingsResetConfirmMessage =>
+      'Projects, clients, time entries, settings, and Jira/Personio links on this device will be permanently deleted, and the connection to the sync folder will be removed. This cannot be undone.';
+
+  @override
+  String get settingsResetConfirmButton => 'Yes, reset everything';
+
+  @override
+  String get settingsResetSuccess => 'The app has been reset.';
+
+  @override
+  String get settingsResetError => 'Reset failed.';
 }

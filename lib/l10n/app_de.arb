@@ -254,5 +254,13 @@
   "csvNo": "nein",
   "entriesJiraStatusSynced": "In Jira gebucht",
   "entriesJiraStatusPending": "Jira-Buchung ausstehend",
-  "entriesJiraStatusError": "Jira-Buchung fehlgeschlagen"
+  "entriesJiraStatusError": "Jira-Buchung fehlgeschlagen",
+  "settingsResetTitle": "Zurücksetzen",
+  "settingsResetDescription": "Löscht alle lokalen Daten dieses Geräts (Projekte, Kunden, Zeiteinträge, Einstellungen, Jira-/Personio-Verknüpfungen) und trennt die Verbindung zum Sync-Ordner. Andere Geräte sind davon nicht betroffen.",
+  "settingsResetButton": "Komplett zurücksetzen",
+  "settingsResetConfirmTitle": "Wirklich alles zurücksetzen?",
+  "settingsResetConfirmMessage": "Projekte, Kunden, Zeiteinträge, Einstellungen und Jira-/Personio-Verknüpfungen auf diesem Gerät werden unwiderruflich gelöscht, und die Verbindung zum Sync-Ordner wird getrennt. Diese Aktion kann nicht rückgängig gemacht werden.",
+  "settingsResetConfirmButton": "Ja, alles zurücksetzen",
+  "settingsResetSuccess": "App wurde zurückgesetzt.",
+  "settingsResetError": "Zurücksetzen fehlgeschlagen."
 }

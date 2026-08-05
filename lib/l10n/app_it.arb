@@ -193,5 +193,13 @@
   "csvNo": "no",
   "entriesJiraStatusSynced": "Registrato su Jira",
   "entriesJiraStatusPending": "Registrazione Jira in sospeso",
-  "entriesJiraStatusError": "Registrazione Jira non riuscita"
+  "entriesJiraStatusError": "Registrazione Jira non riuscita",
+  "settingsResetTitle": "Ripristina",
+  "settingsResetDescription": "Elimina tutti i dati locali di questo dispositivo (progetti, clienti, voci di tempo, impostazioni, collegamenti Jira/Personio) e lo disconnette dalla cartella di sincronizzazione. Gli altri dispositivi non vengono interessati.",
+  "settingsResetButton": "Ripristina tutto",
+  "settingsResetConfirmTitle": "Ripristinare davvero tutto?",
+  "settingsResetConfirmMessage": "Progetti, clienti, voci di tempo, impostazioni e collegamenti Jira/Personio su questo dispositivo verranno eliminati definitivamente, e la connessione alla cartella di sincronizzazione verrà rimossa. Questa azione non può essere annullata.",
+  "settingsResetConfirmButton": "Sì, ripristina tutto",
+  "settingsResetSuccess": "L'app è stata ripristinata.",
+  "settingsResetError": "Ripristino non riuscito."
 }

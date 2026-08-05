@@ -571,4 +571,30 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get entriesJiraStatusError => 'Error al registrar en Jira';
+
+  @override
+  String get settingsResetTitle => 'Restablecer';
+
+  @override
+  String get settingsResetDescription =>
+      'Elimina todos los datos locales de este dispositivo (proyectos, clientes, entradas de tiempo, ajustes, vínculos de Jira/Personio) y lo desconecta de la carpeta de sincronización. Los demás dispositivos no se ven afectados.';
+
+  @override
+  String get settingsResetButton => 'Restablecer todo';
+
+  @override
+  String get settingsResetConfirmTitle => '¿Restablecer todo de verdad?';
+
+  @override
+  String get settingsResetConfirmMessage =>
+      'Los proyectos, clientes, entradas de tiempo, ajustes y vínculos de Jira/Personio de este dispositivo se eliminarán permanentemente, y se eliminará la conexión con la carpeta de sincronización. Esta acción no se puede deshacer.';
+
+  @override
+  String get settingsResetConfirmButton => 'Sí, restablecer todo';
+
+  @override
+  String get settingsResetSuccess => 'La aplicación se ha restablecido.';
+
+  @override
+  String get settingsResetError => 'No se pudo restablecer.';
 }
