@@ -57,6 +57,53 @@ class SyncedWrites {
     return project;
   }
 
+  /// Partial update -- see [ProjectsDao.updateProject] for the [Value]
+  /// semantics. Returns the row after the write so callers (the project
+  /// form dialog) can use it without a second read.
+  Future<Project> updateProject(
+    String id, {
+    Value<String> name = const Value.absent(),
+    Value<String> colorHex = const Value.absent(),
+    Value<bool> billable = const Value.absent(),
+    Value<int?> hourlyRateCents = const Value.absent(),
+    Value<String?> currency = const Value.absent(),
+  }) async {
+    await db.projectsDao.updateProject(
+      id,
+      name: name,
+      colorHex: colorHex,
+      billable: billable,
+      hourlyRateCents: hourlyRateCents,
+      currency: currency,
+    );
+    return _logCurrentProjectState(id);
+  }
+
+  Future<void> archiveProject(String id) async {
+    await db.projectsDao.archiveProject(id);
+    await _logCurrentProjectState(id);
+  }
+
+  Future<void> unarchiveProject(String id) async {
+    await db.projectsDao.unarchiveProject(id);
+    await _logCurrentProjectState(id);
+  }
+
+  /// Re-reads the project's current row and appends it as an
+  /// [EventOp.update] log entry -- the write-then-log pattern every project
+  /// mutation above (other than [createProject]) shares, mirroring
+  /// [_logCurrentState]'s role for TimeEntries.
+  Future<Project> _logCurrentProjectState(String id) async {
+    final current = await (db.select(db.projects)..where((p) => p.id.equals(id))).getSingle();
+    await logWriter.appendEvent(
+      entityType: EntityTypes.project,
+      entityId: id,
+      op: EventOp.update,
+      payload: current.toJson(),
+    );
+    return current;
+  }
+
   Future<TimeEntry> startEntry({
     required String deviceId,
     String? projectId,
