@@ -8,7 +8,7 @@ import '../../core/format/date_format.dart';
 import '../../core/format/quick_add_durations.dart';
 import '../../l10n/app_localizations.dart';
 import '../jira/widgets/jira_ticket_field.dart';
-import '../projects/new_project_dialog.dart';
+import '../projects/project_form_dialog.dart';
 import '../projects/projects_providers.dart';
 import 'manual_entry_dialog.dart';
 
@@ -164,7 +164,7 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
                 ),
                 IconButton(
                   tooltip: l10n.timerNewProjectTooltip,
-                  onPressed: () => showNewProjectDialog(context, ref),
+                  onPressed: () => showProjectFormDialog(context, ref),
                   icon: const Icon(Icons.add_box_outlined),
                 ),
               ],

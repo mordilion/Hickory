@@ -14,7 +14,7 @@ import '../../l10n/app_localizations.dart';
 import '../entries/entries_list.dart';
 import '../entries/quick_add_bar.dart';
 import '../jira/widgets/jira_ticket_field.dart';
-import '../projects/new_project_dialog.dart';
+import '../projects/project_form_dialog.dart';
 import '../projects/projects_providers.dart';
 import 'idle_prompt_dialog.dart';
 import 'idle_tracking.dart';
@@ -319,7 +319,7 @@ class _StartCard extends ConsumerWidget {
                 ),
                 IconButton(
                   tooltip: l10n.timerNewProjectTooltip,
-                  onPressed: () => showNewProjectDialog(context, ref),
+                  onPressed: () => showProjectFormDialog(context, ref),
                   icon: const Icon(Icons.add_box_outlined),
                 ),
               ],
