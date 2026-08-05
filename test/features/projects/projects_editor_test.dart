@@ -163,4 +163,78 @@ void main() {
     expect(find.text('Edit project'), findsOneWidget);
     expect(find.text('Website Relaunch'), findsWidgets);
   });
+
+  testWidgets('renders a delete action on active project rows', (tester) async {
+    final project = await seedProject();
+    await tester.pumpWidget(makeApp(active: [project]));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.delete_outline), findsOneWidget);
+  });
+
+  testWidgets('renders a delete action on archived project rows', (tester) async {
+    final project = await seedProject(archived: true);
+    await tester.pumpWidget(makeApp(archived: [project]));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Archived projects'));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.delete_outline), findsOneWidget);
+  });
+
+  testWidgets('confirming delete removes a project with no entries from the database', (tester) async {
+    final project = await seedProject();
+    await tester.pumpWidget(makeApp(active: [project]));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete project?'), findsOneWidget);
+
+    await tester.runAsync(() async {
+      await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+      await pumpUntilTrue(tester, () async {
+        final remaining =
+            await (db.select(db.projects)..where((p) => p.id.equals(project.id))).get();
+        return remaining.isEmpty;
+      });
+    });
+  });
+
+  testWidgets('cancelling the delete confirmation leaves the project untouched', (tester) async {
+    final project = await seedProject();
+    await tester.pumpWidget(makeApp(active: [project]));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await tester.pumpAndSettle();
+
+    final remaining = await (db.select(db.projects)..where((p) => p.id.equals(project.id))).get();
+    expect(remaining, hasLength(1));
+  });
+
+  testWidgets('attempting to delete a project with entries shows the blocked-delete error', (
+    tester,
+  ) async {
+    final project = await seedProject();
+    await db.timeEntriesDao.startEntry(deviceId: 'device-1', projectId: project.id);
+    await tester.pumpWidget(makeApp(active: [project]));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pumpAndSettle();
+
+    await tester.runAsync(() async {
+      await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+      await pumpUntilTrue(tester, () async {
+        await tester.pump();
+        return find.text("This project still has time entries assigned and can't be deleted.").evaluate().isNotEmpty;
+      });
+    });
+
+    final remaining = await (db.select(db.projects)..where((p) => p.id.equals(project.id))).get();
+    expect(remaining, hasLength(1));
+  });
 }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/sync_providers.dart';
 import '../../data/drift/database.dart';
+import '../../data/sync/synced_writes.dart' show ProjectHasTimeEntriesException;
 import '../../l10n/app_localizations.dart';
 import 'project_form_dialog.dart';
 import 'projects_providers.dart';
@@ -52,6 +53,40 @@ class _ProjectsEditorState extends ConsumerState<ProjectsEditor> {
         await writes.unarchiveProject(id);
       });
 
+  Future<void> _delete(String id) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.projectsDeleteConfirmTitle),
+        content: Text(l10n.projectsDeleteConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.commonDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    await _guardedWrite(() async {
+      final writes = await ref.read(syncedWritesProvider.future);
+      try {
+        await writes.deleteProject(id);
+      } on ProjectHasTimeEntriesException {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.projectsDeleteHasEntriesError)),
+          );
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -88,6 +123,11 @@ class _ProjectsEditorState extends ConsumerState<ProjectsEditor> {
                   tooltip: l10n.projectsArchiveTooltip,
                   onPressed: _busy ? null : () => _archive(project.id),
                 ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  tooltip: l10n.projectsDeleteTooltip,
+                  onPressed: _busy ? null : () => _delete(project.id),
+                ),
               ],
             ),
           ),
@@ -114,10 +154,20 @@ class _ProjectsEditorState extends ConsumerState<ProjectsEditor> {
                     project.name,
                     style: TextStyle(color: Theme.of(context).disabledColor),
                   ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.unarchive_outlined),
-                    tooltip: l10n.projectsUnarchiveTooltip,
-                    onPressed: _busy ? null : () => _unarchive(project.id),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.unarchive_outlined),
+                        tooltip: l10n.projectsUnarchiveTooltip,
+                        onPressed: _busy ? null : () => _unarchive(project.id),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline),
+                        tooltip: l10n.projectsDeleteTooltip,
+                        onPressed: _busy ? null : () => _delete(project.id),
+                      ),
+                    ],
                   ),
                 ),
             ],
