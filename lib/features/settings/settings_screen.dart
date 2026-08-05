@@ -13,6 +13,7 @@ import '../../core/update/update_checker.dart';
 import '../../core/update/update_installer.dart';
 import '../../l10n/app_localizations.dart';
 import '../projects/projects_editor.dart';
+import 'app_reset_section.dart';
 import 'break_rule_tiers_editor.dart';
 import 'language_dropdown.dart';
 import 'quick_add_durations_editor.dart';
@@ -252,6 +253,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ),
           ],
+          const SizedBox(height: 16),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: AppResetSection(),
+            ),
+          ),
         ],
       ),
     );
