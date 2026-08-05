@@ -15,6 +15,9 @@ void main() {
           request.url.toString(),
           'https://api.github.com/repos/mordilion/Hickory/releases/latest',
         );
+        // GitHub rejects requests with no User-Agent header (403) --
+        // regression check for that requirement.
+        expect(request.headers['User-Agent'], isNotEmpty);
         return http.Response(
           jsonEncode({
             'tag_name': 'v1.2.3',

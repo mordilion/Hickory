@@ -42,7 +42,10 @@ class GithubReleaseClient {
     try {
       final response = await _httpClient.get(
         Uri.parse('https://api.github.com/repos/$owner/$repo/releases/latest'),
-        headers: {'Accept': 'application/vnd.github+json'},
+        // GitHub rejects any request with no User-Agent header (403), even
+        // for public, unauthenticated endpoints -- Dart's http package
+        // doesn't send one by default, unlike a browser or curl.
+        headers: {'Accept': 'application/vnd.github+json', 'User-Agent': 'Hickory-App'},
       );
       if (response.statusCode != 200) return null;
       final decoded = jsonDecode(response.body) as Map<String, dynamic>;
