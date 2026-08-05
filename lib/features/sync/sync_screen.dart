@@ -302,6 +302,11 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
           result.failed,
         ),
       );
+      // Advance the visible range immediately (not just the invalidated
+      // provider, which nothing rebuilds against) -- the range must keep
+      // moving forward after a push without requiring the user to leave
+      // and reopen this screen.
+      await _initPersonioRange();
     } catch (_) {
       if (mounted) setState(() => _personioStatusMessage = l10n.syncPersonioUnexpectedError);
     } finally {
