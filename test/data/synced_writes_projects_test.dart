@@ -83,4 +83,27 @@ void main() {
     expect(event.op, EventOp.update);
     expect(event.payload?['archived'], isFalse);
   });
+
+  test('deleteProject removes the project and logs a delete event when it has no entries', () async {
+    final project = await writes.createProject(name: 'Website Relaunch', colorHex: '#5B8DEF');
+
+    await writes.deleteProject(project.id);
+
+    final remaining = await (db.select(db.projects)..where((p) => p.id.equals(project.id))).get();
+    expect(remaining, isEmpty);
+    final event = lastLoggedEvent(project.id);
+    expect(event.entityType, EntityTypes.project);
+    expect(event.op, EventOp.delete);
+    expect(event.payload, isNull);
+  });
+
+  test('deleteProject throws and leaves the project untouched when it has entries', () async {
+    final project = await writes.createProject(name: 'Website Relaunch', colorHex: '#5B8DEF');
+    await db.timeEntriesDao.startEntry(deviceId: 'dev_a', projectId: project.id);
+
+    await expectLater(writes.deleteProject(project.id), throwsA(isA<ProjectHasTimeEntriesException>()));
+
+    final remaining = await (db.select(db.projects)..where((p) => p.id.equals(project.id))).get();
+    expect(remaining, hasLength(1));
+  });
 }

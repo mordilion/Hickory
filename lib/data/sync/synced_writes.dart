@@ -20,6 +20,11 @@ class BreakRuleTierValues {
   final int requiredBreakMinutes;
 }
 
+/// Thrown by [SyncedWrites.deleteProject] when the project still has at
+/// least one time entry pointing at it -- archiving is the removal path
+/// for projects with history, deletion is only for projects with none.
+class ProjectHasTimeEntriesException implements Exception {}
+
 /// Thin write-through wrapper around the DAOs: every mutation is applied to
 /// the local drift cache immediately (via the DAO, for instant UI feedback)
 /// and also appended to the device's own event log, per the architecture
@@ -88,6 +93,18 @@ class SyncedWrites {
   Future<void> unarchiveProject(String id) async {
     await db.projectsDao.unarchiveProject(id);
     await _logCurrentProjectState(id);
+  }
+
+  Future<void> deleteProject(String id) async {
+    final hasEntries = await db.timeEntriesDao.hasEntriesForProject(id);
+    if (hasEntries) throw ProjectHasTimeEntriesException();
+    await db.projectsDao.deleteProject(id);
+    await logWriter.appendEvent(
+      entityType: EntityTypes.project,
+      entityId: id,
+      op: EventOp.delete,
+      payload: null,
+    );
   }
 
   /// Re-reads the project's current row and appends it as an
