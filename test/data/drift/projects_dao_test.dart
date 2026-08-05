@@ -1,8 +1,7 @@
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/data/drift/database.dart';
-import 'package:matcher/matcher.dart' as matcher;
 
 void main() {
   late AppDatabase db;
@@ -50,8 +49,8 @@ void main() {
 
     final updated =
         await (db.select(db.projects)..where((p) => p.id.equals(project.id))).getSingle();
-    expect(updated.hourlyRateCents, matcher.isNull);
-    expect(updated.currency, matcher.isNull);
+    expect(updated.hourlyRateCents, isNull);
+    expect(updated.currency, isNull);
   });
 
   test('archiveProject sets archived to true', () async {
