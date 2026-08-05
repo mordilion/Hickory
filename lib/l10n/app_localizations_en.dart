@@ -38,6 +38,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTimeFormat => 'Time format';
 
   @override
+  String get settingsUpdateTitle => 'Updates';
+
+  @override
+  String settingsUpdateCurrentVersion(Object version) {
+    return 'Current version: $version';
+  }
+
+  @override
+  String get settingsUpdateCheckButton => 'Check for updates';
+
+  @override
+  String get settingsUpdateChecking => 'Checking for updates...';
+
+  @override
+  String get settingsUpdateUpToDate => 'You\'re on the latest version.';
+
+  @override
+  String get settingsUpdateCheckError =>
+      'Update check failed. Please try again later.';
+
+  @override
+  String settingsUpdateAvailable(Object version) {
+    return 'Version $version is available.';
+  }
+
+  @override
+  String get settingsUpdateInstallButton => 'Install now';
+
+  @override
+  String get settingsUpdateInstalling => 'Installing update...';
+
+  @override
+  String get settingsUpdateInstallError =>
+      'Installation failed. Please try again or download the new version manually from GitHub.';
+
+  @override
   String get syncTitle => 'Sync settings';
 
   @override

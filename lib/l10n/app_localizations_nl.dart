@@ -39,6 +39,42 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsTimeFormat => 'Tijdnotatie';
 
   @override
+  String get settingsUpdateTitle => 'Updates';
+
+  @override
+  String settingsUpdateCurrentVersion(Object version) {
+    return 'Huidige versie: $version';
+  }
+
+  @override
+  String get settingsUpdateCheckButton => 'Naar updates zoeken';
+
+  @override
+  String get settingsUpdateChecking => 'Zoeken naar updates...';
+
+  @override
+  String get settingsUpdateUpToDate => 'Je hebt de nieuwste versie.';
+
+  @override
+  String get settingsUpdateCheckError =>
+      'Update-controle mislukt. Probeer het later opnieuw.';
+
+  @override
+  String settingsUpdateAvailable(Object version) {
+    return 'Versie $version is beschikbaar.';
+  }
+
+  @override
+  String get settingsUpdateInstallButton => 'Nu installeren';
+
+  @override
+  String get settingsUpdateInstalling => 'Update wordt geïnstalleerd...';
+
+  @override
+  String get settingsUpdateInstallError =>
+      'Installatie mislukt. Probeer het opnieuw of download de nieuwe versie handmatig van GitHub.';
+
+  @override
   String get syncTitle => 'Synchronisatie-instellingen';
 
   @override

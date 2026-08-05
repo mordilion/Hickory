@@ -39,6 +39,42 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsTimeFormat => 'Formato de hora';
 
   @override
+  String get settingsUpdateTitle => 'Actualizaciones';
+
+  @override
+  String settingsUpdateCurrentVersion(Object version) {
+    return 'Versión actual: $version';
+  }
+
+  @override
+  String get settingsUpdateCheckButton => 'Buscar actualizaciones';
+
+  @override
+  String get settingsUpdateChecking => 'Buscando actualizaciones...';
+
+  @override
+  String get settingsUpdateUpToDate => 'Tienes la última versión.';
+
+  @override
+  String get settingsUpdateCheckError =>
+      'La comprobación de actualizaciones falló. Inténtalo de nuevo más tarde.';
+
+  @override
+  String settingsUpdateAvailable(Object version) {
+    return 'La versión $version está disponible.';
+  }
+
+  @override
+  String get settingsUpdateInstallButton => 'Instalar ahora';
+
+  @override
+  String get settingsUpdateInstalling => 'Instalando actualización...';
+
+  @override
+  String get settingsUpdateInstallError =>
+      'La instalación falló. Inténtalo de nuevo o descarga la nueva versión manualmente desde GitHub.';
+
+  @override
   String get syncTitle => 'Ajustes de sincronización';
 
   @override

@@ -160,6 +160,66 @@ abstract class AppLocalizations {
   /// **'Zeitformat'**
   String get settingsTimeFormat;
 
+  /// No description provided for @settingsUpdateTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Updates'**
+  String get settingsUpdateTitle;
+
+  /// No description provided for @settingsUpdateCurrentVersion.
+  ///
+  /// In de, this message translates to:
+  /// **'Aktuelle Version: {version}'**
+  String settingsUpdateCurrentVersion(Object version);
+
+  /// No description provided for @settingsUpdateCheckButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Nach Updates suchen'**
+  String get settingsUpdateCheckButton;
+
+  /// No description provided for @settingsUpdateChecking.
+  ///
+  /// In de, this message translates to:
+  /// **'Suche nach Updates...'**
+  String get settingsUpdateChecking;
+
+  /// No description provided for @settingsUpdateUpToDate.
+  ///
+  /// In de, this message translates to:
+  /// **'Du hast die neueste Version.'**
+  String get settingsUpdateUpToDate;
+
+  /// No description provided for @settingsUpdateCheckError.
+  ///
+  /// In de, this message translates to:
+  /// **'Update-Prüfung fehlgeschlagen. Bitte versuche es später erneut.'**
+  String get settingsUpdateCheckError;
+
+  /// No description provided for @settingsUpdateAvailable.
+  ///
+  /// In de, this message translates to:
+  /// **'Version {version} ist verfügbar.'**
+  String settingsUpdateAvailable(Object version);
+
+  /// No description provided for @settingsUpdateInstallButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Jetzt installieren'**
+  String get settingsUpdateInstallButton;
+
+  /// No description provided for @settingsUpdateInstalling.
+  ///
+  /// In de, this message translates to:
+  /// **'Update wird installiert...'**
+  String get settingsUpdateInstalling;
+
+  /// No description provided for @settingsUpdateInstallError.
+  ///
+  /// In de, this message translates to:
+  /// **'Installation fehlgeschlagen. Bitte versuche es erneut oder lade die neue Version manuell von GitHub herunter.'**
+  String get settingsUpdateInstallError;
+
   /// No description provided for @syncTitle.
   ///
   /// In de, this message translates to:

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,7 @@ import 'core/di/autostart_service.dart';
 import 'core/di/database_provider.dart';
 import 'core/di/locale_provider.dart';
 import 'core/di/sync_providers.dart';
+import 'core/di/update_providers.dart';
 import 'core/locale/locale_resolution.dart';
 import 'core/theme/app_text_theme.dart';
 import 'core/window/quit_behavior.dart';
@@ -76,4 +78,17 @@ Future<void> main() async {
       child: HickoryApp(scaffoldMessengerKey: windowTrayController.scaffoldMessengerKey),
     ),
   );
+
+  // Silent by design: only ever sets availableUpdateProvider when a real
+  // update is found (Settings surfaces it) -- never shown as an error or
+  // any other visible feedback if the check itself fails.
+  if (Platform.isMacOS || Platform.isWindows) {
+    unawaited(
+      container.read(updateCheckerProvider).checkForUpdate().then((update) {
+        if (update != null) {
+          container.read(availableUpdateProvider.notifier).state = update;
+        }
+      }),
+    );
+  }
 }
