@@ -577,7 +577,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settingsResetDescription =>
-      'Elimina tutti i dati locali di questo dispositivo (progetti, clienti, voci di tempo, impostazioni, collegamenti Jira/Personio) e lo disconnette dalla cartella di sincronizzazione. Gli altri dispositivi non vengono interessati.';
+      'Elimina tutti i dati locali di questo dispositivo (progetti, clienti, voci di tempo, impostazioni, collegamenti Jira/Personio), rimuove definitivamente la cronologia di questo dispositivo dalla cartella di sincronizzazione e lo disconnette. Gli altri dispositivi non vengono interessati, ma non potranno più vedere la cronologia rimossa.';
 
   @override
   String get settingsResetButton => 'Ripristina tutto';
@@ -587,7 +587,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settingsResetConfirmMessage =>
-      'Progetti, clienti, voci di tempo, impostazioni e collegamenti Jira/Personio su questo dispositivo verranno eliminati definitivamente, e la connessione alla cartella di sincronizzazione verrà rimossa. Questa azione non può essere annullata.';
+      'Progetti, clienti, voci di tempo, impostazioni e collegamenti Jira/Personio su questo dispositivo verranno eliminati definitivamente. Anche la cronologia di questo dispositivo verrà rimossa definitivamente dalla cartella di sincronizzazione, e la connessione ad essa verrà rimossa. Questa azione non può essere annullata.';
 
   @override
   String get settingsResetConfirmButton => 'Sì, ripristina tutto';

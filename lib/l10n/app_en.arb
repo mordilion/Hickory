@@ -195,10 +195,10 @@
   "entriesJiraStatusPending": "Jira booking pending",
   "entriesJiraStatusError": "Jira booking failed",
   "settingsResetTitle": "Reset",
-  "settingsResetDescription": "Deletes all of this device's local data (projects, clients, time entries, settings, Jira/Personio links) and disconnects it from the sync folder. Other devices are not affected.",
+  "settingsResetDescription": "Deletes all of this device's local data (projects, clients, time entries, settings, Jira/Personio links), permanently removes this device's own history from the sync folder, and disconnects it. Other devices are not affected, but can no longer see the removed history either.",
   "settingsResetButton": "Reset everything",
   "settingsResetConfirmTitle": "Really reset everything?",
-  "settingsResetConfirmMessage": "Projects, clients, time entries, settings, and Jira/Personio links on this device will be permanently deleted, and the connection to the sync folder will be removed. This cannot be undone.",
+  "settingsResetConfirmMessage": "Projects, clients, time entries, settings, and Jira/Personio links on this device will be permanently deleted. This device's own history will also be permanently removed from the sync folder, and the connection to it will be removed. This cannot be undone.",
   "settingsResetConfirmButton": "Yes, reset everything",
   "settingsResetSuccess": "The app has been reset.",
   "settingsResetError": "Reset failed."

@@ -574,7 +574,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsResetDescription =>
-      'Deletes all of this device\'s local data (projects, clients, time entries, settings, Jira/Personio links) and disconnects it from the sync folder. Other devices are not affected.';
+      'Deletes all of this device\'s local data (projects, clients, time entries, settings, Jira/Personio links), permanently removes this device\'s own history from the sync folder, and disconnects it. Other devices are not affected, but can no longer see the removed history either.';
 
   @override
   String get settingsResetButton => 'Reset everything';
@@ -584,7 +584,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsResetConfirmMessage =>
-      'Projects, clients, time entries, settings, and Jira/Personio links on this device will be permanently deleted, and the connection to the sync folder will be removed. This cannot be undone.';
+      'Projects, clients, time entries, settings, and Jira/Personio links on this device will be permanently deleted. This device\'s own history will also be permanently removed from the sync folder, and the connection to it will be removed. This cannot be undone.';
 
   @override
   String get settingsResetConfirmButton => 'Yes, reset everything';

@@ -195,10 +195,10 @@
   "entriesJiraStatusPending": "Registro en Jira pendiente",
   "entriesJiraStatusError": "Error al registrar en Jira",
   "settingsResetTitle": "Restablecer",
-  "settingsResetDescription": "Elimina todos los datos locales de este dispositivo (proyectos, clientes, entradas de tiempo, ajustes, vínculos de Jira/Personio) y lo desconecta de la carpeta de sincronización. Los demás dispositivos no se ven afectados.",
+  "settingsResetDescription": "Elimina todos los datos locales de este dispositivo (proyectos, clientes, entradas de tiempo, ajustes, vínculos de Jira/Personio), elimina de forma permanente el historial propio de este dispositivo de la carpeta de sincronización y lo desconecta. Los demás dispositivos no se ven afectados, pero tampoco podrán ver ya el historial eliminado.",
   "settingsResetButton": "Restablecer todo",
   "settingsResetConfirmTitle": "¿Restablecer todo de verdad?",
-  "settingsResetConfirmMessage": "Los proyectos, clientes, entradas de tiempo, ajustes y vínculos de Jira/Personio de este dispositivo se eliminarán permanentemente, y se eliminará la conexión con la carpeta de sincronización. Esta acción no se puede deshacer.",
+  "settingsResetConfirmMessage": "Los proyectos, clientes, entradas de tiempo, ajustes y vínculos de Jira/Personio de este dispositivo se eliminarán permanentemente. El historial propio de este dispositivo también se eliminará de forma permanente de la carpeta de sincronización, y se eliminará la conexión con ella. Esta acción no se puede deshacer.",
   "settingsResetConfirmButton": "Sí, restablecer todo",
   "settingsResetSuccess": "La aplicación se ha restablecido.",
   "settingsResetError": "No se pudo restablecer."

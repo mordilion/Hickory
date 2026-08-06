@@ -195,10 +195,10 @@
   "entriesJiraStatusPending": "Registrazione Jira in sospeso",
   "entriesJiraStatusError": "Registrazione Jira non riuscita",
   "settingsResetTitle": "Ripristina",
-  "settingsResetDescription": "Elimina tutti i dati locali di questo dispositivo (progetti, clienti, voci di tempo, impostazioni, collegamenti Jira/Personio) e lo disconnette dalla cartella di sincronizzazione. Gli altri dispositivi non vengono interessati.",
+  "settingsResetDescription": "Elimina tutti i dati locali di questo dispositivo (progetti, clienti, voci di tempo, impostazioni, collegamenti Jira/Personio), rimuove definitivamente la cronologia di questo dispositivo dalla cartella di sincronizzazione e lo disconnette. Gli altri dispositivi non vengono interessati, ma non potranno più vedere la cronologia rimossa.",
   "settingsResetButton": "Ripristina tutto",
   "settingsResetConfirmTitle": "Ripristinare davvero tutto?",
-  "settingsResetConfirmMessage": "Progetti, clienti, voci di tempo, impostazioni e collegamenti Jira/Personio su questo dispositivo verranno eliminati definitivamente, e la connessione alla cartella di sincronizzazione verrà rimossa. Questa azione non può essere annullata.",
+  "settingsResetConfirmMessage": "Progetti, clienti, voci di tempo, impostazioni e collegamenti Jira/Personio su questo dispositivo verranno eliminati definitivamente. Anche la cronologia di questo dispositivo verrà rimossa definitivamente dalla cartella di sincronizzazione, e la connessione ad essa verrà rimossa. Questa azione non può essere annullata.",
   "settingsResetConfirmButton": "Sì, ripristina tutto",
   "settingsResetSuccess": "L'app è stata ripristinata.",
   "settingsResetError": "Ripristino non riuscito."

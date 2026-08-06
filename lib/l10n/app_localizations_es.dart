@@ -577,7 +577,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsResetDescription =>
-      'Elimina todos los datos locales de este dispositivo (proyectos, clientes, entradas de tiempo, ajustes, vínculos de Jira/Personio) y lo desconecta de la carpeta de sincronización. Los demás dispositivos no se ven afectados.';
+      'Elimina todos los datos locales de este dispositivo (proyectos, clientes, entradas de tiempo, ajustes, vínculos de Jira/Personio), elimina de forma permanente el historial propio de este dispositivo de la carpeta de sincronización y lo desconecta. Los demás dispositivos no se ven afectados, pero tampoco podrán ver ya el historial eliminado.';
 
   @override
   String get settingsResetButton => 'Restablecer todo';
@@ -587,7 +587,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsResetConfirmMessage =>
-      'Los proyectos, clientes, entradas de tiempo, ajustes y vínculos de Jira/Personio de este dispositivo se eliminarán permanentemente, y se eliminará la conexión con la carpeta de sincronización. Esta acción no se puede deshacer.';
+      'Los proyectos, clientes, entradas de tiempo, ajustes y vínculos de Jira/Personio de este dispositivo se eliminarán permanentemente. El historial propio de este dispositivo también se eliminará de forma permanente de la carpeta de sincronización, y se eliminará la conexión con ella. Esta acción no se puede deshacer.';
 
   @override
   String get settingsResetConfirmButton => 'Sí, restablecer todo';

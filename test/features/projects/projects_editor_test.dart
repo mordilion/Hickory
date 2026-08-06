@@ -199,6 +199,9 @@ void main() {
         return remaining.isEmpty;
       });
     });
+
+    final remaining = await (db.select(db.projects)..where((p) => p.id.equals(project.id))).get();
+    expect(remaining, isEmpty);
   });
 
   testWidgets('cancelling the delete confirmation leaves the project untouched', (tester) async {

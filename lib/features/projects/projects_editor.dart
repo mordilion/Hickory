@@ -22,8 +22,9 @@ class ProjectsEditor extends ConsumerStatefulWidget {
 }
 
 class _ProjectsEditorState extends ConsumerState<ProjectsEditor> {
-  /// True while an archive/reactivate write is in flight -- disables every
-  /// action in this editor so a fast double-tap can't fire the write twice.
+  /// True while an archive/reactivate/delete write is in flight -- disables
+  /// every action in this editor so a fast double-tap can't fire the write
+  /// twice.
   bool _busy = false;
 
   Future<void> _guardedWrite(Future<void> Function() write) async {

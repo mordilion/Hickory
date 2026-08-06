@@ -124,10 +124,12 @@ void main() {
         await tester.pump();
         return resetCalled;
       });
+      expect(resetCalled, isTrue);
       await pumpUntilTrue(() async {
         await tester.pump();
         return find.text('The app has been reset.').evaluate().isNotEmpty;
       });
+      expect(find.text('The app has been reset.'), findsOneWidget);
     });
   });
 }

@@ -579,7 +579,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settingsResetDescription =>
-      'Verwijdert alle lokale gegevens van dit apparaat (projecten, klanten, tijdregistraties, instellingen, Jira-/Personio-koppelingen) en koppelt het los van de synchronisatiemap. Andere apparaten worden niet beïnvloed.';
+      'Verwijdert alle lokale gegevens van dit apparaat (projecten, klanten, tijdregistraties, instellingen, Jira-/Personio-koppelingen), verwijdert de eigen geschiedenis van dit apparaat definitief uit de synchronisatiemap en koppelt het apparaat los. Andere apparaten worden niet beïnvloed, maar kunnen de verwijderde geschiedenis ook niet meer zien.';
 
   @override
   String get settingsResetButton => 'Alles resetten';
@@ -589,7 +589,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settingsResetConfirmMessage =>
-      'Projecten, klanten, tijdregistraties, instellingen en Jira-/Personio-koppelingen op dit apparaat worden permanent verwijderd, en de verbinding met de synchronisatiemap wordt verwijderd. Dit kan niet ongedaan worden gemaakt.';
+      'Projecten, klanten, tijdregistraties, instellingen en Jira-/Personio-koppelingen op dit apparaat worden permanent verwijderd. Ook de eigen geschiedenis van dit apparaat wordt definitief uit de synchronisatiemap verwijderd, en de verbinding ermee wordt verbroken. Dit kan niet ongedaan worden gemaakt.';
 
   @override
   String get settingsResetConfirmButton => 'Ja, alles resetten';

@@ -14,6 +14,9 @@ import '../sync/sync_paths.dart';
 /// forgotten, and third-party credentials plus the locale preference are
 /// cleared. Deliberately bypasses SyncedWrites/the event log entirely: this
 /// *is* the sync state being cleared, so it can't go through that pipeline.
+/// Table deletion order in `resetEverything` is arbitrary -- safe only
+/// because this app never enables `PRAGMA foreign_keys`; enabling it later
+/// would require ordering these deletes.
 class AppResetService {
   AppResetService({
     required this.db,
@@ -36,13 +39,13 @@ class AppResetService {
   final LocaleStore localeStore;
 
   Future<void> resetEverything() async {
+    await _deleteDeviceLogDir(effectiveSyncRoot);
+    await _deleteDeviceLogDir(defaultSyncRoot);
     await db.transaction(() async {
       for (final table in db.allTables) {
         await db.delete(table).go();
       }
     });
-    await _deleteDeviceLogDir(effectiveSyncRoot);
-    await _deleteDeviceLogDir(defaultSyncRoot);
     await clearSyncFolder();
     await jiraCredentialsStore.clear();
     await personioCredentialsStore.clear();

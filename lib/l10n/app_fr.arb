@@ -195,10 +195,10 @@
   "entriesJiraStatusPending": "Enregistrement Jira en attente",
   "entriesJiraStatusError": "Échec de l'enregistrement Jira",
   "settingsResetTitle": "Réinitialiser",
-  "settingsResetDescription": "Supprime toutes les données locales de cet appareil (projets, clients, saisies de temps, paramètres, liens Jira/Personio) et le déconnecte du dossier de synchronisation. Les autres appareils ne sont pas concernés.",
+  "settingsResetDescription": "Supprime toutes les données locales de cet appareil (projets, clients, saisies de temps, paramètres, liens Jira/Personio), retire définitivement l'historique propre à cet appareil du dossier de synchronisation, puis le déconnecte. Les autres appareils ne sont pas concernés, mais ne pourront plus non plus voir l'historique retiré.",
   "settingsResetButton": "Tout réinitialiser",
   "settingsResetConfirmTitle": "Vraiment tout réinitialiser ?",
-  "settingsResetConfirmMessage": "Les projets, clients, saisies de temps, paramètres et liens Jira/Personio de cet appareil seront définitivement supprimés, et la connexion au dossier de synchronisation sera supprimée. Cette action est irréversible.",
+  "settingsResetConfirmMessage": "Les projets, clients, saisies de temps, paramètres et liens Jira/Personio de cet appareil seront définitivement supprimés. L'historique propre à cet appareil sera également retiré définitivement du dossier de synchronisation, et la connexion à ce dossier sera supprimée. Cette action est irréversible.",
   "settingsResetConfirmButton": "Oui, tout réinitialiser",
   "settingsResetSuccess": "L'application a été réinitialisée.",
   "settingsResetError": "La réinitialisation a échoué."

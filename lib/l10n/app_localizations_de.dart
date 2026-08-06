@@ -579,7 +579,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsResetDescription =>
-      'Löscht alle lokalen Daten dieses Geräts (Projekte, Kunden, Zeiteinträge, Einstellungen, Jira-/Personio-Verknüpfungen) und trennt die Verbindung zum Sync-Ordner. Andere Geräte sind davon nicht betroffen.';
+      'Löscht alle lokalen Daten dieses Geräts (Projekte, Kunden, Zeiteinträge, Einstellungen, Jira-/Personio-Verknüpfungen), entfernt den eigenen Verlauf dieses Geräts endgültig aus dem Sync-Ordner und trennt die Verbindung dazu. Andere Geräte sind davon nicht betroffen, können den entfernten Verlauf aber auch nicht mehr nachträglich sehen.';
 
   @override
   String get settingsResetButton => 'Komplett zurücksetzen';
@@ -589,7 +589,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsResetConfirmMessage =>
-      'Projekte, Kunden, Zeiteinträge, Einstellungen und Jira-/Personio-Verknüpfungen auf diesem Gerät werden unwiderruflich gelöscht, und die Verbindung zum Sync-Ordner wird getrennt. Diese Aktion kann nicht rückgängig gemacht werden.';
+      'Projekte, Kunden, Zeiteinträge, Einstellungen und Jira-/Personio-Verknüpfungen auf diesem Gerät werden unwiderruflich gelöscht. Der eigene Verlauf dieses Geräts wird auch endgültig aus dem Sync-Ordner entfernt, und die Verbindung dazu wird getrennt. Diese Aktion kann nicht rückgängig gemacht werden.';
 
   @override
   String get settingsResetConfirmButton => 'Ja, alles zurücksetzen';
