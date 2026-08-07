@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/features/reports/report_calculations.dart';
+import 'package:hickory/features/reports/report_view_state.dart';
 
 Project _project({
   required String id,
@@ -29,6 +30,7 @@ TimeEntry _entry({
   required DateTime startAt,
   required DateTime endAt,
   String? description,
+  bool? billableOverride,
 }) {
   final now = DateTime.utc(2026, 7, 1);
   return TimeEntry(
@@ -42,6 +44,7 @@ TimeEntry _entry({
     createdAt: now,
     updatedAt: now,
     totalPausedSeconds: 0,
+    billableOverride: billableOverride,
   );
 }
 
@@ -198,6 +201,163 @@ void main() {
       expect(totals.length, 2);
       expect(totals[localDay(sameDayStart1)], const Duration(hours: 1, minutes: 30));
       expect(totals[localDay(otherDayStart)], const Duration(minutes: 45));
+    });
+  });
+
+  group('filterEntries', () {
+    final billableProject = _project(id: 'p1', name: 'Billable Co');
+    final nonBillableProject = _project(id: 'p2', name: 'Internal', billable: false);
+    final projects = [billableProject, nonBillableProject];
+
+    test('returns entries unchanged when no filters are active', () {
+      final entries = [
+        _entry(
+          id: 'e1',
+          projectId: 'p1',
+          startAt: DateTime.utc(2026, 7, 7, 9),
+          endAt: DateTime.utc(2026, 7, 7, 10),
+        ),
+      ];
+      final result =
+          filterEntries(entries, projects, projectIds: {}, billableFilter: BillableFilter.all);
+      expect(result, entries);
+    });
+
+    test('project filter excludes non-matching and no-project entries', () {
+      final entries = [
+        _entry(
+          id: 'e1',
+          projectId: 'p1',
+          startAt: DateTime.utc(2026, 7, 7, 9),
+          endAt: DateTime.utc(2026, 7, 7, 10),
+        ),
+        _entry(
+          id: 'e2',
+          projectId: 'p2',
+          startAt: DateTime.utc(2026, 7, 7, 9),
+          endAt: DateTime.utc(2026, 7, 7, 10),
+        ),
+        _entry(
+          id: 'e3',
+          startAt: DateTime.utc(2026, 7, 7, 9),
+          endAt: DateTime.utc(2026, 7, 7, 10),
+        ),
+      ];
+      final result = filterEntries(
+        entries,
+        projects,
+        projectIds: {'p1'},
+        billableFilter: BillableFilter.all,
+      );
+      expect(result.map((e) => e.id), ['e1']);
+    });
+
+    test('billableOnly uses the project billable flag when no override is set', () {
+      final entries = [
+        _entry(
+          id: 'e1',
+          projectId: 'p1',
+          startAt: DateTime.utc(2026, 7, 7, 9),
+          endAt: DateTime.utc(2026, 7, 7, 10),
+        ),
+        _entry(
+          id: 'e2',
+          projectId: 'p2',
+          startAt: DateTime.utc(2026, 7, 7, 9),
+          endAt: DateTime.utc(2026, 7, 7, 10),
+        ),
+      ];
+      final result = filterEntries(
+        entries,
+        projects,
+        projectIds: {},
+        billableFilter: BillableFilter.billableOnly,
+      );
+      expect(result.map((e) => e.id), ['e1']);
+    });
+
+    test('nonBillableOnly uses the project billable flag when no override is set', () {
+      final entries = [
+        _entry(
+          id: 'e1',
+          projectId: 'p1',
+          startAt: DateTime.utc(2026, 7, 7, 9),
+          endAt: DateTime.utc(2026, 7, 7, 10),
+        ),
+        _entry(
+          id: 'e2',
+          projectId: 'p2',
+          startAt: DateTime.utc(2026, 7, 7, 9),
+          endAt: DateTime.utc(2026, 7, 7, 10),
+        ),
+      ];
+      final result = filterEntries(
+        entries,
+        projects,
+        projectIds: {},
+        billableFilter: BillableFilter.nonBillableOnly,
+      );
+      expect(result.map((e) => e.id), ['e2']);
+    });
+
+    test('billableOverride takes precedence over the project billable flag', () {
+      final entries = [
+        // Billable project, but this entry overrides to non-billable.
+        _entry(
+          id: 'e1',
+          projectId: 'p1',
+          startAt: DateTime.utc(2026, 7, 7, 9),
+          endAt: DateTime.utc(2026, 7, 7, 10),
+          billableOverride: false,
+        ),
+        // Non-billable project, but this entry overrides to billable.
+        _entry(
+          id: 'e2',
+          projectId: 'p2',
+          startAt: DateTime.utc(2026, 7, 7, 9),
+          endAt: DateTime.utc(2026, 7, 7, 10),
+          billableOverride: true,
+        ),
+      ];
+      final billableOnly = filterEntries(
+        entries,
+        projects,
+        projectIds: {},
+        billableFilter: BillableFilter.billableOnly,
+      );
+      expect(billableOnly.map((e) => e.id), ['e2']);
+      final nonBillableOnly = filterEntries(
+        entries,
+        projects,
+        projectIds: {},
+        billableFilter: BillableFilter.nonBillableOnly,
+      );
+      expect(nonBillableOnly.map((e) => e.id), ['e1']);
+    });
+
+    test('combines project and billable filters', () {
+      final entries = [
+        _entry(
+          id: 'e1',
+          projectId: 'p1',
+          startAt: DateTime.utc(2026, 7, 7, 9),
+          endAt: DateTime.utc(2026, 7, 7, 10),
+        ),
+        _entry(
+          id: 'e2',
+          projectId: 'p1',
+          startAt: DateTime.utc(2026, 7, 7, 9),
+          endAt: DateTime.utc(2026, 7, 7, 10),
+          billableOverride: false,
+        ),
+      ];
+      final result = filterEntries(
+        entries,
+        projects,
+        projectIds: {'p1'},
+        billableFilter: BillableFilter.billableOnly,
+      );
+      expect(result.map((e) => e.id), ['e1']);
     });
   });
 }

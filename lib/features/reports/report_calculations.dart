@@ -1,5 +1,6 @@
 import '../../data/drift/database.dart';
 import '../../data/drift/time_entry_extensions.dart';
+import 'report_view_state.dart';
 
 /// Pure calculation, no DB/Flutter dependency beyond the drift row types —
 /// straightforward to unit test with plain in-memory lists.
@@ -80,4 +81,26 @@ Map<DateTime, Duration> totalsByDay(List<TimeEntry> entries) {
     totals.update(day, (existing) => existing + duration, ifAbsent: () => duration);
   }
   return totals;
+}
+
+/// Narrows [entries] to those matching [projectIds] (empty = no
+/// restriction) and [billableFilter]. Effective billable status is
+/// [TimeEntry.billableOverride] when set, else the entry's project's
+/// [Project.billable] (false if the entry has no project). Pure, no
+/// DB/Flutter dependency -- same testing shape as [totalsByProject].
+List<TimeEntry> filterEntries(
+  List<TimeEntry> entries,
+  List<Project> projects, {
+  required Set<String> projectIds,
+  required BillableFilter billableFilter,
+}) {
+  if (projectIds.isEmpty && billableFilter == BillableFilter.all) return entries;
+  final projectsById = {for (final p in projects) p.id: p};
+  return entries.where((entry) {
+    if (projectIds.isNotEmpty && !projectIds.contains(entry.projectId)) return false;
+    if (billableFilter == BillableFilter.all) return true;
+    final effectiveBillable =
+        entry.billableOverride ?? projectsById[entry.projectId]?.billable ?? false;
+    return billableFilter == BillableFilter.billableOnly ? effectiveBillable : !effectiveBillable;
+  }).toList();
 }
