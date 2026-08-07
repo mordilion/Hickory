@@ -6,6 +6,7 @@ import '../../core/di/locale_provider.dart';
 import '../../core/di/personio_providers.dart';
 import '../../core/di/reset_providers.dart';
 import '../../core/di/sync_providers.dart';
+import '../../features/reports/report_view_controller.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Settings-screen "danger zone": returns this device to a fresh-install
@@ -55,17 +56,18 @@ class _AppResetSectionState extends ConsumerState<AppResetSection> {
       ref.invalidate(jiraCredentialsProvider);
       ref.invalidate(personioCredentialsProvider);
       ref.invalidate(localeControllerProvider);
+      ref.invalidate(reportViewControllerProvider);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsResetSuccess)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.settingsResetSuccess)));
       }
     } catch (error) {
       debugPrint('Failed to reset the app: $error');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.settingsResetError)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.settingsResetError)));
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -80,9 +82,15 @@ class _AppResetSectionState extends ConsumerState<AppResetSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.settingsResetTitle, style: Theme.of(context).textTheme.titleMedium),
+        Text(
+          l10n.settingsResetTitle,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
         const SizedBox(height: 4),
-        Text(l10n.settingsResetDescription, style: Theme.of(context).textTheme.bodySmall),
+        Text(
+          l10n.settingsResetDescription,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
         const SizedBox(height: 12),
         OutlinedButton(
           style: OutlinedButton.styleFrom(

@@ -169,7 +169,7 @@ void main() {
   );
 
   test(
-    'resetEverything clears the sync folder pointer, credentials, and locale',
+    'resetEverything clears the sync folder pointer, credentials, locale, and report filters',
     () async {
       await makeService().resetEverything();
 
