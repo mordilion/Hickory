@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add "Today" and "Yesterday" report presets, plus a combinable project and billable/non-billable filter that's remembered across restarts and respected by CSV export.
+
 ## [1.1.0] - 2026-08-07
 
 ### Added
