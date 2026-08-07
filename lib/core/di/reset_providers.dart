@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/reset/app_reset_service.dart';
 import '../../data/sync/sync_paths.dart';
+import '../../features/reports/report_view_controller.dart';
 import 'database_provider.dart';
 import 'device_id_provider.dart';
 import 'jira_providers.dart';
@@ -17,6 +18,9 @@ final appResetServiceProvider = FutureProvider<AppResetService>((ref) async {
   final deviceId = await ref.watch(deviceIdProvider.future);
   final effectiveRoot = await ref.watch(effectiveSyncRootProvider.future);
   final localeStore = await ref.watch(localeStoreProvider.future);
+  final reportViewStateStore = await ref.watch(
+    reportViewStateStoreProvider.future,
+  );
   return AppResetService(
     db: db,
     deviceId: deviceId,
@@ -26,5 +30,6 @@ final appResetServiceProvider = FutureProvider<AppResetService>((ref) async {
     jiraCredentialsStore: ref.watch(jiraCredentialsStoreProvider),
     personioCredentialsStore: ref.watch(personioCredentialsStoreProvider),
     localeStore: localeStore,
+    reportViewStateStore: reportViewStateStore,
   );
 });

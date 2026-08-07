@@ -3,6 +3,7 @@ import 'dart:io';
 import '../../core/locale/locale_store.dart';
 import '../../features/jira/jira_credentials_store.dart';
 import '../../features/personio/personio_credentials_store.dart';
+import '../../features/reports/report_view_state_store.dart';
 import '../drift/database.dart';
 import '../sync/sync_paths.dart';
 
@@ -11,8 +12,9 @@ import '../sync/sync_paths.dart';
 /// sync pass can't re-ingest and resurrect its own history -- see
 /// docs/superpowers/specs/2026-08-05-project-delete-and-full-reset-design.md
 /// section 3.1 for why that matters), the configured sync folder is
-/// forgotten, and third-party credentials plus the locale preference are
-/// cleared. Deliberately bypasses SyncedWrites/the event log entirely: this
+/// forgotten, and third-party credentials plus the locale preference and
+/// Reports screen filter state are cleared. Deliberately bypasses
+/// SyncedWrites/the event log entirely: this
 /// *is* the sync state being cleared, so it can't go through that pipeline.
 /// Table deletion order in `resetEverything` is arbitrary -- safe only
 /// because this app never enables `PRAGMA foreign_keys`; enabling it later
@@ -27,6 +29,7 @@ class AppResetService {
     required this.jiraCredentialsStore,
     required this.personioCredentialsStore,
     required this.localeStore,
+    required this.reportViewStateStore,
   });
 
   final AppDatabase db;
@@ -37,6 +40,7 @@ class AppResetService {
   final JiraCredentialsStore jiraCredentialsStore;
   final PersonioCredentialsStore personioCredentialsStore;
   final LocaleStore localeStore;
+  final ReportViewStateStore reportViewStateStore;
 
   Future<void> resetEverything() async {
     await _deleteDeviceLogDir(effectiveSyncRoot);
@@ -50,6 +54,7 @@ class AppResetService {
     await jiraCredentialsStore.clear();
     await personioCredentialsStore.clear();
     await localeStore.clear();
+    await reportViewStateStore.clear();
   }
 
   Future<void> _deleteDeviceLogDir(Directory root) async {

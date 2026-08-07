@@ -10,6 +10,7 @@ import 'package:hickory/data/reset/app_reset_service.dart';
 import 'package:hickory/features/jira/jira_credentials_store.dart';
 import 'package:hickory/features/personio/personio_credentials_store.dart';
 import 'package:hickory/core/locale/locale_store.dart';
+import 'package:hickory/features/reports/report_view_state_store.dart';
 import 'package:hickory/features/settings/app_reset_section.dart';
 import 'package:hickory/l10n/app_localizations.dart';
 
@@ -48,7 +49,9 @@ void main() {
 
   setUp(() {
     db = AppDatabase.forTesting(NativeDatabase.memory());
-    tempDir = Directory.systemTemp.createTempSync('hickory_app_reset_section_test_');
+    tempDir = Directory.systemTemp.createTempSync(
+      'hickory_app_reset_section_test_',
+    );
     resetCalled = false;
   });
 
@@ -58,27 +61,34 @@ void main() {
   });
 
   Widget makeApp() => ProviderScope(
-        overrides: [
-          appResetServiceProvider.overrideWith(
-            (ref) async => AppResetService(
-              db: db,
-              deviceId: 'device-1',
-              effectiveSyncRoot: Directory('${tempDir.path}/effective')..createSync(),
-              defaultSyncRoot: Directory('${tempDir.path}/default')..createSync(),
-              clearSyncFolder: () async => resetCalled = true,
-              jiraCredentialsStore: _NoopJiraCredentialsStore(),
-              personioCredentialsStore: _NoopPersonioCredentialsStore(),
-              localeStore: LocaleStore(supportDirectory: Directory('${tempDir.path}/locale')..createSync()),
-            ),
+    overrides: [
+      appResetServiceProvider.overrideWith(
+        (ref) async => AppResetService(
+          db: db,
+          deviceId: 'device-1',
+          effectiveSyncRoot: Directory('${tempDir.path}/effective')
+            ..createSync(),
+          defaultSyncRoot: Directory('${tempDir.path}/default')..createSync(),
+          clearSyncFolder: () async => resetCalled = true,
+          jiraCredentialsStore: _NoopJiraCredentialsStore(),
+          personioCredentialsStore: _NoopPersonioCredentialsStore(),
+          localeStore: LocaleStore(
+            supportDirectory: Directory('${tempDir.path}/locale')..createSync(),
           ),
-        ],
-        child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: const Scaffold(body: AppResetSection()),
+          reportViewStateStore: ReportViewStateStore(
+            supportDirectory: Directory('${tempDir.path}/report_view_state')
+              ..createSync(),
+          ),
         ),
-      );
+      ),
+    ],
+    child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en'),
+      home: const Scaffold(body: AppResetSection()),
+    ),
+  );
 
   testWidgets('shows the reset button', (tester) async {
     await tester.pumpWidget(makeApp());
@@ -87,18 +97,19 @@ void main() {
     expect(find.text('Reset everything'), findsOneWidget);
   });
 
-  testWidgets('tapping the button opens a confirmation dialog explaining the consequences', (
-    tester,
-  ) async {
-    await tester.pumpWidget(makeApp());
-    await tester.pumpAndSettle();
+  testWidgets(
+    'tapping the button opens a confirmation dialog explaining the consequences',
+    (tester) async {
+      await tester.pumpWidget(makeApp());
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Reset everything'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Reset everything'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Really reset everything?'), findsOneWidget);
-    expect(resetCalled, isFalse);
-  });
+      expect(find.text('Really reset everything?'), findsOneWidget);
+      expect(resetCalled, isFalse);
+    },
+  );
 
   testWidgets('cancelling the confirmation performs no reset', (tester) async {
     await tester.pumpWidget(makeApp());
@@ -112,14 +123,18 @@ void main() {
     expect(resetCalled, isFalse);
   });
 
-  testWidgets('confirming runs the reset and shows a success message', (tester) async {
+  testWidgets('confirming runs the reset and shows a success message', (
+    tester,
+  ) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
     await tester.tap(find.text('Reset everything'));
     await tester.pumpAndSettle();
 
     await tester.runAsync(() async {
-      await tester.tap(find.widgetWithText(FilledButton, 'Yes, reset everything'));
+      await tester.tap(
+        find.widgetWithText(FilledButton, 'Yes, reset everything'),
+      );
       await pumpUntilTrue(() async {
         await tester.pump();
         return resetCalled;
