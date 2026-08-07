@@ -46,8 +46,8 @@ DateTimeRange rangeForPreset(ReportRangePreset preset, {DateTime? now}) {
   }
 }
 
-final reportEntriesProvider =
-    StreamProvider.family<List<TimeEntry>, DateTimeRange>((ref, range) {
+final reportEntriesProvider = StreamProvider.autoDispose
+    .family<List<TimeEntry>, DateTimeRange>((ref, range) {
       return ref
           .watch(appDatabaseProvider)
           .timeEntriesDao
