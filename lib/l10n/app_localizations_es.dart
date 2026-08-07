@@ -289,6 +289,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get commonDelete => 'Eliminar';
 
   @override
+  String get commonClose => 'Cerrar';
+
+  @override
   String get entriesEmpty => 'Aún no hay entradas.';
 
   @override
@@ -510,6 +513,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reportsCustomRange => 'Personalizado…';
 
   @override
+  String get reportsToday => 'Hoy';
+
+  @override
+  String get reportsYesterday => 'Ayer';
+
+  @override
   String reportsError(String error) {
     return 'Error: $error';
   }
@@ -529,6 +538,38 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get reportsEmptyRange => 'No hay entradas en este período.';
+
+  @override
+  String get reportsEmptyFiltered =>
+      'No hay entradas para este período y estos filtros.';
+
+  @override
+  String get reportsFilterTooltip => 'Filtro';
+
+  @override
+  String get reportsFilterDialogTitle => 'Filtro';
+
+  @override
+  String get reportsFilterProjectsLabel => 'Proyectos';
+
+  @override
+  String get reportsFilterProjectsHint =>
+      'Ninguna selección equivale a todos los proyectos.';
+
+  @override
+  String get reportsFilterBillableLabel => 'Facturable';
+
+  @override
+  String get reportsFilterBillableAll => 'Todo';
+
+  @override
+  String get reportsFilterBillableOnly => 'Solo facturable';
+
+  @override
+  String get reportsFilterBillableNonOnly => 'Solo no facturable';
+
+  @override
+  String get reportsFilterReset => 'Restablecer filtros';
 
   @override
   String get csvHeaderDate => 'Fecha';

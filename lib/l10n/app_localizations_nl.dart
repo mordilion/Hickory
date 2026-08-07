@@ -290,6 +290,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get commonDelete => 'Verwijderen';
 
   @override
+  String get commonClose => 'Sluiten';
+
+  @override
   String get entriesEmpty => 'Nog geen invoer.';
 
   @override
@@ -512,6 +515,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get reportsCustomRange => 'Aangepast…';
 
   @override
+  String get reportsToday => 'Vandaag';
+
+  @override
+  String get reportsYesterday => 'Gisteren';
+
+  @override
   String reportsError(String error) {
     return 'Fout: $error';
   }
@@ -531,6 +540,38 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get reportsEmptyRange => 'Geen invoer in deze periode.';
+
+  @override
+  String get reportsEmptyFiltered =>
+      'Geen invoer voor deze periode en deze filters.';
+
+  @override
+  String get reportsFilterTooltip => 'Filter';
+
+  @override
+  String get reportsFilterDialogTitle => 'Filter';
+
+  @override
+  String get reportsFilterProjectsLabel => 'Projecten';
+
+  @override
+  String get reportsFilterProjectsHint =>
+      'Geen selectie betekent alle projecten.';
+
+  @override
+  String get reportsFilterBillableLabel => 'Factureerbaar';
+
+  @override
+  String get reportsFilterBillableAll => 'Alles';
+
+  @override
+  String get reportsFilterBillableOnly => 'Alleen factureerbaar';
+
+  @override
+  String get reportsFilterBillableNonOnly => 'Alleen niet-factureerbaar';
+
+  @override
+  String get reportsFilterReset => 'Filters resetten';
 
   @override
   String get csvHeaderDate => 'Datum';

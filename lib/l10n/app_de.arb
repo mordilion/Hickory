@@ -127,6 +127,7 @@
   "commonCancel": "Abbrechen",
   "commonSave": "Speichern",
   "commonDelete": "Löschen",
+  "commonClose": "Schließen",
   "entriesEmpty": "Noch keine Einträge.",
   "entriesNoDescription": "Ohne Beschreibung",
   "entriesError": "Fehler: {error}",
@@ -221,6 +222,8 @@
   "reportsLast30Days": "Letzte 30 Tage",
   "reportsAll": "Alle",
   "reportsCustomRange": "Benutzerdefiniert…",
+  "reportsToday": "Heute",
+  "reportsYesterday": "Gestern",
   "reportsError": "Fehler: {error}",
   "@reportsError": {
     "placeholders": {
@@ -241,6 +244,16 @@
     }
   },
   "reportsEmptyRange": "Keine Einträge in diesem Zeitraum.",
+  "reportsEmptyFiltered": "Keine Einträge für diesen Zeitraum und diese Filter.",
+  "reportsFilterTooltip": "Filter",
+  "reportsFilterDialogTitle": "Filter",
+  "reportsFilterProjectsLabel": "Projekte",
+  "reportsFilterProjectsHint": "Keine Auswahl entspricht allen Projekten.",
+  "reportsFilterBillableLabel": "Abrechenbar",
+  "reportsFilterBillableAll": "Alle",
+  "reportsFilterBillableOnly": "Nur abrechenbar",
+  "reportsFilterBillableNonOnly": "Nur nicht abrechenbar",
+  "reportsFilterReset": "Filter zurücksetzen",
   "csvHeaderDate": "Datum",
   "csvHeaderStart": "Start",
   "csvHeaderEnd": "Ende",

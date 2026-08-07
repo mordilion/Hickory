@@ -597,6 +597,12 @@ abstract class AppLocalizations {
   /// **'Löschen'**
   String get commonDelete;
 
+  /// No description provided for @commonClose.
+  ///
+  /// In de, this message translates to:
+  /// **'Schließen'**
+  String get commonClose;
+
   /// No description provided for @entriesEmpty.
   ///
   /// In de, this message translates to:
@@ -999,6 +1005,18 @@ abstract class AppLocalizations {
   /// **'Benutzerdefiniert…'**
   String get reportsCustomRange;
 
+  /// No description provided for @reportsToday.
+  ///
+  /// In de, this message translates to:
+  /// **'Heute'**
+  String get reportsToday;
+
+  /// No description provided for @reportsYesterday.
+  ///
+  /// In de, this message translates to:
+  /// **'Gestern'**
+  String get reportsYesterday;
+
   /// No description provided for @reportsError.
   ///
   /// In de, this message translates to:
@@ -1028,6 +1046,66 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Keine Einträge in diesem Zeitraum.'**
   String get reportsEmptyRange;
+
+  /// No description provided for @reportsEmptyFiltered.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Einträge für diesen Zeitraum und diese Filter.'**
+  String get reportsEmptyFiltered;
+
+  /// No description provided for @reportsFilterTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Filter'**
+  String get reportsFilterTooltip;
+
+  /// No description provided for @reportsFilterDialogTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Filter'**
+  String get reportsFilterDialogTitle;
+
+  /// No description provided for @reportsFilterProjectsLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Projekte'**
+  String get reportsFilterProjectsLabel;
+
+  /// No description provided for @reportsFilterProjectsHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Auswahl entspricht allen Projekten.'**
+  String get reportsFilterProjectsHint;
+
+  /// No description provided for @reportsFilterBillableLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Abrechenbar'**
+  String get reportsFilterBillableLabel;
+
+  /// No description provided for @reportsFilterBillableAll.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle'**
+  String get reportsFilterBillableAll;
+
+  /// No description provided for @reportsFilterBillableOnly.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur abrechenbar'**
+  String get reportsFilterBillableOnly;
+
+  /// No description provided for @reportsFilterBillableNonOnly.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur nicht abrechenbar'**
+  String get reportsFilterBillableNonOnly;
+
+  /// No description provided for @reportsFilterReset.
+  ///
+  /// In de, this message translates to:
+  /// **'Filter zurücksetzen'**
+  String get reportsFilterReset;
 
   /// No description provided for @csvHeaderDate.
   ///

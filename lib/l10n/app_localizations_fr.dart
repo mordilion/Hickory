@@ -291,6 +291,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get commonDelete => 'Supprimer';
 
   @override
+  String get commonClose => 'Fermer';
+
+  @override
   String get entriesEmpty => 'Aucune entrée pour l\'instant.';
 
   @override
@@ -515,6 +518,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reportsCustomRange => 'Personnalisé…';
 
   @override
+  String get reportsToday => 'Aujourd\'hui';
+
+  @override
+  String get reportsYesterday => 'Hier';
+
+  @override
   String reportsError(String error) {
     return 'Erreur : $error';
   }
@@ -534,6 +543,38 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get reportsEmptyRange => 'Aucune entrée sur cette période.';
+
+  @override
+  String get reportsEmptyFiltered =>
+      'Aucune entrée pour cette période et ces filtres.';
+
+  @override
+  String get reportsFilterTooltip => 'Filtre';
+
+  @override
+  String get reportsFilterDialogTitle => 'Filtre';
+
+  @override
+  String get reportsFilterProjectsLabel => 'Projets';
+
+  @override
+  String get reportsFilterProjectsHint =>
+      'Aucune sélection équivaut à tous les projets.';
+
+  @override
+  String get reportsFilterBillableLabel => 'Facturable';
+
+  @override
+  String get reportsFilterBillableAll => 'Tout';
+
+  @override
+  String get reportsFilterBillableOnly => 'Facturable uniquement';
+
+  @override
+  String get reportsFilterBillableNonOnly => 'Non facturable uniquement';
+
+  @override
+  String get reportsFilterReset => 'Réinitialiser les filtres';
 
   @override
   String get csvHeaderDate => 'Date';
