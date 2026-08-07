@@ -16,7 +16,10 @@ class ReportViewState {
     this.customRange,
     this.projectIds = const {},
     this.billableFilter = BillableFilter.all,
-  });
+  }) : assert(
+        preset != null || customRange != null,
+        'ReportViewState requires either a preset or a customRange',
+      );
 
   final ReportRangePreset? preset;
   final DateTimeRange? customRange;
