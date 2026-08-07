@@ -90,4 +90,45 @@ void main() {
       expect(state.preset, ReportRangePreset.thisMonth);
     },
   );
+
+  test(
+    'read returns the default state when preset and customRange are both null',
+    () async {
+      final file = File('${tempDir.path}/report_view_state.json');
+      await file.writeAsString('{"preset": null}');
+
+      final store = ReportViewStateStore(supportDirectory: tempDir);
+      final state = await store.read();
+      expect(state.preset, ReportRangePreset.thisMonth);
+      expect(state.customRange, isNull);
+    },
+  );
+
+  test(
+    'clear deletes the file so a later read returns the default state',
+    () async {
+      final store = ReportViewStateStore(supportDirectory: tempDir);
+      await store.write(
+        const ReportViewState(
+          preset: ReportRangePreset.today,
+          projectIds: {'p1'},
+          billableFilter: BillableFilter.billableOnly,
+        ),
+      );
+
+      await store.clear();
+
+      final state = await store.read();
+      expect(state.preset, ReportRangePreset.thisMonth);
+      expect(state.customRange, isNull);
+      expect(state.projectIds, isEmpty);
+      expect(state.billableFilter, BillableFilter.all);
+    },
+  );
+
+  test('clear does not throw when no file exists', () async {
+    final store = ReportViewStateStore(supportDirectory: tempDir);
+
+    await expectLater(store.clear(), completes);
+  });
 }

@@ -53,6 +53,12 @@ class ReportViewStateStore {
           (json['projectIds'] as List<dynamic>?)?.cast<String>().toSet() ??
           const <String>{};
 
+      // In debug/test this invariant is also caught by ReportViewState's
+      // assert, but asserts are stripped in release builds -- without this
+      // explicit check a persisted `{"preset": null}` (no custom range)
+      // would construct an invalid state and crash later on `.range` access.
+      if (preset == null && customRange == null) return const ReportViewState();
+
       return ReportViewState(
         preset: preset,
         customRange: customRange,
@@ -78,5 +84,13 @@ class ReportViewStateStore {
         'billableFilter': state.billableFilter.name,
       }),
     );
+  }
+
+  Future<void> clear() async {
+    try {
+      await _file.delete();
+    } on PathNotFoundException {
+      // Already absent — nothing to do.
+    }
   }
 }
