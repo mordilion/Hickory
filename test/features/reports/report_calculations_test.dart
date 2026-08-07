@@ -51,7 +51,11 @@ TimeEntry _entry({
 void main() {
   group('totalsByProject', () {
     test('sums duration per project and computes a billable amount', () {
-      final billableProject = _project(id: 'p1', name: 'Client X', hourlyRateCents: 10000);
+      final billableProject = _project(
+        id: 'p1',
+        name: 'Client X',
+        hourlyRateCents: 10000,
+      );
       final entries = [
         _entry(
           id: 'e1',
@@ -76,44 +80,50 @@ void main() {
       expect(totals.single.currency, 'EUR');
     });
 
-    test('entries with no project are grouped under "Kein Projekt" with no amount', () {
-      final entries = [
-        _entry(
-          id: 'e1',
-          projectId: null,
-          startAt: DateTime.utc(2026, 7, 7, 9),
-          endAt: DateTime.utc(2026, 7, 7, 9, 45),
-        ),
-      ];
+    test(
+      'entries with no project are grouped under "Kein Projekt" with no amount',
+      () {
+        final entries = [
+          _entry(
+            id: 'e1',
+            projectId: null,
+            startAt: DateTime.utc(2026, 7, 7, 9),
+            endAt: DateTime.utc(2026, 7, 7, 9, 45),
+          ),
+        ];
 
-      final totals = totalsByProject(entries, const []);
+        final totals = totalsByProject(entries, const []);
 
-      expect(totals.single.projectId, isNull);
-      expect(totals.single.projectName, 'Kein Projekt');
-      expect(totals.single.amountCents, isNull);
-    });
+        expect(totals.single.projectId, isNull);
+        expect(totals.single.projectName, 'Kein Projekt');
+        expect(totals.single.amountCents, isNull);
+      },
+    );
 
-    test('a non-billable project never gets an amount even with an hourly rate', () {
-      final project = _project(
-        id: 'p1',
-        name: 'Internal',
-        billable: false,
-        hourlyRateCents: 10000,
-      );
-      final entries = [
-        _entry(
-          id: 'e1',
-          projectId: 'p1',
-          startAt: DateTime.utc(2026, 7, 7, 9),
-          endAt: DateTime.utc(2026, 7, 7, 10),
-        ),
-      ];
+    test(
+      'a non-billable project never gets an amount even with an hourly rate',
+      () {
+        final project = _project(
+          id: 'p1',
+          name: 'Internal',
+          billable: false,
+          hourlyRateCents: 10000,
+        );
+        final entries = [
+          _entry(
+            id: 'e1',
+            projectId: 'p1',
+            startAt: DateTime.utc(2026, 7, 7, 9),
+            endAt: DateTime.utc(2026, 7, 7, 10),
+          ),
+        ];
 
-      final totals = totalsByProject(entries, [project]);
+        final totals = totalsByProject(entries, [project]);
 
-      expect(totals.single.billable, isFalse);
-      expect(totals.single.amountCents, isNull);
-    });
+        expect(totals.single.billable, isFalse);
+        expect(totals.single.amountCents, isNull);
+      },
+    );
 
     test('a still-running entry (no endAt) is excluded', () {
       final now = DateTime.utc(2026, 7, 1);
@@ -183,9 +193,21 @@ void main() {
       final sameDayStart2 = DateTime.utc(2026, 7, 7, 14);
       final otherDayStart = DateTime.utc(2026, 7, 8, 9);
       final entries = [
-        _entry(id: 'e1', startAt: sameDayStart1, endAt: DateTime.utc(2026, 7, 7, 10)),
-        _entry(id: 'e2', startAt: sameDayStart2, endAt: DateTime.utc(2026, 7, 7, 14, 30)),
-        _entry(id: 'e3', startAt: otherDayStart, endAt: DateTime.utc(2026, 7, 8, 9, 45)),
+        _entry(
+          id: 'e1',
+          startAt: sameDayStart1,
+          endAt: DateTime.utc(2026, 7, 7, 10),
+        ),
+        _entry(
+          id: 'e2',
+          startAt: sameDayStart2,
+          endAt: DateTime.utc(2026, 7, 7, 14, 30),
+        ),
+        _entry(
+          id: 'e3',
+          startAt: otherDayStart,
+          endAt: DateTime.utc(2026, 7, 8, 9, 45),
+        ),
       ];
 
       final totals = totalsByDay(entries);
@@ -199,14 +221,21 @@ void main() {
       }
 
       expect(totals.length, 2);
-      expect(totals[localDay(sameDayStart1)], const Duration(hours: 1, minutes: 30));
+      expect(
+        totals[localDay(sameDayStart1)],
+        const Duration(hours: 1, minutes: 30),
+      );
       expect(totals[localDay(otherDayStart)], const Duration(minutes: 45));
     });
   });
 
   group('filterEntries', () {
     final billableProject = _project(id: 'p1', name: 'Billable Co');
-    final nonBillableProject = _project(id: 'p2', name: 'Internal', billable: false);
+    final nonBillableProject = _project(
+      id: 'p2',
+      name: 'Internal',
+      billable: false,
+    );
     final projects = [billableProject, nonBillableProject];
 
     test('returns entries unchanged when no filters are active', () {
@@ -218,8 +247,12 @@ void main() {
           endAt: DateTime.utc(2026, 7, 7, 10),
         ),
       ];
-      final result =
-          filterEntries(entries, projects, projectIds: {}, billableFilter: BillableFilter.all);
+      final result = filterEntries(
+        entries,
+        projects,
+        projectIds: {},
+        billableFilter: BillableFilter.all,
+      );
       expect(result, entries);
     });
 
@@ -252,88 +285,97 @@ void main() {
       expect(result.map((e) => e.id), ['e1']);
     });
 
-    test('billableOnly uses the project billable flag when no override is set', () {
-      final entries = [
-        _entry(
-          id: 'e1',
-          projectId: 'p1',
-          startAt: DateTime.utc(2026, 7, 7, 9),
-          endAt: DateTime.utc(2026, 7, 7, 10),
-        ),
-        _entry(
-          id: 'e2',
-          projectId: 'p2',
-          startAt: DateTime.utc(2026, 7, 7, 9),
-          endAt: DateTime.utc(2026, 7, 7, 10),
-        ),
-      ];
-      final result = filterEntries(
-        entries,
-        projects,
-        projectIds: {},
-        billableFilter: BillableFilter.billableOnly,
-      );
-      expect(result.map((e) => e.id), ['e1']);
-    });
+    test(
+      'billableOnly uses the project billable flag when no override is set',
+      () {
+        final entries = [
+          _entry(
+            id: 'e1',
+            projectId: 'p1',
+            startAt: DateTime.utc(2026, 7, 7, 9),
+            endAt: DateTime.utc(2026, 7, 7, 10),
+          ),
+          _entry(
+            id: 'e2',
+            projectId: 'p2',
+            startAt: DateTime.utc(2026, 7, 7, 9),
+            endAt: DateTime.utc(2026, 7, 7, 10),
+          ),
+        ];
+        final result = filterEntries(
+          entries,
+          projects,
+          projectIds: {},
+          billableFilter: BillableFilter.billableOnly,
+        );
+        expect(result.map((e) => e.id), ['e1']);
+      },
+    );
 
-    test('nonBillableOnly uses the project billable flag when no override is set', () {
-      final entries = [
-        _entry(
-          id: 'e1',
-          projectId: 'p1',
-          startAt: DateTime.utc(2026, 7, 7, 9),
-          endAt: DateTime.utc(2026, 7, 7, 10),
-        ),
-        _entry(
-          id: 'e2',
-          projectId: 'p2',
-          startAt: DateTime.utc(2026, 7, 7, 9),
-          endAt: DateTime.utc(2026, 7, 7, 10),
-        ),
-      ];
-      final result = filterEntries(
-        entries,
-        projects,
-        projectIds: {},
-        billableFilter: BillableFilter.nonBillableOnly,
-      );
-      expect(result.map((e) => e.id), ['e2']);
-    });
+    test(
+      'nonBillableOnly uses the project billable flag when no override is set',
+      () {
+        final entries = [
+          _entry(
+            id: 'e1',
+            projectId: 'p1',
+            startAt: DateTime.utc(2026, 7, 7, 9),
+            endAt: DateTime.utc(2026, 7, 7, 10),
+          ),
+          _entry(
+            id: 'e2',
+            projectId: 'p2',
+            startAt: DateTime.utc(2026, 7, 7, 9),
+            endAt: DateTime.utc(2026, 7, 7, 10),
+          ),
+        ];
+        final result = filterEntries(
+          entries,
+          projects,
+          projectIds: {},
+          billableFilter: BillableFilter.nonBillableOnly,
+        );
+        expect(result.map((e) => e.id), ['e2']);
+      },
+    );
 
-    test('billableOverride takes precedence over the project billable flag', () {
-      final entries = [
-        // Billable project, but this entry overrides to non-billable.
-        _entry(
-          id: 'e1',
-          projectId: 'p1',
-          startAt: DateTime.utc(2026, 7, 7, 9),
-          endAt: DateTime.utc(2026, 7, 7, 10),
-          billableOverride: false,
-        ),
-        // Non-billable project, but this entry overrides to billable.
-        _entry(
-          id: 'e2',
-          projectId: 'p2',
-          startAt: DateTime.utc(2026, 7, 7, 9),
-          endAt: DateTime.utc(2026, 7, 7, 10),
-          billableOverride: true,
-        ),
-      ];
-      final billableOnly = filterEntries(
-        entries,
-        projects,
-        projectIds: {},
-        billableFilter: BillableFilter.billableOnly,
-      );
-      expect(billableOnly.map((e) => e.id), ['e2']);
-      final nonBillableOnly = filterEntries(
-        entries,
-        projects,
-        projectIds: {},
-        billableFilter: BillableFilter.nonBillableOnly,
-      );
-      expect(nonBillableOnly.map((e) => e.id), ['e1']);
-    });
+    test(
+      'billableOverride takes precedence over the project billable flag',
+      () {
+        final entries = [
+          // Billable project, but this entry overrides to non-billable.
+          _entry(
+            id: 'e1',
+            projectId: 'p1',
+            startAt: DateTime.utc(2026, 7, 7, 9),
+            endAt: DateTime.utc(2026, 7, 7, 10),
+            billableOverride: false,
+          ),
+          // Non-billable project, but this entry overrides to billable.
+          _entry(
+            id: 'e2',
+            projectId: 'p2',
+            startAt: DateTime.utc(2026, 7, 7, 9),
+            endAt: DateTime.utc(2026, 7, 7, 10),
+            billableOverride: true,
+          ),
+        ];
+        final billableOnly = filterEntries(
+          entries,
+          projects,
+          projectIds: {},
+          billableFilter: BillableFilter.billableOnly,
+        );
+        expect(billableOnly.map((e) => e.id), ['e2']);
+        final nonBillableOnly = filterEntries(
+          entries,
+          projects,
+          projectIds: {},
+          billableFilter: BillableFilter.nonBillableOnly,
+        );
+        expect(nonBillableOnly.map((e) => e.id), ['e1']);
+      },
+    );
 
     test('combines project and billable filters', () {
       final entries = [

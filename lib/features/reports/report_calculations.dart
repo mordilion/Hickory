@@ -52,8 +52,9 @@ List<ProjectTotal> totalsByProject(
     final project = projectId == null ? null : projectsById[projectId];
     final billable = project?.billable ?? false;
     final rateCents = project?.hourlyRateCents;
-    final amountCents =
-        (billable && rateCents != null) ? (rateCents * duration.inMinutes / 60).round() : null;
+    final amountCents = (billable && rateCents != null)
+        ? (rateCents * duration.inMinutes / 60).round()
+        : null;
     totals.add(
       ProjectTotal(
         projectId: projectId,
@@ -78,7 +79,11 @@ Map<DateTime, Duration> totalsByDay(List<TimeEntry> entries) {
     final local = entry.startAt.toLocal();
     final day = DateTime(local.year, local.month, local.day);
     final duration = entry.workedDuration;
-    totals.update(day, (existing) => existing + duration, ifAbsent: () => duration);
+    totals.update(
+      day,
+      (existing) => existing + duration,
+      ifAbsent: () => duration,
+    );
   }
   return totals;
 }
@@ -94,13 +99,21 @@ List<TimeEntry> filterEntries(
   required Set<String> projectIds,
   required BillableFilter billableFilter,
 }) {
-  if (projectIds.isEmpty && billableFilter == BillableFilter.all) return entries;
+  if (projectIds.isEmpty && billableFilter == BillableFilter.all) {
+    return entries;
+  }
   final projectsById = {for (final p in projects) p.id: p};
   return entries.where((entry) {
-    if (projectIds.isNotEmpty && !projectIds.contains(entry.projectId)) return false;
+    if (projectIds.isNotEmpty && !projectIds.contains(entry.projectId)) {
+      return false;
+    }
     if (billableFilter == BillableFilter.all) return true;
     final effectiveBillable =
-        entry.billableOverride ?? projectsById[entry.projectId]?.billable ?? false;
-    return billableFilter == BillableFilter.billableOnly ? effectiveBillable : !effectiveBillable;
+        entry.billableOverride ??
+        projectsById[entry.projectId]?.billable ??
+        false;
+    return billableFilter == BillableFilter.billableOnly
+        ? effectiveBillable
+        : !effectiveBillable;
   }).toList();
 }

@@ -11,7 +11,9 @@ part 'report_view_controller.g.dart';
 
 @Riverpod(keepAlive: true)
 Future<ReportViewStateStore> reportViewStateStore(Ref ref) async =>
-    ReportViewStateStore(supportDirectory: await getApplicationSupportDirectory());
+    ReportViewStateStore(
+      supportDirectory: await getApplicationSupportDirectory(),
+    );
 
 /// The Reports screen's remembered range + filters (see [ReportViewState]).
 /// Loaded once from disk on first use and kept alive for the app's
@@ -43,11 +45,13 @@ class ReportViewController extends _$ReportViewController {
   Future<void> setCustomRange(DateTimeRange range) =>
       _update((s) => s.copyWith(preset: () => null, customRange: () => range));
 
-  Future<void> setProjectIds(Set<String> ids) => _update((s) => s.copyWith(projectIds: ids));
+  Future<void> setProjectIds(Set<String> ids) =>
+      _update((s) => s.copyWith(projectIds: ids));
 
   Future<void> setBillableFilter(BillableFilter filter) =>
       _update((s) => s.copyWith(billableFilter: filter));
 
-  Future<void> resetFilters() =>
-      _update((s) => s.copyWith(projectIds: {}, billableFilter: BillableFilter.all));
+  Future<void> resetFilters() => _update(
+    (s) => s.copyWith(projectIds: {}, billableFilter: BillableFilter.all),
+  );
 }

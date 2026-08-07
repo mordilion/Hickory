@@ -19,7 +19,8 @@ class ReportViewStateStore {
 
   final Directory supportDirectory;
 
-  File get _file => File(p.join(supportDirectory.path, 'report_view_state.json'));
+  File get _file =>
+      File(p.join(supportDirectory.path, 'report_view_state.json'));
 
   /// Returns the default state (this-month preset, no filters) if the file
   /// is missing, unreadable, or contains an unrecognized preset/billable
@@ -30,20 +31,27 @@ class ReportViewStateStore {
       final json = jsonDecode(content) as Map<String, dynamic>;
 
       final presetName = json['preset'] as String?;
-      final preset = presetName == null ? null : ReportRangePreset.values.byName(presetName);
+      final preset = presetName == null
+          ? null
+          : ReportRangePreset.values.byName(presetName);
 
       final customStart = json['customRangeStart'] as String?;
       final customEnd = json['customRangeEnd'] as String?;
       final customRange = (customStart != null && customEnd != null)
-          ? DateTimeRange(start: DateTime.parse(customStart), end: DateTime.parse(customEnd))
+          ? DateTimeRange(
+              start: DateTime.parse(customStart),
+              end: DateTime.parse(customEnd),
+            )
           : null;
 
       final billableName = json['billableFilter'] as String?;
-      final billableFilter =
-          billableName == null ? BillableFilter.all : BillableFilter.values.byName(billableName);
+      final billableFilter = billableName == null
+          ? BillableFilter.all
+          : BillableFilter.values.byName(billableName);
 
       final projectIds =
-          (json['projectIds'] as List<dynamic>?)?.cast<String>().toSet() ?? const <String>{};
+          (json['projectIds'] as List<dynamic>?)?.cast<String>().toSet() ??
+          const <String>{};
 
       return ReportViewState(
         preset: preset,

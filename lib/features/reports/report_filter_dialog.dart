@@ -34,8 +34,14 @@ class ReportFilterDialog extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.reportsFilterProjectsLabel, style: Theme.of(context).textTheme.titleSmall),
-              Text(l10n.reportsFilterProjectsHint, style: Theme.of(context).textTheme.bodySmall),
+              Text(
+                l10n.reportsFilterProjectsLabel,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              Text(
+                l10n.reportsFilterProjectsHint,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
               ...projects.map(
                 (project) => CheckboxListTile(
                   dense: true,
@@ -48,7 +54,11 @@ class ReportFilterDialog extends ConsumerWidget {
                         height: 12,
                         margin: const EdgeInsets.only(right: 8),
                         decoration: BoxDecoration(
-                          color: Color(int.parse(project.colorHex.replaceFirst('#', '0xFF'))),
+                          color: Color(
+                            int.parse(
+                              project.colorHex.replaceFirst('#', '0xFF'),
+                            ),
+                          ),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -78,18 +88,22 @@ class ReportFilterDialog extends ConsumerWidget {
                   ChoiceChip(
                     label: Text(l10n.reportsFilterBillableAll),
                     selected: billableFilter == BillableFilter.all,
-                    onSelected: (_) => controller.setBillableFilter(BillableFilter.all),
+                    onSelected: (_) =>
+                        controller.setBillableFilter(BillableFilter.all),
                   ),
                   ChoiceChip(
                     label: Text(l10n.reportsFilterBillableOnly),
                     selected: billableFilter == BillableFilter.billableOnly,
-                    onSelected: (_) => controller.setBillableFilter(BillableFilter.billableOnly),
+                    onSelected: (_) => controller.setBillableFilter(
+                      BillableFilter.billableOnly,
+                    ),
                   ),
                   ChoiceChip(
                     label: Text(l10n.reportsFilterBillableNonOnly),
                     selected: billableFilter == BillableFilter.nonBillableOnly,
-                    onSelected: (_) =>
-                        controller.setBillableFilter(BillableFilter.nonBillableOnly),
+                    onSelected: (_) => controller.setBillableFilter(
+                      BillableFilter.nonBillableOnly,
+                    ),
                   ),
                 ],
               ),

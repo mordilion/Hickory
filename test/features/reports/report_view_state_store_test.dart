@@ -10,7 +10,9 @@ void main() {
   late Directory tempDir;
 
   setUp(() {
-    tempDir = Directory.systemTemp.createTempSync('hickory_report_view_state_test_');
+    tempDir = Directory.systemTemp.createTempSync(
+      'hickory_report_view_state_test_',
+    );
   });
 
   tearDown(() {
@@ -26,28 +28,36 @@ void main() {
     expect(state.billableFilter, BillableFilter.all);
   });
 
-  test('write then read round-trips a preset-based state, and persists across instances', () async {
-    final store = ReportViewStateStore(supportDirectory: tempDir);
-    const state = ReportViewState(
-      preset: ReportRangePreset.today,
-      projectIds: {'p1', 'p2'},
-      billableFilter: BillableFilter.billableOnly,
-    );
+  test(
+    'write then read round-trips a preset-based state, and persists across instances',
+    () async {
+      final store = ReportViewStateStore(supportDirectory: tempDir);
+      const state = ReportViewState(
+        preset: ReportRangePreset.today,
+        projectIds: {'p1', 'p2'},
+        billableFilter: BillableFilter.billableOnly,
+      );
 
-    await store.write(state);
+      await store.write(state);
 
-    final read = await store.read();
-    expect(read.preset, ReportRangePreset.today);
-    expect(read.customRange, isNull);
-    expect(read.projectIds, {'p1', 'p2'});
-    expect(read.billableFilter, BillableFilter.billableOnly);
-    final fresh = await ReportViewStateStore(supportDirectory: tempDir).read();
-    expect(fresh.preset, ReportRangePreset.today);
-  });
+      final read = await store.read();
+      expect(read.preset, ReportRangePreset.today);
+      expect(read.customRange, isNull);
+      expect(read.projectIds, {'p1', 'p2'});
+      expect(read.billableFilter, BillableFilter.billableOnly);
+      final fresh = await ReportViewStateStore(
+        supportDirectory: tempDir,
+      ).read();
+      expect(fresh.preset, ReportRangePreset.today);
+    },
+  );
 
   test('write then read round-trips a custom-range state', () async {
     final store = ReportViewStateStore(supportDirectory: tempDir);
-    final range = DateTimeRange(start: DateTime(2026, 1, 1), end: DateTime(2026, 2, 1));
+    final range = DateTimeRange(
+      start: DateTime(2026, 1, 1),
+      end: DateTime(2026, 2, 1),
+    );
     final state = ReportViewState(preset: null, customRange: range);
 
     await store.write(state);
@@ -57,21 +67,27 @@ void main() {
     expect(read.customRange, range);
   });
 
-  test('read returns the default state for a corrupt file instead of throwing', () async {
-    final file = File('${tempDir.path}/report_view_state.json');
-    await file.writeAsString('{not valid json');
+  test(
+    'read returns the default state for a corrupt file instead of throwing',
+    () async {
+      final file = File('${tempDir.path}/report_view_state.json');
+      await file.writeAsString('{not valid json');
 
-    final store = ReportViewStateStore(supportDirectory: tempDir);
-    final state = await store.read();
-    expect(state.preset, ReportRangePreset.thisMonth);
-  });
+      final store = ReportViewStateStore(supportDirectory: tempDir);
+      final state = await store.read();
+      expect(state.preset, ReportRangePreset.thisMonth);
+    },
+  );
 
-  test('read returns the default state for an unrecognized preset name', () async {
-    final file = File('${tempDir.path}/report_view_state.json');
-    await file.writeAsString('{"preset": "someFuturePreset"}');
+  test(
+    'read returns the default state for an unrecognized preset name',
+    () async {
+      final file = File('${tempDir.path}/report_view_state.json');
+      await file.writeAsString('{"preset": "someFuturePreset"}');
 
-    final store = ReportViewStateStore(supportDirectory: tempDir);
-    final state = await store.read();
-    expect(state.preset, ReportRangePreset.thisMonth);
-  });
+      final store = ReportViewStateStore(supportDirectory: tempDir);
+      final state = await store.read();
+      expect(state.preset, ReportRangePreset.thisMonth);
+    },
+  );
 }

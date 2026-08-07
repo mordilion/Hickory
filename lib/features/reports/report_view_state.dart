@@ -17,9 +17,9 @@ class ReportViewState {
     this.projectIds = const {},
     this.billableFilter = BillableFilter.all,
   }) : assert(
-        preset != null || customRange != null,
-        'ReportViewState requires either a preset or a customRange',
-      );
+         preset != null || customRange != null,
+         'ReportViewState requires either a preset or a customRange',
+       );
 
   final ReportRangePreset? preset;
   final DateTimeRange? customRange;
@@ -29,10 +29,12 @@ class ReportViewState {
   // customRange is always set together with a null preset (see
   // ReportViewController.setPreset/setCustomRange in report_view_controller.dart),
   // so the ! here reflects that invariant rather than an unchecked assumption.
-  DateTimeRange get range => preset == null ? customRange! : rangeForPreset(preset!);
+  DateTimeRange get range =>
+      preset == null ? customRange! : rangeForPreset(preset!);
 
   int get activeFilterCount =>
-      (projectIds.isNotEmpty ? 1 : 0) + (billableFilter != BillableFilter.all ? 1 : 0);
+      (projectIds.isNotEmpty ? 1 : 0) +
+      (billableFilter != BillableFilter.all ? 1 : 0);
 
   ReportViewState copyWith({
     ReportRangePreset? Function()? preset,

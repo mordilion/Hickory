@@ -50,7 +50,10 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     await ref.read(reportViewControllerProvider.notifier).setCustomRange(range);
   }
 
-  Future<void> _exportCsv(List<TimeEntry> entries, List<Project> projects) async {
+  Future<void> _exportCsv(
+    List<TimeEntry> entries,
+    List<Project> projects,
+  ) async {
     final l10n = AppLocalizations.of(context);
     final settings = ref.read(appSettingsProvider).value;
     final csv = entriesToCsv(
@@ -68,7 +71,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
       bytes: Uint8List.fromList(utf8.encode(csv)),
     );
     if (!mounted) return;
-    setState(() => _exportStatus = path == null ? null : l10n.reportsExportedTo(path));
+    setState(
+      () => _exportStatus = path == null ? null : l10n.reportsExportedTo(path),
+    );
   }
 
   @override
@@ -81,7 +86,10 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.reportsTitle, style: Theme.of(context).textTheme.headlineSmall),
+          Text(
+            l10n.reportsTitle,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
           const SizedBox(height: 12),
           Expanded(
             child: viewAsync.when(
@@ -92,7 +100,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                 onExport: _exportCsv,
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text(l10n.reportsError(e.toString()))),
+              error: (e, _) =>
+                  Center(child: Text(l10n.reportsError(e.toString()))),
             ),
           ),
         ],
@@ -112,7 +121,8 @@ class _ReportRangeAndBody extends ConsumerWidget {
   final ReportViewState viewState;
   final String? exportStatus;
   final VoidCallback onSelectCustomRange;
-  final Future<void> Function(List<TimeEntry> entries, List<Project> projects) onExport;
+  final Future<void> Function(List<TimeEntry> entries, List<Project> projects)
+  onExport;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -132,7 +142,13 @@ class _ReportRangeAndBody extends ConsumerWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  _presetChip(context, ref, l10n.reportsToday, ReportRangePreset.today, tokens),
+                  _presetChip(
+                    context,
+                    ref,
+                    l10n.reportsToday,
+                    ReportRangePreset.today,
+                    tokens,
+                  ),
                   _presetChip(
                     context,
                     ref,
@@ -161,8 +177,17 @@ class _ReportRangeAndBody extends ConsumerWidget {
                     ReportRangePreset.last30Days,
                     tokens,
                   ),
-                  _presetChip(context, ref, l10n.reportsAll, ReportRangePreset.all, tokens),
-                  ActionChip(label: Text(l10n.reportsCustomRange), onPressed: onSelectCustomRange),
+                  _presetChip(
+                    context,
+                    ref,
+                    l10n.reportsAll,
+                    ReportRangePreset.all,
+                    tokens,
+                  ),
+                  ActionChip(
+                    label: Text(l10n.reportsCustomRange),
+                    onPressed: onSelectCustomRange,
+                  ),
                 ],
               ),
             ),
@@ -203,10 +228,12 @@ class _ReportRangeAndBody extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text(l10n.reportsError(e.toString()))),
+              error: (e, _) =>
+                  Center(child: Text(l10n.reportsError(e.toString()))),
             ),
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text(l10n.reportsError(e.toString()))),
+            error: (e, _) =>
+                Center(child: Text(l10n.reportsError(e.toString()))),
           ),
         ),
         if (exportStatus != null) ...[
@@ -229,7 +256,8 @@ class _ReportRangeAndBody extends ConsumerWidget {
       label: Text(label),
       selected: selected,
       selectedColor: tokens.navActiveIcon.withValues(alpha: 0.22),
-      onSelected: (_) => ref.read(reportViewControllerProvider.notifier).setPreset(preset),
+      onSelected: (_) =>
+          ref.read(reportViewControllerProvider.notifier).setPreset(preset),
     );
   }
 }
@@ -250,8 +278,15 @@ class _ReportBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final totals = totalsByProject(entries, projects, noProjectLabel: l10n.commonNoProject);
-    final totalDuration = totals.fold<Duration>(Duration.zero, (sum, t) => sum + t.duration);
+    final totals = totalsByProject(
+      entries,
+      projects,
+      noProjectLabel: l10n.commonNoProject,
+    );
+    final totalDuration = totals.fold<Duration>(
+      Duration.zero,
+      (sum, t) => sum + t.duration,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,7 +310,9 @@ class _ReportBody extends StatelessWidget {
           child: totals.isEmpty
               ? Center(
                   child: Text(
-                    hasActiveFilters ? l10n.reportsEmptyFiltered : l10n.reportsEmptyRange,
+                    hasActiveFilters
+                        ? l10n.reportsEmptyFiltered
+                        : l10n.reportsEmptyRange,
                   ),
                 )
               : ListView.builder(
