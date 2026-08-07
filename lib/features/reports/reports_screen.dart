@@ -13,6 +13,9 @@ import '../../data/drift/database.dart';
 import '../../l10n/app_localizations.dart';
 import 'csv_export.dart';
 import 'report_calculations.dart';
+import 'report_filter_dialog.dart';
+import 'report_view_controller.dart';
+import 'report_view_state.dart';
 import 'reports_providers.dart';
 
 class ReportsScreen extends ConsumerStatefulWidget {
@@ -23,27 +26,20 @@ class ReportsScreen extends ConsumerStatefulWidget {
 }
 
 class _ReportsScreenState extends ConsumerState<ReportsScreen> {
-  ReportRangePreset? _selectedPreset = ReportRangePreset.thisMonth;
   String? _exportStatus;
 
-  void _selectPreset(ReportRangePreset preset) {
-    setState(() => _selectedPreset = preset);
-    ref.read(reportRangeProvider.notifier).state = rangeForPreset(preset);
-  }
-
-  Future<void> _selectCustomRange() async {
+  Future<void> _selectCustomRange(DateTimeRange currentRange) async {
     final now = DateTime.now();
     final picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(now.year - 5),
       lastDate: DateTime(now.year + 1),
-      initialDateRange: ref.read(reportRangeProvider),
+      initialDateRange: currentRange,
     );
     if (picked == null) return;
-    setState(() => _selectedPreset = null);
     // showDateRangePicker's end date is inclusive-at-midnight; our range end
     // is exclusive, so push it one day forward to include the whole day.
-    ref.read(reportRangeProvider.notifier).state = DateTimeRange(
+    final range = DateTimeRange(
       start: DateTime(picked.start.year, picked.start.month, picked.start.day),
       end: DateTime(
         picked.end.year,
@@ -51,6 +47,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         picked.end.day,
       ).add(const Duration(days: 1)),
     );
+    await ref.read(reportViewControllerProvider.notifier).setCustomRange(range);
   }
 
   Future<void> _exportCsv(List<TimeEntry> entries, List<Project> projects) async {
@@ -77,9 +74,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final entriesAsync = ref.watch(reportEntriesProvider);
-    final projectsAsync = ref.watch(reportProjectsProvider);
-    final tokens = HickoryColors.of(context);
+    final viewAsync = ref.watch(reportViewControllerProvider);
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -88,61 +83,168 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         children: [
           Text(l10n.reportsTitle, style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _presetChip(l10n.reportsThisWeek, ReportRangePreset.thisWeek, tokens),
-              _presetChip(l10n.reportsThisMonth, ReportRangePreset.thisMonth, tokens),
-              _presetChip(l10n.reportsLast30Days, ReportRangePreset.last30Days, tokens),
-              _presetChip(l10n.reportsAll, ReportRangePreset.all, tokens),
-              ActionChip(
-                label: Text(l10n.reportsCustomRange),
-                onPressed: _selectCustomRange,
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
           Expanded(
-            child: entriesAsync.when(
-              data: (entries) => projectsAsync.when(
-                data: (projects) => _ReportBody(
-                  entries: entries,
-                  projects: projects,
-                  onExport: () => _exportCsv(entries, projects),
-                ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Center(child: Text(l10n.reportsError(e.toString()))),
+            child: viewAsync.when(
+              data: (viewState) => _ReportRangeAndBody(
+                viewState: viewState,
+                exportStatus: _exportStatus,
+                onSelectCustomRange: () => _selectCustomRange(viewState.range),
+                onExport: _exportCsv,
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text(l10n.reportsError(e.toString()))),
             ),
           ),
-          if (_exportStatus != null) ...[
-            const SizedBox(height: 8),
-            Text(_exportStatus!, style: Theme.of(context).textTheme.bodySmall),
-          ],
         ],
       ),
     );
   }
+}
 
-  Widget _presetChip(String label, ReportRangePreset preset, HickoryColors tokens) {
-    final selected = _selectedPreset == preset;
+class _ReportRangeAndBody extends ConsumerWidget {
+  const _ReportRangeAndBody({
+    required this.viewState,
+    required this.exportStatus,
+    required this.onSelectCustomRange,
+    required this.onExport,
+  });
+
+  final ReportViewState viewState;
+  final String? exportStatus;
+  final VoidCallback onSelectCustomRange;
+  final Future<void> Function(List<TimeEntry> entries, List<Project> projects) onExport;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final tokens = HickoryColors.of(context);
+    final entriesAsync = ref.watch(reportEntriesProvider(viewState.range));
+    final projectsAsync = ref.watch(reportProjectsProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _presetChip(context, ref, l10n.reportsToday, ReportRangePreset.today, tokens),
+                  _presetChip(
+                    context,
+                    ref,
+                    l10n.reportsYesterday,
+                    ReportRangePreset.yesterday,
+                    tokens,
+                  ),
+                  _presetChip(
+                    context,
+                    ref,
+                    l10n.reportsThisWeek,
+                    ReportRangePreset.thisWeek,
+                    tokens,
+                  ),
+                  _presetChip(
+                    context,
+                    ref,
+                    l10n.reportsThisMonth,
+                    ReportRangePreset.thisMonth,
+                    tokens,
+                  ),
+                  _presetChip(
+                    context,
+                    ref,
+                    l10n.reportsLast30Days,
+                    ReportRangePreset.last30Days,
+                    tokens,
+                  ),
+                  _presetChip(context, ref, l10n.reportsAll, ReportRangePreset.all, tokens),
+                  ActionChip(label: Text(l10n.reportsCustomRange), onPressed: onSelectCustomRange),
+                ],
+              ),
+            ),
+            Badge(
+              label: Text('${viewState.activeFilterCount}'),
+              isLabelVisible: viewState.activeFilterCount > 0,
+              child: IconButton(
+                icon: const Icon(Icons.filter_list),
+                tooltip: l10n.reportsFilterTooltip,
+                onPressed: () {
+                  final projects = projectsAsync.value;
+                  if (projects == null) return;
+                  showDialog<void>(
+                    context: context,
+                    builder: (_) => ReportFilterDialog(projects: projects),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Expanded(
+          child: entriesAsync.when(
+            data: (entries) => projectsAsync.when(
+              data: (projects) {
+                final filtered = filterEntries(
+                  entries,
+                  projects,
+                  projectIds: viewState.projectIds,
+                  billableFilter: viewState.billableFilter,
+                );
+                return _ReportBody(
+                  entries: filtered,
+                  projects: projects,
+                  hasActiveFilters: viewState.activeFilterCount > 0,
+                  onExport: () => onExport(filtered, projects),
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text(l10n.reportsError(e.toString()))),
+            ),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(child: Text(l10n.reportsError(e.toString()))),
+          ),
+        ),
+        if (exportStatus != null) ...[
+          const SizedBox(height: 8),
+          Text(exportStatus!, style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ],
+    );
+  }
+
+  Widget _presetChip(
+    BuildContext context,
+    WidgetRef ref,
+    String label,
+    ReportRangePreset preset,
+    HickoryColors tokens,
+  ) {
+    final selected = viewState.preset == preset;
     return ChoiceChip(
       label: Text(label),
       selected: selected,
       selectedColor: tokens.navActiveIcon.withValues(alpha: 0.22),
-      onSelected: (_) => _selectPreset(preset),
+      onSelected: (_) => ref.read(reportViewControllerProvider.notifier).setPreset(preset),
     );
   }
 }
 
 class _ReportBody extends StatelessWidget {
-  const _ReportBody({required this.entries, required this.projects, required this.onExport});
+  const _ReportBody({
+    required this.entries,
+    required this.projects,
+    required this.hasActiveFilters,
+    required this.onExport,
+  });
 
   final List<TimeEntry> entries;
   final List<Project> projects;
+  final bool hasActiveFilters;
   final VoidCallback onExport;
 
   @override
@@ -171,7 +273,11 @@ class _ReportBody extends StatelessWidget {
         const SizedBox(height: 12),
         Expanded(
           child: totals.isEmpty
-              ? Center(child: Text(l10n.reportsEmptyRange))
+              ? Center(
+                  child: Text(
+                    hasActiveFilters ? l10n.reportsEmptyFiltered : l10n.reportsEmptyRange,
+                  ),
+                )
               : ListView.builder(
                   itemCount: totals.length,
                   itemBuilder: (context, index) {
