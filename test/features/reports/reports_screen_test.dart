@@ -215,6 +215,17 @@ void main() {
         find.text('No entries for this period and these filters.'),
         findsOneWidget,
       );
+
+      // The export button is disabled for an empty list -- this only holds
+      // if it was built from the filtered entries, not the raw unfiltered
+      // range query (which still has 2 entries at this point).
+      final exportButton = tester.widget<FilledButton>(
+        find.ancestor(
+          of: find.byIcon(Icons.download),
+          matching: find.byType(FilledButton),
+        ),
+      );
+      expect(exportButton.onPressed, isNull);
     },
   );
 
