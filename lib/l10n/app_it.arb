@@ -6,6 +6,8 @@
   "settingsLanguage": "Lingua",
   "settingsLanguageSystem": "Predefinita di sistema ({language})",
   "settingsTitle": "Impostazioni",
+  "settingsCategoryGeneral": "Generale",
+  "settingsCategoryTimeTracking": "Rilevamento del tempo",
   "settingsAutostart": "Avvia all'accensione del sistema",
   "settingsDateFormat": "Formato data",
   "settingsTimeFormat": "Formato ora",

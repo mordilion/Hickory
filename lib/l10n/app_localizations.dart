@@ -142,6 +142,18 @@ abstract class AppLocalizations {
   /// **'Einstellungen'**
   String get settingsTitle;
 
+  /// No description provided for @settingsCategoryGeneral.
+  ///
+  /// In de, this message translates to:
+  /// **'Allgemein'**
+  String get settingsCategoryGeneral;
+
+  /// No description provided for @settingsCategoryTimeTracking.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeiterfassung'**
+  String get settingsCategoryTimeTracking;
+
   /// No description provided for @settingsAutostart.
   ///
   /// In de, this message translates to:

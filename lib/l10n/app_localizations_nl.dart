@@ -30,6 +30,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsTitle => 'Instellingen';
 
   @override
+  String get settingsCategoryGeneral => 'Algemeen';
+
+  @override
+  String get settingsCategoryTimeTracking => 'Tijdregistratie';
+
+  @override
   String get settingsAutostart => 'Openen bij systeemstart';
 
   @override

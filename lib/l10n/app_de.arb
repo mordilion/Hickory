@@ -11,6 +11,8 @@
     }
   },
   "settingsTitle": "Einstellungen",
+  "settingsCategoryGeneral": "Allgemein",
+  "settingsCategoryTimeTracking": "Zeiterfassung",
   "settingsAutostart": "Beim Systemstart öffnen",
   "settingsDateFormat": "Datumsformat",
   "settingsTimeFormat": "Zeitformat",

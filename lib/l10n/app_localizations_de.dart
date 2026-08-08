@@ -29,6 +29,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsTitle => 'Einstellungen';
 
   @override
+  String get settingsCategoryGeneral => 'Allgemein';
+
+  @override
+  String get settingsCategoryTimeTracking => 'Zeiterfassung';
+
+  @override
   String get settingsAutostart => 'Beim Systemstart öffnen';
 
   @override

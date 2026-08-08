@@ -30,6 +30,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsTitle => 'Paramètres';
 
   @override
+  String get settingsCategoryGeneral => 'Général';
+
+  @override
+  String get settingsCategoryTimeTracking => 'Suivi du temps';
+
+  @override
   String get settingsAutostart => 'Ouvrir au démarrage du système';
 
   @override

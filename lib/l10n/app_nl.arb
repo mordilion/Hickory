@@ -6,6 +6,8 @@
   "settingsLanguage": "Taal",
   "settingsLanguageSystem": "Systeemstandaard ({language})",
   "settingsTitle": "Instellingen",
+  "settingsCategoryGeneral": "Algemeen",
+  "settingsCategoryTimeTracking": "Tijdregistratie",
   "settingsAutostart": "Openen bij systeemstart",
   "settingsDateFormat": "Datumnotatie",
   "settingsTimeFormat": "Tijdnotatie",
