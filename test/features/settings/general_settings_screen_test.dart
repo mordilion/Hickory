@@ -18,8 +18,7 @@ import 'package:hickory/l10n/app_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 class _FakeAutostartService extends AutostartService {
-  _FakeAutostartService({this.enabled = false});
-  bool enabled;
+  bool enabled = false;
 
   @override
   Future<bool> isEnabled() async => enabled;
@@ -57,8 +56,12 @@ void main() {
 
   setUp(() {
     db = AppDatabase.forTesting(NativeDatabase.memory());
-    syncRoot = Directory.systemTemp.createTempSync('hickory_general_settings_test_sync_');
-    localeDir = Directory.systemTemp.createTempSync('hickory_general_settings_test_locale_');
+    syncRoot = Directory.systemTemp.createTempSync(
+      'hickory_general_settings_test_sync_',
+    );
+    localeDir = Directory.systemTemp.createTempSync(
+      'hickory_general_settings_test_locale_',
+    );
     autostartService = _FakeAutostartService();
   });
 
@@ -69,53 +72,59 @@ void main() {
   });
 
   Widget makeApp() => ProviderScope(
-        overrides: [
-          appSettingsProvider.overrideWith(
-            (ref) => Stream.value(
-              AppSettingsRow(
-                id: 'default',
-                dateFormat: 'iso',
-                timeFormat: '24h',
-                quickAddDurationsMinutes: '15,30,45,60',
-                countPausedTimeAsBreak: false,
-                updatedAt: DateTime.utc(2026, 1, 1),
-              ),
-            ),
+    overrides: [
+      appSettingsProvider.overrideWith(
+        (ref) => Stream.value(
+          AppSettingsRow(
+            id: 'default',
+            dateFormat: 'iso',
+            timeFormat: '24h',
+            quickAddDurationsMinutes: '15,30,45,60',
+            countPausedTimeAsBreak: false,
+            updatedAt: DateTime.utc(2026, 1, 1),
           ),
-          syncedWritesProvider.overrideWith(
-            (ref) async => SyncedWrites(
-              db: db,
-              logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
-            ),
-          ),
-          autostartServiceProvider.overrideWithValue(autostartService),
-          localeStoreProvider.overrideWith(
-            (ref) async => LocaleStore(supportDirectory: localeDir),
-          ),
-        ],
-        child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: const Scaffold(body: GeneralSettingsScreen()),
         ),
-      );
+      ),
+      syncedWritesProvider.overrideWith(
+        (ref) async => SyncedWrites(
+          db: db,
+          logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
+        ),
+      ),
+      autostartServiceProvider.overrideWithValue(autostartService),
+      localeStoreProvider.overrideWith(
+        (ref) async => LocaleStore(supportDirectory: localeDir),
+      ),
+    ],
+    child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en'),
+      home: const Scaffold(body: GeneralSettingsScreen()),
+    ),
+  );
 
   Future<String?> currentDateFormat() async {
     final row = await db.select(db.appSettings).getSingleOrNull();
     return row?.dateFormat;
   }
 
-  testWidgets('shows the autostart switch reflecting the current state', (tester) async {
+  testWidgets('shows the autostart switch reflecting the current state', (
+    tester,
+  ) async {
     autostartService.enabled = true;
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
 
-    final switchTile = tester.widget<SwitchListTile>(find.byType(SwitchListTile));
+    final switchTile = tester.widget<SwitchListTile>(
+      find.byType(SwitchListTile),
+    );
     expect(switchTile.value, isTrue);
   });
 
-  testWidgets('toggling autostart persists via AutostartService', (tester) async {
+  testWidgets('toggling autostart persists via AutostartService', (
+    tester,
+  ) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
 
@@ -123,7 +132,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(autostartService.enabled, isTrue);
-    final switchTile = tester.widget<SwitchListTile>(find.byType(SwitchListTile));
+    final switchTile = tester.widget<SwitchListTile>(
+      find.byType(SwitchListTile),
+    );
     expect(switchTile.value, isTrue);
   });
 
