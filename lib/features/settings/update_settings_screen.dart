@@ -38,8 +38,9 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
             : null,
       );
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         setState(() => _updateStatusMessage = l10n.settingsUpdateCheckError);
+      }
     } finally {
       if (mounted) setState(() => _updateBusy = false);
     }
@@ -65,8 +66,9 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
         );
       }
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         setState(() => _updateStatusMessage = l10n.settingsUpdateInstallError);
+      }
     } finally {
       if (mounted) setState(() => _updateBusy = false);
     }
