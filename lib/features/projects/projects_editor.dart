@@ -11,8 +11,8 @@ import 'projects_providers.dart';
 /// Settings-screen project manager: edit/archive active projects, reactivate
 /// archived ones. Lives in the `projects` feature (not `settings/`) since it
 /// operates on the cross-cutting Project entity also used by Timer --
-/// settings_screen.dart composes it the same way app_shell.dart composes
-/// screens from other features. See
+/// projects_settings_screen.dart composes it the same way the other
+/// Settings category screens compose their own feature widgets. See
 /// docs/superpowers/specs/2026-08-04-project-editing-design.md.
 class ProjectsEditor extends ConsumerStatefulWidget {
   const ProjectsEditor({super.key});

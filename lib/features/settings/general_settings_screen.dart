@@ -9,6 +9,8 @@ import '../../l10n/app_localizations.dart';
 import 'language_dropdown.dart';
 import 'settings_sub_page.dart';
 
+/// Autostart toggle plus date/time-format and language settings -- state
+/// and handlers relocated verbatim from the old monolithic SettingsScreen.
 class GeneralSettingsScreen extends ConsumerStatefulWidget {
   const GeneralSettingsScreen({super.key});
 

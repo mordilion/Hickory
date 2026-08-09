@@ -5,6 +5,8 @@ import 'break_rule_tiers_editor.dart';
 import 'quick_add_durations_editor.dart';
 import 'settings_sub_page.dart';
 
+/// Quick-add durations and break-rule tiers, each in its own unmodified
+/// editor widget.
 class TimeTrackingSettingsScreen extends StatelessWidget {
   const TimeTrackingSettingsScreen({super.key});
 
