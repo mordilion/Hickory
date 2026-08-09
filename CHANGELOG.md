@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Reorganize Settings into a category list (General, Time Tracking, Projects, Update, Reset) with drill-down sub-pages, replacing the previous single flat stack of cards.
+- Reorganize Settings into a category list (General, Time tracking, Projects, Updates, Reset) with drill-down sub-pages, replacing the previous single flat stack of cards.
 
 ## [1.1.0] - 2026-08-07
 

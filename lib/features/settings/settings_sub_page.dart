@@ -26,7 +26,10 @@ class SettingsSubPage extends StatelessWidget {
                 const BackButton(),
                 if (title != null) ...[
                   const SizedBox(width: 8),
-                  Text(title!, style: Theme.of(context).textTheme.headlineSmall),
+                  Text(
+                    title!,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                 ],
               ],
             ),

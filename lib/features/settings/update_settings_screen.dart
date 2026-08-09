@@ -31,14 +31,15 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
       _updateBusy = true;
       _updateStatusMessage = l10n.settingsUpdateChecking;
     });
-    // Captured before the await below: if this screen gets popped while the
-    // check is in flight, using ref.read() after the await would throw
-    // StateError (the widget's element is disposed) and silently drop a
-    // real result. The notifier itself outlives this screen (its provider
-    // isn't scoped to this widget), so writing to it directly is safe.
-    final checker = ref.read(updateCheckerProvider);
-    final updateNotifier = ref.read(availableUpdateProvider.notifier);
     try {
+      // Captured before the await below: if this screen gets popped while
+      // the check is in flight, using ref.read() after the await would
+      // throw StateError (the widget's element is disposed) and silently
+      // drop a real result. The notifier itself outlives this screen (its
+      // provider isn't scoped to this widget), so writing to it directly is
+      // safe. Kept inside the try so a throw here is still caught below.
+      final checker = ref.read(updateCheckerProvider);
+      final updateNotifier = ref.read(availableUpdateProvider.notifier);
       final update = await checker.checkForUpdate();
       updateNotifier.state = update;
       if (!mounted) return;
@@ -62,13 +63,14 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
       _updateBusy = true;
       _updateStatusMessage = l10n.settingsUpdateInstalling;
     });
-    // Same reasoning as _checkForUpdates: capture everything ref-derived
-    // before the first await, so a pop mid-download doesn't throw and
-    // silently abandon an update that already finished downloading.
-    final installer = ref.read(updateInstallerProvider);
-    final db = ref.read(appDatabaseProvider);
-    final writesFuture = ref.read(syncedWritesProvider.future);
     try {
+      // Same reasoning as _checkForUpdates: capture everything ref-derived
+      // before the first await, so a pop mid-download doesn't throw and
+      // silently abandon an update that already finished downloading. Kept
+      // inside the try so a throw here is still caught below.
+      final installer = ref.read(updateInstallerProvider);
+      final db = ref.read(appDatabaseProvider);
+      final writesFuture = ref.read(syncedWritesProvider.future);
       final extracted = await installer.prepareUpdate(update);
       final writes = await writesFuture;
       await installer.quitAndSwap(extracted, db: db, writes: writes);

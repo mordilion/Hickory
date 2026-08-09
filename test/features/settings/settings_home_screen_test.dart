@@ -79,7 +79,10 @@ void main() {
           NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
           NavigationDestination(icon: Icon(Icons.circle), label: 'Other'),
         ],
-        children: const [SettingsScreen(), Center(child: Text('Other tab'))],
+        children: const [
+          SettingsScreen(),
+          Center(child: Text('Other tab')),
+        ],
       ),
     ),
   );
@@ -135,7 +138,16 @@ void main() {
     expect(find.byType(GeneralSettingsScreen), findsOneWidget);
   });
 
-  testWidgets('switching tabs and back preserves the open sub-page', (tester) async {
+  testWidgets('switching tabs and back preserves the open sub-page', (
+    tester,
+  ) async {
+    // IndexedStack keeps every tab's widget tree mounted (via Visibility,
+    // not Offstage), so a bare find.byType would pass even without ever
+    // switching tabs -- assert on NavigationBar.selectedIndex too, so a
+    // regression that stops preserving state is actually caught.
+    NavigationBar navBar() =>
+        tester.widget<NavigationBar>(find.byType(NavigationBar));
+
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
 
@@ -145,10 +157,11 @@ void main() {
 
     await tester.tap(find.text('Other'));
     await tester.pumpAndSettle();
-    expect(find.text('Other tab'), findsOneWidget);
+    expect(navBar().selectedIndex, 1);
 
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
+    expect(navBar().selectedIndex, 0);
     expect(find.byType(GeneralSettingsScreen), findsOneWidget);
   });
 }
