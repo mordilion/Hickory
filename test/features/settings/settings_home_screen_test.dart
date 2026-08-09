@@ -14,7 +14,7 @@ import 'package:hickory/features/projects/projects_providers.dart';
 import 'package:hickory/features/settings/general_settings_screen.dart';
 import 'package:hickory/features/settings/projects_settings_screen.dart';
 import 'package:hickory/features/settings/reset_settings_screen.dart';
-import 'package:hickory/features/settings/settings_home_screen.dart';
+import 'package:hickory/features/settings/settings_screen.dart';
 import 'package:hickory/features/settings/time_tracking_settings_screen.dart';
 import 'package:hickory/features/settings/update_settings_screen.dart';
 import 'package:hickory/features/shell/nav_shell.dart';
@@ -79,18 +79,7 @@ void main() {
           NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
           NavigationDestination(icon: Icon(Icons.circle), label: 'Other'),
         ],
-        // Builds the same nested-Navigator shape SettingsScreen (Task 9)
-        // wraps as a thin wrapper, inline -- so this test only depends on
-        // SettingsHomeScreen and doesn't need SettingsScreen to exist yet.
-        // Task 9's own settings_screen_test.dart separately verifies that
-        // SettingsScreen actually produces this same shape.
-        children: [
-          Navigator(
-            onGenerateRoute: (settings) =>
-                MaterialPageRoute(builder: (_) => const SettingsHomeScreen()),
-          ),
-          const Center(child: Text('Other tab')),
-        ],
+        children: const [SettingsScreen(), Center(child: Text('Other tab'))],
       ),
     ),
   );
@@ -143,6 +132,23 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.byType(GeneralSettingsScreen), findsOneWidget);
+  });
+
+  testWidgets('switching tabs and back preserves the open sub-page', (tester) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('General'));
+    await tester.pumpAndSettle();
+    expect(find.byType(GeneralSettingsScreen), findsOneWidget);
+
+    await tester.tap(find.text('Other'));
+    await tester.pumpAndSettle();
+    expect(find.text('Other tab'), findsOneWidget);
+
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
     expect(find.byType(GeneralSettingsScreen), findsOneWidget);
   });
 }
