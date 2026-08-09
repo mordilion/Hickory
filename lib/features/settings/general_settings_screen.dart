@@ -13,7 +13,8 @@ class GeneralSettingsScreen extends ConsumerStatefulWidget {
   const GeneralSettingsScreen({super.key});
 
   @override
-  ConsumerState<GeneralSettingsScreen> createState() => _GeneralSettingsScreenState();
+  ConsumerState<GeneralSettingsScreen> createState() =>
+      _GeneralSettingsScreenState();
 }
 
 class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen> {
@@ -88,7 +89,9 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen> {
                         child: DropdownButtonFormField<DateFormatStyle>(
                           initialValue: dateStyle,
                           isDense: true,
-                          decoration: InputDecoration(labelText: l10n.settingsDateFormat),
+                          decoration: InputDecoration(
+                            labelText: l10n.settingsDateFormat,
+                          ),
                           items: DateFormatStyle.values
                               .map(
                                 (style) => DropdownMenuItem(
@@ -97,13 +100,16 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen> {
                                     formatDate(
                                       now,
                                       style,
-                                      Localizations.localeOf(context).languageCode,
+                                      Localizations.localeOf(
+                                        context,
+                                      ).languageCode,
                                     ),
                                   ),
                                 ),
                               )
                               .toList(),
-                          onChanged: (style) => style == null ? null : _setDateFormat(style),
+                          onChanged: (style) =>
+                              style == null ? null : _setDateFormat(style),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -111,7 +117,9 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen> {
                         child: DropdownButtonFormField<TimeFormatStyle>(
                           initialValue: timeStyle,
                           isDense: true,
-                          decoration: InputDecoration(labelText: l10n.settingsTimeFormat),
+                          decoration: InputDecoration(
+                            labelText: l10n.settingsTimeFormat,
+                          ),
                           items: TimeFormatStyle.values
                               .map(
                                 (style) => DropdownMenuItem(
@@ -120,7 +128,8 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen> {
                                 ),
                               )
                               .toList(),
-                          onChanged: (style) => style == null ? null : _setTimeFormat(style),
+                          onChanged: (style) =>
+                              style == null ? null : _setTimeFormat(style),
                         ),
                       ),
                     ],

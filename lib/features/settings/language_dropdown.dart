@@ -16,8 +16,9 @@ class LanguageDropdown extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final explicit = ref.watch(localeControllerProvider).value;
-    final systemResolved =
-        resolveLocale(WidgetsBinding.instance.platformDispatcher.locale);
+    final systemResolved = resolveLocale(
+      WidgetsBinding.instance.platformDispatcher.locale,
+    );
     final systemName = languageDisplayNames[systemResolved.languageCode]!;
 
     return DropdownButtonFormField<String>(

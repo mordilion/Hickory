@@ -40,56 +40,60 @@ void main() {
     await initializeDateFormatting('en');
   });
 
-  setUp(() => localeDir = Directory.systemTemp.createTempSync('settings_home_screen_test_'));
+  setUp(
+    () => localeDir = Directory.systemTemp.createTempSync(
+      'settings_home_screen_test_',
+    ),
+  );
   tearDown(() => localeDir.deleteSync(recursive: true));
 
   Widget makeApp() => ProviderScope(
-        overrides: [
-          appSettingsProvider.overrideWith(
-            (ref) => Stream.value(
-              AppSettingsRow(
-                id: 'default',
-                dateFormat: 'iso',
-                timeFormat: '24h',
-                quickAddDurationsMinutes: '15,30,45,60',
-                countPausedTimeAsBreak: false,
-                updatedAt: DateTime.utc(2026, 1, 1),
-              ),
-            ),
-          ),
-          breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),
-          activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
-          archivedProjectsProvider.overrideWith((ref) => Stream.value(const [])),
-          autostartServiceProvider.overrideWithValue(_FakeAutostartService()),
-          localeStoreProvider.overrideWith(
-            (ref) async => LocaleStore(supportDirectory: localeDir),
-          ),
-          currentAppVersionProvider.overrideWith((ref) async => '1.1.0'),
-        ],
-        child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: NavShell(
-            destinations: const [
-              NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
-              NavigationDestination(icon: Icon(Icons.circle), label: 'Other'),
-            ],
-            // Builds the same nested-Navigator shape SettingsScreen (Task 9)
-            // wraps as a thin wrapper, inline -- so this test only depends on
-            // SettingsHomeScreen and doesn't need SettingsScreen to exist yet.
-            // Task 9's own settings_screen_test.dart separately verifies that
-            // SettingsScreen actually produces this same shape.
-            children: [
-              Navigator(
-                onGenerateRoute: (settings) =>
-                    MaterialPageRoute(builder: (_) => const SettingsHomeScreen()),
-              ),
-              const Center(child: Text('Other tab')),
-            ],
+    overrides: [
+      appSettingsProvider.overrideWith(
+        (ref) => Stream.value(
+          AppSettingsRow(
+            id: 'default',
+            dateFormat: 'iso',
+            timeFormat: '24h',
+            quickAddDurationsMinutes: '15,30,45,60',
+            countPausedTimeAsBreak: false,
+            updatedAt: DateTime.utc(2026, 1, 1),
           ),
         ),
-      );
+      ),
+      breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),
+      activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
+      archivedProjectsProvider.overrideWith((ref) => Stream.value(const [])),
+      autostartServiceProvider.overrideWithValue(_FakeAutostartService()),
+      localeStoreProvider.overrideWith(
+        (ref) async => LocaleStore(supportDirectory: localeDir),
+      ),
+      currentAppVersionProvider.overrideWith((ref) async => '1.1.0'),
+    ],
+    child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en'),
+      home: NavShell(
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
+          NavigationDestination(icon: Icon(Icons.circle), label: 'Other'),
+        ],
+        // Builds the same nested-Navigator shape SettingsScreen (Task 9)
+        // wraps as a thin wrapper, inline -- so this test only depends on
+        // SettingsHomeScreen and doesn't need SettingsScreen to exist yet.
+        // Task 9's own settings_screen_test.dart separately verifies that
+        // SettingsScreen actually produces this same shape.
+        children: [
+          Navigator(
+            onGenerateRoute: (settings) =>
+                MaterialPageRoute(builder: (_) => const SettingsHomeScreen()),
+          ),
+          const Center(child: Text('Other tab')),
+        ],
+      ),
+    ),
+  );
 
   testWidgets('shows all category rows', (tester) async {
     await tester.pumpWidget(makeApp());
@@ -128,7 +132,9 @@ void main() {
     },
   );
 
-  testWidgets('the bottom nav bar stays visible while browsing a sub-page', (tester) async {
+  testWidgets('the bottom nav bar stays visible while browsing a sub-page', (
+    tester,
+  ) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
     expect(find.byType(NavigationBar), findsOneWidget);

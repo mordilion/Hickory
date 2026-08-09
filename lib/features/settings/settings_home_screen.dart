@@ -25,7 +25,10 @@ class SettingsHomeScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.settingsTitle, style: Theme.of(context).textTheme.headlineSmall),
+          Text(
+            l10n.settingsTitle,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
           const SizedBox(height: 16),
           Card(
             child: Column(
@@ -35,7 +38,9 @@ class SettingsHomeScreen extends StatelessWidget {
                   title: Text(l10n.settingsCategoryGeneral),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const GeneralSettingsScreen()),
+                    MaterialPageRoute(
+                      builder: (_) => const GeneralSettingsScreen(),
+                    ),
                   ),
                 ),
                 const Divider(height: 1),
@@ -44,7 +49,9 @@ class SettingsHomeScreen extends StatelessWidget {
                   title: Text(l10n.settingsCategoryTimeTracking),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const TimeTrackingSettingsScreen()),
+                    MaterialPageRoute(
+                      builder: (_) => const TimeTrackingSettingsScreen(),
+                    ),
                   ),
                 ),
                 const Divider(height: 1),
@@ -53,7 +60,9 @@ class SettingsHomeScreen extends StatelessWidget {
                   title: Text(l10n.settingsProjectsTitle),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ProjectsSettingsScreen()),
+                    MaterialPageRoute(
+                      builder: (_) => const ProjectsSettingsScreen(),
+                    ),
                   ),
                 ),
                 if (Platform.isMacOS || Platform.isWindows) ...[
@@ -63,20 +72,27 @@ class SettingsHomeScreen extends StatelessWidget {
                     title: Text(l10n.settingsUpdateTitle),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const UpdateSettingsScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => const UpdateSettingsScreen(),
+                      ),
                     ),
                   ),
                 ],
                 const Divider(height: 1),
                 ListTile(
-                  leading: Icon(Icons.warning_amber_outlined, color: colorScheme.error),
+                  leading: Icon(
+                    Icons.warning_amber_outlined,
+                    color: colorScheme.error,
+                  ),
                   title: Text(
                     l10n.settingsResetTitle,
                     style: TextStyle(color: colorScheme.error),
                   ),
                   trailing: Icon(Icons.chevron_right, color: colorScheme.error),
                   onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ResetSettingsScreen()),
+                    MaterialPageRoute(
+                      builder: (_) => const ResetSettingsScreen(),
+                    ),
                   ),
                 ),
               ],

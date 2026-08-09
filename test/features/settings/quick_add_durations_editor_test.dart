@@ -43,7 +43,9 @@ void main() {
 
   setUp(() {
     db = AppDatabase.forTesting(NativeDatabase.memory());
-    syncRoot = Directory.systemTemp.createTempSync('hickory_quick_add_settings_test_');
+    syncRoot = Directory.systemTemp.createTempSync(
+      'hickory_quick_add_settings_test_',
+    );
   });
 
   tearDown(() async {
@@ -51,7 +53,8 @@ void main() {
     if (syncRoot.existsSync()) syncRoot.deleteSync(recursive: true);
   });
 
-  Widget makeApp({List<int> durations = const [15, 30, 45, 60]}) => ProviderScope(
+  Widget makeApp({List<int> durations = const [15, 30, 45, 60]}) =>
+      ProviderScope(
         overrides: [
           appSettingsProvider.overrideWith(
             (ref) => Stream.value(
@@ -68,7 +71,10 @@ void main() {
           syncedWritesProvider.overrideWith(
             (ref) async => SyncedWrites(
               db: db,
-              logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
+              logWriter: SyncLogWriter(
+                syncRoot: syncRoot,
+                deviceId: 'device-1',
+              ),
             ),
           ),
         ],
@@ -95,17 +101,21 @@ void main() {
       await tester.pumpWidget(makeApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.descendant(
-        of: find.widgetWithText(Chip, '30 min'),
-        matching: find.byIcon(Icons.cancel),
-      ));
+      await tester.tap(
+        find.descendant(
+          of: find.widgetWithText(Chip, '30 min'),
+          matching: find.byIcon(Icons.cancel),
+        ),
+      );
 
       await pumpUntilTrue(
         tester,
         () async => await _currentQuickAddDurationsMinutes(db) == '15,45,60',
       );
 
-      final quickAddDurationsMinutes = await _currentQuickAddDurationsMinutes(db);
+      final quickAddDurationsMinutes = await _currentQuickAddDurationsMinutes(
+        db,
+      );
       expect(quickAddDurationsMinutes, '15,45,60');
 
       await tester.pumpWidget(const SizedBox());
@@ -136,10 +146,13 @@ void main() {
 
       await pumpUntilTrue(
         tester,
-        () async => await _currentQuickAddDurationsMinutes(db) == '15,30,45,60,90',
+        () async =>
+            await _currentQuickAddDurationsMinutes(db) == '15,30,45,60,90',
       );
 
-      final quickAddDurationsMinutes = await _currentQuickAddDurationsMinutes(db);
+      final quickAddDurationsMinutes = await _currentQuickAddDurationsMinutes(
+        db,
+      );
       expect(quickAddDurationsMinutes, '15,30,45,60,90');
 
       await tester.pumpWidget(const SizedBox());
@@ -159,17 +172,21 @@ void main() {
       await tester.pumpWidget(makeApp(durations: const [15]));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.descendant(
-        of: find.widgetWithText(Chip, '15 min'),
-        matching: find.byIcon(Icons.cancel),
-      ));
+      await tester.tap(
+        find.descendant(
+          of: find.widgetWithText(Chip, '15 min'),
+          matching: find.byIcon(Icons.cancel),
+        ),
+      );
 
       await pumpUntilTrue(
         tester,
         () async => await _currentQuickAddDurationsMinutes(db) == '',
       );
 
-      final quickAddDurationsMinutes = await _currentQuickAddDurationsMinutes(db);
+      final quickAddDurationsMinutes = await _currentQuickAddDurationsMinutes(
+        db,
+      );
       expect(quickAddDurationsMinutes, '');
 
       await tester.pumpWidget(const SizedBox());

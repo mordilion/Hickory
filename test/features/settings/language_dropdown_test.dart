@@ -11,7 +11,10 @@ import 'package:hickory/l10n/app_localizations.dart';
 void main() {
   late Directory tempDir;
 
-  setUp(() => tempDir = Directory.systemTemp.createTempSync('language_dropdown_test'));
+  setUp(
+    () =>
+        tempDir = Directory.systemTemp.createTempSync('language_dropdown_test'),
+  );
   tearDown(() => tempDir.deleteSync(recursive: true));
 
   // Mirrors HickoryApp's locale wiring (locale follows the controller, so
@@ -19,23 +22,23 @@ void main() {
   // starts at German because nothing is stored and resolveLocale of the
   // test binding's en_US would give English — so pin the platform locale.
   Widget makeApp() => ProviderScope(
-        overrides: [
-          localeStoreProvider.overrideWith(
-            (ref) async => LocaleStore(supportDirectory: tempDir),
-          ),
-        ],
-        child: Consumer(
-          builder: (context, ref, _) {
-            final locale = ref.watch(localeControllerProvider).value;
-            return MaterialApp(
-              locale: locale ?? const Locale('de'),
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              home: const Scaffold(body: LanguageDropdown()),
-            );
-          },
-        ),
-      );
+    overrides: [
+      localeStoreProvider.overrideWith(
+        (ref) async => LocaleStore(supportDirectory: tempDir),
+      ),
+    ],
+    child: Consumer(
+      builder: (context, ref, _) {
+        final locale = ref.watch(localeControllerProvider).value;
+        return MaterialApp(
+          locale: locale ?? const Locale('de'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const Scaffold(body: LanguageDropdown()),
+        );
+      },
+    ),
+  );
 
   // Real dart:io futures cannot finish inside the fake-async test zone on
   // their own: their completions land on the fake microtask queue, which
@@ -48,7 +51,9 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('shows the system-default option with the resolved language', (tester) async {
+  testWidgets('shows the system-default option with the resolved language', (
+    tester,
+  ) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
     expect(find.text('Sprache'), findsOneWidget);
@@ -56,7 +61,9 @@ void main() {
     expect(find.textContaining('Systemstandard'), findsOneWidget);
   });
 
-  testWidgets('selecting a language persists it via the controller', (tester) async {
+  testWidgets('selecting a language persists it via the controller', (
+    tester,
+  ) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
 
@@ -67,9 +74,11 @@ void main() {
       tester.element(find.byType(LanguageDropdown)),
       listen: false,
     );
-    for (var i = 0;
-        i < 50 && container.read(localeControllerProvider).isLoading;
-        i++) {
+    for (
+      var i = 0;
+      i < 50 && container.read(localeControllerProvider).isLoading;
+      i++
+    ) {
       await pumpRealIo(tester);
     }
 

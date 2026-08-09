@@ -13,7 +13,8 @@ class UpdateSettingsScreen extends ConsumerStatefulWidget {
   const UpdateSettingsScreen({super.key});
 
   @override
-  ConsumerState<UpdateSettingsScreen> createState() => _UpdateSettingsScreenState();
+  ConsumerState<UpdateSettingsScreen> createState() =>
+      _UpdateSettingsScreenState();
 }
 
 class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
@@ -31,9 +32,14 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
       final update = await checker.checkForUpdate();
       ref.read(availableUpdateProvider.notifier).state = update;
       if (!mounted) return;
-      setState(() => _updateStatusMessage = update == null ? l10n.settingsUpdateUpToDate : null);
+      setState(
+        () => _updateStatusMessage = update == null
+            ? l10n.settingsUpdateUpToDate
+            : null,
+      );
     } catch (_) {
-      if (mounted) setState(() => _updateStatusMessage = l10n.settingsUpdateCheckError);
+      if (mounted)
+        setState(() => _updateStatusMessage = l10n.settingsUpdateCheckError);
     } finally {
       if (mounted) setState(() => _updateBusy = false);
     }
@@ -53,10 +59,14 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
       await installer.quitAndSwap(extracted, db: db, writes: writes);
     } on UpdateInstallPermissionException {
       if (mounted) {
-        setState(() => _updateStatusMessage = l10n.settingsUpdateInstallErrorPermission);
+        setState(
+          () =>
+              _updateStatusMessage = l10n.settingsUpdateInstallErrorPermission,
+        );
       }
     } catch (_) {
-      if (mounted) setState(() => _updateStatusMessage = l10n.settingsUpdateInstallError);
+      if (mounted)
+        setState(() => _updateStatusMessage = l10n.settingsUpdateInstallError);
     } finally {
       if (mounted) setState(() => _updateBusy = false);
     }
@@ -75,7 +85,10 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.settingsUpdateTitle, style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                l10n.settingsUpdateTitle,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: 8),
               currentVersionAsync.when(
                 data: (version) => Text(
@@ -87,18 +100,26 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
               ),
               if (_updateStatusMessage != null) ...[
                 const SizedBox(height: 8),
-                Text(_updateStatusMessage!, style: Theme.of(context).textTheme.bodySmall),
+                Text(
+                  _updateStatusMessage!,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
               ],
               const SizedBox(height: 16),
               if (availableUpdate != null) ...[
                 Text(l10n.settingsUpdateAvailable(availableUpdate.version)),
                 if (availableUpdate.notes.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Text(availableUpdate.notes, style: Theme.of(context).textTheme.bodySmall),
+                  Text(
+                    availableUpdate.notes,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                 ],
                 const SizedBox(height: 12),
                 FilledButton(
-                  onPressed: _updateBusy ? null : () => _installUpdate(availableUpdate),
+                  onPressed: _updateBusy
+                      ? null
+                      : () => _installUpdate(availableUpdate),
                   child: Text(l10n.settingsUpdateInstallButton),
                 ),
               ] else

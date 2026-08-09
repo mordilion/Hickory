@@ -18,10 +18,10 @@ import 'package:hickory/l10n/app_localizations.dart';
 
 class _FakeUpdateChecker extends UpdateChecker {
   _FakeUpdateChecker(this._result)
-      : super(
-          releaseClient: GithubReleaseClient(owner: 'test', repo: 'test'),
-          platformAssetName: 'test.zip',
-        );
+    : super(
+        releaseClient: GithubReleaseClient(owner: 'test', repo: 'test'),
+        platformAssetName: 'test.zip',
+      );
 
   final UpdateInfo? _result;
 
@@ -56,8 +56,12 @@ void main() {
 
   setUp(() {
     db = AppDatabase.forTesting(NativeDatabase.memory());
-    syncRoot = Directory.systemTemp.createTempSync('hickory_update_settings_test_sync_');
-    extractedDir = Directory.systemTemp.createTempSync('hickory_update_settings_test_extracted_');
+    syncRoot = Directory.systemTemp.createTempSync(
+      'hickory_update_settings_test_sync_',
+    );
+    extractedDir = Directory.systemTemp.createTempSync(
+      'hickory_update_settings_test_extracted_',
+    );
     installer = _FakeUpdateInstaller(extractedDir);
   });
 
@@ -68,25 +72,25 @@ void main() {
   });
 
   Widget makeApp({UpdateInfo? checkResult}) => ProviderScope(
-        overrides: [
-          currentAppVersionProvider.overrideWith((ref) async => '1.1.0'),
-          updateCheckerProvider.overrideWithValue(_FakeUpdateChecker(checkResult)),
-          updateInstallerProvider.overrideWithValue(installer),
-          appDatabaseProvider.overrideWithValue(db),
-          syncedWritesProvider.overrideWith(
-            (ref) async => SyncedWrites(
-              db: db,
-              logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
-            ),
-          ),
-        ],
-        child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: const Scaffold(body: UpdateSettingsScreen()),
+    overrides: [
+      currentAppVersionProvider.overrideWith((ref) async => '1.1.0'),
+      updateCheckerProvider.overrideWithValue(_FakeUpdateChecker(checkResult)),
+      updateInstallerProvider.overrideWithValue(installer),
+      appDatabaseProvider.overrideWithValue(db),
+      syncedWritesProvider.overrideWith(
+        (ref) async => SyncedWrites(
+          db: db,
+          logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
         ),
-      );
+      ),
+    ],
+    child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en'),
+      home: const Scaffold(body: UpdateSettingsScreen()),
+    ),
+  );
 
   testWidgets('shows the current version', (tester) async {
     await tester.pumpWidget(makeApp());
@@ -95,56 +99,59 @@ void main() {
     expect(find.textContaining('1.1.0'), findsOneWidget);
   });
 
-  testWidgets('checking for updates with none available shows the up-to-date message', (
-    tester,
-  ) async {
-    await tester.pumpWidget(makeApp(checkResult: null));
-    await tester.pumpAndSettle();
+  testWidgets(
+    'checking for updates with none available shows the up-to-date message',
+    (tester) async {
+      await tester.pumpWidget(makeApp(checkResult: null));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Check for updates'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Check for updates'));
+      await tester.pumpAndSettle();
 
-    expect(find.text("You're on the latest version."), findsOneWidget);
-  });
+      expect(find.text("You're on the latest version."), findsOneWidget);
+    },
+  );
 
-  testWidgets('checking for updates with one available shows the install button', (
-    tester,
-  ) async {
-    const update = UpdateInfo(
-      version: '1.2.0',
-      notes: 'Bug fixes',
-      downloadUrl: 'https://example.com/a.zip',
-      checksumUrl: 'https://example.com/a.sha256',
-      size: 1024,
-    );
-    await tester.pumpWidget(makeApp(checkResult: update));
-    await tester.pumpAndSettle();
+  testWidgets(
+    'checking for updates with one available shows the install button',
+    (tester) async {
+      const update = UpdateInfo(
+        version: '1.2.0',
+        notes: 'Bug fixes',
+        downloadUrl: 'https://example.com/a.zip',
+        checksumUrl: 'https://example.com/a.sha256',
+        size: 1024,
+      );
+      await tester.pumpWidget(makeApp(checkResult: update));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Check for updates'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Check for updates'));
+      await tester.pumpAndSettle();
 
-    expect(find.textContaining('1.2.0'), findsWidgets);
-    expect(find.text('Install now'), findsOneWidget);
-  });
+      expect(find.textContaining('1.2.0'), findsWidgets);
+      expect(find.text('Install now'), findsOneWidget);
+    },
+  );
 
-  testWidgets('installing calls prepareUpdate and quitAndSwap on the installer', (
-    tester,
-  ) async {
-    const update = UpdateInfo(
-      version: '1.2.0',
-      notes: '',
-      downloadUrl: 'https://example.com/a.zip',
-      checksumUrl: 'https://example.com/a.sha256',
-      size: 1024,
-    );
-    await tester.pumpWidget(makeApp(checkResult: update));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Check for updates'));
-    await tester.pumpAndSettle();
+  testWidgets(
+    'installing calls prepareUpdate and quitAndSwap on the installer',
+    (tester) async {
+      const update = UpdateInfo(
+        version: '1.2.0',
+        notes: '',
+        downloadUrl: 'https://example.com/a.zip',
+        checksumUrl: 'https://example.com/a.sha256',
+        size: 1024,
+      );
+      await tester.pumpWidget(makeApp(checkResult: update));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Check for updates'));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Install now'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Install now'));
+      await tester.pumpAndSettle();
 
-    expect(installer.quitAndSwapCalled, isTrue);
-  });
+      expect(installer.quitAndSwapCalled, isTrue);
+    },
+  );
 }

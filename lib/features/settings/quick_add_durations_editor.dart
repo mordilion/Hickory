@@ -15,10 +15,16 @@ class QuickAddDurationsEditor extends ConsumerWidget {
   Future<void> _remove(WidgetRef ref, List<int> current, int minutes) async {
     final updated = List<int>.from(current)..remove(minutes);
     final writes = await ref.read(syncedWritesProvider.future);
-    await writes.updateAppSettings(quickAddDurationsMinutes: formatQuickAddDurations(updated));
+    await writes.updateAppSettings(
+      quickAddDurationsMinutes: formatQuickAddDurations(updated),
+    );
   }
 
-  Future<void> _add(BuildContext context, WidgetRef ref, List<int> current) async {
+  Future<void> _add(
+    BuildContext context,
+    WidgetRef ref,
+    List<int> current,
+  ) async {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
     final minutes = await showDialog<int>(
@@ -29,12 +35,18 @@ class QuickAddDurationsEditor extends ConsumerWidget {
           controller: controller,
           keyboardType: TextInputType.number,
           autofocus: true,
-          decoration: InputDecoration(labelText: l10n.settingsQuickAddNewDurationLabel),
+          decoration: InputDecoration(
+            labelText: l10n.settingsQuickAddNewDurationLabel,
+          ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.commonCancel)),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.commonCancel),
+          ),
           FilledButton(
-            onPressed: () => Navigator.of(context).pop(int.tryParse(controller.text.trim())),
+            onPressed: () =>
+                Navigator.of(context).pop(int.tryParse(controller.text.trim())),
             child: Text(l10n.commonSave),
           ),
         ],
@@ -43,7 +55,9 @@ class QuickAddDurationsEditor extends ConsumerWidget {
     if (minutes == null || minutes <= 0 || current.contains(minutes)) return;
     final updated = List<int>.from(current)..add(minutes);
     final writes = await ref.read(syncedWritesProvider.future);
-    await writes.updateAppSettings(quickAddDurationsMinutes: formatQuickAddDurations(updated));
+    await writes.updateAppSettings(
+      quickAddDurationsMinutes: formatQuickAddDurations(updated),
+    );
   }
 
   @override
@@ -55,9 +69,15 @@ class QuickAddDurationsEditor extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.settingsQuickAddTitle, style: Theme.of(context).textTheme.titleMedium),
+        Text(
+          l10n.settingsQuickAddTitle,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
         const SizedBox(height: 4),
-        Text(l10n.settingsQuickAddDescription, style: Theme.of(context).textTheme.bodySmall),
+        Text(
+          l10n.settingsQuickAddDescription,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
         const SizedBox(height: 12),
         Wrap(
           spacing: 8,

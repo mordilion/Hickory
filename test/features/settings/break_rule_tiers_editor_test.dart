@@ -47,7 +47,9 @@ void main() {
 
   setUp(() {
     db = AppDatabase.forTesting(NativeDatabase.memory());
-    syncRoot = Directory.systemTemp.createTempSync('hickory_break_rule_settings_test_');
+    syncRoot = Directory.systemTemp.createTempSync(
+      'hickory_break_rule_settings_test_',
+    );
   });
 
   tearDown(() async {
@@ -75,43 +77,47 @@ void main() {
     List<BreakRuleTier> tiers = const [],
     bool countPausedTimeAsBreak = false,
   }) => ProviderScope(
-        overrides: [
-          breakRuleTiersProvider.overrideWith((ref) => Stream.value(tiers)),
-          appSettingsProvider.overrideWith(
-            (ref) => Stream.value(
-              AppSettingsRow(
-                id: 'default',
-                dateFormat: 'iso',
-                timeFormat: '24h',
-                quickAddDurationsMinutes: '15,30,45,60',
-                countPausedTimeAsBreak: countPausedTimeAsBreak,
-                updatedAt: DateTime.utc(2026, 1, 1),
-              ),
-            ),
+    overrides: [
+      breakRuleTiersProvider.overrideWith((ref) => Stream.value(tiers)),
+      appSettingsProvider.overrideWith(
+        (ref) => Stream.value(
+          AppSettingsRow(
+            id: 'default',
+            dateFormat: 'iso',
+            timeFormat: '24h',
+            quickAddDurationsMinutes: '15,30,45,60',
+            countPausedTimeAsBreak: countPausedTimeAsBreak,
+            updatedAt: DateTime.utc(2026, 1, 1),
           ),
-          deviceIdProvider.overrideWith((ref) async => 'device-1'),
-          syncedWritesProvider.overrideWith(
-            (ref) async => SyncedWrites(
-              db: db,
-              logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
-            ),
-          ),
-        ],
-        child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: const Scaffold(body: BreakRuleTiersEditor()),
         ),
-      );
+      ),
+      deviceIdProvider.overrideWith((ref) async => 'device-1'),
+      syncedWritesProvider.overrideWith(
+        (ref) async => SyncedWrites(
+          db: db,
+          logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
+        ),
+      ),
+    ],
+    child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en'),
+      home: const Scaffold(body: BreakRuleTiersEditor()),
+    ),
+  );
 
-  testWidgets('tapping the Germany preset creates its two tiers', (tester) async {
+  testWidgets('tapping the Germany preset creates its two tiers', (
+    tester,
+  ) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
 
     await tester.runAsync(() async {
       await tester.tap(find.text('Germany'));
-      await pumpUntilTrue(() async => (await db.select(db.breakRuleTiers).get()).length == 2);
+      await pumpUntilTrue(
+        () async => (await db.select(db.breakRuleTiers).get()).length == 2,
+      );
     });
 
     final tiers = await db.select(db.breakRuleTiers).get();
@@ -120,38 +126,39 @@ void main() {
     expect(tiers.map((t) => t.requiredBreakMinutes), [30, 45]);
   });
 
-  testWidgets('tapping a preset replaces any existing tiers rather than adding to them', (
-    tester,
-  ) async {
-    final now = DateTime.utc(2026, 1, 1);
-    await tester.pumpWidget(
-      makeApp(
-        tiers: [
-          BreakRuleTier(
-            id: 'old',
-            afterMinutes: 120,
-            requiredBreakMinutes: 10,
-            deviceId: 'device-1',
-            createdAt: now,
-            updatedAt: now,
-          ),
-        ],
-      ),
-    );
-    await tester.pumpAndSettle();
+  testWidgets(
+    'tapping a preset replaces any existing tiers rather than adding to them',
+    (tester) async {
+      final now = DateTime.utc(2026, 1, 1);
+      await tester.pumpWidget(
+        makeApp(
+          tiers: [
+            BreakRuleTier(
+              id: 'old',
+              afterMinutes: 120,
+              requiredBreakMinutes: 10,
+              deviceId: 'device-1',
+              createdAt: now,
+              updatedAt: now,
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    await tester.runAsync(() async {
-      await tester.tap(find.text('Austria'));
-      await pumpUntilTrue(() async {
-        final rows = await db.select(db.breakRuleTiers).get();
-        return rows.length == 1 && rows.single.afterMinutes == 360;
+      await tester.runAsync(() async {
+        await tester.tap(find.text('Austria'));
+        await pumpUntilTrue(() async {
+          final rows = await db.select(db.breakRuleTiers).get();
+          return rows.length == 1 && rows.single.afterMinutes == 360;
+        });
       });
-    });
 
-    final tiers = await db.select(db.breakRuleTiers).get();
-    expect(tiers, hasLength(1));
-    expect(tiers.single.afterMinutes, 360);
-  });
+      final tiers = await db.select(db.breakRuleTiers).get();
+      expect(tiers, hasLength(1));
+      expect(tiers.single.afterMinutes, 360);
+    },
+  );
 
   testWidgets('tapping None clears all tiers', (tester) async {
     final now = DateTime.utc(2026, 1, 1);
@@ -173,13 +180,17 @@ void main() {
 
     await tester.runAsync(() async {
       await tester.tap(find.text('None'));
-      await pumpUntilTrue(() async => (await db.select(db.breakRuleTiers).get()).isEmpty);
+      await pumpUntilTrue(
+        () async => (await db.select(db.breakRuleTiers).get()).isEmpty,
+      );
     });
 
     expect(await db.select(db.breakRuleTiers).get(), isEmpty);
   });
 
-  testWidgets('renders tier thresholds as hours/minutes, not a clock time', (tester) async {
+  testWidgets('renders tier thresholds as hours/minutes, not a clock time', (
+    tester,
+  ) async {
     final now = DateTime.utc(2026, 1, 1);
     await tester.pumpWidget(
       makeApp(
@@ -223,7 +234,9 @@ void main() {
 
     await tester.runAsync(() async {
       await tester.tap(find.byIcon(Icons.delete_outline));
-      await pumpUntilTrue(() async => (await db.select(db.breakRuleTiers).get()).isEmpty);
+      await pumpUntilTrue(
+        () async => (await db.select(db.breakRuleTiers).get()).isEmpty,
+      );
     });
 
     expect(await db.select(db.breakRuleTiers).get(), isEmpty);
@@ -244,7 +257,9 @@ void main() {
       // The dialog's Navigator.pop() (which resolves showDialog's Future
       // and lets _add's write continuation run) needs a frame to settle.
       await tester.pump();
-      await pumpUntilTrue(() async => (await db.select(db.breakRuleTiers).get()).isNotEmpty);
+      await pumpUntilTrue(
+        () async => (await db.select(db.breakRuleTiers).get()).isNotEmpty,
+      );
     });
 
     final tiers = await db.select(db.breakRuleTiers).get();
@@ -253,39 +268,45 @@ void main() {
     expect(tiers.single.requiredBreakMinutes, 20);
   });
 
-  testWidgets('entering a non-numeric value shows an inline error and keeps the dialog open', (
+  testWidgets(
+    'entering a non-numeric value shows an inline error and keeps the dialog open',
+    (tester) async {
+      await tester.pumpWidget(makeApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Add rule'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField).first, 'abc');
+      await tester.enterText(find.byType(TextField).last, '20');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      // The dialog is still open (Save didn't pop it) and shows the error
+      // as the field's own errorText, not a SnackBar hidden behind the
+      // modal barrier.
+      expect(find.text('Add rule'), findsOneWidget);
+      expect(find.text('Please enter valid minute values.'), findsWidgets);
+      expect(await db.select(db.breakRuleTiers).get(), isEmpty);
+    },
+  );
+
+  testWidgets(
+    'renders the switch already on when countPausedTimeAsBreak is true',
+    (tester) async {
+      await tester.pumpWidget(makeApp(countPausedTimeAsBreak: true));
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
+        isTrue,
+      );
+    },
+  );
+
+  testWidgets('toggling "Include pause-button time" persists the setting', (
     tester,
   ) async {
-    await tester.pumpWidget(makeApp());
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text('Add rule'));
-    await tester.pumpAndSettle();
-
-    await tester.enterText(find.byType(TextField).first, 'abc');
-    await tester.enterText(find.byType(TextField).last, '20');
-    await tester.tap(find.text('Save'));
-    await tester.pumpAndSettle();
-
-    // The dialog is still open (Save didn't pop it) and shows the error
-    // as the field's own errorText, not a SnackBar hidden behind the
-    // modal barrier.
-    expect(find.text('Add rule'), findsOneWidget);
-    expect(find.text('Please enter valid minute values.'), findsWidgets);
-    expect(await db.select(db.breakRuleTiers).get(), isEmpty);
-  });
-
-  testWidgets('renders the switch already on when countPausedTimeAsBreak is true', (tester) async {
-    await tester.pumpWidget(makeApp(countPausedTimeAsBreak: true));
-    await tester.pumpAndSettle();
-
-    expect(
-      tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
-      isTrue,
-    );
-  });
-
-  testWidgets('toggling "Include pause-button time" persists the setting', (tester) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
 

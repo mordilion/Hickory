@@ -39,7 +39,8 @@ const _presets = [
   ),
 ];
 
-String _presetLabel(AppLocalizations l10n, _PresetCountry country) => switch (country) {
+String _presetLabel(AppLocalizations l10n, _PresetCountry country) =>
+    switch (country) {
       _PresetCountry.germany => l10n.settingsBreakRulePresetGermany,
       _PresetCountry.austria => l10n.settingsBreakRulePresetAustria,
       _PresetCountry.switzerland => l10n.settingsBreakRulePresetSwitzerland,
@@ -66,7 +67,8 @@ class BreakRuleTiersEditor extends ConsumerStatefulWidget {
   const BreakRuleTiersEditor({super.key});
 
   @override
-  ConsumerState<BreakRuleTiersEditor> createState() => _BreakRuleTiersEditorState();
+  ConsumerState<BreakRuleTiersEditor> createState() =>
+      _BreakRuleTiersEditorState();
 }
 
 class _BreakRuleTiersEditorState extends ConsumerState<BreakRuleTiersEditor> {
@@ -84,7 +86,11 @@ class _BreakRuleTiersEditorState extends ConsumerState<BreakRuleTiersEditor> {
       debugPrint('Failed to save break-rule setting: $error');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context).settingsBreakRuleSaveError)),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).settingsBreakRuleSaveError,
+            ),
+          ),
         );
       }
     } finally {
@@ -92,18 +98,20 @@ class _BreakRuleTiersEditorState extends ConsumerState<BreakRuleTiersEditor> {
     }
   }
 
-  Future<void> _applyPreset(List<BreakRuleTierValues> tiers) => _guardedWrite(() async {
+  Future<void> _applyPreset(List<BreakRuleTierValues> tiers) =>
+      _guardedWrite(() async {
         final deviceId = await ref.read(deviceIdProvider.future);
         final writes = await ref.read(syncedWritesProvider.future);
         await writes.replaceBreakRuleTiers(deviceId: deviceId, tiers: tiers);
       });
 
   Future<void> _remove(String id) => _guardedWrite(() async {
-        final writes = await ref.read(syncedWritesProvider.future);
-        await writes.deleteBreakRuleTier(id);
-      });
+    final writes = await ref.read(syncedWritesProvider.future);
+    await writes.deleteBreakRuleTier(id);
+  });
 
-  Future<void> _setCountPausedTimeAsBreak(bool value) => _guardedWrite(() async {
+  Future<void> _setCountPausedTimeAsBreak(bool value) =>
+      _guardedWrite(() async {
         final writes = await ref.read(syncedWritesProvider.future);
         await writes.updateAppSettings(countPausedTimeAsBreak: value);
       });
@@ -151,13 +159,24 @@ class _BreakRuleTiersEditorState extends ConsumerState<BreakRuleTiersEditor> {
                 FilledButton(
                   onPressed: () {
                     final after = int.tryParse(afterController.text.trim());
-                    final required = int.tryParse(requiredController.text.trim());
-                    if (after == null || required == null || after <= 0 || required <= 0) {
-                      setDialogState(() => errorText = l10n.settingsBreakRuleInvalidTierError);
+                    final required = int.tryParse(
+                      requiredController.text.trim(),
+                    );
+                    if (after == null ||
+                        required == null ||
+                        after <= 0 ||
+                        required <= 0) {
+                      setDialogState(
+                        () =>
+                            errorText = l10n.settingsBreakRuleInvalidTierError,
+                      );
                       return;
                     }
                     Navigator.of(context).pop(
-                      BreakRuleTierValues(afterMinutes: after, requiredBreakMinutes: required),
+                      BreakRuleTierValues(
+                        afterMinutes: after,
+                        requiredBreakMinutes: required,
+                      ),
                     );
                   },
                   child: Text(l10n.commonSave),
@@ -194,9 +213,15 @@ class _BreakRuleTiersEditorState extends ConsumerState<BreakRuleTiersEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.settingsBreakRuleTitle, style: Theme.of(context).textTheme.titleMedium),
+        Text(
+          l10n.settingsBreakRuleTitle,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
         const SizedBox(height: 4),
-        Text(l10n.settingsBreakRuleDescription, style: Theme.of(context).textTheme.bodySmall),
+        Text(
+          l10n.settingsBreakRuleDescription,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
         const SizedBox(height: 12),
         Wrap(
           spacing: 8,
@@ -220,7 +245,9 @@ class _BreakRuleTiersEditorState extends ConsumerState<BreakRuleTiersEditor> {
             title: Text(
               l10n.settingsBreakRuleTierLabel(
                 _formatHoursMinutes(Duration(minutes: tier.afterMinutes)),
-                _formatHoursMinutes(Duration(minutes: tier.requiredBreakMinutes)),
+                _formatHoursMinutes(
+                  Duration(minutes: tier.requiredBreakMinutes),
+                ),
               ),
             ),
             trailing: IconButton(
