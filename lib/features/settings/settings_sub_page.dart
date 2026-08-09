@@ -14,23 +14,26 @@ class SettingsSubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const BackButton(),
-              if (title != null) ...[
-                const SizedBox(width: 8),
-                Text(title!, style: Theme.of(context).textTheme.headlineSmall),
+    return Material(
+      color: Theme.of(context).colorScheme.surface,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const BackButton(),
+                if (title != null) ...[
+                  const SizedBox(width: 8),
+                  Text(title!, style: Theme.of(context).textTheme.headlineSmall),
+                ],
               ],
-            ],
-          ),
-          const SizedBox(height: 16),
-          Expanded(child: SingleChildScrollView(child: child)),
-        ],
+            ),
+            const SizedBox(height: 16),
+            Expanded(child: SingleChildScrollView(child: child)),
+          ],
+        ),
       ),
     );
   }
