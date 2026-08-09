@@ -9,6 +9,10 @@ import '../../core/update/update_installer.dart';
 import '../../l10n/app_localizations.dart';
 import 'settings_sub_page.dart';
 
+/// Update-check and install flow -- state and handlers relocated verbatim
+/// from the old monolithic SettingsScreen. The Platform.isMacOS/isWindows
+/// guard that gated this content lives in SettingsHomeScreen instead,
+/// controlling whether this screen is reachable at all.
 class UpdateSettingsScreen extends ConsumerStatefulWidget {
   const UpdateSettingsScreen({super.key});
 
@@ -27,10 +31,16 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
       _updateBusy = true;
       _updateStatusMessage = l10n.settingsUpdateChecking;
     });
+    // Captured before the await below: if this screen gets popped while the
+    // check is in flight, using ref.read() after the await would throw
+    // StateError (the widget's element is disposed) and silently drop a
+    // real result. The notifier itself outlives this screen (its provider
+    // isn't scoped to this widget), so writing to it directly is safe.
+    final checker = ref.read(updateCheckerProvider);
+    final updateNotifier = ref.read(availableUpdateProvider.notifier);
     try {
-      final checker = ref.read(updateCheckerProvider);
       final update = await checker.checkForUpdate();
-      ref.read(availableUpdateProvider.notifier).state = update;
+      updateNotifier.state = update;
       if (!mounted) return;
       setState(
         () => _updateStatusMessage = update == null
@@ -52,11 +62,15 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
       _updateBusy = true;
       _updateStatusMessage = l10n.settingsUpdateInstalling;
     });
+    // Same reasoning as _checkForUpdates: capture everything ref-derived
+    // before the first await, so a pop mid-download doesn't throw and
+    // silently abandon an update that already finished downloading.
+    final installer = ref.read(updateInstallerProvider);
+    final db = ref.read(appDatabaseProvider);
+    final writesFuture = ref.read(syncedWritesProvider.future);
     try {
-      final installer = ref.read(updateInstallerProvider);
       final extracted = await installer.prepareUpdate(update);
-      final db = ref.read(appDatabaseProvider);
-      final writes = await ref.read(syncedWritesProvider.future);
+      final writes = await writesFuture;
       await installer.quitAndSwap(extracted, db: db, writes: writes);
     } on UpdateInstallPermissionException {
       if (mounted) {

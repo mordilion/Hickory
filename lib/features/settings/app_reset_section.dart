@@ -49,14 +49,20 @@ class _AppResetSectionState extends ConsumerState<AppResetSection> {
     if (confirmed != true || !mounted) return;
 
     setState(() => _busy = true);
+    // Captured before any await: if this screen gets popped mid-reset (now
+    // possible since Settings got its own Navigator), ref.invalidate after
+    // an await would throw StateError once this widget is disposed. A
+    // ProviderContainer isn't tied to this widget's lifecycle, so invalidating
+    // through it stays safe even if the screen is gone by the time this runs.
+    final container = ProviderScope.containerOf(context, listen: false);
     try {
       final service = await ref.read(appResetServiceProvider.future);
       await service.resetEverything();
-      ref.invalidate(configuredSyncFolderPathProvider);
-      ref.invalidate(jiraCredentialsProvider);
-      ref.invalidate(personioCredentialsProvider);
-      ref.invalidate(localeControllerProvider);
-      ref.invalidate(reportViewControllerProvider);
+      container.invalidate(configuredSyncFolderPathProvider);
+      container.invalidate(jiraCredentialsProvider);
+      container.invalidate(personioCredentialsProvider);
+      container.invalidate(localeControllerProvider);
+      container.invalidate(reportViewControllerProvider);
       if (mounted) {
         ScaffoldMessenger.of(
           context,
