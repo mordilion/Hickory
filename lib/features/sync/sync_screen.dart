@@ -66,7 +66,11 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
     setState(() {
       _personioFrom = latest == null
           ? DateTime(now.year, now.month, now.day)
-          : DateTime(latest.year, latest.month, latest.day).add(const Duration(days: 1));
+          : DateTime(
+              latest.year,
+              latest.month,
+              latest.day,
+            ).add(const Duration(days: 1));
       _personioTo = DateTime(now.year, now.month, now.day);
     });
   }
@@ -125,7 +129,9 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
     final apiToken = _jiraApiTokenController.text.trim();
     if (email.isEmpty || apiToken.isEmpty) return false;
     final uri = Uri.tryParse(_jiraBaseUrlController.text.trim());
-    return uri != null && uri.isAbsolute && (uri.scheme == 'http' || uri.scheme == 'https');
+    return uri != null &&
+        uri.isAbsolute &&
+        (uri.scheme == 'http' || uri.scheme == 'https');
   }
 
   Future<void> _saveJiraCredentials() async {
@@ -148,9 +154,13 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
         ),
       );
       ref.invalidate(jiraCredentialsProvider);
-      if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraCredentialsSaved);
+      if (mounted) {
+        setState(() => _jiraStatusMessage = l10n.syncJiraCredentialsSaved);
+      }
     } catch (_) {
-      if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraUnexpectedError);
+      if (mounted) {
+        setState(() => _jiraStatusMessage = l10n.syncJiraUnexpectedError);
+      }
     } finally {
       if (mounted) setState(() => _jiraBusy = false);
     }
@@ -165,7 +175,9 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
     try {
       final client = await ref.read(jiraClientProvider.future);
       if (client == null) {
-        if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraNotConfigured);
+        if (mounted) {
+          setState(() => _jiraStatusMessage = l10n.syncJiraNotConfigured);
+        }
         return;
       }
       final ok = await client.testConnection();
@@ -180,7 +192,9 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
       // malformed URL, DNS failure) — the single most likely error right
       // after first configuring credentials, so this must not be left to
       // propagate unhandled.
-      if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraTestConnectionFailure);
+      if (mounted) {
+        setState(() => _jiraStatusMessage = l10n.syncJiraTestConnectionFailure);
+      }
     } finally {
       if (mounted) setState(() => _jiraBusy = false);
     }
@@ -195,7 +209,9 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
     try {
       final service = await ref.read(jiraSyncServiceProvider.future);
       if (service == null) {
-        if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraNotConfigured);
+        if (mounted) {
+          setState(() => _jiraStatusMessage = l10n.syncJiraNotConfigured);
+        }
         return;
       }
       final result = await service.syncNow();
@@ -209,7 +225,9 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
         ),
       );
     } catch (_) {
-      if (mounted) setState(() => _jiraStatusMessage = l10n.syncJiraUnexpectedError);
+      if (mounted) {
+        setState(() => _jiraStatusMessage = l10n.syncJiraUnexpectedError);
+      }
     } finally {
       if (mounted) setState(() => _jiraBusy = false);
     }
@@ -224,7 +242,9 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
   Future<void> _savePersonioCredentials() async {
     final l10n = AppLocalizations.of(context);
     if (!_hasValidPersonioCredentialsInput()) {
-      setState(() => _personioStatusMessage = l10n.syncPersonioInvalidCredentials);
+      setState(
+        () => _personioStatusMessage = l10n.syncPersonioInvalidCredentials,
+      );
       return;
     }
     setState(() {
@@ -241,9 +261,17 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
         ),
       );
       ref.invalidate(personioCredentialsProvider);
-      if (mounted) setState(() => _personioStatusMessage = l10n.syncPersonioCredentialsSaved);
+      if (mounted) {
+        setState(
+          () => _personioStatusMessage = l10n.syncPersonioCredentialsSaved,
+        );
+      }
     } catch (_) {
-      if (mounted) setState(() => _personioStatusMessage = l10n.syncPersonioUnexpectedError);
+      if (mounted) {
+        setState(
+          () => _personioStatusMessage = l10n.syncPersonioUnexpectedError,
+        );
+      }
     } finally {
       if (mounted) setState(() => _personioBusy = false);
     }
@@ -258,7 +286,11 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
     try {
       final client = await ref.read(personioClientProvider.future);
       if (client == null) {
-        if (mounted) setState(() => _personioStatusMessage = l10n.syncPersonioNotConfigured);
+        if (mounted) {
+          setState(
+            () => _personioStatusMessage = l10n.syncPersonioNotConfigured,
+          );
+        }
         return;
       }
       final ok = await client.testConnection();
@@ -273,7 +305,11 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
       // malformed URL, DNS failure) -- the single most likely error right
       // after first configuring credentials, so this must not be left to
       // propagate unhandled.
-      if (mounted) setState(() => _personioStatusMessage = l10n.syncPersonioTestConnectionFailure);
+      if (mounted) {
+        setState(
+          () => _personioStatusMessage = l10n.syncPersonioTestConnectionFailure,
+        );
+      }
     } finally {
       if (mounted) setState(() => _personioBusy = false);
     }
@@ -288,10 +324,17 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
     try {
       final service = await ref.read(personioSyncServiceProvider.future);
       if (service == null) {
-        if (mounted) setState(() => _personioStatusMessage = l10n.syncPersonioNotConfigured);
+        if (mounted) {
+          setState(
+            () => _personioStatusMessage = l10n.syncPersonioNotConfigured,
+          );
+        }
         return;
       }
-      final result = await service.pushRange(from: _personioFrom, to: _personioTo);
+      final result = await service.pushRange(
+        from: _personioFrom,
+        to: _personioTo,
+      );
       ref.invalidate(personioLatestSyncedAtProvider);
       if (!mounted) return;
       setState(
@@ -308,7 +351,11 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
       // and reopen this screen.
       await _initPersonioRange();
     } catch (_) {
-      if (mounted) setState(() => _personioStatusMessage = l10n.syncPersonioUnexpectedError);
+      if (mounted) {
+        setState(
+          () => _personioStatusMessage = l10n.syncPersonioUnexpectedError,
+        );
+      }
     } finally {
       if (mounted) setState(() => _personioBusy = false);
     }
@@ -353,7 +400,10 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.syncTitle, style: Theme.of(context).textTheme.headlineSmall),
+          Text(
+            l10n.syncTitle,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
           const SizedBox(height: 16),
           Card(
             child: Padding(
@@ -377,7 +427,10 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
                   ),
                   if (_statusMessage != null) ...[
                     const SizedBox(height: 12),
-                    Text(_statusMessage!, style: Theme.of(context).textTheme.bodySmall),
+                    Text(
+                      _statusMessage!,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   ],
                   const SizedBox(height: 16),
                   Wrap(
@@ -400,127 +453,167 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
           ),
           const SizedBox(height: 16),
           Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.syncJiraSectionTitle, style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _jiraBaseUrlController,
-                    decoration: InputDecoration(labelText: l10n.syncJiraBaseUrlLabel),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _jiraEmailController,
-                    decoration: InputDecoration(labelText: l10n.syncJiraEmailLabel),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _jiraApiTokenController,
-                    decoration: InputDecoration(labelText: l10n.syncJiraApiTokenLabel),
-                    obscureText: true,
-                  ),
-                  if (_jiraStatusMessage != null) ...[
-                    const SizedBox(height: 12),
-                    Text(_jiraStatusMessage!, style: Theme.of(context).textTheme.bodySmall),
-                  ],
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
+            child: ExpansionTile(
+              title: Text(
+                l10n.syncJiraSectionTitle,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              initiallyExpanded: false,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      FilledButton(
-                        onPressed: _jiraBusy ? null : _saveJiraCredentials,
-                        child: Text(l10n.syncJiraSaveCredentialsButton),
+                      TextField(
+                        controller: _jiraBaseUrlController,
+                        decoration: InputDecoration(
+                          labelText: l10n.syncJiraBaseUrlLabel,
+                        ),
                       ),
-                      OutlinedButton(
-                        onPressed: _jiraBusy ? null : _testJiraConnection,
-                        child: Text(l10n.syncJiraTestConnectionButton),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _jiraEmailController,
+                        decoration: InputDecoration(
+                          labelText: l10n.syncJiraEmailLabel,
+                        ),
                       ),
-                      OutlinedButton(
-                        onPressed: _jiraBusy ? null : _syncJiraNow,
-                        child: Text(l10n.syncJiraSyncButton),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _jiraApiTokenController,
+                        decoration: InputDecoration(
+                          labelText: l10n.syncJiraApiTokenLabel,
+                        ),
+                        obscureText: true,
+                      ),
+                      if (_jiraStatusMessage != null) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          _jiraStatusMessage!,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          FilledButton(
+                            onPressed: _jiraBusy ? null : _saveJiraCredentials,
+                            child: Text(l10n.syncJiraSaveCredentialsButton),
+                          ),
+                          OutlinedButton(
+                            onPressed: _jiraBusy ? null : _testJiraConnection,
+                            child: Text(l10n.syncJiraTestConnectionButton),
+                          ),
+                          OutlinedButton(
+                            onPressed: _jiraBusy ? null : _syncJiraNow,
+                            child: Text(l10n.syncJiraSyncButton),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 16),
           Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.syncPersonioSectionTitle, style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _personioClientIdController,
-                    decoration: InputDecoration(labelText: l10n.syncPersonioClientIdLabel),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _personioClientSecretController,
-                    decoration: InputDecoration(labelText: l10n.syncPersonioClientSecretLabel),
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _personioEmployeeIdController,
-                    decoration: InputDecoration(labelText: l10n.syncPersonioEmployeeIdLabel),
-                  ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      FilledButton(
-                        onPressed: _personioBusy ? null : _savePersonioCredentials,
-                        child: Text(l10n.syncPersonioSaveCredentialsButton),
-                      ),
-                      OutlinedButton(
-                        onPressed: _personioBusy ? null : _testPersonioConnection,
-                        child: Text(l10n.syncPersonioTestConnectionButton),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: _personioBusy ? null : _pickPersonioFrom,
-                          child: Text(
-                            '${l10n.syncPersonioFromLabel}: ${_formatPersonioDate(_personioFrom)}',
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: _personioBusy ? null : _pickPersonioTo,
-                          child: Text(
-                            '${l10n.syncPersonioToLabel}: ${_formatPersonioDate(_personioTo)}',
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (_personioStatusMessage != null) ...[
-                    const SizedBox(height: 12),
-                    Text(_personioStatusMessage!, style: Theme.of(context).textTheme.bodySmall),
-                  ],
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: _personioBusy ? null : _pushPersonio,
-                    child: Text(l10n.syncPersonioPushButton),
-                  ),
-                ],
+            child: ExpansionTile(
+              title: Text(
+                l10n.syncPersonioSectionTitle,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
+              initiallyExpanded: false,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: _personioClientIdController,
+                        decoration: InputDecoration(
+                          labelText: l10n.syncPersonioClientIdLabel,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _personioClientSecretController,
+                        decoration: InputDecoration(
+                          labelText: l10n.syncPersonioClientSecretLabel,
+                        ),
+                        obscureText: true,
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _personioEmployeeIdController,
+                        decoration: InputDecoration(
+                          labelText: l10n.syncPersonioEmployeeIdLabel,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          FilledButton(
+                            onPressed: _personioBusy
+                                ? null
+                                : _savePersonioCredentials,
+                            child: Text(l10n.syncPersonioSaveCredentialsButton),
+                          ),
+                          OutlinedButton(
+                            onPressed: _personioBusy
+                                ? null
+                                : _testPersonioConnection,
+                            child: Text(l10n.syncPersonioTestConnectionButton),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: _personioBusy
+                                  ? null
+                                  : _pickPersonioFrom,
+                              child: Text(
+                                '${l10n.syncPersonioFromLabel}: '
+                                '${_formatPersonioDate(_personioFrom)}',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: _personioBusy ? null : _pickPersonioTo,
+                              child: Text(
+                                '${l10n.syncPersonioToLabel}: '
+                                '${_formatPersonioDate(_personioTo)}',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (_personioStatusMessage != null) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          _personioStatusMessage!,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      FilledButton(
+                        onPressed: _personioBusy ? null : _pushPersonio,
+                        child: Text(l10n.syncPersonioPushButton),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
