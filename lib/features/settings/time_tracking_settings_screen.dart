@@ -16,7 +16,7 @@ class TimeTrackingSettingsScreen extends StatelessWidget {
     return SettingsSubPage(
       title: l10n.settingsCategoryTimeTracking,
       child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Card(
             child: Padding(

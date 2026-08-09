@@ -11,8 +11,11 @@ class ResetSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SettingsSubPage(
-      child: Card(
-        child: Padding(padding: EdgeInsets.all(16), child: AppResetSection()),
+      child: SizedBox(
+        width: double.infinity,
+        child: Card(
+          child: Padding(padding: EdgeInsets.all(16), child: AppResetSection()),
+        ),
       ),
     );
   }

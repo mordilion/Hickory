@@ -64,7 +64,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen> {
     return SettingsSubPage(
       title: l10n.settingsCategoryGeneral,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Card(
             child: _loading

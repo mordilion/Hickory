@@ -97,55 +97,58 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
     final availableUpdate = ref.watch(availableUpdateProvider);
 
     return SettingsSubPage(
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.settingsUpdateTitle,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              currentVersionAsync.when(
-                data: (version) => Text(
-                  l10n.settingsUpdateCurrentVersion(version),
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                loading: () => const SizedBox.shrink(),
-                error: (_, _) => const SizedBox.shrink(),
-              ),
-              if (_updateStatusMessage != null) ...[
-                const SizedBox(height: 8),
+      child: SizedBox(
+        width: double.infinity,
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  _updateStatusMessage!,
-                  style: Theme.of(context).textTheme.bodySmall,
+                  l10n.settingsUpdateTitle,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-              ],
-              const SizedBox(height: 16),
-              if (availableUpdate != null) ...[
-                Text(l10n.settingsUpdateAvailable(availableUpdate.version)),
-                if (availableUpdate.notes.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                currentVersionAsync.when(
+                  data: (version) => Text(
+                    l10n.settingsUpdateCurrentVersion(version),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, _) => const SizedBox.shrink(),
+                ),
+                if (_updateStatusMessage != null) ...[
                   const SizedBox(height: 8),
                   Text(
-                    availableUpdate.notes,
+                    _updateStatusMessage!,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
-                const SizedBox(height: 12),
-                FilledButton(
-                  onPressed: _updateBusy
-                      ? null
-                      : () => _installUpdate(availableUpdate),
-                  child: Text(l10n.settingsUpdateInstallButton),
-                ),
-              ] else
-                OutlinedButton(
-                  onPressed: _updateBusy ? null : _checkForUpdates,
-                  child: Text(l10n.settingsUpdateCheckButton),
-                ),
-            ],
+                const SizedBox(height: 16),
+                if (availableUpdate != null) ...[
+                  Text(l10n.settingsUpdateAvailable(availableUpdate.version)),
+                  if (availableUpdate.notes.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      availableUpdate.notes,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  FilledButton(
+                    onPressed: _updateBusy
+                        ? null
+                        : () => _installUpdate(availableUpdate),
+                    child: Text(l10n.settingsUpdateInstallButton),
+                  ),
+                ] else
+                  OutlinedButton(
+                    onPressed: _updateBusy ? null : _checkForUpdates,
+                    child: Text(l10n.settingsUpdateCheckButton),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
