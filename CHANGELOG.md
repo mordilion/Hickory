@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-09
+
 ### Added
 
 - Add "Today" and "Yesterday" report presets, plus a combinable project and billable/non-billable filter that's remembered across restarts and respected by CSV export.
@@ -14,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Reorganize Settings into a category list (General, Time tracking, Projects, Updates, Reset) with drill-down sub-pages, replacing the previous single flat stack of cards.
+- Make the Jira and Personio sections on the Sync screen collapsible, and remove the default divider lines for a cleaner look.
 
 ## [1.1.0] - 2026-08-07
 
@@ -45,6 +48,7 @@ which were never distributed to users.
 - Fix the Settings screen not being scrollable when its content overflows the window.
 - Fix the in-app updater silently relaunching the unchanged app on macOS/Windows when it can't write to the install directory; it now fails with a clear, actionable message before quitting instead.
 
-[Unreleased]: https://github.com/mordilion/Hickory/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/mordilion/Hickory/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/mordilion/Hickory/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/mordilion/Hickory/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/mordilion/Hickory/releases/tag/v1.0.2
