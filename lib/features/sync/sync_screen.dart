@@ -459,6 +459,13 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               initiallyExpanded: false,
+              // ExpansionTile draws a top/bottom divider line in the theme's
+              // divider color while expanded by default (see shape/
+              // collapsedShape in Flutter's expansion_tile.dart) -- inside a
+              // Card, that clashes with the Card's own border, so both are
+              // disabled here.
+              shape: const Border(),
+              collapsedShape: const Border(),
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -526,6 +533,13 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               initiallyExpanded: false,
+              // ExpansionTile draws a top/bottom divider line in the theme's
+              // divider color while expanded by default (see shape/
+              // collapsedShape in Flutter's expansion_tile.dart) -- inside a
+              // Card, that clashes with the Card's own border, so both are
+              // disabled here.
+              shape: const Border(),
+              collapsedShape: const Border(),
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
