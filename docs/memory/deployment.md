@@ -40,11 +40,31 @@
 
 Roadmap item, see `ROADMAP.md`. Neither the Apple Developer Program membership nor a
 Windows signing certificate exists yet (as of 2026-08-13) — `release.yml` still ships
-unsigned builds. This section is the acquisition runbook; `release.yml` itself is not
-changed until the credentials below actually exist, so the signing steps can be tested
-against a real submission instead of merged blind.
+unsigned builds. Decision (2026-08-13): pursue the free-first options below before
+spending money; `release.yml` itself is not changed until the relevant credentials
+actually exist, so any signing steps can be tested against a real submission instead of
+merged blind.
 
 ### macOS
+
+**No-cost interim mitigation (actionable now, doesn't require the Apple fee):**
+
+1. Publish a self-hosted Homebrew tap (e.g. `mordilion/homebrew-hickory`) with a Cask
+   definition for `hickory.app`.
+2. Give the Cask a `postflight` block that runs `xattr -cr` on the installed app, so
+   `brew install --cask mordilion/hickory/hickory` users never see the Gatekeeper
+   "damaged" dialog at all — the app is de-quarantined before first launch.
+3. Document the Homebrew install as the primary path in the README; keep the direct
+   ZIP download + manual `xattr -cr` instructions as the fallback for non-Homebrew users.
+4. This does **not** replace real signing/notarization — it only helps Homebrew users.
+   Direct-download users still hit Gatekeeper, and the app still isn't verified by Apple.
+   `[inferred]` — the official `homebrew-cask` repo has gotten stricter about
+   Gatekeeper-bypassing casks over time, which is why this uses a self-hosted tap rather
+   than submitting to the main cask repo; re-check current homebrew-cask policy if
+   submitting there is ever reconsidered.
+
+**Full fix (needs the $99/year Apple Developer Program fee — not started, no funding
+plan yet):**
 
 1. Enroll in the Apple Developer Program (99 USD/year,
    `developer.apple.com/programs/enroll`). Identity verification takes a few days for an
@@ -61,14 +81,27 @@ against a real submission instead of merged blind.
 
 ### Windows
 
-1. Recommended: **Azure Trusted Signing** instead of a classic EV certificate — no
-   hardware token required, works well from GitHub Actions via
-   `azure/trusted-signing-action`. `[inferred]` — verify current pricing/availability on
-   Microsoft's site before purchasing, this may have changed.
-2. Alternative: a classic OV/EV certificate from a CA (DigiCert, SSL.com). EV typically
-   requires a hardware token, which is awkward in CI without a cloud HSM, but gives
-   instant SmartScreen reputation.
-3. GitHub secrets needed (Trusted Signing route): Azure service-principal or OIDC
-   credentials, `TRUSTED_SIGNING_ACCOUNT_NAME`, `TRUSTED_SIGNING_ENDPOINT`,
-   `CERTIFICATE_PROFILE_NAME`.
-4. Future `build-windows` step (not yet implemented): sign `hickory.exe` before zipping.
+**Primary plan: SignPath.io Foundation (free code signing for qualifying OSS
+projects).** Chosen over Azure Trusted Signing specifically because it's free — apply,
+don't pay, unless the application is rejected.
+
+1. Apply through SignPath's open-source program. `[inferred]` — verify the current
+   application URL and eligibility criteria on signpath.io before applying; general
+   OSS-friendliness (public repo, OSI-approved license — Hickory is MIT) is a reasonable
+   fit on paper, but acceptance isn't guaranteed.
+2. If accepted, SignPath provides the certificate and a CI integration (GitHub Action);
+   no certificate cost to the project. Exact secrets/setup depend on their onboarding —
+   fill in once accepted.
+3. Future `build-windows` step (not yet implemented): sign `hickory.exe` via SignPath's
+   action before zipping.
+
+**Fallback if SignPath doesn't work out: Azure Trusted Signing** (paid, ~10 USD/month,
+no hardware token needed, works via `azure/trusted-signing-action`).
+`[inferred]` — verify current pricing/availability on Microsoft's site before
+purchasing.
+
+1. GitHub secrets needed: Azure service-principal or OIDC credentials,
+   `TRUSTED_SIGNING_ACCOUNT_NAME`, `TRUSTED_SIGNING_ENDPOINT`, `CERTIFICATE_PROFILE_NAME`.
+2. A classic OV/EV certificate from a CA (DigiCert, SSL.com) is a further fallback below
+   that — EV needs a hardware token, which is awkward in CI without a cloud HSM, but
+   gives instant SmartScreen reputation.

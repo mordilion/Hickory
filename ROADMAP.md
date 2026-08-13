@@ -8,13 +8,17 @@ document only captures the agreed sequencing and scope at a high level.
 
 ## v1.3 — Trust
 
-**Goal:** remove the biggest friction point for new users: unsigned builds.
+**Goal:** remove the biggest friction point for new users: unsigned builds. Pursuing a
+free-first path before spending money — see `docs/memory/deployment.md` for the full
+runbook.
 
-- macOS code signing + notarization (Apple Developer ID, `notarytool` in the release
-  workflow)
-- Windows code signing (Authenticode certificate, `signtool` in the release workflow)
-- Update README installation instructions to drop the `xattr -cr` Gatekeeper workaround
-  once macOS builds are notarized
+- macOS: self-hosted Homebrew tap with automatic de-quarantine as a free interim
+  mitigation; real notarization (Apple Developer Program, `notarytool`) stays blocked on
+  the $99/year fee until/unless that gets funded
+- Windows: apply to SignPath.io Foundation for free code signing; Azure Trusted Signing
+  as a paid fallback if that doesn't work out
+- Update README installation instructions once the Homebrew tap and/or real signing are
+  in place
 
 ## v1.4 — Migration
 
