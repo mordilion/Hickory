@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/native.dart';
@@ -36,7 +37,7 @@ void main() {
     if (syncRoot.existsSync()) syncRoot.deleteSync(recursive: true);
   });
 
-  Widget makeApp({Client? client}) => ProviderScope(
+  Widget makeApp({Client? client, void Function(Client?)? onResult}) => ProviderScope(
         overrides: [
           syncedWritesProvider.overrideWith(
             (ref) async => SyncedWrites(
@@ -53,7 +54,10 @@ void main() {
             body: Builder(
               builder: (context) => Consumer(
                 builder: (context, ref, _) => TextButton(
-                  onPressed: () => showClientFormDialog(context, ref, client: client),
+                  onPressed: () async {
+                    final result = await showClientFormDialog(context, ref, client: client);
+                    onResult?.call(result);
+                  },
                   child: const Text('open'),
                 ),
               ),
@@ -133,5 +137,168 @@ void main() {
     final clients = await db.select(db.clients).get();
     expect(clients, hasLength(1));
     expect(clients.single.name, 'New Name');
+  });
+
+  testWidgets('create mode: submitting resolves the Future to the created Client', (tester) async {
+    Client? capturedResult;
+    late BuildContext dialogContext;
+    late WidgetRef dialogRef;
+
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        syncedWritesProvider.overrideWith(
+          (ref) async => SyncedWrites(
+            db: db,
+            logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
+          ),
+        ),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => Consumer(
+              builder: (context, ref, _) {
+                dialogContext = context;
+                dialogRef = ref;
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ),
+      ),
+    ));
+    await tester.pump();
+
+    // Call the dialog directly from within runAsync
+    final result = await tester.runAsync(() async {
+      final future = showClientFormDialog(dialogContext, dialogRef);
+
+      // Pump to let the dialog appear
+      await Future.delayed(const Duration(milliseconds: 100));
+      await tester.pump();
+
+      // Enter text and submit
+      await tester.enterText(find.byType(TextField).first, 'New Client Inc');
+      await tester.tap(find.text('Create'));
+      await tester.pump();
+
+      // Wait for the dialog to close and return the result
+      return future;
+    });
+
+    expect(result, isNotNull);
+    expect(result!.name, 'New Client Inc');
+
+    final dbClients = await db.select(db.clients).get();
+    expect(dbClients, hasLength(1));
+    expect(dbClients.single.id, result!.id);
+  });
+
+  testWidgets('edit mode: submitting resolves the Future to the updated Client', (tester) async {
+    final client = await db.clientsDao.createClient(name: 'Original Name');
+    late BuildContext dialogContext;
+    late WidgetRef dialogRef;
+
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        syncedWritesProvider.overrideWith(
+          (ref) async => SyncedWrites(
+            db: db,
+            logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
+          ),
+        ),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => Consumer(
+              builder: (context, ref, _) {
+                dialogContext = context;
+                dialogRef = ref;
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ),
+      ),
+    ));
+    await tester.pump();
+
+    // Call the dialog directly from within runAsync
+    final result = await tester.runAsync(() async {
+      final future = showClientFormDialog(dialogContext, dialogRef, client: client);
+
+      // Pump to let the dialog appear
+      await Future.delayed(const Duration(milliseconds: 100));
+      await tester.pump();
+
+      // Enter text and submit
+      await tester.enterText(find.byType(TextField).first, 'Updated Name');
+      await tester.tap(find.text('Save'));
+      await tester.pump();
+
+      // Wait for the dialog to close and return the result
+      return future;
+    });
+
+    expect(result, isNotNull);
+    expect(result!.name, 'Updated Name');
+    expect(result!.id, client.id);
+
+    final dbClients = await db.select(db.clients).get();
+    expect(dbClients, hasLength(1));
+    expect(dbClients.single.name, 'Updated Name');
+  });
+
+  testWidgets('cancelling resolves the Future to null', (tester) async {
+    Client? capturedResult;
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        syncedWritesProvider.overrideWith(
+          (ref) async => SyncedWrites(
+            db: db,
+            logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
+          ),
+        ),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => Consumer(
+              builder: (context, ref, _) => ElevatedButton(
+                onPressed: () async {
+                  final result = await showClientFormDialog(context, ref);
+                  capturedResult = result;
+                },
+                child: const Text('show-dialog'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ));
+    await tester.pump();
+
+    await tester.tap(find.text('show-dialog'));
+    await tester.pump();
+
+    await tester.enterText(find.byType(TextField).first, 'Some Name');
+
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await tester.pump();
+
+    expect(capturedResult, isNull);
+
+    final dbClients = await db.select(db.clients).get();
+    expect(dbClients, isEmpty);
   });
 }
