@@ -83,17 +83,31 @@ plan yet):**
 
 **Primary plan: SignPath.io Foundation (free code signing for qualifying OSS
 projects).** Chosen over Azure Trusted Signing specifically because it's free — apply,
-don't pay, unless the application is rejected.
+don't pay, unless the application is rejected. `[verified 2026-08-13]` against
+signpath.org and docs.signpath.io.
 
-1. Apply through SignPath's open-source program. `[inferred]` — verify the current
-   application URL and eligibility criteria on signpath.io before applying; general
-   OSS-friendliness (public repo, OSI-approved license — Hickory is MIT) is a reasonable
-   fit on paper, but acceptance isn't guaranteed.
-2. If accepted, SignPath provides the certificate and a CI integration (GitHub Action);
-   no certificate cost to the project. Exact secrets/setup depend on their onboarding —
-   fill in once accepted.
-3. Future `build-windows` step (not yet implemented): sign `hickory.exe` via SignPath's
-   action before zipping.
+1. Apply at [signpath.org/apply](https://signpath.org/apply). Eligibility (per
+   [signpath.org/terms.html](https://signpath.org/terms.html)): OSI-approved license
+   without commercial dual-licensing (Hickory is MIT — qualifies), no proprietary
+   components, actively maintained, already released in the form to be signed (Hickory
+   already ships GitHub Releases), and the functionality must be documented on the
+   download page (README already covers this).
+2. **Trade-off to accept before applying:** the certificate is issued to *SignPath
+   Foundation*, not to Hickory/mordilion — Windows will show "SignPath Foundation" as the
+   publisher in the SmartScreen/properties dialog, not Hickory's own name. SignPath
+   Foundation can also pause/revoke the certificate if their code of conduct is violated.
+3. If accepted: install the [SignPath GitHub App](https://github.com/apps/signpath) on
+   the repo (required for source/build policy verification), add it to a SignPath
+   organization, link it to a SignPath Project for GitHub, and configure a signing
+   policy — SignPath provides the org id/project slug/policy slug during onboarding.
+4. GitHub secret needed: `SIGNPATH_API_TOKEN` (issued by SignPath).
+5. Future `build-windows` steps (not yet implemented, see
+   [docs.signpath.io/trusted-build-systems/github](https://docs.signpath.io/trusted-build-systems/github)):
+   upload `hickory.exe` via `actions/upload-artifact`, then submit it for signing with
+   `signpath/github-action-submit-signing-request@v2`, then use the signed artifact it
+   returns instead of the unsigned one when zipping. Requires all jobs leading up to the
+   signing request to run on GitHub-hosted runners (already the case —
+   `windows-latest`).
 
 **Fallback if SignPath doesn't work out: Azure Trusted Signing** (paid, ~10 USD/month,
 no hardware token needed, works via `azure/trusted-signing-action`).
