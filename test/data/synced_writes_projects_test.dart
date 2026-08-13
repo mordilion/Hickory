@@ -106,4 +106,15 @@ void main() {
     final remaining = await (db.select(db.projects)..where((p) => p.id.equals(project.id))).get();
     expect(remaining, hasLength(1));
   });
+
+  test('updateProject persists clientId and logs it', () async {
+    final client = await writes.createClient(name: 'Acme Inc');
+    final project = await writes.createProject(name: 'Website Relaunch', colorHex: '#5B8DEF');
+
+    final updated = await writes.updateProject(project.id, clientId: Value(client.id));
+
+    expect(updated.clientId, client.id);
+    final event = lastLoggedEvent(project.id);
+    expect(event.payload?['clientId'], client.id);
+  });
 }

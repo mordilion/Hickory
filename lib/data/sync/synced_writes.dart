@@ -25,6 +25,11 @@ class BreakRuleTierValues {
 /// for projects with history, deletion is only for projects with none.
 class ProjectHasTimeEntriesException implements Exception {}
 
+/// Thrown by [SyncedWrites.deleteClient] when the client still has at least
+/// one project referencing it -- archiving is the removal path for clients
+/// with active projects, deletion is only for clients with none.
+class ClientHasProjectsException implements Exception {}
+
 /// Thin write-through wrapper around the DAOs: every mutation is applied to
 /// the local drift cache immediately (via the DAO, for instant UI feedback)
 /// and also appended to the device's own event log, per the architecture
@@ -70,6 +75,7 @@ class SyncedWrites {
     String id, {
     Value<String> name = const Value.absent(),
     Value<String> colorHex = const Value.absent(),
+    Value<String?> clientId = const Value.absent(),
     Value<bool> billable = const Value.absent(),
     Value<int?> hourlyRateCents = const Value.absent(),
     Value<String?> currency = const Value.absent(),
@@ -78,6 +84,7 @@ class SyncedWrites {
       id,
       name: name,
       colorHex: colorHex,
+      clientId: clientId,
       billable: billable,
       hourlyRateCents: hourlyRateCents,
       currency: currency,
@@ -115,6 +122,57 @@ class SyncedWrites {
     final current = await (db.select(db.projects)..where((p) => p.id.equals(id))).getSingle();
     await logWriter.appendEvent(
       entityType: EntityTypes.project,
+      entityId: id,
+      op: EventOp.update,
+      payload: current.toJson(),
+    );
+    return current;
+  }
+
+  Future<Client> createClient({required String name}) async {
+    final client = await db.clientsDao.createClient(name: name);
+    await logWriter.appendEvent(
+      entityType: EntityTypes.client,
+      entityId: client.id,
+      op: EventOp.create,
+      payload: client.toJson(),
+    );
+    return client;
+  }
+
+  Future<Client> updateClient(String id, {Value<String> name = const Value.absent()}) async {
+    await db.clientsDao.updateClient(id, name: name);
+    return _logCurrentClientState(id);
+  }
+
+  Future<void> archiveClient(String id) async {
+    await db.clientsDao.archiveClient(id);
+    await _logCurrentClientState(id);
+  }
+
+  Future<void> unarchiveClient(String id) async {
+    await db.clientsDao.unarchiveClient(id);
+    await _logCurrentClientState(id);
+  }
+
+  Future<void> deleteClient(String id) async {
+    final hasProjects = await db.projectsDao.hasProjectsForClient(id);
+    if (hasProjects) throw ClientHasProjectsException();
+    await db.clientsDao.deleteClient(id);
+    await logWriter.appendEvent(
+      entityType: EntityTypes.client,
+      entityId: id,
+      op: EventOp.delete,
+      payload: null,
+    );
+  }
+
+  /// Re-reads the client's current row and appends it as an [EventOp.update]
+  /// log entry -- mirrors [_logCurrentProjectState] for clients.
+  Future<Client> _logCurrentClientState(String id) async {
+    final current = await (db.select(db.clients)..where((c) => c.id.equals(id))).getSingle();
+    await logWriter.appendEvent(
+      entityType: EntityTypes.client,
       entityId: id,
       op: EventOp.update,
       payload: current.toJson(),
