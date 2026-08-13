@@ -5139,6 +5139,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_events_entity_id',
     'CREATE INDEX idx_events_entity_id ON events (entity_id)',
   );
+  late final ClientsDao clientsDao = ClientsDao(this as AppDatabase);
   late final ProjectsDao projectsDao = ProjectsDao(this as AppDatabase);
   late final TimeEntriesDao timeEntriesDao = TimeEntriesDao(
     this as AppDatabase,

@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'daos/activity_samples_dao.dart';
 import 'daos/app_settings_dao.dart';
 import 'daos/break_rule_tiers_dao.dart';
+import 'daos/clients_dao.dart';
 import 'daos/events_dao.dart';
 import 'daos/jira_worklogs_dao.dart';
 import 'daos/personio_attendances_dao.dart';
@@ -44,6 +45,7 @@ part 'database.g.dart';
     PersonioAttendances,
   ],
   daos: [
+    ClientsDao,
     ProjectsDao,
     TimeEntriesDao,
     EventsDao,
