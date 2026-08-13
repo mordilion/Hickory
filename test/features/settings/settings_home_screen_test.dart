@@ -10,7 +10,9 @@ import 'package:hickory/core/di/locale_provider.dart';
 import 'package:hickory/core/di/update_providers.dart';
 import 'package:hickory/core/locale/locale_store.dart';
 import 'package:hickory/data/drift/database.dart';
+import 'package:hickory/features/clients/clients_providers.dart';
 import 'package:hickory/features/projects/projects_providers.dart';
+import 'package:hickory/features/settings/clients_settings_screen.dart';
 import 'package:hickory/features/settings/general_settings_screen.dart';
 import 'package:hickory/features/settings/projects_settings_screen.dart';
 import 'package:hickory/features/settings/reset_settings_screen.dart';
@@ -64,6 +66,8 @@ void main() {
       breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),
       activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
       archivedProjectsProvider.overrideWith((ref) => Stream.value(const [])),
+      activeClientsProvider.overrideWith((ref) => Stream.value(const [])),
+      archivedClientsProvider.overrideWith((ref) => Stream.value(const [])),
       autostartServiceProvider.overrideWithValue(_FakeAutostartService()),
       localeStoreProvider.overrideWith(
         (ref) async => LocaleStore(supportDirectory: localeDir),
@@ -94,6 +98,7 @@ void main() {
     expect(find.text('General'), findsOneWidget);
     expect(find.text('Time tracking'), findsOneWidget);
     expect(find.text('Projects'), findsOneWidget);
+    expect(find.text('Clients'), findsOneWidget);
     expect(find.text('Reset'), findsOneWidget);
     if (Platform.isMacOS || Platform.isWindows) {
       expect(find.text('Updates'), findsOneWidget);
@@ -117,6 +122,7 @@ void main() {
       await tapAndVerify('General', GeneralSettingsScreen);
       await tapAndVerify('Time tracking', TimeTrackingSettingsScreen);
       await tapAndVerify('Projects', ProjectsSettingsScreen);
+      await tapAndVerify('Clients', ClientsSettingsScreen);
       if (Platform.isMacOS || Platform.isWindows) {
         await tapAndVerify('Updates', UpdateSettingsScreen);
       }

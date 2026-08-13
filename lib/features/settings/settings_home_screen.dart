@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
+import 'clients_settings_screen.dart';
 import 'general_settings_screen.dart';
 import 'projects_settings_screen.dart';
 import 'reset_settings_screen.dart';
@@ -62,6 +63,17 @@ class SettingsHomeScreen extends StatelessWidget {
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => const ProjectsSettingsScreen(),
+                    ),
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.business_outlined),
+                  title: Text(l10n.settingsClientsTitle),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const ClientsSettingsScreen(),
                     ),
                   ),
                 ),
