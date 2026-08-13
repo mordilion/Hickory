@@ -503,6 +503,67 @@ class AppLocalizationsNl extends AppLocalizations {
   String get projectsInvalidRateError => 'Voer een geldig bedrag in.';
 
   @override
+  String get settingsClientsTitle => 'Klanten';
+
+  @override
+  String get settingsClientsDescription =>
+      'Klanten aanmaken, bewerken en archiveren.';
+
+  @override
+  String get settingsClientsAddLabel => 'Klant toevoegen';
+
+  @override
+  String get settingsClientsArchivedSection => 'Gearchiveerde klanten';
+
+  @override
+  String get settingsClientsSaveError =>
+      'Wijziging kon niet worden opgeslagen.';
+
+  @override
+  String get clientsNewClientTitle => 'Nieuwe klant';
+
+  @override
+  String get clientsNameLabel => 'Naam';
+
+  @override
+  String get clientsCreateButton => 'Aanmaken';
+
+  @override
+  String get clientsEditTitle => 'Klant bewerken';
+
+  @override
+  String get clientsEditTooltip => 'Bewerken';
+
+  @override
+  String get clientsArchiveTooltip => 'Archiveren';
+
+  @override
+  String get clientsUnarchiveTooltip => 'Heractiveren';
+
+  @override
+  String get clientsDeleteTooltip => 'Verwijderen';
+
+  @override
+  String get clientsDeleteConfirmTitle => 'Klant verwijderen?';
+
+  @override
+  String get clientsDeleteConfirmMessage =>
+      'Deze klant wordt permanent verwijderd. Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String get clientsDeleteHasProjectsError =>
+      'Deze klant heeft nog gekoppelde projecten en kan niet worden verwijderd.';
+
+  @override
+  String get projectsClientLabel => 'Klant';
+
+  @override
+  String get projectsClientNone => 'Geen klant';
+
+  @override
+  String get projectsClientCreateNew => '+ Nieuwe klant…';
+
+  @override
   String get reportsTitle => 'Rapporten';
 
   @override

@@ -498,6 +498,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get projectsInvalidRateError => 'Please enter a valid amount.';
 
   @override
+  String get settingsClientsTitle => 'Clients';
+
+  @override
+  String get settingsClientsDescription => 'Create, edit, and archive clients.';
+
+  @override
+  String get settingsClientsAddLabel => 'Add client';
+
+  @override
+  String get settingsClientsArchivedSection => 'Archived clients';
+
+  @override
+  String get settingsClientsSaveError => 'Could not save the change.';
+
+  @override
+  String get clientsNewClientTitle => 'New client';
+
+  @override
+  String get clientsNameLabel => 'Name';
+
+  @override
+  String get clientsCreateButton => 'Create';
+
+  @override
+  String get clientsEditTitle => 'Edit client';
+
+  @override
+  String get clientsEditTooltip => 'Edit';
+
+  @override
+  String get clientsArchiveTooltip => 'Archive';
+
+  @override
+  String get clientsUnarchiveTooltip => 'Reactivate';
+
+  @override
+  String get clientsDeleteTooltip => 'Delete';
+
+  @override
+  String get clientsDeleteConfirmTitle => 'Delete client?';
+
+  @override
+  String get clientsDeleteConfirmMessage =>
+      'This client will be permanently deleted. This cannot be undone.';
+
+  @override
+  String get clientsDeleteHasProjectsError =>
+      'This client still has projects assigned and can\'t be deleted.';
+
+  @override
+  String get projectsClientLabel => 'Client';
+
+  @override
+  String get projectsClientNone => 'No client';
+
+  @override
+  String get projectsClientCreateNew => '+ New client…';
+
+  @override
   String get reportsTitle => 'Reports';
 
   @override

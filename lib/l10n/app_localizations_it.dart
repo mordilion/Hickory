@@ -501,6 +501,65 @@ class AppLocalizationsIt extends AppLocalizations {
   String get projectsInvalidRateError => 'Inserisci un importo valido.';
 
   @override
+  String get settingsClientsTitle => 'Clienti';
+
+  @override
+  String get settingsClientsDescription => 'Crea, modifica e archivia clienti.';
+
+  @override
+  String get settingsClientsAddLabel => 'Aggiungi cliente';
+
+  @override
+  String get settingsClientsArchivedSection => 'Clienti archiviati';
+
+  @override
+  String get settingsClientsSaveError => 'Impossibile salvare la modifica.';
+
+  @override
+  String get clientsNewClientTitle => 'Nuovo cliente';
+
+  @override
+  String get clientsNameLabel => 'Nome';
+
+  @override
+  String get clientsCreateButton => 'Crea';
+
+  @override
+  String get clientsEditTitle => 'Modifica cliente';
+
+  @override
+  String get clientsEditTooltip => 'Modifica';
+
+  @override
+  String get clientsArchiveTooltip => 'Archivia';
+
+  @override
+  String get clientsUnarchiveTooltip => 'Riattiva';
+
+  @override
+  String get clientsDeleteTooltip => 'Elimina';
+
+  @override
+  String get clientsDeleteConfirmTitle => 'Eliminare il cliente?';
+
+  @override
+  String get clientsDeleteConfirmMessage =>
+      'Questo cliente verrà eliminato definitivamente. Questa azione non può essere annullata.';
+
+  @override
+  String get clientsDeleteHasProjectsError =>
+      'Questo cliente ha ancora progetti assegnati e non può essere eliminato.';
+
+  @override
+  String get projectsClientLabel => 'Cliente';
+
+  @override
+  String get projectsClientNone => 'Nessun cliente';
+
+  @override
+  String get projectsClientCreateNew => '+ Nuovo cliente…';
+
+  @override
   String get reportsTitle => 'Report';
 
   @override

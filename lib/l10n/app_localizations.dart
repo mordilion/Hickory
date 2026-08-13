@@ -981,6 +981,120 @@ abstract class AppLocalizations {
   /// **'Bitte einen gültigen Betrag eingeben.'**
   String get projectsInvalidRateError;
 
+  /// No description provided for @settingsClientsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kunden'**
+  String get settingsClientsTitle;
+
+  /// No description provided for @settingsClientsDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Kunden anlegen, bearbeiten und archivieren.'**
+  String get settingsClientsDescription;
+
+  /// No description provided for @settingsClientsAddLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Kunde hinzufügen'**
+  String get settingsClientsAddLabel;
+
+  /// No description provided for @settingsClientsArchivedSection.
+  ///
+  /// In de, this message translates to:
+  /// **'Archivierte Kunden'**
+  String get settingsClientsArchivedSection;
+
+  /// No description provided for @settingsClientsSaveError.
+  ///
+  /// In de, this message translates to:
+  /// **'Änderung konnte nicht gespeichert werden.'**
+  String get settingsClientsSaveError;
+
+  /// No description provided for @clientsNewClientTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Neuer Kunde'**
+  String get clientsNewClientTitle;
+
+  /// No description provided for @clientsNameLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Name'**
+  String get clientsNameLabel;
+
+  /// No description provided for @clientsCreateButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Erstellen'**
+  String get clientsCreateButton;
+
+  /// No description provided for @clientsEditTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kunde bearbeiten'**
+  String get clientsEditTitle;
+
+  /// No description provided for @clientsEditTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Bearbeiten'**
+  String get clientsEditTooltip;
+
+  /// No description provided for @clientsArchiveTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Archivieren'**
+  String get clientsArchiveTooltip;
+
+  /// No description provided for @clientsUnarchiveTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Reaktivieren'**
+  String get clientsUnarchiveTooltip;
+
+  /// No description provided for @clientsDeleteTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Löschen'**
+  String get clientsDeleteTooltip;
+
+  /// No description provided for @clientsDeleteConfirmTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kunde löschen?'**
+  String get clientsDeleteConfirmTitle;
+
+  /// No description provided for @clientsDeleteConfirmMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Kunde wird endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.'**
+  String get clientsDeleteConfirmMessage;
+
+  /// No description provided for @clientsDeleteHasProjectsError.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Kunde hat noch zugewiesene Projekte und kann nicht gelöscht werden.'**
+  String get clientsDeleteHasProjectsError;
+
+  /// No description provided for @projectsClientLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Kunde'**
+  String get projectsClientLabel;
+
+  /// No description provided for @projectsClientNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Kein Kunde'**
+  String get projectsClientNone;
+
+  /// No description provided for @projectsClientCreateNew.
+  ///
+  /// In de, this message translates to:
+  /// **'+ Neuer Kunde…'**
+  String get projectsClientCreateNew;
+
   /// No description provided for @reportsTitle.
   ///
   /// In de, this message translates to:

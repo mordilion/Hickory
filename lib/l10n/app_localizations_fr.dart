@@ -506,6 +506,67 @@ class AppLocalizationsFr extends AppLocalizations {
   String get projectsInvalidRateError => 'Veuillez saisir un montant valide.';
 
   @override
+  String get settingsClientsTitle => 'Clients';
+
+  @override
+  String get settingsClientsDescription =>
+      'Créer, modifier et archiver des clients.';
+
+  @override
+  String get settingsClientsAddLabel => 'Ajouter un client';
+
+  @override
+  String get settingsClientsArchivedSection => 'Clients archivés';
+
+  @override
+  String get settingsClientsSaveError =>
+      'Impossible d\'enregistrer la modification.';
+
+  @override
+  String get clientsNewClientTitle => 'Nouveau client';
+
+  @override
+  String get clientsNameLabel => 'Nom';
+
+  @override
+  String get clientsCreateButton => 'Créer';
+
+  @override
+  String get clientsEditTitle => 'Modifier le client';
+
+  @override
+  String get clientsEditTooltip => 'Modifier';
+
+  @override
+  String get clientsArchiveTooltip => 'Archiver';
+
+  @override
+  String get clientsUnarchiveTooltip => 'Réactiver';
+
+  @override
+  String get clientsDeleteTooltip => 'Supprimer';
+
+  @override
+  String get clientsDeleteConfirmTitle => 'Supprimer le client ?';
+
+  @override
+  String get clientsDeleteConfirmMessage =>
+      'Ce client sera définitivement supprimé. Cette action est irréversible.';
+
+  @override
+  String get clientsDeleteHasProjectsError =>
+      'Ce client a encore des projets associés et ne peut pas être supprimé.';
+
+  @override
+  String get projectsClientLabel => 'Client';
+
+  @override
+  String get projectsClientNone => 'Aucun client';
+
+  @override
+  String get projectsClientCreateNew => '+ Nouveau client…';
+
+  @override
   String get reportsTitle => 'Rapports';
 
   @override

@@ -503,6 +503,67 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bitte einen gültigen Betrag eingeben.';
 
   @override
+  String get settingsClientsTitle => 'Kunden';
+
+  @override
+  String get settingsClientsDescription =>
+      'Kunden anlegen, bearbeiten und archivieren.';
+
+  @override
+  String get settingsClientsAddLabel => 'Kunde hinzufügen';
+
+  @override
+  String get settingsClientsArchivedSection => 'Archivierte Kunden';
+
+  @override
+  String get settingsClientsSaveError =>
+      'Änderung konnte nicht gespeichert werden.';
+
+  @override
+  String get clientsNewClientTitle => 'Neuer Kunde';
+
+  @override
+  String get clientsNameLabel => 'Name';
+
+  @override
+  String get clientsCreateButton => 'Erstellen';
+
+  @override
+  String get clientsEditTitle => 'Kunde bearbeiten';
+
+  @override
+  String get clientsEditTooltip => 'Bearbeiten';
+
+  @override
+  String get clientsArchiveTooltip => 'Archivieren';
+
+  @override
+  String get clientsUnarchiveTooltip => 'Reaktivieren';
+
+  @override
+  String get clientsDeleteTooltip => 'Löschen';
+
+  @override
+  String get clientsDeleteConfirmTitle => 'Kunde löschen?';
+
+  @override
+  String get clientsDeleteConfirmMessage =>
+      'Dieser Kunde wird endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get clientsDeleteHasProjectsError =>
+      'Dieser Kunde hat noch zugewiesene Projekte und kann nicht gelöscht werden.';
+
+  @override
+  String get projectsClientLabel => 'Kunde';
+
+  @override
+  String get projectsClientNone => 'Kein Kunde';
+
+  @override
+  String get projectsClientCreateNew => '+ Neuer Kunde…';
+
+  @override
   String get reportsTitle => 'Reports';
 
   @override
