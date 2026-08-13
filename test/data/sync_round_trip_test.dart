@@ -336,4 +336,55 @@ void main() {
       expect(tiers.map((t) => t.afterMinutes), [360, 540]);
     },
   );
+
+  test(
+    'a client syncs to a second device, including archive and delete',
+    () async {
+      final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(writerDb.close);
+      final writerWrites = SyncedWrites(
+        db: writerDb,
+        logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'dev_a'),
+      );
+
+      final client = await writerWrites.createClient(name: 'Acme Inc');
+      await writerWrites.archiveClient(client.id);
+
+      final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(readerDb.close);
+      final ingestor = SyncIngestor(db: readerDb, syncRoot: syncRoot);
+      await ingestor.syncNow();
+
+      final clients = await readerDb.select(readerDb.clients).get();
+      expect(clients, hasLength(1));
+      expect(clients.single.name, 'Acme Inc');
+      expect(clients.single.archived, isTrue);
+
+      await writerWrites.deleteClient(client.id);
+      await ingestor.syncNow();
+
+      expect(await readerDb.select(readerDb.clients).get(), isEmpty);
+    },
+  );
+
+  test(
+    'rebuildFromScratch clears and re-derives clients too',
+    () async {
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
+      final writes = SyncedWrites(
+        db: db,
+        logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'dev_a'),
+      );
+      final ingestor = SyncIngestor(db: db, syncRoot: syncRoot);
+
+      final client = await writes.createClient(name: 'Acme Inc');
+
+      await ingestor.rebuildFromScratch();
+
+      final clients = await db.select(db.clients).get();
+      expect(clients, hasLength(1));
+      expect(clients.single.id, client.id);
+    },
+  );
 }

@@ -49,6 +49,7 @@ class SyncIngestor {
     await db.transaction(() async {
       await db.delete(db.timeEntries).go();
       await db.delete(db.projects).go();
+      await db.delete(db.clients).go();
       await db.delete(db.jiraWorklogs).go();
       await db.delete(db.breakRuleTiers).go();
       await db.delete(db.personioAttendances).go();
@@ -132,6 +133,14 @@ class SyncIngestor {
               .into(db.projects)
               .insertOnConflictUpdate(Project.fromJson(entity.payload!).toCompanion(true));
         }
+      case EntityTypes.client:
+        if (entity.isDeleted) {
+          await (db.delete(db.clients)..where((c) => c.id.equals(entity.entityId))).go();
+        } else {
+          await db
+              .into(db.clients)
+              .insertOnConflictUpdate(Client.fromJson(entity.payload!).toCompanion(true));
+        }
       case EntityTypes.timeEntry:
         if (entity.isDeleted) {
           await (db.delete(db.timeEntries)..where((t) => t.id.equals(entity.entityId))).go();
@@ -200,8 +209,8 @@ class SyncIngestor {
               );
         }
       default:
-        // Client/Tag aren't wired into the app yet (no DAO to apply them
-        // to) — ignored until a later milestone adds them.
+        // Tag isn't wired into the app yet (no DAO to apply it to) --
+        // ignored until a later milestone adds it.
         break;
     }
   }
