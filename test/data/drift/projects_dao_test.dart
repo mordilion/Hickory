@@ -95,4 +95,26 @@ void main() {
     final remaining = await (db.select(db.projects)..where((p) => p.id.equals(project.id))).get();
     expect(remaining, isEmpty);
   });
+
+  test('updateProject can set and clear clientId', () async {
+    final client = await db.clientsDao.createClient(name: 'Acme Inc');
+    final project = await db.projectsDao.createProject(name: 'Website Relaunch', colorHex: '#5B8DEF');
+
+    await db.projectsDao.updateProject(project.id, clientId: Value(client.id));
+    var updated = await (db.select(db.projects)..where((p) => p.id.equals(project.id))).getSingle();
+    expect(updated.clientId, client.id);
+
+    await db.projectsDao.updateProject(project.id, clientId: const Value(null));
+    updated = await (db.select(db.projects)..where((p) => p.id.equals(project.id))).getSingle();
+    expect(updated.clientId, isNull);
+  });
+
+  test('hasProjectsForClient is true only when a project references the client', () async {
+    final client = await db.clientsDao.createClient(name: 'Acme Inc');
+    expect(await db.projectsDao.hasProjectsForClient(client.id), isFalse);
+
+    await db.projectsDao.createProject(name: 'Website Relaunch', colorHex: '#5B8DEF', clientId: client.id);
+
+    expect(await db.projectsDao.hasProjectsForClient(client.id), isTrue);
+  });
 }

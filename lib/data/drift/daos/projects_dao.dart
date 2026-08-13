@@ -67,6 +67,7 @@ class ProjectsDao extends DatabaseAccessor<AppDatabase> with _$ProjectsDaoMixin 
     String id, {
     Value<String> name = const Value.absent(),
     Value<String> colorHex = const Value.absent(),
+    Value<String?> clientId = const Value.absent(),
     Value<bool> billable = const Value.absent(),
     Value<int?> hourlyRateCents = const Value.absent(),
     Value<String?> currency = const Value.absent(),
@@ -75,6 +76,7 @@ class ProjectsDao extends DatabaseAccessor<AppDatabase> with _$ProjectsDaoMixin 
       ProjectsCompanion(
         name: name,
         colorHex: colorHex,
+        clientId: clientId,
         billable: billable,
         hourlyRateCents: hourlyRateCents,
         currency: currency,
@@ -93,4 +95,9 @@ class ProjectsDao extends DatabaseAccessor<AppDatabase> with _$ProjectsDaoMixin 
   }
 
   Future<void> deleteProject(String id) => (delete(projects)..where((p) => p.id.equals(id))).go();
+
+  Future<bool> hasProjectsForClient(String clientId) async {
+    final row = await (select(projects)..where((p) => p.clientId.equals(clientId))..limit(1)).getSingleOrNull();
+    return row != null;
+  }
 }
