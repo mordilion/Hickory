@@ -35,3 +35,40 @@
 - Tag version and `pubspec.yaml` version must match exactly (`vX.Y.Z` vs `X.Y.Z`) or `verify-version` blocks the whole pipeline.
 - The `awk` changelog extraction in `publish` depends on the `## [X.Y.Z]` heading existing in `CHANGELOG.md` *before* the tag is pushed — release notes will be empty otherwise.
 - `UpdateInstaller.quitAndSwap` swaps the install directory from a *detached* shell/PowerShell script that only runs after the app process has fully exited — it has no way to report failure back to the Flutter UI. Because of this, `prepareUpdate()` verifies write access to the install directory's parent *before* the app quits (probes by creating+deleting a throwaway directory there); a failure throws `UpdateInstallPermissionException`, which the Settings screen shows as a specific, actionable message instead of the generic install-failed one. Without this check, a permission failure (e.g. `/Applications` on a non-admin macOS account) made the relaunch script's swap fail silently and its unconditional `open`/`Start-Process` at the end just relaunched the unchanged old app — from the user's perspective, "the app closes and immediately reopens" with no error and no update applied.
+
+## Signing & notarization (planned, v1.3 — blocked on account/certificate acquisition)
+
+Roadmap item, see `ROADMAP.md`. Neither the Apple Developer Program membership nor a
+Windows signing certificate exists yet (as of 2026-08-13) — `release.yml` still ships
+unsigned builds. This section is the acquisition runbook; `release.yml` itself is not
+changed until the credentials below actually exist, so the signing steps can be tested
+against a real submission instead of merged blind.
+
+### macOS
+
+1. Enroll in the Apple Developer Program (99 USD/year,
+   `developer.apple.com/programs/enroll`). Identity verification takes a few days for an
+   individual account, longer for an organization account (needs a D-U-N-S number).
+2. Create a "Developer ID Application" certificate (for distribution outside the Mac App
+   Store), export it as `.p12`, base64-encode it for storage as a GitHub secret.
+3. Create an App Store Connect API key for `notarytool` (preferred over an app-specific
+   password — doesn't expire on password changes).
+4. GitHub secrets needed: `APPLE_CERTIFICATE_P12_BASE64`, `APPLE_CERTIFICATE_PASSWORD`,
+   `APPLE_TEAM_ID`, `APPLE_API_KEY_ID`, `APPLE_API_ISSUER_ID`, `APPLE_API_KEY_P8_BASE64`.
+5. Future `build-macos` steps (not yet implemented): import the certificate into a
+   temporary keychain → `codesign --options runtime` the `.app` → zip → `xcrun notarytool
+   submit --wait` → `xcrun stapler staple` → re-zip the stapled app.
+
+### Windows
+
+1. Recommended: **Azure Trusted Signing** instead of a classic EV certificate — no
+   hardware token required, works well from GitHub Actions via
+   `azure/trusted-signing-action`. `[inferred]` — verify current pricing/availability on
+   Microsoft's site before purchasing, this may have changed.
+2. Alternative: a classic OV/EV certificate from a CA (DigiCert, SSL.com). EV typically
+   requires a hardware token, which is awkward in CI without a cloud HSM, but gives
+   instant SmartScreen reputation.
+3. GitHub secrets needed (Trusted Signing route): Azure service-principal or OIDC
+   credentials, `TRUSTED_SIGNING_ACCOUNT_NAME`, `TRUSTED_SIGNING_ENDPOINT`,
+   `CERTIFICATE_PROFILE_NAME`.
+4. Future `build-windows` step (not yet implemented): sign `hickory.exe` before zipping.
