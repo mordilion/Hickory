@@ -117,6 +117,26 @@ void main() {
     expect(find.byIcon(Icons.unarchive_outlined), findsOneWidget);
   });
 
+  testWidgets('tapping reactivate clears the archived flag in the database', (tester) async {
+    final client = await seedClient(archived: true);
+    await tester.pumpWidget(makeApp(archived: [client]));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Archived clients'));
+    await tester.pumpAndSettle();
+
+    await tester.runAsync(() async {
+      await tester.tap(find.byIcon(Icons.unarchive_outlined));
+      await pumpUntilTrue(tester, () async {
+        final row =
+            await (db.select(db.clients)..where((c) => c.id.equals(client.id))).getSingle();
+        return !row.archived;
+      });
+    });
+
+    final row = await (db.select(db.clients)..where((c) => c.id.equals(client.id))).getSingle();
+    expect(row.archived, isFalse);
+  });
+
   testWidgets('tapping "Add client" opens the create dialog', (tester) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
@@ -125,6 +145,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('New client'), findsOneWidget);
+  });
+
+  testWidgets('tapping edit opens the edit dialog pre-filled with the client name', (tester) async {
+    final client = await seedClient();
+    await tester.pumpWidget(makeApp(active: [client]));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.edit_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Edit client'), findsOneWidget);
+    expect(find.text('Acme Inc'), findsWidgets);
   });
 
   testWidgets('confirming delete removes a client with no projects from the database', (tester) async {
@@ -146,6 +178,20 @@ void main() {
 
     final remaining = await (db.select(db.clients)..where((c) => c.id.equals(client.id))).get();
     expect(remaining, isEmpty);
+  });
+
+  testWidgets('cancelling the delete confirmation leaves the client untouched', (tester) async {
+    final client = await seedClient();
+    await tester.pumpWidget(makeApp(active: [client]));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await tester.pumpAndSettle();
+
+    final remaining = await (db.select(db.clients)..where((c) => c.id.equals(client.id))).get();
+    expect(remaining, hasLength(1));
   });
 
   testWidgets('attempting to delete a client with projects shows the blocked-delete error', (
