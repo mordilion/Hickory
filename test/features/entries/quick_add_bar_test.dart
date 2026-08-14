@@ -212,15 +212,18 @@ void main() {
   });
 
   testWidgets(
-    'picking a start date preserves the previously-picked start time, and vice versa',
+    'picking a start date preserves the previously-picked start time',
     (tester) async {
       await tester.pumpWidget(makeApp());
       await tester.pumpAndSettle();
 
       // Confirm the time picker via its pre-filled default -- this still
-      // exercises _pickTime's date-preserving combine step without depending
+      // exercises _pickDate's time-preserving combine step without depending
       // on the picker's internal widget structure (dial vs. input mode),
-      // which isn't worth pinning down for this test.
+      // which isn't worth pinning down for this test. Using "today" here is
+      // fine: _pickDate's fix (combine with initial.hour/minute) doesn't
+      // depend on the date differing from today to be meaningfully
+      // exercised.
       await tester.tap(find.byType(TextButton).at(1));
       await tester.pumpAndSettle();
       await tester.tap(find.text('OK'));
@@ -238,6 +241,68 @@ void main() {
           ((tester.widget(find.byType(TextButton).at(1)) as TextButton).child! as Text).data;
 
       expect(startTimeLabelAfterDatePick, startTimeLabelAfterTimePick);
+    },
+  );
+
+  testWidgets(
+    'picking a start time preserves a start date other than today '
+    '(regression: _pickTime must not hardcode DateTime.now()\'s date)',
+    (tester) async {
+      await tester.pumpWidget(makeApp());
+      await tester.pumpAndSettle();
+
+      final startDateLabelBeforePick =
+          ((tester.widget(find.byType(TextButton).first) as TextButton).child! as Text).data;
+
+      // Navigate the calendar to a day that is NOT today, staying within the
+      // same month page (no month-navigation needed) and within the
+      // picker's lastDate bound (now + 1 day): pick yesterday, or tomorrow
+      // if today is the 1st of the month.
+      final now = DateTime.now();
+      final targetDay = now.day > 1 ? now.day - 1 : now.day + 1;
+
+      await tester.tap(find.byType(TextButton).first);
+      await tester.pumpAndSettle();
+      expect(find.byType(DatePickerDialog), findsOneWidget);
+
+      // Scope to the dialog: a bare find.text(day) could also match e.g. a
+      // duration chip elsewhere in the tree once the dialog is dismissed, or
+      // ambiguously match multiple calendar cells (header vs. grid) while
+      // it's open.
+      await tester.tap(
+        find.descendant(
+          of: find.byType(DatePickerDialog),
+          matching: find.text(targetDay.toString()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+
+      final startDateLabelAfterDatePick =
+          ((tester.widget(find.byType(TextButton).first) as TextButton).child! as Text).data;
+      expect(
+        startDateLabelAfterDatePick,
+        isNot(startDateLabelBeforePick),
+        reason: 'picking a non-today day should change the displayed start date',
+      );
+
+      // Now pick the start time via its own pre-filled default. This is the
+      // actual regression check: if _pickTime combined the picked time with
+      // DateTime.now()'s date instead of the button's initial date, the
+      // start date would silently snap back to today here.
+      await tester.tap(find.byType(TextButton).at(1));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+
+      final startDateLabelAfterTimePick =
+          ((tester.widget(find.byType(TextButton).first) as TextButton).child! as Text).data;
+      expect(
+        startDateLabelAfterTimePick,
+        startDateLabelAfterDatePick,
+        reason: 'picking a time must not reset the start date back to today',
+      );
     },
   );
 
