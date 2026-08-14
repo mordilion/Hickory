@@ -54,6 +54,11 @@ Future<void> showProjectFormDialog(
   // for the same precaution.
   var selectedColor = project?.colorHex ?? projectColorPalette.first;
   var selectedClientId = project?.clientId;
+  // Bumped every time the inline "+ New client..." flow resolves (created or
+  // cancelled). Combined into the client dropdown's key below to force a
+  // fresh State even when selectedClientId itself doesn't change -- see that
+  // key's doc comment for why a plain rebuild isn't enough on cancel.
+  var clientPickerGeneration = 0;
   var billable = project?.billable ?? true;
   String? rateError;
   return showDialog<void>(
@@ -80,14 +85,24 @@ Future<void> showProjectFormDialog(
                       final clients = ref.watch(activeClientsProvider).value ?? const <Client>[];
                       final validIds = clients.map((c) => c.id).toSet();
                       return DropdownButtonFormField<String?>(
-                        // DropdownButtonFormField only reads initialValue when its
-                        // State is first created, not on every rebuild -- without
-                        // this key, picking "+ New client..." updates
-                        // selectedClientId (used correctly on submit) but the
-                        // dropdown itself would keep showing the old selection.
-                        // Keying on selectedClientId forces a fresh State (and
-                        // therefore a fresh initialValue read) whenever it changes.
-                        key: ValueKey(selectedClientId),
+                        // DropdownButtonFormField's internal FormFieldState only
+                        // re-syncs its displayed value from initialValue in
+                        // didUpdateWidget when initialValue itself changed
+                        // (see _DropdownButtonFormFieldState.didUpdateWidget in
+                        // the Flutter SDK) -- a rebuild with an *unchanged*
+                        // initialValue is a no-op, leaving the dropdown
+                        // showing whatever it locally applied on the last tap
+                        // (e.g. the "+ New client..." sentinel). Keying on
+                        // (selectedClientId, clientPickerGeneration) forces a
+                        // brand-new State -- and therefore a fresh initialValue
+                        // read via initState, bypassing didUpdateWidget's
+                        // equality check entirely -- both when selectedClientId
+                        // changes (a client was picked/created) and when only
+                        // the generation bumps (the inline create dialog was
+                        // cancelled, so selectedClientId is unchanged but the
+                        // dropdown's stale sentinel selection still needs
+                        // clearing).
+                        key: ValueKey((selectedClientId, clientPickerGeneration)),
                         initialValue: validIds.contains(selectedClientId) ? selectedClientId : null,
                         decoration: InputDecoration(labelText: l10n.projectsClientLabel),
                         items: [
@@ -105,9 +120,21 @@ Future<void> showProjectFormDialog(
                             return;
                           }
                           final created = await showClientFormDialog(context, ref);
-                          if (created != null) {
-                            setDialogState(() => selectedClientId = created.id);
-                          }
+                          // Call setDialogState unconditionally, even when
+                          // cancelled (created == null): the dropdown's own
+                          // FormFieldState already applied the sentinel value
+                          // to its displayed selection the moment onChanged
+                          // fired, before this awaited dialog opened. Bumping
+                          // clientPickerGeneration here (always, not just on
+                          // success) changes the dropdown's key even when
+                          // selectedClientId itself doesn't -- required so the
+                          // cancelled case also gets a fresh State; see the
+                          // key's doc comment above for why a plain rebuild
+                          // alone can't resync the display in that case.
+                          setDialogState(() {
+                            clientPickerGeneration++;
+                            if (created != null) selectedClientId = created.id;
+                          });
                         },
                       );
                     },

@@ -272,8 +272,16 @@ void main() {
     // selectedClientId is updated *before* the clients list catches up --
     // which is the realistic ordering, since the query stream has to
     // re-fetch after the write completes -- and only then does the list
-    // update arrive. This proves the ValueKey(selectedClientId) fix actually
-    // makes the dropdown pick up the new value once the list catches up.
+    // update arrive. This proves the dropdown correctly displays the
+    // newly-created client once the list catches up. (In this scenario
+    // selectedClientId itself changes -- null to created.id -- so on this
+    // Flutter version DropdownButtonFormField's own didUpdateWidget would
+    // also re-sync from initialValue on its own, independent of the
+    // ValueKey((selectedClientId, clientPickerGeneration)) fix above; see
+    // that key's doc comment for the cancel-flow case where only the
+    // ValueKey's generation counter makes the difference. Either way, this
+    // test asserts the end-user-visible outcome, not which mechanism
+    // produces it.)
     final clientsController = StreamController<List<Client>>();
     addTearDown(clientsController.close);
     clientsController.add(const <Client>[]);
@@ -335,14 +343,17 @@ void main() {
     // Only now -- after the client row exists and the nested dialog has
     // already resolved (setDialogState already ran with the stale, empty
     // clients list) -- do we let activeClientsProvider catch up. This is the
-    // adversarial ordering the ValueKey fix must handle: selectedClientId
+    // adversarial ordering the dropdown must handle correctly: selectedClientId
     // changes first, and the clients list arrives later.
     clientsController.add([client]);
     await tester.pumpAndSettle();
 
     // The dropdown must show the freshly-created client without re-opening
-    // it -- this is the regression the ValueKey(selectedClientId) fix in
-    // Step 3 guards against.
+    // it or requiring the dialog to be reopened. (In this scenario
+    // selectedClientId changes, so DropdownButtonFormField's own
+    // didUpdateWidget would also re-sync from initialValue on its own here,
+    // independent of the ValueKey fix in Step 3 -- the end-user-visible
+    // behavior is what this test asserts, not which mechanism produces it.)
     expect(find.text('Acme Inc'), findsOneWidget);
 
     await tester.runAsync(() async {
@@ -366,6 +377,45 @@ void main() {
     final project = (await db.select(db.projects).get()).single;
     expect(project.clientId, client.id);
   });
+
+  testWidgets(
+    'create mode: cancelling "+ New client..." reverts the picker display to "No client"',
+    (tester) async {
+      // DropdownButtonFormField's own FormFieldState applies the sentinel
+      // value to its displayed selection the moment onChanged fires --
+      // before the nested client dialog even opens. If the nested dialog is
+      // then cancelled, selectedClientId itself never changes, so a plain
+      // rebuild alone isn't enough to resync the display (see the
+      // clientPickerGeneration/ValueKey doc comment in
+      // project_form_dialog.dart): the fix under test must force a fresh
+      // DropdownButtonFormField State so its displayed value reverts to the
+      // real, unchanged selectedClientId (null / "No client") instead of
+      // staying stuck showing "+ New client...".
+      await tester.pumpWidget(makeApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).first, 'Website Relaunch');
+      await tester.tap(find.byType(DropdownButtonFormField<String?>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('+ New client…').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('New client'), findsOneWidget);
+      await tester.tap(find.widgetWithText(TextButton, 'Cancel').last);
+      await tester.pumpAndSettle();
+
+      // Nested dialog is gone; no client was created.
+      expect(find.text('New client'), findsNothing);
+      expect(await db.select(db.clients).get(), isEmpty);
+
+      // The picker must revert to displaying "No client" rather than
+      // remaining stuck on "+ New client...".
+      expect(find.text('No client'), findsOneWidget);
+      expect(find.text('+ New client…'), findsNothing);
+    },
+  );
 
   testWidgets('create mode: leaving the client picker on "No client" submits a null clientId', (
     tester,
