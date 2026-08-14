@@ -15,25 +15,17 @@ Future<void> showManualEntryDialog(
   BuildContext context,
   WidgetRef ref, {
   TimeEntry? existing,
-  String? initialDescription,
-  String? initialProjectId,
 }) {
   return showDialog<void>(
     context: context,
-    builder: (context) => _ManualEntryDialog(
-      existing: existing,
-      initialDescription: initialDescription,
-      initialProjectId: initialProjectId,
-    ),
+    builder: (context) => _ManualEntryDialog(existing: existing),
   );
 }
 
 class _ManualEntryDialog extends ConsumerStatefulWidget {
-  const _ManualEntryDialog({this.existing, this.initialDescription, this.initialProjectId});
+  const _ManualEntryDialog({this.existing});
 
   final TimeEntry? existing;
-  final String? initialDescription;
-  final String? initialProjectId;
 
   @override
   ConsumerState<_ManualEntryDialog> createState() => _ManualEntryDialogState();
@@ -50,12 +42,10 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
   void initState() {
     super.initState();
     final existing = widget.existing;
-    _descriptionController = TextEditingController(
-      text: existing?.description ?? widget.initialDescription ?? '',
-    );
+    _descriptionController = TextEditingController(text: existing?.description ?? '');
     _startAt = existing?.startAt.toLocal() ?? DateTime.now().subtract(const Duration(hours: 1));
     _endAt = existing?.endAt?.toLocal() ?? DateTime.now();
-    _projectId = existing?.projectId ?? widget.initialProjectId;
+    _projectId = existing?.projectId;
     _jiraTicketKey = existing?.jiraTicketKey;
   }
 
@@ -65,7 +55,7 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
     super.dispose();
   }
 
-  Future<void> _pickDateTime({required bool isStart}) async {
+  Future<void> _pickDate({required bool isStart}) async {
     final initial = isStart ? _startAt : _endAt;
     final date = await showDatePicker(
       context: context,
@@ -74,13 +64,22 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
       lastDate: DateTime.now().add(const Duration(days: 1)),
     );
     if (date == null || !mounted) return;
-    final time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(initial),
-    );
-    if (time == null) return;
-    final combined = DateTime(date.year, date.month, date.day, time.hour, time.minute);
     setState(() {
+      final combined = DateTime(date.year, date.month, date.day, initial.hour, initial.minute);
+      if (isStart) {
+        _startAt = combined;
+      } else {
+        _endAt = combined;
+      }
+    });
+  }
+
+  Future<void> _pickTime({required bool isStart}) async {
+    final initial = isStart ? _startAt : _endAt;
+    final time = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(initial));
+    if (time == null || !mounted) return;
+    setState(() {
+      final combined = DateTime(initial.year, initial.month, initial.day, time.hour, time.minute);
       if (isStart) {
         _startAt = combined;
       } else {
@@ -192,23 +191,35 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
               onChanged: (value) => setState(() => _jiraTicketKey = value),
             ),
             const SizedBox(height: 12),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.entriesStartLabel),
-              subtitle: Text(
-                '${formatDate(_startAt, dateStyle, Localizations.localeOf(context).languageCode)} '
-                '${formatTime(_startAt, timeStyle)}',
-              ),
-              onTap: () => _pickDateTime(isStart: true),
+            Row(
+              children: [
+                Expanded(child: Text(l10n.entriesStartLabel)),
+                TextButton(
+                  onPressed: () => _pickDate(isStart: true),
+                  child: Text(
+                    formatDate(_startAt, dateStyle, Localizations.localeOf(context).languageCode),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => _pickTime(isStart: true),
+                  child: Text(formatTime(_startAt, timeStyle)),
+                ),
+              ],
             ),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.entriesEndLabel),
-              subtitle: Text(
-                '${formatDate(_endAt, dateStyle, Localizations.localeOf(context).languageCode)} '
-                '${formatTime(_endAt, timeStyle)}',
-              ),
-              onTap: () => _pickDateTime(isStart: false),
+            Row(
+              children: [
+                Expanded(child: Text(l10n.entriesEndLabel)),
+                TextButton(
+                  onPressed: () => _pickDate(isStart: false),
+                  child: Text(
+                    formatDate(_endAt, dateStyle, Localizations.localeOf(context).languageCode),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => _pickTime(isStart: false),
+                  child: Text(formatTime(_endAt, timeStyle)),
+                ),
+              ],
             ),
           ],
         ),

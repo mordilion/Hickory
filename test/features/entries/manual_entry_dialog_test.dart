@@ -155,4 +155,139 @@ void main() {
     expect(find.text('Edit entry'), findsOneWidget);
     expect(await db.select(db.timeEntries).get(), hasLength(1));
   });
+
+  testWidgets('tapping the start-date button opens a date picker', (tester) async {
+    final entry = await tester.runAsync(
+      () => writes.createManualEntry(
+        deviceId: 'device-1',
+        startAt: DateTime.now().subtract(const Duration(hours: 1)),
+        endAt: DateTime.now(),
+        description: 'Standup',
+      ),
+    );
+
+    await tester.pumpWidget(makeApp([entry!]));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Standup'));
+    await tester.pumpAndSettle();
+    expect(find.text('Edit entry'), findsOneWidget);
+
+    // Row order in the dialog: [Start label][start date][start time], then
+    // [End label][end date][end time] -- TextButton index 0 is start-date.
+    await tester.tap(find.byType(TextButton).first);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DatePickerDialog), findsOneWidget);
+  });
+
+  testWidgets(
+    'picking a start time preserves a start date other than today '
+    '(regression: _pickTime must not hardcode DateTime.now()\'s date)',
+    (tester) async {
+      // startAt is "now minus an hour", i.e. today -- the picker's initial
+      // month page will contain today, letting us navigate to an adjacent
+      // day within the same page (see targetDay below).
+      final entry = await tester.runAsync(
+        () => writes.createManualEntry(
+          deviceId: 'device-1',
+          startAt: DateTime.now().subtract(const Duration(hours: 1)),
+          endAt: DateTime.now(),
+          description: 'Standup',
+        ),
+      );
+
+      await tester.pumpWidget(makeApp([entry!]));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Standup'));
+      await tester.pumpAndSettle();
+
+      final startDateLabelBeforePick =
+          ((tester.widget(find.byType(TextButton).first) as TextButton).child! as Text).data;
+
+      // Navigate the calendar to a day that is NOT today, staying within the
+      // same month page (no month-navigation needed) and within the
+      // picker's lastDate bound (now + 1 day): pick yesterday, or tomorrow
+      // if today is the 1st of the month.
+      final now = DateTime.now();
+      final targetDay = now.day > 1 ? now.day - 1 : now.day + 1;
+
+      await tester.tap(find.byType(TextButton).first);
+      await tester.pumpAndSettle();
+      expect(find.byType(DatePickerDialog), findsOneWidget);
+
+      // Scope to the dialog: a bare find.text(day) could also ambiguously
+      // match multiple calendar cells (header vs. grid) while it's open.
+      await tester.tap(
+        find.descendant(
+          of: find.byType(DatePickerDialog),
+          matching: find.text(targetDay.toString()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+
+      final startDateLabelAfterDatePick =
+          ((tester.widget(find.byType(TextButton).first) as TextButton).child! as Text).data;
+      expect(
+        startDateLabelAfterDatePick,
+        isNot(startDateLabelBeforePick),
+        reason: 'picking a non-today day should change the displayed start date',
+      );
+
+      // Now pick the start time via its own pre-filled default. This is the
+      // actual regression check: if _pickTime combined the picked time with
+      // DateTime.now()'s date instead of the button's initial date, the
+      // start date would silently snap back to today here.
+      await tester.tap(find.byType(TextButton).at(1));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+
+      final startDateLabelAfterTimePick =
+          ((tester.widget(find.byType(TextButton).first) as TextButton).child! as Text).data;
+      expect(
+        startDateLabelAfterTimePick,
+        startDateLabelAfterDatePick,
+        reason: 'picking a time must not reset the start date back to today',
+      );
+    },
+  );
+
+  testWidgets(
+    'picking a start date preserves the already-set start time',
+    (tester) async {
+      final entry = await tester.runAsync(
+        () => writes.createManualEntry(
+          deviceId: 'device-1',
+          startAt: DateTime(2026, 7, 1, 9, 30),
+          endAt: DateTime(2026, 7, 1, 10, 30),
+          description: 'Standup',
+        ),
+      );
+
+      await tester.pumpWidget(makeApp([entry!]));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Standup'));
+      await tester.pumpAndSettle();
+
+      // TextButton index 1 is start-time; confirm its pre-filled label first.
+      final startTimeButton = tester.widget<TextButton>(find.byType(TextButton).at(1));
+      final startTimeLabelBefore = (startTimeButton.child! as Text).data;
+
+      // Pick a start date and accept the pre-filled initialDate (today isn't
+      // relevant here -- the point is confirming a date doesn't reset time).
+      await tester.tap(find.byType(TextButton).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+
+      final startTimeLabelAfter =
+          ((tester.widget(find.byType(TextButton).at(1)) as TextButton).child! as Text).data;
+      expect(startTimeLabelAfter, startTimeLabelBefore);
+    },
+  );
 }
