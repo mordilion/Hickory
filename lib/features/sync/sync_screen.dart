@@ -396,7 +396,7 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
     final folderAsync = ref.watch(configuredSyncFolderPathProvider);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -405,229 +405,246 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  folderAsync.when(
-                    data: (path) => Text(
-                      path == null
-                          ? l10n.syncNoFolderSelected
-                          : l10n.syncFolderPath(path),
+          SizedBox(
+            width: double.infinity,
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    folderAsync.when(
+                      data: (path) => Text(
+                        path == null
+                            ? l10n.syncNoFolderSelected
+                            : l10n.syncFolderPath(path),
+                      ),
+                      loading: () => const LinearProgressIndicator(),
+                      error: (e, _) => Text(l10n.syncError('$e')),
                     ),
-                    loading: () => const LinearProgressIndicator(),
-                    error: (e, _) => Text(l10n.syncError('$e')),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.syncFolderDescription,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  if (_statusMessage != null) ...[
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     Text(
-                      _statusMessage!,
+                      l10n.syncFolderDescription,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
-                  ],
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      OutlinedButton(
-                        onPressed: _busy ? null : _syncNow,
-                        child: Text(l10n.syncNowButton),
-                      ),
-                      FilledButton(
-                        onPressed: _busy ? null : _pickFolder,
-                        child: Text(l10n.syncChooseFolderButton),
+                    if (_statusMessage != null) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        _statusMessage!,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
+                    const SizedBox(height: 16),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        OutlinedButton(
+                          onPressed: _busy ? null : _syncNow,
+                          child: Text(l10n.syncNowButton),
+                        ),
+                        FilledButton(
+                          onPressed: _busy ? null : _pickFolder,
+                          child: Text(l10n.syncChooseFolderButton),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: Card(
+              child: ExpansionTile(
+                title: Text(
+                  l10n.syncJiraSectionTitle,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                initiallyExpanded: false,
+                // ExpansionTile draws a top/bottom divider line in the theme's
+                // divider color while expanded by default (see shape/
+                // collapsedShape in Flutter's expansion_tile.dart) -- inside a
+                // Card, that clashes with the Card's own border, so both are
+                // disabled here.
+                shape: const Border(),
+                collapsedShape: const Border(),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          controller: _jiraBaseUrlController,
+                          decoration: InputDecoration(
+                            labelText: l10n.syncJiraBaseUrlLabel,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _jiraEmailController,
+                          decoration: InputDecoration(
+                            labelText: l10n.syncJiraEmailLabel,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _jiraApiTokenController,
+                          decoration: InputDecoration(
+                            labelText: l10n.syncJiraApiTokenLabel,
+                          ),
+                          obscureText: true,
+                        ),
+                        if (_jiraStatusMessage != null) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            _jiraStatusMessage!,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
+                        const SizedBox(height: 16),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            FilledButton(
+                              onPressed: _jiraBusy
+                                  ? null
+                                  : _saveJiraCredentials,
+                              child: Text(l10n.syncJiraSaveCredentialsButton),
+                            ),
+                            OutlinedButton(
+                              onPressed: _jiraBusy ? null : _testJiraConnection,
+                              child: Text(l10n.syncJiraTestConnectionButton),
+                            ),
+                            OutlinedButton(
+                              onPressed: _jiraBusy ? null : _syncJiraNow,
+                              child: Text(l10n.syncJiraSyncButton),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 16),
-          Card(
-            child: ExpansionTile(
-              title: Text(
-                l10n.syncJiraSectionTitle,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              initiallyExpanded: false,
-              // ExpansionTile draws a top/bottom divider line in the theme's
-              // divider color while expanded by default (see shape/
-              // collapsedShape in Flutter's expansion_tile.dart) -- inside a
-              // Card, that clashes with the Card's own border, so both are
-              // disabled here.
-              shape: const Border(),
-              collapsedShape: const Border(),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextField(
-                        controller: _jiraBaseUrlController,
-                        decoration: InputDecoration(
-                          labelText: l10n.syncJiraBaseUrlLabel,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: _jiraEmailController,
-                        decoration: InputDecoration(
-                          labelText: l10n.syncJiraEmailLabel,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: _jiraApiTokenController,
-                        decoration: InputDecoration(
-                          labelText: l10n.syncJiraApiTokenLabel,
-                        ),
-                        obscureText: true,
-                      ),
-                      if (_jiraStatusMessage != null) ...[
-                        const SizedBox(height: 12),
-                        Text(
-                          _jiraStatusMessage!,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                      const SizedBox(height: 16),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: [
-                          FilledButton(
-                            onPressed: _jiraBusy ? null : _saveJiraCredentials,
-                            child: Text(l10n.syncJiraSaveCredentialsButton),
-                          ),
-                          OutlinedButton(
-                            onPressed: _jiraBusy ? null : _testJiraConnection,
-                            child: Text(l10n.syncJiraTestConnectionButton),
-                          ),
-                          OutlinedButton(
-                            onPressed: _jiraBusy ? null : _syncJiraNow,
-                            child: Text(l10n.syncJiraSyncButton),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+          SizedBox(
+            width: double.infinity,
+            child: Card(
+              child: ExpansionTile(
+                title: Text(
+                  l10n.syncPersonioSectionTitle,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          Card(
-            child: ExpansionTile(
-              title: Text(
-                l10n.syncPersonioSectionTitle,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              initiallyExpanded: false,
-              // ExpansionTile draws a top/bottom divider line in the theme's
-              // divider color while expanded by default (see shape/
-              // collapsedShape in Flutter's expansion_tile.dart) -- inside a
-              // Card, that clashes with the Card's own border, so both are
-              // disabled here.
-              shape: const Border(),
-              collapsedShape: const Border(),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextField(
-                        controller: _personioClientIdController,
-                        decoration: InputDecoration(
-                          labelText: l10n.syncPersonioClientIdLabel,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: _personioClientSecretController,
-                        decoration: InputDecoration(
-                          labelText: l10n.syncPersonioClientSecretLabel,
-                        ),
-                        obscureText: true,
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: _personioEmployeeIdController,
-                        decoration: InputDecoration(
-                          labelText: l10n.syncPersonioEmployeeIdLabel,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: [
-                          FilledButton(
-                            onPressed: _personioBusy
-                                ? null
-                                : _savePersonioCredentials,
-                            child: Text(l10n.syncPersonioSaveCredentialsButton),
+                initiallyExpanded: false,
+                // ExpansionTile draws a top/bottom divider line in the theme's
+                // divider color while expanded by default (see shape/
+                // collapsedShape in Flutter's expansion_tile.dart) -- inside a
+                // Card, that clashes with the Card's own border, so both are
+                // disabled here.
+                shape: const Border(),
+                collapsedShape: const Border(),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          controller: _personioClientIdController,
+                          decoration: InputDecoration(
+                            labelText: l10n.syncPersonioClientIdLabel,
                           ),
-                          OutlinedButton(
-                            onPressed: _personioBusy
-                                ? null
-                                : _testPersonioConnection,
-                            child: Text(l10n.syncPersonioTestConnectionButton),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _personioClientSecretController,
+                          decoration: InputDecoration(
+                            labelText: l10n.syncPersonioClientSecretLabel,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
+                          obscureText: true,
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _personioEmployeeIdController,
+                          decoration: InputDecoration(
+                            labelText: l10n.syncPersonioEmployeeIdLabel,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            FilledButton(
                               onPressed: _personioBusy
                                   ? null
-                                  : _pickPersonioFrom,
+                                  : _savePersonioCredentials,
                               child: Text(
-                                '${l10n.syncPersonioFromLabel}: '
-                                '${_formatPersonioDate(_personioFrom)}',
+                                l10n.syncPersonioSaveCredentialsButton,
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: _personioBusy ? null : _pickPersonioTo,
+                            OutlinedButton(
+                              onPressed: _personioBusy
+                                  ? null
+                                  : _testPersonioConnection,
                               child: Text(
-                                '${l10n.syncPersonioToLabel}: '
-                                '${_formatPersonioDate(_personioTo)}',
+                                l10n.syncPersonioTestConnectionButton,
                               ),
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: _personioBusy
+                                    ? null
+                                    : _pickPersonioFrom,
+                                child: Text(
+                                  '${l10n.syncPersonioFromLabel}: '
+                                  '${_formatPersonioDate(_personioFrom)}',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: _personioBusy
+                                    ? null
+                                    : _pickPersonioTo,
+                                child: Text(
+                                  '${l10n.syncPersonioToLabel}: '
+                                  '${_formatPersonioDate(_personioTo)}',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (_personioStatusMessage != null) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            _personioStatusMessage!,
+                            style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
-                      ),
-                      if (_personioStatusMessage != null) ...[
-                        const SizedBox(height: 12),
-                        Text(
-                          _personioStatusMessage!,
-                          style: Theme.of(context).textTheme.bodySmall,
+                        const SizedBox(height: 16),
+                        FilledButton(
+                          onPressed: _personioBusy ? null : _pushPersonio,
+                          child: Text(l10n.syncPersonioPushButton),
                         ),
                       ],
-                      const SizedBox(height: 16),
-                      FilledButton(
-                        onPressed: _personioBusy ? null : _pushPersonio,
-                        child: Text(l10n.syncPersonioPushButton),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
