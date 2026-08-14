@@ -213,6 +213,11 @@ void main() {
       });
     });
 
+    // pumpUntilTrue above only polls for the message and returns silently on
+    // timeout -- it never fails the test on its own. This assertion is what
+    // actually makes the test fail if the blocked-delete error never appears.
+    expect(find.text("This client still has projects assigned and can't be deleted."), findsOneWidget);
+
     final remaining = await (db.select(db.clients)..where((c) => c.id.equals(client.id))).get();
     expect(remaining, hasLength(1));
   });
