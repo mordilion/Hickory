@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/native.dart';
@@ -8,6 +9,7 @@ import 'package:hickory/core/di/sync_providers.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
+import 'package:hickory/features/clients/clients_providers.dart';
 import 'package:hickory/features/projects/project_form_dialog.dart';
 import 'package:hickory/l10n/app_localizations.dart';
 
@@ -19,6 +21,30 @@ Future<void> pumpUntilTrue(
   for (var i = 0; i < maxTries; i++) {
     if (await condition()) return;
     await tester.pump(const Duration(milliseconds: 10));
+  }
+}
+
+/// Waits until exactly [expectedCount] `AlertDialog`s are present, driving a
+/// short real-time delay (via `runAsync`) between each `pumpAndSettle()`.
+/// Needed after a dialog's submit button triggers a write that appends a
+/// sync-log event (real file I/O, on top of the DB write) before calling
+/// `Navigator.pop()`: `db.select(...).get()` becoming non-empty only proves
+/// the DB write landed, not that the write's full async chain -- and
+/// therefore the pop -- has actually resumed. A single `pumpAndSettle()`
+/// immediately afterwards can run before that continuation gets a real
+/// event-loop turn, leaving the dialog's route still stacked on top and
+/// absorbing later taps. `pump(duration)` alone can't fix this: it only
+/// advances Flutter's virtual test clock (for animations), not real time, so
+/// it never gives the pending real Future a chance to progress.
+Future<void> pumpUntilDialogCount(
+  WidgetTester tester,
+  int expectedCount, {
+  int maxTries = 20,
+}) async {
+  for (var i = 0; i < maxTries; i++) {
+    if (find.byType(AlertDialog).evaluate().length == expectedCount) return;
+    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 200)));
+    await tester.pumpAndSettle();
   }
 }
 
@@ -44,6 +70,7 @@ void main() {
               logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
             ),
           ),
+          activeClientsProvider.overrideWith((ref) => Stream.value(const <Client>[])),
         ],
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -179,5 +206,227 @@ void main() {
     expect(find.text('New project'), findsOneWidget);
     expect(find.text('Please enter a valid amount.'), findsWidgets);
     expect(await db.select(db.projects).get(), isEmpty);
+  });
+
+  testWidgets('create mode: selecting an existing client sets clientId on submit', (tester) async {
+    final client = await db.clientsDao.createClient(name: 'Acme Inc');
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          syncedWritesProvider.overrideWith(
+            (ref) async => SyncedWrites(
+              db: db,
+              logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
+            ),
+          ),
+          activeClientsProvider.overrideWith((ref) => Stream.value([client])),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => Consumer(
+                builder: (context, ref, _) => TextButton(
+                  onPressed: () => showProjectFormDialog(context, ref),
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'Website Relaunch');
+    await tester.tap(find.byType(DropdownButtonFormField<String?>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Acme Inc').last);
+    await tester.pumpAndSettle();
+
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Create'));
+      await tester.pump();
+      await pumpUntilTrue(tester, () async => (await db.select(db.projects).get()).isNotEmpty);
+    });
+
+    final projects = await db.select(db.projects).get();
+    expect(projects.single.clientId, client.id);
+  });
+
+  testWidgets('create mode: creating a client inline via the picker selects it, and it stays selected', (
+    tester,
+  ) async {
+    // activeClientsProvider is driven by a StreamController the test controls
+    // directly, rather than makeApp()'s static empty-stream override or a
+    // real live drift query stream. A static override can never reflect the
+    // client created by the nested dialog (it would make the dropdown's
+    // post-creation state unprovable), while a real drift stream races pump
+    // timing (see projects_editor_test.dart's Global Constraints comment).
+    // Driving the emission manually lets the test deterministically exercise
+    // the exact sequence that matters: the client is created and
+    // selectedClientId is updated *before* the clients list catches up --
+    // which is the realistic ordering, since the query stream has to
+    // re-fetch after the write completes -- and only then does the list
+    // update arrive. This proves the ValueKey(selectedClientId) fix actually
+    // makes the dropdown pick up the new value once the list catches up.
+    final clientsController = StreamController<List<Client>>();
+    addTearDown(clientsController.close);
+    clientsController.add(const <Client>[]);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          syncedWritesProvider.overrideWith(
+            (ref) async => SyncedWrites(
+              db: db,
+              logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
+            ),
+          ),
+          activeClientsProvider.overrideWith((ref) => clientsController.stream),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => Consumer(
+                builder: (context, ref, _) => TextButton(
+                  onPressed: () => showProjectFormDialog(context, ref),
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'Website Relaunch');
+    await tester.tap(find.byType(DropdownButtonFormField<String?>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('+ New client…').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('New client'), findsOneWidget);
+    await tester.enterText(find.byType(TextField).last, 'Acme Inc');
+
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Create').last);
+      await tester.pump();
+      await pumpUntilTrue(tester, () async => (await db.select(db.clients).get()).isNotEmpty);
+    });
+    await tester.pumpAndSettle();
+    // The client row existing doesn't mean the nested dialog has actually
+    // closed yet -- see pumpUntilDialogCount's doc comment. Wait for it to
+    // close before touching the project dialog underneath it.
+    await pumpUntilDialogCount(tester, 1);
+
+    final client = (await db.select(db.clients).get()).single;
+
+    // Only now -- after the client row exists and the nested dialog has
+    // already resolved (setDialogState already ran with the stale, empty
+    // clients list) -- do we let activeClientsProvider catch up. This is the
+    // adversarial ordering the ValueKey fix must handle: selectedClientId
+    // changes first, and the clients list arrives later.
+    clientsController.add([client]);
+    await tester.pumpAndSettle();
+
+    // The dropdown must show the freshly-created client without re-opening
+    // it -- this is the regression the ValueKey(selectedClientId) fix in
+    // Step 3 guards against.
+    expect(find.text('Acme Inc'), findsOneWidget);
+
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Create').first);
+      await tester.pump();
+      await pumpUntilTrue(tester, () async => (await db.select(db.projects).get()).isNotEmpty);
+      // The project row existing only proves the DB write landed, not that
+      // SyncedWrites.createProject's trailing sync-log file write (real I/O,
+      // appended after the row insert) has finished. Give it a little more
+      // real time so it isn't still in flight when tearDown() deletes
+      // syncRoot out from under it -- which otherwise surfaces as a stray
+      // PathNotFoundException "after the test had already completed",
+      // misattributed to whatever test happens to run next. A plain real
+      // delay (no extra pump/pumpAndSettle) is enough here and avoids
+      // repeated animation-settle cycles, which is what triggers a
+      // pre-existing, unrelated TextEditingController-disposal race in this
+      // dialog's own `.whenComplete()` cleanup under heavier pumping.
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+    });
+
+    final project = (await db.select(db.projects).get()).single;
+    expect(project.clientId, client.id);
+  });
+
+  testWidgets('create mode: leaving the client picker on "No client" submits a null clientId', (
+    tester,
+  ) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'Website Relaunch');
+
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Create'));
+      await tester.pump();
+      await pumpUntilTrue(tester, () async => (await db.select(db.projects).get()).isNotEmpty);
+    });
+
+    final projects = await db.select(db.projects).get();
+    expect(projects.single.clientId, isNull);
+  });
+
+  testWidgets('edit mode: pre-selects the project\'s existing client', (tester) async {
+    final client = await db.clientsDao.createClient(name: 'Acme Inc');
+    final project = await db.projectsDao.createProject(
+      name: 'Website Relaunch',
+      colorHex: '#5B8DEF',
+      clientId: client.id,
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          syncedWritesProvider.overrideWith(
+            (ref) async => SyncedWrites(
+              db: db,
+              logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
+            ),
+          ),
+          activeClientsProvider.overrideWith((ref) => Stream.value([client])),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => Consumer(
+                builder: (context, ref, _) => TextButton(
+                  onPressed: () => showProjectFormDialog(context, ref, project: project),
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Acme Inc'), findsOneWidget);
   });
 }

@@ -12,6 +12,7 @@ import 'package:hickory/core/di/sync_providers.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
+import 'package:hickory/features/clients/clients_providers.dart';
 import 'package:hickory/features/entries/entries_list.dart';
 import 'package:hickory/features/entries/quick_add_bar.dart';
 import 'package:hickory/features/projects/projects_providers.dart';
@@ -64,6 +65,7 @@ void main() {
   Widget makeApp({List<TimeEntry> entries = const []}) => ProviderScope(
         overrides: [
           activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
+          activeClientsProvider.overrideWith((ref) => Stream.value(const [])),
           allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
           jiraWorklogsByEntryIdProvider.overrideWith((ref) => Stream.value(const {})),
           breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),

@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/di/sync_providers.dart';
 import '../../data/drift/database.dart';
 import '../../l10n/app_localizations.dart';
+import '../clients/client_form_dialog.dart';
+import '../clients/clients_providers.dart';
 
 const projectColorPalette = [
   '#5B8DEF',
@@ -14,6 +16,8 @@ const projectColorPalette = [
   '#B85BEF',
   '#5BD3EF',
 ];
+
+const _createNewClientSentinel = '__create_new_client__';
 
 /// Parses a user-entered hourly-rate string ("95", "95.50", "95,50") into
 /// whole cents. Returns null both for an empty string (no rate set) and for
@@ -49,6 +53,7 @@ Future<void> showProjectFormDialog(
   // project's original values. See break_rule_tiers_editor.dart's `_add`
   // for the same precaution.
   var selectedColor = project?.colorHex ?? projectColorPalette.first;
+  var selectedClientId = project?.clientId;
   var billable = project?.billable ?? true;
   String? rateError;
   return showDialog<void>(
@@ -68,6 +73,44 @@ Future<void> showProjectFormDialog(
                     controller: nameController,
                     autofocus: true,
                     decoration: InputDecoration(labelText: l10n.projectsNameLabel),
+                  ),
+                  const SizedBox(height: 12),
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final clients = ref.watch(activeClientsProvider).value ?? const <Client>[];
+                      final validIds = clients.map((c) => c.id).toSet();
+                      return DropdownButtonFormField<String?>(
+                        // DropdownButtonFormField only reads initialValue when its
+                        // State is first created, not on every rebuild -- without
+                        // this key, picking "+ New client..." updates
+                        // selectedClientId (used correctly on submit) but the
+                        // dropdown itself would keep showing the old selection.
+                        // Keying on selectedClientId forces a fresh State (and
+                        // therefore a fresh initialValue read) whenever it changes.
+                        key: ValueKey(selectedClientId),
+                        initialValue: validIds.contains(selectedClientId) ? selectedClientId : null,
+                        decoration: InputDecoration(labelText: l10n.projectsClientLabel),
+                        items: [
+                          DropdownMenuItem(value: null, child: Text(l10n.projectsClientNone)),
+                          for (final client in clients)
+                            DropdownMenuItem(value: client.id, child: Text(client.name)),
+                          DropdownMenuItem(
+                            value: _createNewClientSentinel,
+                            child: Text(l10n.projectsClientCreateNew),
+                          ),
+                        ],
+                        onChanged: (value) async {
+                          if (value != _createNewClientSentinel) {
+                            setDialogState(() => selectedClientId = value);
+                            return;
+                          }
+                          final created = await showClientFormDialog(context, ref);
+                          if (created != null) {
+                            setDialogState(() => selectedClientId = created.id);
+                          }
+                        },
+                      );
+                    },
                   ),
                   const SizedBox(height: 12),
                   Wrap(
@@ -131,6 +174,7 @@ Future<void> showProjectFormDialog(
                     await writes.createProject(
                       name: name,
                       colorHex: selectedColor,
+                      clientId: selectedClientId,
                       billable: billable,
                       hourlyRateCents: rateCents,
                       currency: currency.isEmpty ? null : currency,
@@ -140,6 +184,7 @@ Future<void> showProjectFormDialog(
                       project.id,
                       name: Value(name),
                       colorHex: Value(selectedColor),
+                      clientId: Value(selectedClientId),
                       billable: Value(billable),
                       hourlyRateCents: Value(rateCents),
                       currency: Value(currency.isEmpty ? null : currency),

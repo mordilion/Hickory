@@ -8,6 +8,7 @@ import 'package:hickory/core/di/sync_providers.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
+import 'package:hickory/features/clients/clients_providers.dart';
 import 'package:hickory/features/projects/projects_editor.dart';
 import 'package:hickory/features/projects/projects_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
@@ -50,6 +51,7 @@ void main() {
         overrides: [
           activeProjectsProvider.overrideWith((ref) => Stream.value(active)),
           archivedProjectsProvider.overrideWith((ref) => Stream.value(archived)),
+          activeClientsProvider.overrideWith((ref) => Stream.value(const [])),
           syncedWritesProvider.overrideWith(
             (ref) async => SyncedWrites(
               db: db,
