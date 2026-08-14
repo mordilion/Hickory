@@ -360,9 +360,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get quickAddMoreTooltip => 'More options';
-
-  @override
   String get quickAddSubmitTooltip => 'Add entry';
 
   @override

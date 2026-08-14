@@ -363,9 +363,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get quickAddMoreTooltip => 'Meer opties';
-
-  @override
   String get quickAddSubmitTooltip => 'Invoer toevoegen';
 
   @override

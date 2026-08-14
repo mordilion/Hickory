@@ -129,7 +129,6 @@
       "minutes": { "type": "int" }
     }
   },
-  "quickAddMoreTooltip": "More options",
   "quickAddSubmitTooltip": "Add entry",
   "settingsQuickAddTitle": "Quick Add",
   "settingsQuickAddDescription": "These durations appear as quick-add buttons on the Timer tab.",

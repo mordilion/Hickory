@@ -361,9 +361,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get quickAddMoreTooltip => 'Weitere Optionen';
-
-  @override
   String get quickAddSubmitTooltip => 'Eintrag hinzufügen';
 
   @override

@@ -723,12 +723,6 @@ abstract class AppLocalizations {
   /// **'{minutes} Min'**
   String quickAddDurationChipLabel(int minutes);
 
-  /// No description provided for @quickAddMoreTooltip.
-  ///
-  /// In de, this message translates to:
-  /// **'Weitere Optionen'**
-  String get quickAddMoreTooltip;
-
   /// No description provided for @quickAddSubmitTooltip.
   ///
   /// In de, this message translates to:
