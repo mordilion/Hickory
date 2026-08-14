@@ -96,6 +96,9 @@ class ProjectsDao extends DatabaseAccessor<AppDatabase> with _$ProjectsDaoMixin 
 
   Future<void> deleteProject(String id) => (delete(projects)..where((p) => p.id.equals(id))).go();
 
+  /// Checks whether any project references [clientId] -- including archived
+  /// projects, not just active ones -- since an archived project still
+  /// blocks deleting the client it belongs to.
   Future<bool> hasProjectsForClient(String clientId) async {
     final row = await (select(projects)..where((p) => p.clientId.equals(clientId))..limit(1)).getSingleOrNull();
     return row != null;
