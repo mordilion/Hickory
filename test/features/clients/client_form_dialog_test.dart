@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/native.dart';
@@ -140,7 +139,6 @@ void main() {
   });
 
   testWidgets('create mode: submitting resolves the Future to the created Client', (tester) async {
-    Client? capturedResult;
     late BuildContext dialogContext;
     late WidgetRef dialogRef;
 
@@ -194,7 +192,7 @@ void main() {
 
     final dbClients = await db.select(db.clients).get();
     expect(dbClients, hasLength(1));
-    expect(dbClients.single.id, result!.id);
+    expect(dbClients.single.id, result.id);
   });
 
   testWidgets('edit mode: submitting resolves the Future to the updated Client', (tester) async {
@@ -249,7 +247,7 @@ void main() {
 
     expect(result, isNotNull);
     expect(result!.name, 'Updated Name');
-    expect(result!.id, client.id);
+    expect(result.id, client.id);
 
     final dbClients = await db.select(db.clients).get();
     expect(dbClients, hasLength(1));
