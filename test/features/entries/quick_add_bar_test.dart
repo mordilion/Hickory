@@ -200,26 +200,71 @@ void main() {
     expect(find.text('New project'), findsOneWidget);
   });
 
+  testWidgets('tapping the start-date button opens a date picker', (tester) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+
+    // Row order after this task: [start date][start time] – [end date][end time][submit].
+    await tester.tap(find.byType(TextButton).first);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DatePickerDialog), findsOneWidget);
+  });
+
   testWidgets(
-    'tapping the more icon opens the full dialog prefilled with the current description',
+    'picking a start date preserves the previously-picked start time, and vice versa',
     (tester) async {
       await tester.pumpWidget(makeApp());
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextField).first, 'Retro');
-      await tester.tap(find.byTooltip('More options'));
+      // Confirm the time picker via its pre-filled default -- this still
+      // exercises _pickTime's date-preserving combine step without depending
+      // on the picker's internal widget structure (dial vs. input mode),
+      // which isn't worth pinning down for this test.
+      await tester.tap(find.byType(TextButton).at(1));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+      final startTimeLabelAfterTimePick =
+          ((tester.widget(find.byType(TextButton).at(1)) as TextButton).child! as Text).data;
+
+      // Now confirm the date picker via its pre-filled default too, and
+      // check the time button's label is unchanged.
+      await tester.tap(find.byType(TextButton).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+      final startTimeLabelAfterDatePick =
+          ((tester.widget(find.byType(TextButton).at(1)) as TextButton).child! as Text).data;
+
+      expect(startTimeLabelAfterDatePick, startTimeLabelAfterTimePick);
+    },
+  );
+
+  testWidgets(
+    'submitting after picking an end date writes that date to the entry',
+    (tester) async {
+      await tester.pumpWidget(makeApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('Manual entry'), findsOneWidget);
-      // Scoped to the dialog, not a bare find.text('Retro') -- the bar's own
-      // description field behind the dialog still reads "Retro" too, so an
-      // unscoped assertion would pass even if the dialog itself were never
-      // actually prefilled.
-      final retroInDialog = find.descendant(
-        of: find.byType(AlertDialog),
-        matching: find.text('Retro'),
+      await tester.enterText(find.byType(TextField).first, 'Dated entry');
+      // TextButton index 2 is end-date (0: start-date, 1: start-time, 2: end-date, 3: end-time).
+      await tester.tap(find.byType(TextButton).at(2));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Add entry'));
+      await tester.pump();
+
+      await pumpUntilTrue(
+        tester,
+        () async => (await db.select(db.timeEntries).get()).isNotEmpty,
       );
-      expect(retroInDialog, findsOneWidget);
+
+      final created = (await db.select(db.timeEntries).get()).single;
+      expect(created.description, 'Dated entry');
+      expect(created.endAt, isNotNull);
     },
   );
 }

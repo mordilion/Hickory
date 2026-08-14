@@ -10,14 +10,10 @@ import '../../l10n/app_localizations.dart';
 import '../jira/widgets/jira_ticket_field.dart';
 import '../projects/project_form_dialog.dart';
 import '../projects/projects_providers.dart';
-import 'manual_entry_dialog.dart';
 
-/// Pinned above [EntriesList] on the Timer tab; creates today's manual
-/// entries in as few taps as possible (duration chips instead of the full
-/// dialog's two date+time pickers). Replaces the old FAB — anything the bar
-/// can't do (a different day, exact timestamps) is reached via its "more"
-/// icon, which opens the existing full dialog prefilled with the bar's
-/// current description/project. See
+/// Pinned above [EntriesList] on the Timer tab; creates manual entries for
+/// any day in as few taps as possible via inline start/end date+time
+/// buttons plus duration chips. Replaces the old FAB. See
 /// docs/superpowers/specs/2026-08-03-quick-entry-redesign-design.md.
 class QuickAddBar extends ConsumerStatefulWidget {
   const QuickAddBar({super.key});
@@ -76,8 +72,26 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
     final initial = isStart ? _displayStartAt : _displayEndAt;
     final time = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(initial));
     if (time == null || !mounted) return;
-    final now = DateTime.now();
-    final combined = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    final combined = DateTime(initial.year, initial.month, initial.day, time.hour, time.minute);
+    final freshStart = _displayStartAt;
+    final freshEnd = _displayEndAt;
+    setState(() {
+      _startAt = isStart ? combined : freshStart;
+      _endAt = isStart ? freshEnd : combined;
+      _rangeTouched = true;
+    });
+  }
+
+  Future<void> _pickDate({required bool isStart}) async {
+    final initial = isStart ? _displayStartAt : _displayEndAt;
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now().add(const Duration(days: 1)),
+    );
+    if (date == null || !mounted) return;
+    final combined = DateTime(date.year, date.month, date.day, initial.hour, initial.minute);
     final freshStart = _displayStartAt;
     final freshEnd = _displayEndAt;
     setState(() {
@@ -115,21 +129,12 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
     });
   }
 
-  void _openFullDialog() {
-    final description = _descriptionController.text.trim();
-    showManualEntryDialog(
-      context,
-      ref,
-      initialDescription: description.isEmpty ? null : description,
-      initialProjectId: _projectId,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final projectsAsync = ref.watch(activeProjectsProvider);
     final settings = ref.watch(appSettingsProvider).value;
+    final dateStyle = settings.dateStyle;
     final timeStyle = settings.timeStyle;
     final durations = settings.quickAddDurations;
 
@@ -193,18 +198,25 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 TextButton(
+                  onPressed: () => _pickDate(isStart: true),
+                  child: Text(
+                    formatDate(_displayStartAt, dateStyle, Localizations.localeOf(context).languageCode),
+                  ),
+                ),
+                TextButton(
                   onPressed: () => _pickTime(isStart: true),
                   child: Text(formatTime(_displayStartAt, timeStyle)),
                 ),
                 const Text('–'),
                 TextButton(
+                  onPressed: () => _pickDate(isStart: false),
+                  child: Text(
+                    formatDate(_displayEndAt, dateStyle, Localizations.localeOf(context).languageCode),
+                  ),
+                ),
+                TextButton(
                   onPressed: () => _pickTime(isStart: false),
                   child: Text(formatTime(_displayEndAt, timeStyle)),
-                ),
-                IconButton(
-                  tooltip: l10n.quickAddMoreTooltip,
-                  onPressed: _openFullDialog,
-                  icon: const Icon(Icons.calendar_month_outlined),
                 ),
                 IconButton.filled(
                   tooltip: l10n.quickAddSubmitTooltip,
