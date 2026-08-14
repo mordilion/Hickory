@@ -560,6 +560,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get projectsClientCreateNew => '+ Nuevo cliente…';
 
   @override
+  String projectsClientArchivedLabel(String name) {
+    return '$name (archivado)';
+  }
+
+  @override
   String get reportsTitle => 'Informes';
 
   @override

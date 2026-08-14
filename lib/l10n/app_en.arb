@@ -191,6 +191,12 @@
   "projectsClientLabel": "Client",
   "projectsClientNone": "No client",
   "projectsClientCreateNew": "+ New client…",
+  "projectsClientArchivedLabel": "{name} (archived)",
+  "@projectsClientArchivedLabel": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
   "reportsTitle": "Reports",
   "reportsThisWeek": "This week",
   "reportsThisMonth": "This month",

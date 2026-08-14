@@ -62,7 +62,7 @@ void main() {
     if (syncRoot.existsSync()) syncRoot.deleteSync(recursive: true);
   });
 
-  Widget makeApp({Project? project}) => ProviderScope(
+  Widget makeApp({Project? project, List<Client> archivedClients = const <Client>[]}) => ProviderScope(
         overrides: [
           syncedWritesProvider.overrideWith(
             (ref) async => SyncedWrites(
@@ -71,6 +71,7 @@ void main() {
             ),
           ),
           activeClientsProvider.overrideWith((ref) => Stream.value(const <Client>[])),
+          archivedClientsProvider.overrideWith((ref) => Stream.value(archivedClients)),
         ],
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -220,6 +221,7 @@ void main() {
             ),
           ),
           activeClientsProvider.overrideWith((ref) => Stream.value([client])),
+          archivedClientsProvider.overrideWith((ref) => Stream.value(const <Client>[])),
         ],
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -296,6 +298,7 @@ void main() {
             ),
           ),
           activeClientsProvider.overrideWith((ref) => clientsController.stream),
+          archivedClientsProvider.overrideWith((ref) => Stream.value(const <Client>[])),
         ],
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -360,19 +363,23 @@ void main() {
       await tester.tap(find.text('Create').first);
       await tester.pump();
       await pumpUntilTrue(tester, () async => (await db.select(db.projects).get()).isNotEmpty);
-      // The project row existing only proves the DB write landed, not that
-      // SyncedWrites.createProject's trailing sync-log file write (real I/O,
-      // appended after the row insert) has finished. Give it a little more
-      // real time so it isn't still in flight when tearDown() deletes
-      // syncRoot out from under it -- which otherwise surfaces as a stray
-      // PathNotFoundException "after the test had already completed",
-      // misattributed to whatever test happens to run next. A plain real
-      // delay (no extra pump/pumpAndSettle) is enough here and avoids
-      // repeated animation-settle cycles, which is what triggers a
-      // pre-existing, unrelated TextEditingController-disposal race in this
-      // dialog's own `.whenComplete()` cleanup under heavier pumping.
-      await Future<void>.delayed(const Duration(milliseconds: 800));
     });
+    // The project row existing only proves the DB write landed, not that
+    // SyncedWrites.createProject's trailing sync-log file write (real I/O,
+    // appended after the row insert) has finished -- the submit button only
+    // calls Navigator.pop() once that whole awaited chain resolves, so
+    // waiting for the dialog to actually close is a real, observable signal
+    // that the write (DB row *and* sync-log file) is done, rather than a
+    // fixed guess at how long it might take. Needed so the write isn't still
+    // in flight when tearDown() deletes syncRoot out from under it -- which
+    // otherwise surfaces as a stray PathNotFoundException "after the test
+    // had already completed", misattributed to whatever test happens to run
+    // next. (This used to also be a workaround for a TextEditingController-
+    // disposal race in this dialog's own cleanup under heavier pumping;
+    // project_form_dialog.dart now disposes its controllers via
+    // State.dispose() instead of showDialog's `.whenComplete()`, so that
+    // race no longer applies here.)
+    await pumpUntilDialogCount(tester, 0);
 
     final project = (await db.select(db.projects).get()).single;
     expect(project.clientId, client.id);
@@ -454,6 +461,7 @@ void main() {
             ),
           ),
           activeClientsProvider.overrideWith((ref) => Stream.value([client])),
+          archivedClientsProvider.overrideWith((ref) => Stream.value(const <Client>[])),
         ],
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -479,4 +487,49 @@ void main() {
 
     expect(find.text('Acme Inc'), findsOneWidget);
   });
+
+  testWidgets(
+    'edit mode: a project whose client was archived still shows and re-saves that client',
+    (tester) async {
+      // Regression test for the picker silently disagreeing with the DB: the
+      // project's clientId points at a client that's since been archived, so
+      // it's absent from activeClientsProvider. Before the fix, the picker
+      // fell back to displaying "No client" while selectedClientId still
+      // held the archived id -- saving an unrelated change would silently
+      // write that stale-looking-but-still-correct id back, with the UI
+      // never telling the user which client (if any) was really assigned.
+      final client = await db.clientsDao.createClient(name: 'Acme Inc');
+      await db.clientsDao.archiveClient(client.id);
+      final project = await db.projectsDao.createProject(
+        name: 'Website Relaunch',
+        colorHex: '#5B8DEF',
+        clientId: client.id,
+      );
+      await tester.pumpWidget(makeApp(project: project, archivedClients: [client]));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      // The archived client must be visibly shown -- not "No client" -- and
+      // labelled distinctly so the user understands it's archived.
+      expect(find.text('Acme Inc (archived)'), findsOneWidget);
+      expect(find.text('No client'), findsNothing);
+
+      // Submit without touching the picker: the project's clientId must
+      // still round-trip to the archived client, proving the display and
+      // the persisted value now agree.
+      await tester.runAsync(() async {
+        await tester.tap(find.text('Save'));
+        await tester.pump();
+        await pumpUntilTrue(tester, () async {
+          final row = await (db.select(db.projects)..where((p) => p.id.equals(project.id))).getSingle();
+          return row.clientId == client.id;
+        });
+      });
+
+      final row = await (db.select(db.projects)..where((p) => p.id.equals(project.id))).getSingle();
+      expect(row.clientId, client.id);
+    },
+  );
 }

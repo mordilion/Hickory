@@ -564,6 +564,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get projectsClientCreateNew => '+ Nieuwe klant…';
 
   @override
+  String projectsClientArchivedLabel(String name) {
+    return '$name (gearchiveerd)';
+  }
+
+  @override
   String get reportsTitle => 'Rapporten';
 
   @override

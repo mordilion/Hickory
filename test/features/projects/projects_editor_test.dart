@@ -52,6 +52,7 @@ void main() {
           activeProjectsProvider.overrideWith((ref) => Stream.value(active)),
           archivedProjectsProvider.overrideWith((ref) => Stream.value(archived)),
           activeClientsProvider.overrideWith((ref) => Stream.value(const [])),
+          archivedClientsProvider.overrideWith((ref) => Stream.value(const [])),
           syncedWritesProvider.overrideWith(
             (ref) async => SyncedWrites(
               db: db,

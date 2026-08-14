@@ -1095,6 +1095,12 @@ abstract class AppLocalizations {
   /// **'+ Neuer Kunde…'**
   String get projectsClientCreateNew;
 
+  /// No description provided for @projectsClientArchivedLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} (archiviert)'**
+  String projectsClientArchivedLabel(String name);
+
   /// No description provided for @reportsTitle.
   ///
   /// In de, this message translates to:

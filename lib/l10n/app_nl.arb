@@ -191,6 +191,12 @@
   "projectsClientLabel": "Klant",
   "projectsClientNone": "Geen klant",
   "projectsClientCreateNew": "+ Nieuwe klant…",
+  "projectsClientArchivedLabel": "{name} (gearchiveerd)",
+  "@projectsClientArchivedLabel": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
   "reportsTitle": "Rapporten",
   "reportsThisWeek": "Deze week",
   "reportsThisMonth": "Deze maand",

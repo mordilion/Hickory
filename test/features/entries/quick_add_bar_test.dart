@@ -66,6 +66,7 @@ void main() {
         overrides: [
           activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
           activeClientsProvider.overrideWith((ref) => Stream.value(const [])),
+          archivedClientsProvider.overrideWith((ref) => Stream.value(const [])),
           allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
           jiraWorklogsByEntryIdProvider.overrideWith((ref) => Stream.value(const {})),
           breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),
