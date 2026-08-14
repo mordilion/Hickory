@@ -36,7 +36,7 @@ void main() {
     if (syncRoot.existsSync()) syncRoot.deleteSync(recursive: true);
   });
 
-  Widget makeApp({Client? client, void Function(Client?)? onResult}) => ProviderScope(
+  Widget makeApp({Client? client}) => ProviderScope(
         overrides: [
           syncedWritesProvider.overrideWith(
             (ref) async => SyncedWrites(
@@ -53,10 +53,7 @@ void main() {
             body: Builder(
               builder: (context) => Consumer(
                 builder: (context, ref, _) => TextButton(
-                  onPressed: () async {
-                    final result = await showClientFormDialog(context, ref, client: client);
-                    onResult?.call(result);
-                  },
+                  onPressed: () => showClientFormDialog(context, ref, client: client),
                   child: const Text('open'),
                 ),
               ),
