@@ -63,42 +63,49 @@ void main() {
   // list after a write -- mirroring entries_list_test.dart's own technique
   // -- rather than watching a live stream.
   Widget makeApp({List<TimeEntry> entries = const []}) => ProviderScope(
-        overrides: [
-          activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
-          activeClientsProvider.overrideWith((ref) => Stream.value(const [])),
-          archivedClientsProvider.overrideWith((ref) => Stream.value(const [])),
-          allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
-          jiraWorklogsByEntryIdProvider.overrideWith((ref) => Stream.value(const {})),
-          breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),
-          appSettingsProvider.overrideWith(
-            (ref) => Stream.value(
-              AppSettingsRow(
-                id: 'default',
-                dateFormat: 'iso',
-                timeFormat: '24h',
-                quickAddDurationsMinutes: '15,30,45,60',
-                countPausedTimeAsBreak: false,
-                updatedAt: DateTime.utc(2026, 1, 1),
-              ),
-            ),
-          ),
-          deviceIdProvider.overrideWith((ref) async => 'device-1'),
-          syncedWritesProvider.overrideWith(
-            (ref) async => SyncedWrites(
-              db: db,
-              logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
-            ),
-          ),
-        ],
-        child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: Scaffold(
-            body: Column(children: [const QuickAddBar(), Expanded(child: EntriesList())]),
+    overrides: [
+      activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
+      activeClientsProvider.overrideWith((ref) => Stream.value(const [])),
+      archivedClientsProvider.overrideWith((ref) => Stream.value(const [])),
+      allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
+      jiraWorklogsByEntryIdProvider.overrideWith(
+        (ref) => Stream.value(const {}),
+      ),
+      breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),
+      appSettingsProvider.overrideWith(
+        (ref) => Stream.value(
+          AppSettingsRow(
+            id: 'default',
+            dateFormat: 'iso',
+            timeFormat: '24h',
+            quickAddDurationsMinutes: '15,30,45,60',
+            countPausedTimeAsBreak: false,
+            updatedAt: DateTime.utc(2026, 1, 1),
           ),
         ),
-      );
+      ),
+      deviceIdProvider.overrideWith((ref) async => 'device-1'),
+      syncedWritesProvider.overrideWith(
+        (ref) async => SyncedWrites(
+          db: db,
+          logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
+        ),
+      ),
+    ],
+    child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en'),
+      home: Scaffold(
+        body: Column(
+          children: [
+            const QuickAddBar(),
+            Expanded(child: EntriesList()),
+          ],
+        ),
+      ),
+    ),
+  );
 
   testWidgets(
     'tapping a duration chip then submit creates an entry visible under Today',
@@ -183,14 +190,18 @@ void main() {
     },
   );
 
-  testWidgets('the Jira ticket field is visible without extra taps', (tester) async {
+  testWidgets('the Jira ticket field is visible without extra taps', (
+    tester,
+  ) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
 
     expect(find.text('Jira ticket'), findsOneWidget);
   });
 
-  testWidgets('tapping the new-project icon opens the new-project dialog', (tester) async {
+  testWidgets('tapping the new-project icon opens the new-project dialog', (
+    tester,
+  ) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
 
@@ -200,7 +211,9 @@ void main() {
     expect(find.text('New project'), findsOneWidget);
   });
 
-  testWidgets('tapping the start-date button opens a date picker', (tester) async {
+  testWidgets('tapping the start-date button opens a date picker', (
+    tester,
+  ) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
 
@@ -229,7 +242,9 @@ void main() {
       await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
       final startTimeLabelAfterTimePick =
-          ((tester.widget(find.byType(TextButton).at(1)) as TextButton).child! as Text).data;
+          ((tester.widget(find.byType(TextButton).at(1)) as TextButton).child!
+                  as Text)
+              .data;
 
       // Now confirm the date picker via its pre-filled default too, and
       // check the time button's label is unchanged.
@@ -238,83 +253,115 @@ void main() {
       await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
       final startTimeLabelAfterDatePick =
-          ((tester.widget(find.byType(TextButton).at(1)) as TextButton).child! as Text).data;
+          ((tester.widget(find.byType(TextButton).at(1)) as TextButton).child!
+                  as Text)
+              .data;
 
       expect(startTimeLabelAfterDatePick, startTimeLabelAfterTimePick);
     },
   );
 
+  testWidgets('picking a start time preserves a start date other than today '
+      '(regression: _pickTime must not hardcode DateTime.now()\'s date)', (
+    tester,
+  ) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+
+    final startDateLabelBeforePick =
+        ((tester.widget(find.byType(TextButton).first) as TextButton).child!
+                as Text)
+            .data;
+
+    // Navigate the calendar to a day that is NOT today, staying within the
+    // same month page (no month-navigation needed) and within the
+    // picker's lastDate bound (now + 1 day): pick yesterday, or tomorrow
+    // if today is the 1st of the month.
+    final now = DateTime.now();
+    final targetDay = now.day > 1 ? now.day - 1 : now.day + 1;
+
+    await tester.tap(find.byType(TextButton).first);
+    await tester.pumpAndSettle();
+    expect(find.byType(DatePickerDialog), findsOneWidget);
+
+    // Scope to the dialog: a bare find.text(day) could also match e.g. a
+    // duration chip elsewhere in the tree once the dialog is dismissed, or
+    // ambiguously match multiple calendar cells (header vs. grid) while
+    // it's open.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(DatePickerDialog),
+        matching: find.text(targetDay.toString()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+
+    final startDateLabelAfterDatePick =
+        ((tester.widget(find.byType(TextButton).first) as TextButton).child!
+                as Text)
+            .data;
+    expect(
+      startDateLabelAfterDatePick,
+      isNot(startDateLabelBeforePick),
+      reason: 'picking a non-today day should change the displayed start date',
+    );
+
+    // Now pick the start time via its own pre-filled default. This is the
+    // actual regression check: if _pickTime combined the picked time with
+    // DateTime.now()'s date instead of the button's initial date, the
+    // start date would silently snap back to today here.
+    await tester.tap(find.byType(TextButton).at(1));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+
+    final startDateLabelAfterTimePick =
+        ((tester.widget(find.byType(TextButton).first) as TextButton).child!
+                as Text)
+            .data;
+    expect(
+      startDateLabelAfterTimePick,
+      startDateLabelAfterDatePick,
+      reason: 'picking a time must not reset the start date back to today',
+    );
+  });
+
   testWidgets(
-    'picking a start time preserves a start date other than today '
-    '(regression: _pickTime must not hardcode DateTime.now()\'s date)',
+    'submitting after picking a date writes that picked date to the entry',
     (tester) async {
       await tester.pumpWidget(makeApp());
       await tester.pumpAndSettle();
 
-      final startDateLabelBeforePick =
-          ((tester.widget(find.byType(TextButton).first) as TextButton).child! as Text).data;
+      await tester.enterText(find.byType(TextField).first, 'Dated entry');
 
-      // Navigate the calendar to a day that is NOT today, staying within the
-      // same month page (no month-navigation needed) and within the
-      // picker's lastDate bound (now + 1 day): pick yesterday, or tomorrow
-      // if today is the 1st of the month.
+      // Pick a genuine non-today day (same technique as the regression test
+      // above), but choose which field to move and in which direction based
+      // on the day-of-month so the range stays valid: _submit() blocks with
+      // a snackbar (no DB write) if the computed endAt ends up before
+      // startAt. Moving the start date backward (the common case) widens
+      // the range correctly; moving it forward would invert it. On the 1st
+      // of the month there is no earlier day within the same calendar page,
+      // so move the end date forward instead (mirrors the existing
+      // targetDay = now.day > 1 ? now.day - 1 : now.day + 1 pattern).
       final now = DateTime.now();
-      final targetDay = now.day > 1 ? now.day - 1 : now.day + 1;
+      final movingStart = now.day > 1;
+      final targetDay = movingStart ? now.day - 1 : now.day + 1;
+      // TextButton index 0 is start-date, 2 is end-date
+      // (0: start-date, 1: start-time, 2: end-date, 3: end-time).
+      final dateButtonIndex = movingStart ? 0 : 2;
 
-      await tester.tap(find.byType(TextButton).first);
+      await tester.tap(find.byType(TextButton).at(dateButtonIndex));
       await tester.pumpAndSettle();
       expect(find.byType(DatePickerDialog), findsOneWidget);
 
-      // Scope to the dialog: a bare find.text(day) could also match e.g. a
-      // duration chip elsewhere in the tree once the dialog is dismissed, or
-      // ambiguously match multiple calendar cells (header vs. grid) while
-      // it's open.
       await tester.tap(
         find.descendant(
           of: find.byType(DatePickerDialog),
           matching: find.text(targetDay.toString()),
         ),
       );
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('OK'));
-      await tester.pumpAndSettle();
-
-      final startDateLabelAfterDatePick =
-          ((tester.widget(find.byType(TextButton).first) as TextButton).child! as Text).data;
-      expect(
-        startDateLabelAfterDatePick,
-        isNot(startDateLabelBeforePick),
-        reason: 'picking a non-today day should change the displayed start date',
-      );
-
-      // Now pick the start time via its own pre-filled default. This is the
-      // actual regression check: if _pickTime combined the picked time with
-      // DateTime.now()'s date instead of the button's initial date, the
-      // start date would silently snap back to today here.
-      await tester.tap(find.byType(TextButton).at(1));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('OK'));
-      await tester.pumpAndSettle();
-
-      final startDateLabelAfterTimePick =
-          ((tester.widget(find.byType(TextButton).first) as TextButton).child! as Text).data;
-      expect(
-        startDateLabelAfterTimePick,
-        startDateLabelAfterDatePick,
-        reason: 'picking a time must not reset the start date back to today',
-      );
-    },
-  );
-
-  testWidgets(
-    'submitting after picking an end date writes that date to the entry',
-    (tester) async {
-      await tester.pumpWidget(makeApp());
-      await tester.pumpAndSettle();
-
-      await tester.enterText(find.byType(TextField).first, 'Dated entry');
-      // TextButton index 2 is end-date (0: start-date, 1: start-time, 2: end-date, 3: end-time).
-      await tester.tap(find.byType(TextButton).at(2));
       await tester.pumpAndSettle();
       await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
@@ -330,6 +377,11 @@ void main() {
       final created = (await db.select(db.timeEntries).get()).single;
       expect(created.description, 'Dated entry');
       expect(created.endAt, isNotNull);
+      if (movingStart) {
+        expect(created.startAt.toLocal().day, targetDay);
+      } else {
+        expect(created.endAt!.toLocal().day, targetDay);
+      }
     },
   );
 }
