@@ -31,11 +31,11 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
   Duration _lastAppliedDuration = const Duration(minutes: 30);
 
   /// True once the user has explicitly picked a duration chip or nudged a
-  /// time button since the last reset. While false, [_startAt]/[_endAt] are
-  /// a stale snapshot from whenever the bar last reset (e.g. hours ago on a
-  /// desktop app left open) rather than the live default — [_displayStartAt]
-  /// / [_displayEndAt] recompute against "now" instead of trusting them, and
-  /// [_submit] refreshes the stored values before writing.
+  /// date or time button since the last reset. While false, [_startAt]/
+  /// [_endAt] are a stale snapshot from whenever the bar last reset (e.g.
+  /// hours ago on a desktop app left open) rather than the live default —
+  /// [_displayStartAt]/[_displayEndAt] recompute against "now" instead of
+  /// trusting them, and [_submit] refreshes the stored values before writing.
   bool _rangeTouched = false;
 
   DateTime get _displayEndAt => _rangeTouched ? _endAt : DateTime.now();
@@ -70,9 +70,18 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
 
   Future<void> _pickTime({required bool isStart}) async {
     final initial = isStart ? _displayStartAt : _displayEndAt;
-    final time = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(initial));
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+    );
     if (time == null || !mounted) return;
-    final combined = DateTime(initial.year, initial.month, initial.day, time.hour, time.minute);
+    final combined = DateTime(
+      initial.year,
+      initial.month,
+      initial.day,
+      time.hour,
+      time.minute,
+    );
     final freshStart = _displayStartAt;
     final freshEnd = _displayEndAt;
     setState(() {
@@ -91,7 +100,13 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
       lastDate: DateTime.now().add(const Duration(days: 1)),
     );
     if (date == null || !mounted) return;
-    final combined = DateTime(date.year, date.month, date.day, initial.hour, initial.minute);
+    final combined = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      initial.hour,
+      initial.minute,
+    );
     final freshStart = _displayStartAt;
     final freshEnd = _displayEndAt;
     setState(() {
@@ -105,7 +120,11 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
     if (!_rangeTouched) _resetTimeRange(_lastAppliedDuration);
     if (_endAt.isBefore(_startAt)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).entriesEndBeforeStartError)),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).entriesEndBeforeStartError,
+          ),
+        ),
       );
       return;
     }
@@ -136,6 +155,7 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
     final settings = ref.watch(appSettingsProvider).value;
     final dateStyle = settings.dateStyle;
     final timeStyle = settings.timeStyle;
+    final languageCode = Localizations.localeOf(context).languageCode;
     final durations = settings.quickAddDurations;
 
     return Card(
@@ -145,7 +165,9 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
           children: [
             TextField(
               controller: _descriptionController,
-              decoration: InputDecoration(labelText: l10n.entriesDescriptionLabel),
+              decoration: InputDecoration(
+                labelText: l10n.entriesDescriptionLabel,
+              ),
             ),
             const SizedBox(height: 12),
             Row(
@@ -154,11 +176,19 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
                   child: projectsAsync.when(
                     data: (projects) => DropdownButtonFormField<String?>(
                       initialValue: _projectId,
-                      decoration: InputDecoration(labelText: l10n.entriesProjectLabel),
+                      decoration: InputDecoration(
+                        labelText: l10n.entriesProjectLabel,
+                      ),
                       items: [
-                        DropdownMenuItem<String?>(value: null, child: Text(l10n.commonNoProject)),
+                        DropdownMenuItem<String?>(
+                          value: null,
+                          child: Text(l10n.commonNoProject),
+                        ),
                         ...projects.map(
-                          (p) => DropdownMenuItem<String?>(value: p.id, child: Text(p.name)),
+                          (p) => DropdownMenuItem<String?>(
+                            value: p.id,
+                            child: Text(p.name),
+                          ),
                         ),
                       ],
                       onChanged: (value) => setState(() => _projectId = value),
@@ -200,7 +230,7 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
                 TextButton(
                   onPressed: () => _pickDate(isStart: true),
                   child: Text(
-                    formatDate(_displayStartAt, dateStyle, Localizations.localeOf(context).languageCode),
+                    formatDate(_displayStartAt, dateStyle, languageCode),
                   ),
                 ),
                 TextButton(
@@ -211,7 +241,7 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
                 TextButton(
                   onPressed: () => _pickDate(isStart: false),
                   child: Text(
-                    formatDate(_displayEndAt, dateStyle, Localizations.localeOf(context).languageCode),
+                    formatDate(_displayEndAt, dateStyle, languageCode),
                   ),
                 ),
                 TextButton(

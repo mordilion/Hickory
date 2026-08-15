@@ -42,8 +42,12 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
   void initState() {
     super.initState();
     final existing = widget.existing;
-    _descriptionController = TextEditingController(text: existing?.description ?? '');
-    _startAt = existing?.startAt.toLocal() ?? DateTime.now().subtract(const Duration(hours: 1));
+    _descriptionController = TextEditingController(
+      text: existing?.description ?? '',
+    );
+    _startAt =
+        existing?.startAt.toLocal() ??
+        DateTime.now().subtract(const Duration(hours: 1));
     _endAt = existing?.endAt?.toLocal() ?? DateTime.now();
     _projectId = existing?.projectId;
     _jiraTicketKey = existing?.jiraTicketKey;
@@ -65,7 +69,13 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
     );
     if (date == null || !mounted) return;
     setState(() {
-      final combined = DateTime(date.year, date.month, date.day, initial.hour, initial.minute);
+      final combined = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        initial.hour,
+        initial.minute,
+      );
       if (isStart) {
         _startAt = combined;
       } else {
@@ -76,10 +86,19 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
 
   Future<void> _pickTime({required bool isStart}) async {
     final initial = isStart ? _startAt : _endAt;
-    final time = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(initial));
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+    );
     if (time == null || !mounted) return;
     setState(() {
-      final combined = DateTime(initial.year, initial.month, initial.day, time.hour, time.minute);
+      final combined = DateTime(
+        initial.year,
+        initial.month,
+        initial.day,
+        time.hour,
+        time.minute,
+      );
       if (isStart) {
         _startAt = combined;
       } else {
@@ -116,7 +135,11 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
   Future<void> _save() async {
     if (_endAt.isBefore(_startAt)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).entriesEndBeforeStartError)),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).entriesEndBeforeStartError,
+          ),
+        ),
       );
       return;
     }
@@ -155,10 +178,13 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
     final settings = ref.watch(appSettingsProvider).value;
     final dateStyle = settings.dateStyle;
     final timeStyle = settings.timeStyle;
+    final languageCode = Localizations.localeOf(context).languageCode;
 
     return AlertDialog(
       title: Text(
-        widget.existing == null ? l10n.entriesManualEntryTitle : l10n.entriesEditEntryTitle,
+        widget.existing == null
+            ? l10n.entriesManualEntryTitle
+            : l10n.entriesEditEntryTitle,
       ),
       content: SingleChildScrollView(
         child: Column(
@@ -167,17 +193,27 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
           children: [
             TextField(
               controller: _descriptionController,
-              decoration: InputDecoration(labelText: l10n.entriesDescriptionLabel),
+              decoration: InputDecoration(
+                labelText: l10n.entriesDescriptionLabel,
+              ),
             ),
             const SizedBox(height: 12),
             projectsAsync.when(
               data: (projects) => DropdownButtonFormField<String?>(
                 initialValue: _projectId,
-                decoration: InputDecoration(labelText: l10n.entriesProjectLabel),
+                decoration: InputDecoration(
+                  labelText: l10n.entriesProjectLabel,
+                ),
                 items: [
-                  DropdownMenuItem<String?>(value: null, child: Text(l10n.commonNoProject)),
+                  DropdownMenuItem<String?>(
+                    value: null,
+                    child: Text(l10n.commonNoProject),
+                  ),
                   ...projects.map(
-                    (p) => DropdownMenuItem<String?>(value: p.id, child: Text(p.name)),
+                    (p) => DropdownMenuItem<String?>(
+                      value: p.id,
+                      child: Text(p.name),
+                    ),
                   ),
                 ],
                 onChanged: (value) => setState(() => _projectId = value),
@@ -194,30 +230,51 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
             Row(
               children: [
                 Expanded(child: Text(l10n.entriesStartLabel)),
-                TextButton(
-                  onPressed: () => _pickDate(isStart: true),
-                  child: Text(
-                    formatDate(_startAt, dateStyle, Localizations.localeOf(context).languageCode),
+                // Flexible + Wrap (rather than the buttons sitting directly
+                // in the Row) lets the date/time pair drop to a second line
+                // instead of forcing a hard RenderFlex overflow when a long
+                // date format + verbose time format leave too little room
+                // next to the label at a narrow dialog width.
+                Flexible(
+                  child: Wrap(
+                    alignment: WrapAlignment.end,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () => _pickDate(isStart: true),
+                        child: Text(
+                          formatDate(_startAt, dateStyle, languageCode),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => _pickTime(isStart: true),
+                        child: Text(formatTime(_startAt, timeStyle)),
+                      ),
+                    ],
                   ),
-                ),
-                TextButton(
-                  onPressed: () => _pickTime(isStart: true),
-                  child: Text(formatTime(_startAt, timeStyle)),
                 ),
               ],
             ),
             Row(
               children: [
                 Expanded(child: Text(l10n.entriesEndLabel)),
-                TextButton(
-                  onPressed: () => _pickDate(isStart: false),
-                  child: Text(
-                    formatDate(_endAt, dateStyle, Localizations.localeOf(context).languageCode),
+                Flexible(
+                  child: Wrap(
+                    alignment: WrapAlignment.end,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () => _pickDate(isStart: false),
+                        child: Text(
+                          formatDate(_endAt, dateStyle, languageCode),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => _pickTime(isStart: false),
+                        child: Text(formatTime(_endAt, timeStyle)),
+                      ),
+                    ],
                   ),
-                ),
-                TextButton(
-                  onPressed: () => _pickTime(isStart: false),
-                  child: Text(formatTime(_endAt, timeStyle)),
                 ),
               ],
             ),
@@ -229,7 +286,9 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
         if (widget.existing != null)
           TextButton(
             onPressed: _delete,
-            style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
             child: Text(l10n.commonDelete),
           )
         else
