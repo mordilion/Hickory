@@ -116,7 +116,6 @@
   "entriesBreakInsufficientTooltip": "Pausa troppo breve",
   "entriesToday": "Oggi",
   "entriesYesterday": "Ieri",
-  "entriesDayHeader": "{day} · {total}",
   "entriesWeekHeader": "Settimana {week} · {range}",
   "entriesWorkLabel": "Lavorato: {duration}",
   "entriesBreakInsufficientDaysTooltip": "{count, plural, =1{1 giorno con una pausa troppo breve} other{{count} giorni con pause troppo brevi}}",

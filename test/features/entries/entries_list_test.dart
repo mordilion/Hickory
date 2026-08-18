@@ -6,9 +6,12 @@ import 'package:hickory/core/di/break_rule_tiers_provider.dart';
 import 'package:hickory/core/di/jira_providers.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/features/entries/entries_list.dart';
+import 'package:hickory/features/entries/entry_tree.dart';
+import 'package:hickory/features/entries/entry_tree_expansion.dart';
 import 'package:hickory/features/projects/projects_providers.dart';
 import 'package:hickory/features/timer/timer_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 TimeEntry _entry({
   required String id,
@@ -47,12 +50,19 @@ BreakRuleTier _tier({required int afterMinutes, required int requiredBreakMinute
 }
 
 void main() {
+  // Month names go through intl's DateFormat.MMMM, which throws unless the
+  // locale data is loaded (the all-numeric date styles never needed it).
+  setUpAll(() => initializeDateFormatting('en'));
+
   Widget makeApp(
     List<TimeEntry> entries, {
     List<BreakRuleTier> tiers = const [],
     bool countPausedTimeAsBreak = false,
+    Set<String>? expanded,
   }) => ProviderScope(
         overrides: [
+          if (expanded != null)
+            entryTreeExpansionProvider.overrideWith(() => _FixedExpansion(expanded)),
           allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
           activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
           jiraWorklogsByEntryIdProvider.overrideWith((ref) => Stream.value(const {})),
@@ -78,26 +88,39 @@ void main() {
         ),
       );
 
+  // Break and worked sums appear on the year, month and week rows as well as
+  // the day's, so a bare find.text matches four times over single-day data.
+  // Scope to the row carrying [label] to assert about one level only.
+  Finder row(String label) =>
+      find.ancestor(of: find.text(label), matching: find.byType(InkWell));
+
   testWidgets('groups entries under Today/Yesterday headers with totals', (tester) async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day, 9);
     final yesterday = today.subtract(const Duration(days: 1));
     await tester.pumpWidget(
-      makeApp([
-        _entry(id: '1', startAt: today, endAt: today.add(const Duration(hours: 1))),
-        _entry(id: '2', startAt: yesterday, endAt: yesterday.add(const Duration(minutes: 30))),
-      ]),
+      makeApp(
+        [
+          _entry(id: '1', startAt: today, endAt: today.add(const Duration(hours: 1))),
+          _entry(id: '2', startAt: yesterday, endAt: yesterday.add(const Duration(minutes: 30))),
+        ],
+        // Both days explicitly: the default seed opens only today's path, and
+        // on a Monday (or the 1st) yesterday sits in a collapsed week or month.
+        expanded: {...defaultExpandedKeys(today), ...defaultExpandedKeys(yesterday)},
+      ),
     );
     await tester.pumpAndSettle();
 
-    // Match the full header text ("Today · 01:00") rather than just the
-    // duration substring: with a single entry per day, the day total equals
-    // that entry's own duration, so a substring match on the duration alone
-    // would also match the entry row's trailing duration text. The '24h'
-    // settings override above maps to TimeFormatStyle.h24, which hides
-    // seconds in both the header total and the entry row's own duration.
-    expect(find.text('Today · 01:00'), findsOneWidget);
-    expect(find.text('Yesterday · 00:30'), findsOneWidget);
+    // Label and total are separate widgets now, so each is asserted on its own
+    // row. The '24h' settings override above maps to TimeFormatStyle.h24, which
+    // hides seconds in both the header total and the entry row's duration.
+    expect(find.text('Today'), findsOneWidget);
+    expect(find.descendant(of: row('Today'), matching: find.text('01:00')), findsOneWidget);
+    expect(find.text('Yesterday'), findsOneWidget);
+    expect(
+      find.descendant(of: row('Yesterday'), matching: find.text('00:30')),
+      findsOneWidget,
+    );
   });
 
   testWidgets(
@@ -143,7 +166,7 @@ void main() {
             endAt: today.add(const Duration(hours: 3)),
           ),
           _entry(id: '3', startAt: yesterday, endAt: yesterday.add(const Duration(minutes: 30))),
-        ]),
+        ], expanded: {...defaultExpandedKeys(today), ...defaultExpandedKeys(yesterday)}),
       );
       await tester.pumpAndSettle();
 
@@ -174,7 +197,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Break: 01:00'), findsOneWidget);
+    expect(
+      find.descendant(of: row('Today'), matching: find.text('Break: 01:00')),
+      findsOneWidget,
+    );
     expect(find.byIcon(Icons.warning_amber_rounded), findsNothing);
   });
 
@@ -199,8 +225,22 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Break: 00:10'), findsOneWidget);
-      expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+      expect(
+        find.descendant(of: row('Today'), matching: find.text('Break: 00:10')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: row('Today'), matching: find.byIcon(Icons.warning_amber_rounded)),
+        findsOneWidget,
+      );
+      // The warning bubbles up, so a collapsed list still shows where to look.
+      expect(
+        find.descendant(
+          of: row('${today.year}'),
+          matching: find.byIcon(Icons.warning_amber_rounded),
+        ),
+        findsOneWidget,
+      );
     },
   );
 
@@ -222,7 +262,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Break: 00:30'), findsOneWidget);
+    expect(
+      find.descendant(of: row('Today'), matching: find.text('Break: 00:30')),
+      findsOneWidget,
+    );
     expect(find.byIcon(Icons.warning_amber_rounded), findsNothing);
   });
 
@@ -246,7 +289,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Break: 00:10'), findsOneWidget);
+      expect(
+        find.descendant(of: row('Today'), matching: find.text('Break: 00:10')),
+        findsOneWidget,
+      );
     },
   );
 
@@ -269,7 +315,81 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Break: 00:00'), findsOneWidget);
+      expect(
+      find.descendant(of: row('Today'), matching: find.text('Break: 00:00')),
+      findsOneWidget,
+    );
     },
   );
+
+  testWidgets('shows only year rows when everything is collapsed', (tester) async {
+    await tester.pumpWidget(
+      makeApp(
+        [_entry(id: '1', startAt: DateTime(2024, 5, 6, 9), endAt: DateTime(2024, 5, 6, 10))],
+        expanded: const <String>{},
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('2024'), findsOneWidget);
+    expect(find.text('May'), findsNothing);
+    expect(find.byType(Dismissible), findsNothing);
+  });
+
+  testWidgets('tapping a year row reveals its months', (tester) async {
+    await tester.pumpWidget(
+      makeApp(
+        [_entry(id: '1', startAt: DateTime(2024, 5, 6, 9), endAt: DateTime(2024, 5, 6, 10))],
+        expanded: const <String>{},
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('2024'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('May'), findsOneWidget);
+    // One level only: the week below stays collapsed.
+    expect(find.textContaining('Week 19'), findsNothing);
+  });
+
+  testWidgets('a year row carries worked and break sums', (tester) async {
+    await tester.pumpWidget(
+      makeApp(
+        [
+          _entry(id: '1', startAt: DateTime(2024, 5, 6, 8), endAt: DateTime(2024, 5, 6, 10)),
+          _entry(id: '2', startAt: DateTime(2024, 5, 6, 11), endAt: DateTime(2024, 5, 6, 12)),
+        ],
+        expanded: const <String>{},
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('03:00'), findsOneWidget);
+    expect(find.text('Break: 01:00'), findsOneWidget);
+  });
+
+  testWidgets("the default expansion shows today's entries", (tester) async {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day, 9);
+    await tester.pumpWidget(
+      makeApp([
+        _entry(id: '1', startAt: start, endAt: start.add(const Duration(hours: 1))),
+      ]),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Today'), findsOneWidget);
+    expect(find.byType(Dismissible), findsOneWidget);
+  });
+}
+
+/// Pins the expansion set so a test doesn't silently depend on today's date.
+class _FixedExpansion extends EntryTreeExpansion {
+  _FixedExpansion(this._initial);
+
+  final Set<String> _initial;
+
+  @override
+  Set<String> build() => _initial;
 }

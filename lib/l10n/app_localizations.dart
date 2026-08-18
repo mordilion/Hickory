@@ -711,12 +711,6 @@ abstract class AppLocalizations {
   /// **'Gestern'**
   String get entriesYesterday;
 
-  /// No description provided for @entriesDayHeader.
-  ///
-  /// In de, this message translates to:
-  /// **'{day} · {total}'**
-  String entriesDayHeader(String day, String total);
-
   /// No description provided for @entriesWeekHeader.
   ///
   /// In de, this message translates to:

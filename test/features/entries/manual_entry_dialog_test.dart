@@ -13,6 +13,8 @@ import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
 import 'package:hickory/features/entries/entries_list.dart';
+import 'package:hickory/features/entries/entry_tree.dart';
+import 'package:hickory/features/entries/entry_tree_expansion.dart';
 import 'package:hickory/features/projects/projects_providers.dart';
 import 'package:hickory/features/timer/timer_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
@@ -40,8 +42,13 @@ void main() {
   // deviceIdProvider/syncedWritesProvider are static Stream.value overrides
   // rather than real drift streams, to avoid a known flutter_test false
   // positive with live QueryStreams at teardown.
-  Widget makeApp(List<TimeEntry> entries) => ProviderScope(
+  Widget makeApp(List<TimeEntry> entries, {Set<String>? expanded}) => ProviderScope(
         overrides: [
+          // EntriesList only renders an entry whose day is expanded, and the
+          // default seed opens today's path -- which a fixed 2026-07-01 entry
+          // is not on. Such a test has to name its own path.
+          if (expanded != null)
+            entryTreeExpansionProvider.overrideWith(() => _FixedExpansion(expanded)),
           allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
           activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
           jiraWorklogsByEntryIdProvider.overrideWith((ref) => Stream.value(const {})),
@@ -268,7 +275,9 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(makeApp([entry!]));
+      await tester.pumpWidget(
+        makeApp([entry!], expanded: defaultExpandedKeys(DateTime(2026, 7, 1))),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Standup'));
@@ -305,7 +314,9 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(makeApp([entry!]));
+      await tester.pumpWidget(
+        makeApp([entry!], expanded: defaultExpandedKeys(DateTime(2026, 7, 1))),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Standup'));
@@ -353,7 +364,9 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(makeApp([entry!]));
+      await tester.pumpWidget(
+        makeApp([entry!], expanded: defaultExpandedKeys(DateTime(2026, 7, 1))),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Standup'));
@@ -398,4 +411,14 @@ void main() {
       );
     },
   );
+}
+
+/// Pins the expansion set so a test doesn't silently depend on today's date.
+class _FixedExpansion extends EntryTreeExpansion {
+  _FixedExpansion(this._initial);
+
+  final Set<String> _initial;
+
+  @override
+  Set<String> build() => _initial;
 }

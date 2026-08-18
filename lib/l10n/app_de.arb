@@ -156,13 +156,6 @@
   "entriesBreakInsufficientTooltip": "Pause zu kurz",
   "entriesToday": "Heute",
   "entriesYesterday": "Gestern",
-  "entriesDayHeader": "{day} · {total}",
-  "@entriesDayHeader": {
-    "placeholders": {
-      "day": { "type": "String" },
-      "total": { "type": "String" }
-    }
-  },
   "entriesWeekHeader": "KW {week} · {range}",
   "@entriesWeekHeader": {
     "placeholders": {

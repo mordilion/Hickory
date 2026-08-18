@@ -116,7 +116,6 @@
   "entriesBreakInsufficientTooltip": "Pauze te kort",
   "entriesToday": "Vandaag",
   "entriesYesterday": "Gisteren",
-  "entriesDayHeader": "{day} · {total}",
   "entriesWeekHeader": "Week {week} · {range}",
   "entriesWorkLabel": "Gewerkt: {duration}",
   "entriesBreakInsufficientDaysTooltip": "{count, plural, =1{1 dag met een te korte pauze} other{{count} dagen met te korte pauzes}}",

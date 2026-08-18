@@ -352,11 +352,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get entriesYesterday => 'Ayer';
 
   @override
-  String entriesDayHeader(String day, String total) {
-    return '$day · $total';
-  }
-
-  @override
   String entriesWeekHeader(int week, String range) {
     return 'Semana $week · $range';
   }
