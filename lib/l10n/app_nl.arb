@@ -117,12 +117,9 @@
   "entriesToday": "Vandaag",
   "entriesYesterday": "Gisteren",
   "entriesDayHeader": "{day} · {total}",
-  "@entriesDayHeader": {
-    "placeholders": {
-      "day": { "type": "String" },
-      "total": { "type": "String" }
-    }
-  },
+  "entriesWeekHeader": "Week {week} · {range}",
+  "entriesWorkLabel": "Gewerkt: {duration}",
+  "entriesBreakInsufficientDaysTooltip": "{count, plural, =1{1 dag met een te korte pauze} other{{count} dagen met te korte pauzes}}",
   "quickAddDurationChipLabel": "{minutes} min",
   "@quickAddDurationChipLabel": {
     "placeholders": {

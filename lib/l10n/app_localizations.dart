@@ -717,6 +717,24 @@ abstract class AppLocalizations {
   /// **'{day} · {total}'**
   String entriesDayHeader(String day, String total);
 
+  /// No description provided for @entriesWeekHeader.
+  ///
+  /// In de, this message translates to:
+  /// **'KW {week} · {range}'**
+  String entriesWeekHeader(int week, String range);
+
+  /// No description provided for @entriesWorkLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Arbeitszeit: {duration}'**
+  String entriesWorkLabel(String duration);
+
+  /// No description provided for @entriesBreakInsufficientDaysTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Tag mit zu kurzer Pause} other{{count} Tage mit zu kurzer Pause}}'**
+  String entriesBreakInsufficientDaysTooltip(num count);
+
   /// No description provided for @quickAddDurationChipLabel.
   ///
   /// In de, this message translates to:

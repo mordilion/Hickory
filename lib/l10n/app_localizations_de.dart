@@ -356,6 +356,27 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String entriesWeekHeader(int week, String range) {
+    return 'KW $week · $range';
+  }
+
+  @override
+  String entriesWorkLabel(String duration) {
+    return 'Arbeitszeit: $duration';
+  }
+
+  @override
+  String entriesBreakInsufficientDaysTooltip(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tage mit zu kurzer Pause',
+      one: '1 Tag mit zu kurzer Pause',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String quickAddDurationChipLabel(int minutes) {
     return '$minutes Min';
   }

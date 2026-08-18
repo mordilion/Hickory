@@ -117,12 +117,9 @@
   "entriesToday": "Aujourd'hui",
   "entriesYesterday": "Hier",
   "entriesDayHeader": "{day} · {total}",
-  "@entriesDayHeader": {
-    "placeholders": {
-      "day": { "type": "String" },
-      "total": { "type": "String" }
-    }
-  },
+  "entriesWeekHeader": "Semaine {week} · {range}",
+  "entriesWorkLabel": "Travaillé : {duration}",
+  "entriesBreakInsufficientDaysTooltip": "{count, plural, =1{1 jour avec une pause trop courte} other{{count} jours avec des pauses trop courtes}}",
   "quickAddDurationChipLabel": "{minutes} min",
   "@quickAddDurationChipLabel": {
     "placeholders": {

@@ -163,6 +163,25 @@
       "total": { "type": "String" }
     }
   },
+  "entriesWeekHeader": "KW {week} · {range}",
+  "@entriesWeekHeader": {
+    "placeholders": {
+      "week": { "type": "int" },
+      "range": { "type": "String" }
+    }
+  },
+  "entriesWorkLabel": "Arbeitszeit: {duration}",
+  "@entriesWorkLabel": {
+    "placeholders": {
+      "duration": { "type": "String" }
+    }
+  },
+  "entriesBreakInsufficientDaysTooltip": "{count, plural, =1{1 Tag mit zu kurzer Pause} other{{count} Tage mit zu kurzer Pause}}",
+  "@entriesBreakInsufficientDaysTooltip": {
+    "placeholders": {
+      "count": { "type": "num" }
+    }
+  },
   "quickAddDurationChipLabel": "{minutes} Min",
   "@quickAddDurationChipLabel": {
     "placeholders": {
