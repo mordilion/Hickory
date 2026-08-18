@@ -10,6 +10,7 @@ import '../../data/drift/database.dart';
 import '../../l10n/app_localizations.dart';
 import '../jira/widgets/jira_ticket_field.dart';
 import '../projects/projects_providers.dart';
+import 'entry_time_range.dart';
 
 Future<void> showManualEntryDialog(
   BuildContext context,
@@ -76,11 +77,18 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
         initial.hour,
         initial.minute,
       );
-      if (isStart) {
-        _startAt = combined;
-      } else {
+      if (!isStart) {
         _endAt = combined;
+        return;
       }
+      // Order matters: the new end is derived from the *old* range, so it
+      // has to be computed before _startAt is overwritten.
+      _endAt = endFollowingStart(
+        previousStartAt: _startAt,
+        previousEndAt: _endAt,
+        newStartAt: combined,
+      );
+      _startAt = combined;
     });
   }
 
@@ -99,11 +107,16 @@ class _ManualEntryDialogState extends ConsumerState<_ManualEntryDialog> {
         time.hour,
         time.minute,
       );
-      if (isStart) {
-        _startAt = combined;
-      } else {
+      if (!isStart) {
         _endAt = combined;
+        return;
       }
+      _endAt = endFollowingStart(
+        previousStartAt: _startAt,
+        previousEndAt: _endAt,
+        newStartAt: combined,
+      );
+      _startAt = combined;
     });
   }
 

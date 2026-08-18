@@ -10,6 +10,7 @@ import '../../l10n/app_localizations.dart';
 import '../jira/widgets/jira_ticket_field.dart';
 import '../projects/project_form_dialog.dart';
 import '../projects/projects_providers.dart';
+import 'entry_time_range.dart';
 
 /// Pinned above [EntriesList] on the Timer tab; creates manual entries for
 /// any day in as few taps as possible via inline start/end date+time
@@ -85,9 +86,18 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
     final freshStart = _displayStartAt;
     final freshEnd = _displayEndAt;
     setState(() {
-      _startAt = isStart ? combined : freshStart;
-      _endAt = isStart ? freshEnd : combined;
       _rangeTouched = true;
+      if (!isStart) {
+        _startAt = freshStart;
+        _endAt = combined;
+        return;
+      }
+      _startAt = combined;
+      _endAt = endFollowingStart(
+        previousStartAt: freshStart,
+        previousEndAt: freshEnd,
+        newStartAt: combined,
+      );
     });
   }
 
@@ -110,9 +120,18 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
     final freshStart = _displayStartAt;
     final freshEnd = _displayEndAt;
     setState(() {
-      _startAt = isStart ? combined : freshStart;
-      _endAt = isStart ? freshEnd : combined;
       _rangeTouched = true;
+      if (!isStart) {
+        _startAt = freshStart;
+        _endAt = combined;
+        return;
+      }
+      _startAt = combined;
+      _endAt = endFollowingStart(
+        previousStartAt: freshStart,
+        previousEndAt: freshEnd,
+        newStartAt: combined,
+      );
     });
   }
 

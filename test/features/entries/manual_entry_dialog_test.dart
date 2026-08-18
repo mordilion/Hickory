@@ -290,4 +290,112 @@ void main() {
       expect(startTimeLabelAfter, startTimeLabelBefore);
     },
   );
+
+  testWidgets(
+    'picking a start date pulls the end date onto the same day, keeping the end time',
+    (tester) async {
+      // Fixed timestamps (not "now"): the assertion is about the end date
+      // landing on the picked start date, so both sides must be pinned.
+      final entry = await tester.runAsync(
+        () => writes.createManualEntry(
+          deviceId: 'device-1',
+          startAt: DateTime(2026, 7, 1, 9, 30),
+          endAt: DateTime(2026, 7, 1, 10, 30),
+          description: 'Standup',
+        ),
+      );
+
+      await tester.pumpWidget(makeApp([entry!]));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Standup'));
+      await tester.pumpAndSettle();
+
+      // 0: start-date, 1: start-time, 2: end-date, 3: end-time.
+      String label(int index) =>
+          ((tester.widget(find.byType(TextButton).at(index)) as TextButton).child! as Text).data!;
+
+      final startDateBefore = label(0);
+      final endTimeBefore = label(3);
+
+      // Navigate to the 2nd of July 2026 -- same calendar page as the entry's
+      // own date, so no month navigation is needed, and a day the end is not
+      // on yet (it starts on the 1st).
+      await tester.tap(find.byType(TextButton).first);
+      await tester.pumpAndSettle();
+      expect(find.byType(DatePickerDialog), findsOneWidget);
+      await tester.tap(
+        find.descendant(of: find.byType(DatePickerDialog), matching: find.text('2')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+
+      expect(label(0), isNot(startDateBefore), reason: 'start date should have moved to the 2nd');
+      expect(
+        label(2),
+        label(0),
+        reason: 'end date should follow the picked start date onto the same day',
+      );
+      expect(label(3), endTimeBefore, reason: 'the end time itself must not change');
+    },
+  );
+
+  testWidgets(
+    'picking a start time shifts the end time by the same amount, preserving the duration',
+    (tester) async {
+      final entry = await tester.runAsync(
+        () => writes.createManualEntry(
+          deviceId: 'device-1',
+          startAt: DateTime(2026, 7, 1, 9, 30),
+          endAt: DateTime(2026, 7, 1, 10, 0),
+          description: 'Standup',
+        ),
+      );
+
+      await tester.pumpWidget(makeApp([entry!]));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Standup'));
+      await tester.pumpAndSettle();
+
+      String label(int index) =>
+          ((tester.widget(find.byType(TextButton).at(index)) as TextButton).child! as Text).data!;
+
+      expect(label(1), '09:30');
+      expect(label(3), '10:00');
+
+      // Confirming the time picker's pre-filled default would prove nothing (a
+      // zero-length shift is indistinguishable from no wiring at all -- see the
+      // feature memory's note on this), so switch the picker into text-input
+      // mode and type a genuinely different start time. 10:45 stays inside the
+      // 1-12 hour field the picker shows under this test's 'en' locale (a
+      // 24-hour value like 14 fails its validator, leaving the dialog open and
+      // the time unchanged) and keeps the pre-filled AM period, so no period
+      // toggle is needed.
+      await tester.tap(find.byType(TextButton).at(1));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Switch to text input mode'));
+      await tester.pumpAndSettle();
+
+      // Scope to the picker: a bare find.byType(TextField) would hit the
+      // description field of the dialog underneath first.
+      final pickerFields = find.descendant(
+        of: find.byType(TimePickerDialog),
+        matching: find.byType(TextField),
+      );
+      await tester.enterText(pickerFields.at(0), '10');
+      await tester.enterText(pickerFields.at(1), '45');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+
+      expect(label(1), '10:45');
+      expect(
+        label(3),
+        '11:15',
+        reason: 'the end should move with the start, keeping the 30-minute duration',
+      );
+    },
+  );
 }

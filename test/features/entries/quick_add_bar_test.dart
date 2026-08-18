@@ -384,4 +384,57 @@ void main() {
       }
     },
   );
+
+  testWidgets(
+    'picking a start date moves the end with it, so the submitted entry '
+    'keeps the chosen duration instead of stretching across days',
+    (tester) async {
+      await tester.pumpWidget(makeApp());
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField).first, 'Followed entry');
+      await tester.tap(find.text('30 min'));
+      await tester.pump();
+
+      // Same non-today day trick as the tests above. Direction doesn't
+      // matter here the way it does for the end-date test: moving the start
+      // forward now drags the end forward too, so the range stays valid and
+      // _submit() never hits its end-before-start guard.
+      final now = DateTime.now();
+      final targetDay = now.day > 1 ? now.day - 1 : now.day + 1;
+
+      await tester.tap(find.byType(TextButton).first);
+      await tester.pumpAndSettle();
+      expect(find.byType(DatePickerDialog), findsOneWidget);
+      await tester.tap(
+        find.descendant(
+          of: find.byType(DatePickerDialog),
+          matching: find.text(targetDay.toString()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Add entry'));
+      await tester.pump();
+
+      await pumpUntilTrue(
+        tester,
+        () async => (await db.select(db.timeEntries).get()).isNotEmpty,
+      );
+
+      final created = (await db.select(db.timeEntries).get()).single;
+      expect(created.startAt.toLocal().day, targetDay);
+      // The real regression this guards: before the end followed the start,
+      // the end stayed on today and the entry silently became a
+      // ~24-hour-long one. Asserting the duration (rather than the end's
+      // calendar day) also holds for a start time late enough that the
+      // 30-minute range crosses midnight.
+      expect(
+        created.endAt!.difference(created.startAt),
+        const Duration(minutes: 30),
+      );
+    },
+  );
 }
