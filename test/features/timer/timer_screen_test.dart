@@ -11,6 +11,7 @@ import 'package:hickory/core/di/device_id_provider.dart';
 import 'package:hickory/core/di/jira_providers.dart';
 import 'package:hickory/core/di/sync_providers.dart';
 import 'package:hickory/core/theme/app_theme.dart';
+import 'package:hickory/core/widgets/gradient_buttons.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
@@ -103,8 +104,37 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Start'), findsOneWidget);
-    expect(find.byTooltip('Add entry'), findsNothing);
+    expect(find.text('Add entry'), findsNothing);
   });
+
+  testWidgets(
+    'the quick-add submit button is styled exactly like the timer Start button',
+    (tester) async {
+      await tester.pumpWidget(makeApp());
+      await tester.pumpAndSettle();
+
+      // Timer and Manual mode never render at the same time, so the two
+      // buttons have to be captured across the mode switch rather than
+      // compared side by side in one tree.
+      final start = tester.widget<GradientPillButton>(
+        find.widgetWithText(GradientPillButton, 'Start'),
+      );
+
+      await tester.tap(find.text('Manual'));
+      await tester.pumpAndSettle();
+
+      final submit = tester.widget<GradientPillButton>(
+        find.widgetWithText(GradientPillButton, 'Add entry'),
+      );
+
+      expect(submit.gradient, start.gradient);
+      expect(submit.foregroundColor, start.foregroundColor);
+      // The glyph is the one intentional difference: same button, different
+      // action.
+      expect(start.icon, Icons.play_arrow);
+      expect(submit.icon, Icons.add);
+    },
+  );
 
   testWidgets('tapping Manual (no running entry) swaps to the quick-add bar', (tester) async {
     await tester.pumpWidget(makeApp());
@@ -113,7 +143,7 @@ void main() {
     await tester.tap(find.text('Manual'));
     await tester.pumpAndSettle();
 
-    expect(find.byTooltip('Add entry'), findsOneWidget);
+    expect(find.text('Add entry'), findsOneWidget);
     expect(find.text('What are you working on?'), findsNothing);
   });
 
@@ -132,6 +162,6 @@ void main() {
     // independent of the live elapsed-time text) and the quick-add bar
     // never appeared.
     expect(find.text('Stop'), findsOneWidget);
-    expect(find.byTooltip('Add entry'), findsNothing);
+    expect(find.text('Add entry'), findsNothing);
   });
 }

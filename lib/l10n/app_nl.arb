@@ -129,7 +129,7 @@
       "minutes": { "type": "int" }
     }
   },
-  "quickAddSubmitTooltip": "Invoer toevoegen",
+  "quickAddSubmitLabel": "Invoer toevoegen",
   "settingsQuickAddTitle": "Snel toevoegen",
   "settingsQuickAddDescription": "Deze duren verschijnen als snelkeuzeknoppen op het tabblad Timer.",
   "settingsQuickAddAddLabel": "Toevoegen",

@@ -9,6 +9,7 @@ import 'package:hickory/core/di/break_rule_tiers_provider.dart';
 import 'package:hickory/core/di/device_id_provider.dart';
 import 'package:hickory/core/di/jira_providers.dart';
 import 'package:hickory/core/di/sync_providers.dart';
+import 'package:hickory/core/theme/app_theme.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
@@ -93,6 +94,10 @@ void main() {
       ),
     ],
     child: MaterialApp(
+      // The submit button reads its gradient from HickoryColors, which only
+      // exists as a ThemeExtension on the app's own theme -- a bare
+      // MaterialApp trips that lookup's assert.
+      theme: AppTheme.light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('en'),
@@ -118,7 +123,7 @@ void main() {
       await tester.enterText(find.byType(TextField).first, 'Standup');
       await tester.tap(find.text('30 min'));
       await tester.pump();
-      await tester.tap(find.byTooltip('Add entry'));
+      await tester.tap(find.text('Add entry'));
       await tester.pump();
 
       await pumpUntilTrue(
@@ -172,7 +177,7 @@ void main() {
 
       final beforeSubmit = DateTime.now();
       await tester.enterText(find.byType(TextField).first, 'No chip tapped');
-      await tester.tap(find.byTooltip('Add entry'));
+      await tester.tap(find.text('Add entry'));
       await tester.pump();
 
       await pumpUntilTrue(
@@ -366,7 +371,7 @@ void main() {
       await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byTooltip('Add entry'));
+      await tester.tap(find.text('Add entry'));
       await tester.pump();
 
       await pumpUntilTrue(
@@ -416,7 +421,7 @@ void main() {
       await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byTooltip('Add entry'));
+      await tester.tap(find.text('Add entry'));
       await tester.pump();
 
       await pumpUntilTrue(

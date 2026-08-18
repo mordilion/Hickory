@@ -169,7 +169,7 @@
       "minutes": { "type": "int" }
     }
   },
-  "quickAddSubmitTooltip": "Eintrag hinzufügen",
+  "quickAddSubmitLabel": "Eintrag hinzufügen",
   "settingsQuickAddTitle": "Schnelleingabe",
   "settingsQuickAddDescription": "Diese Zeitdauern erscheinen als Schnellauswahl im Timer-Tab.",
   "settingsQuickAddAddLabel": "Hinzufügen",

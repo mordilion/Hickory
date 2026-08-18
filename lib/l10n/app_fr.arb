@@ -129,7 +129,7 @@
       "minutes": { "type": "int" }
     }
   },
-  "quickAddSubmitTooltip": "Ajouter une entrée",
+  "quickAddSubmitLabel": "Ajouter une entrée",
   "settingsQuickAddTitle": "Ajout rapide",
   "settingsQuickAddDescription": "Ces durées apparaissent comme boutons d'ajout rapide dans l'onglet Minuteur.",
   "settingsQuickAddAddLabel": "Ajouter",

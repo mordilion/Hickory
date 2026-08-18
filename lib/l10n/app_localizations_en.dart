@@ -360,7 +360,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get quickAddSubmitTooltip => 'Add entry';
+  String get quickAddSubmitLabel => 'Add entry';
 
   @override
   String get settingsQuickAddTitle => 'Quick Add';

@@ -363,7 +363,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get quickAddSubmitTooltip => 'Invoer toevoegen';
+  String get quickAddSubmitLabel => 'Invoer toevoegen';
 
   @override
   String get settingsQuickAddTitle => 'Snel toevoegen';

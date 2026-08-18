@@ -6,6 +6,8 @@ import '../../core/di/device_id_provider.dart';
 import '../../core/di/sync_providers.dart';
 import '../../core/format/date_format.dart';
 import '../../core/format/quick_add_durations.dart';
+import '../../core/theme/hickory_colors.dart';
+import '../../core/widgets/gradient_buttons.dart';
 import '../../l10n/app_localizations.dart';
 import '../jira/widgets/jira_ticket_field.dart';
 import '../projects/project_form_dialog.dart';
@@ -176,6 +178,7 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
     final timeStyle = settings.timeStyle;
     final languageCode = Localizations.localeOf(context).languageCode;
     final durations = settings.quickAddDurations;
+    final tokens = HickoryColors.of(context);
 
     return Card(
       child: Padding(
@@ -267,12 +270,19 @@ class _QuickAddBarState extends ConsumerState<QuickAddBar> {
                   onPressed: () => _pickTime(isStart: false),
                   child: Text(formatTime(_displayEndAt, timeStyle)),
                 ),
-                IconButton.filled(
-                  tooltip: l10n.quickAddSubmitTooltip,
-                  onPressed: _submit,
-                  icon: const Icon(Icons.add),
-                ),
               ],
+            ),
+            const SizedBox(height: 12),
+            // Same GradientPillButton treatment as the Timer card's Start
+            // button (see TimerScreen): the two are the same commitment in
+            // their respective modes, so they get the same full-width pill
+            // rather than the small round icon button this used to be.
+            GradientPillButton(
+              label: l10n.quickAddSubmitLabel,
+              icon: Icons.add,
+              gradient: tokens.primaryGradient,
+              foregroundColor: tokens.onPrimaryGradient,
+              onPressed: _submit,
             ),
           ],
         ),

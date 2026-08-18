@@ -129,7 +129,7 @@
       "minutes": { "type": "int" }
     }
   },
-  "quickAddSubmitTooltip": "Aggiungi voce",
+  "quickAddSubmitLabel": "Aggiungi voce",
   "settingsQuickAddTitle": "Aggiunta rapida",
   "settingsQuickAddDescription": "Queste durate compaiono come pulsanti di aggiunta rapida nella scheda Timer.",
   "settingsQuickAddAddLabel": "Aggiungi",

@@ -361,7 +361,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get quickAddSubmitTooltip => 'Aggiungi voce';
+  String get quickAddSubmitLabel => 'Aggiungi voce';
 
   @override
   String get settingsQuickAddTitle => 'Aggiunta rapida';
