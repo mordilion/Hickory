@@ -13,7 +13,6 @@ import '../../data/drift/time_entry_extensions.dart';
 import '../../l10n/app_localizations.dart';
 import '../projects/projects_providers.dart';
 import '../timer/timer_providers.dart';
-import 'break_rule_calculations.dart';
 import 'day_grouping.dart';
 import 'manual_entry_dialog.dart';
 
@@ -45,6 +44,7 @@ class EntriesList extends ConsumerWidget {
         final tiers = tiersAsync.value ?? const <BreakRuleTier>[];
         final groups = groupEntriesByDay(
           finished,
+          tiers: tiers,
           includePausedTimeInBreak: countPausedTimeAsBreak,
         );
         final localeName = Localizations.localeOf(context).languageCode;
@@ -59,7 +59,7 @@ class EntriesList extends ConsumerWidget {
                   day: group.day,
                   total: group.totalDuration,
                   breakDuration: group.breakDuration,
-                  requiredBreak: requiredBreakForWorked(group.totalDuration, tiers),
+                  requiredBreak: group.requiredBreak,
                   l10n: l10n,
                   dateStyle: dateStyle,
                   timeStyle: timeStyle,

@@ -26,6 +26,18 @@ TimeEntry _entry({
   );
 }
 
+BreakRuleTier _tier({required int afterMinutes, required int requiredBreakMinutes}) {
+  final now = DateTime.utc(2026, 1, 1);
+  return BreakRuleTier(
+    id: 'tier-$afterMinutes',
+    afterMinutes: afterMinutes,
+    requiredBreakMinutes: requiredBreakMinutes,
+    deviceId: 'device-1',
+    createdAt: now,
+    updatedAt: now,
+  );
+}
+
 void main() {
   test('groups entries by local calendar day, most recent day first', () {
     final entries = [
@@ -89,5 +101,42 @@ void main() {
 
     final withPaused = groupEntriesByDay(entries, includePausedTimeInBreak: true);
     expect(withPaused.single.breakDuration, const Duration(hours: 1, minutes: 10));
+  });
+
+  group('requiredBreak', () {
+    test('is null when no tier applies to the worked time', () {
+      final groups = groupEntriesByDay([
+        _entry(id: '1', startAt: DateTime(2026, 8, 18, 9), endAt: DateTime(2026, 8, 18, 10)),
+      ]);
+
+      expect(groups.single.requiredBreak, isNull);
+      expect(groups.single.isBreakInsufficient, isFalse);
+    });
+
+    test('reports the tier value and flags a break that falls short', () {
+      final groups = groupEntriesByDay(
+        [
+          _entry(id: '1', startAt: DateTime(2026, 8, 18, 8), endAt: DateTime(2026, 8, 18, 15)),
+        ],
+        tiers: [_tier(afterMinutes: 360, requiredBreakMinutes: 30)],
+      );
+
+      expect(groups.single.requiredBreak, const Duration(minutes: 30));
+      // A single uninterrupted entry means no break at all was taken.
+      expect(groups.single.isBreakInsufficient, isTrue);
+    });
+
+    test('does not flag a day whose gap covers the required break', () {
+      final groups = groupEntriesByDay(
+        [
+          _entry(id: '1', startAt: DateTime(2026, 8, 18, 8), endAt: DateTime(2026, 8, 18, 12)),
+          _entry(id: '2', startAt: DateTime(2026, 8, 18, 13), endAt: DateTime(2026, 8, 18, 16)),
+        ],
+        tiers: [_tier(afterMinutes: 360, requiredBreakMinutes: 30)],
+      );
+
+      expect(groups.single.breakDuration, const Duration(hours: 1));
+      expect(groups.single.isBreakInsufficient, isFalse);
+    });
   });
 }
