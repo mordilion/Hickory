@@ -82,7 +82,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsUpdateInstallErrorPermission =>
-      'Hickory n\'a pas d\'accès en écriture à son dossier d\'installation. Déplacez l\'application vers un emplacement accessible en écriture, ou mettez-la à jour manuellement depuis GitHub.';
+      'Hickory ne peut pas écrire dans son dossier d\'installation : l\'app fonctionne dans la sandbox macOS, ce qui l\'empêche quels que soient les droits du dossier. Téléchargez la nouvelle version depuis GitHub et remplacez l\'app dans le Finder.';
 
   @override
   String get syncTitle => 'Paramètres de synchronisation';

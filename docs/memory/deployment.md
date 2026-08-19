@@ -30,6 +30,25 @@
 - On update: downloads the platform ZIP, verifies its SHA256 checksum against the `.sha256` file from the release, extracts, and swaps the installation.
 - Only wired up for macOS/Windows (`Platform.isMacOS || Platform.isWindows` gate in the settings screen) — matches the platforms actually built by the release workflow.
 
+## macOS auto-update is blocked by the App Sandbox (found 2026-08-19)
+
+- The app ships `com.apple.security.app-sandbox` in both entitlement files, so it may only
+  write inside `~/Library/Containers/com.hickory.hickory`. `/Applications` is denied
+  regardless of bundle ownership or `admin` group membership — verified on an admin account
+  owning the bundle, where the same `mkdir` succeeds from a shell and fails from the app.
+- `UpdateInstallPermissionException` is therefore the *normal* macOS outcome, not an edge
+  case, and its old message ("move the app somewhere writable") named a place that does not
+  exist under the sandbox. Corrected to point at the manual download.
+- Removing the write probe would not help: `quitAndSwap`'s detached script is a child of the
+  sandboxed app and inherits the sandbox.
+- Fix decided: drop the sandbox, which forces a data migration out of the container because
+  `getApplicationSupportDirectory()` resolves there today and nothing exists outside it. See
+  `docs/superpowers/specs/2026-08-19-macos-sandbox-removal-design.md`. Keychain access for
+  Jira/Personio credentials is an open risk to verify against a copied container before
+  release.
+- The migration cannot ship through the built-in updater: the installed sandboxed build is
+  what cannot install it. That one update has to be manual.
+
 ## Gotchas
 
 - Tag version and `pubspec.yaml` version must match exactly (`vX.Y.Z` vs `X.Y.Z`) or `verify-version` blocks the whole pipeline.

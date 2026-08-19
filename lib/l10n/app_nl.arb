@@ -21,7 +21,7 @@
   "settingsUpdateInstallButton": "Nu installeren",
   "settingsUpdateInstalling": "Update wordt geïnstalleerd...",
   "settingsUpdateInstallError": "Installatie mislukt. Probeer het opnieuw of download de nieuwe versie handmatig van GitHub.",
-  "settingsUpdateInstallErrorPermission": "Hickory heeft geen schrijftoegang tot de installatiemap. Verplaats de app naar een locatie waar je wel kunt schrijven, of werk handmatig bij via GitHub.",
+  "settingsUpdateInstallErrorPermission": "Hickory kan niet naar zijn installatiemap schrijven: de app draait in de macOS-sandbox, die dat blokkeert ongeacht de maprechten. Download de nieuwe versie van GitHub en vervang de app in de Finder.",
   "syncTitle": "Synchronisatie-instellingen",
   "syncNoFolderSelected": "Geen map geselecteerd – gegevens blijven alleen op dit apparaat.",
   "syncFolderPath": "Synchronisatiemap: {path}",

@@ -82,7 +82,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settingsUpdateInstallErrorPermission =>
-      'Hickory heeft geen schrijftoegang tot de installatiemap. Verplaats de app naar een locatie waar je wel kunt schrijven, of werk handmatig bij via GitHub.';
+      'Hickory kan niet naar zijn installatiemap schrijven: de app draait in de macOS-sandbox, die dat blokkeert ongeacht de maprechten. Download de nieuwe versie van GitHub en vervang de app in de Finder.';
 
   @override
   String get syncTitle => 'Synchronisatie-instellingen';

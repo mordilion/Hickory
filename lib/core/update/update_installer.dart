@@ -21,12 +21,23 @@ class UpdateInstallException implements Exception {
   String toString() => message;
 }
 
-/// Raised when the install directory's parent can't be written to -- e.g.
-/// the app lives in a location the current OS user account doesn't have
-/// write access to (the common case: /Applications on a macOS account
-/// that isn't in the `admin` group). Distinct from [UpdateInstallException]
-/// so the Settings UI can show a specific, actionable message instead of
-/// the generic install-failed one.
+/// Raised when the install directory's parent can't be written to.
+///
+/// On macOS this is currently the *normal* outcome, not an edge case: the app
+/// ships with `com.apple.security.app-sandbox` (see
+/// macos/Runner/Release.entitlements), and a sandboxed app may only write
+/// inside its container. `/Applications` is therefore denied no matter who
+/// owns the bundle or which groups the account is in — verified 2026-08-19 on
+/// an admin account owning the bundle, where the same mkdir succeeds from a
+/// shell and fails from the app. [quitAndSwap]'s detached script inherits the
+/// sandbox too, so removing this probe would only move the failure past the
+/// point of no return.
+///
+/// Distinct from [UpdateInstallException] so the Settings UI can name the
+/// manual download instead of the generic install-failed message. Revisit the
+/// wording once the sandbox is dropped (docs/superpowers/specs/
+/// 2026-08-19-macos-sandbox-removal-design.md), after which a genuine
+/// permission problem becomes the real cause again.
 class UpdateInstallPermissionException extends UpdateInstallException {
   UpdateInstallPermissionException(super.message);
 }

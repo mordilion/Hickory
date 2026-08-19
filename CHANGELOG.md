@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Explain the real reason automatic updates fail on macOS. The message used to suggest moving the app to a writable folder, which cannot work: the sandboxed build may only write inside its own container, so it now points at the manual download instead.
+
 ## [1.3.0] - 2026-08-19
 
 ### Added
