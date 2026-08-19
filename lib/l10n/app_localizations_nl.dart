@@ -86,6 +86,22 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String settingsUpdateDownloading(String received, String total) {
+    return 'Update downloaden … $received van $total MB';
+  }
+
+  @override
+  String settingsUpdateDownloadingUnknownSize(String received) {
+    return 'Update downloaden … $received MB';
+  }
+
+  @override
+  String get settingsUpdateVerifying => 'Controlesom controleren …';
+
+  @override
+  String get settingsUpdateExtracting => 'Update uitpakken …';
+
+  @override
   String get syncTitle => 'Synchronisatie-instellingen';
 
   @override

@@ -32,6 +32,21 @@
     }
   },
   "settingsUpdateInstallErrorPermission": "Hickory kann seinen Installationsordner nicht ersetzen ({path}). Das passiert, wenn die App einem anderen Benutzerkonto gehört. Verschiebe sie in deinen eigenen Programme-Ordner oder aktualisiere manuell über GitHub.",
+  "settingsUpdateDownloading": "Lade Update … {received} von {total} MB",
+  "@settingsUpdateDownloading": {
+    "placeholders": {
+      "received": { "type": "String" },
+      "total": { "type": "String" }
+    }
+  },
+  "settingsUpdateDownloadingUnknownSize": "Lade Update … {received} MB",
+  "@settingsUpdateDownloadingUnknownSize": {
+    "placeholders": {
+      "received": { "type": "String" }
+    }
+  },
+  "settingsUpdateVerifying": "Prüfsumme wird geprüft …",
+  "settingsUpdateExtracting": "Update wird entpackt …",
   "syncTitle": "Sync-Einstellungen",
   "syncNoFolderSelected": "Kein Ordner gewählt – Daten bleiben nur lokal auf diesem Gerät.",
   "syncFolderPath": "Sync-Ordner: {path}",

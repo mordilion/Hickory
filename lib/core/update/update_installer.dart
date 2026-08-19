@@ -11,6 +11,7 @@ import '../../data/drift/database.dart';
 import '../../data/sync/synced_writes.dart';
 import '../window/quit_behavior.dart';
 import 'update_checker.dart';
+import 'update_progress.dart';
 
 /// Raised for any failure in [UpdateInstaller.prepareUpdate] -- carries a
 /// caller-safe message suitable for the Settings UI.
@@ -34,7 +35,10 @@ class UpdateInstallException implements Exception {
 /// offending directory and a remedy instead of the generic install-failed
 /// message.
 class UpdateInstallPermissionException extends UpdateInstallException {
-  UpdateInstallPermissionException(super.message, {required this.installParentPath});
+  UpdateInstallPermissionException(
+    super.message, {
+    required this.installParentPath,
+  });
 
   /// The directory that could not be written to, so the UI can name it.
   final String installParentPath;
@@ -67,7 +71,10 @@ class UpdateInstaller {
   /// Downloads, verifies, and extracts [update], returning the archive's
   /// single top-level directory (the install root on Windows, the .app
   /// bundle on macOS).
-  Future<Directory> prepareUpdate(UpdateInfo update) async {
+  Future<Directory> prepareUpdate(
+    UpdateInfo update, {
+    void Function(UpdateProgress)? onProgress,
+  }) async {
     if (!Platform.isMacOS && !Platform.isWindows) {
       throw UpdateInstallException(
         'Automatic updates are only supported on macOS and Windows.',
@@ -91,8 +98,9 @@ class UpdateInstaller {
     await workDir.create(recursive: true);
 
     final zipFile = File(p.join(workDir.path, 'update.zip'));
-    await _downloadToFile(update.downloadUrl, zipFile);
+    await _downloadToFile(update.downloadUrl, zipFile, onProgress: onProgress);
 
+    onProgress?.call(const UpdateVerifying());
     final expectedChecksum = (await _downloadString(
       update.checksumUrl,
     )).trim().toLowerCase();
@@ -105,6 +113,7 @@ class UpdateInstaller {
       );
     }
 
+    onProgress?.call(const UpdateExtracting());
     final extractedDir = Directory(p.join(workDir.path, 'extracted'));
     await extractedDir.create(recursive: true);
     await extractFileToDisk(zipFile.path, extractedDir.path);
@@ -147,14 +156,51 @@ class UpdateInstaller {
     await windowManager.destroy();
   }
 
-  Future<void> _downloadToFile(String url, File file) async {
-    final response = await _httpClient.get(Uri.parse(url));
+  /// Streams [url] into [file], reporting progress as it goes.
+  ///
+  /// Streamed rather than buffered: the archive is over 20 MB, and holding all
+  /// of it in memory to then write it out bought nothing but a peak. Streaming
+  /// is also what makes a real progress bar possible at all.
+  Future<void> _downloadToFile(
+    String url,
+    File file, {
+    void Function(UpdateProgress)? onProgress,
+  }) async {
+    final response = await _httpClient.send(
+      http.Request('GET', Uri.parse(url)),
+    );
     if (response.statusCode != 200) {
       throw UpdateInstallException(
         'Failed to download update (HTTP ${response.statusCode}).',
       );
     }
-    await file.writeAsBytes(response.bodyBytes);
+    final totalBytes = response.contentLength;
+    final throttle = DownloadProgressThrottle();
+    var receivedBytes = 0;
+    final sink = file.openWrite();
+    try {
+      await for (final chunk in response.stream) {
+        sink.add(chunk);
+        receivedBytes += chunk.length;
+        if (onProgress == null) continue;
+        if (!throttle.shouldReport(
+          receivedBytes: receivedBytes,
+          totalBytes: totalBytes,
+        )) {
+          continue;
+        }
+        onProgress(
+          UpdateDownloading(
+            receivedBytes: receivedBytes,
+            totalBytes: totalBytes,
+          ),
+        );
+      }
+    } finally {
+      // Closed in a finally so a failed download can't leave the handle open
+      // and the partial file locked.
+      await sink.close();
+    }
   }
 
   Future<String> _downloadString(String url) async {

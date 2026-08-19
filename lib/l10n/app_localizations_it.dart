@@ -86,6 +86,22 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String settingsUpdateDownloading(String received, String total) {
+    return 'Download aggiornamento … $received di $total MB';
+  }
+
+  @override
+  String settingsUpdateDownloadingUnknownSize(String received) {
+    return 'Download aggiornamento … $received MB';
+  }
+
+  @override
+  String get settingsUpdateVerifying => 'Verifica del checksum …';
+
+  @override
+  String get settingsUpdateExtracting => 'Estrazione aggiornamento …';
+
+  @override
   String get syncTitle => 'Impostazioni di sincronizzazione';
 
   @override

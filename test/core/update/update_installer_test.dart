@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive_io.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/core/update/update_checker.dart';
 import 'package:hickory/core/update/update_installer.dart';
+import 'package:hickory/core/update/update_progress.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:path/path.dart' as p;
@@ -195,6 +197,66 @@ void main() {
           ),
         ),
       );
+    },
+  );
+
+  // A plain test(), not testWidgets(): prepareUpdate does real file I/O, which
+  // the widget binding's fake async zone never services -- the same trap the
+  // entries tests document.
+  test(
+    'reports rising download progress and then the later phases',
+    () async {
+      final zipBytes = buildFixtureZip();
+      final checksum = sha256.convert(zipBytes).toString();
+      // Deliver the archive in several chunks so progress can actually move --
+      // MockClient's non-streaming form hands over one chunk and would make a
+      // broken throttle look fine.
+      const chunkCount = 4;
+      final chunkSize = (zipBytes.length / chunkCount).ceil();
+      final installer = UpdateInstaller(
+        httpClient: MockClient.streaming((request, _) async {
+          if (request.url.path.endsWith('.sha256')) {
+            return http.StreamedResponse(
+              Stream.value(utf8.encode(checksum)),
+              200,
+            );
+          }
+          return http.StreamedResponse(
+            Stream.fromIterable([
+              for (var start = 0; start < zipBytes.length; start += chunkSize)
+                zipBytes.sublist(
+                  start,
+                  (start + chunkSize).clamp(0, zipBytes.length),
+                ),
+            ]),
+            200,
+            contentLength: zipBytes.length,
+          );
+        }),
+        installDirOverride: Directory(p.join(fakeTempDir.path, 'Hickory.app')),
+      );
+
+      final reported = <UpdateProgress>[];
+      await installer.prepareUpdate(update, onProgress: reported.add);
+
+      final downloads = reported.whereType<UpdateDownloading>().toList();
+      expect(downloads, isNotEmpty);
+      expect(
+        downloads.map((d) => d.receivedBytes).toList(),
+        orderedEquals(downloads.map((d) => d.receivedBytes).toList()..sort()),
+        reason: 'received byte counts must never go backwards',
+      );
+      expect(
+        downloads.last.receivedBytes,
+        zipBytes.length,
+        reason: 'the final chunk must report, or the bar stops short of full',
+      );
+      expect(downloads.last.fraction, 1.0);
+      // Order matters: the label must not fall back to "downloading" after the
+      // download is done.
+      expect(reported.indexOf(downloads.last), lessThan(reported.length - 2));
+      expect(reported[reported.length - 2], isA<UpdateVerifying>());
+      expect(reported.last, isA<UpdateExtracting>());
     },
   );
 }

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Show a progress bar while an update installs: a real percentage with megabytes during the download, then a labelled bar for verifying the checksum and unpacking, which cannot report progress.
+
 ## [1.3.2] - 2026-08-19
 
 ### Fixed

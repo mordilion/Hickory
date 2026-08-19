@@ -70,6 +70,24 @@
 - The migration cannot ship through the built-in updater: the installed sandboxed build is
   what cannot install it. That one update has to be manual.
 
+## Update progress reporting
+
+- `UpdateInstaller.prepareUpdate` takes an optional `onProgress` callback and reports
+  `UpdateDownloading` / `UpdateVerifying` / `UpdateExtracting` (`core/update/update_progress.dart`).
+  Only the download carries numbers; weighting the other phases would produce a bar that jumps
+  and then hangs.
+- The download streams (`_httpClient.send`) rather than buffering — that is what makes progress
+  possible at all, and it stops the 23 MB archive from sitting in memory.
+- `DownloadProgressThrottle` collapses thousands of chunks to whole-percent changes, always
+  reporting completion so the bar reaches its end. Without a `Content-Length` it steps every
+  256 KB and the bar goes indeterminate.
+- **Testing traps, both hit while building this:** a fake installer that returns immediately
+  clears the progress in its `finally` before the test can pump a frame — the fake needs to
+  block on a `Completer` mid-install. And `MockClient` (non-streaming) delivers the body as one
+  chunk, so a broken throttle passes; use `MockClient.streaming` with several chunks. Also keep
+  installer tests in `test()`, not `testWidgets()`: `prepareUpdate` does real file I/O, which
+  the widget binding's fake async zone never services and the test just hangs.
+
 ## Gotchas
 
 - Tag version and `pubspec.yaml` version must match exactly (`vX.Y.Z` vs `X.Y.Z`) or `verify-version` blocks the whole pipeline.

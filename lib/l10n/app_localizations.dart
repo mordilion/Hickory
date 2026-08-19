@@ -238,6 +238,30 @@ abstract class AppLocalizations {
   /// **'Hickory kann seinen Installationsordner nicht ersetzen ({path}). Das passiert, wenn die App einem anderen Benutzerkonto gehört. Verschiebe sie in deinen eigenen Programme-Ordner oder aktualisiere manuell über GitHub.'**
   String settingsUpdateInstallErrorPermission(String path);
 
+  /// No description provided for @settingsUpdateDownloading.
+  ///
+  /// In de, this message translates to:
+  /// **'Lade Update … {received} von {total} MB'**
+  String settingsUpdateDownloading(String received, String total);
+
+  /// No description provided for @settingsUpdateDownloadingUnknownSize.
+  ///
+  /// In de, this message translates to:
+  /// **'Lade Update … {received} MB'**
+  String settingsUpdateDownloadingUnknownSize(String received);
+
+  /// No description provided for @settingsUpdateVerifying.
+  ///
+  /// In de, this message translates to:
+  /// **'Prüfsumme wird geprüft …'**
+  String get settingsUpdateVerifying;
+
+  /// No description provided for @settingsUpdateExtracting.
+  ///
+  /// In de, this message translates to:
+  /// **'Update wird entpackt …'**
+  String get settingsUpdateExtracting;
+
   /// No description provided for @syncTitle.
   ///
   /// In de, this message translates to:

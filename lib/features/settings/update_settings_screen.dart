@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/database_provider.dart';
@@ -6,6 +7,7 @@ import '../../core/di/sync_providers.dart';
 import '../../core/di/update_providers.dart';
 import '../../core/update/update_checker.dart';
 import '../../core/update/update_installer.dart';
+import '../../core/update/update_progress.dart';
 import '../../l10n/app_localizations.dart';
 import 'settings_sub_page.dart';
 
@@ -24,6 +26,9 @@ class UpdateSettingsScreen extends ConsumerStatefulWidget {
 class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
   bool _updateBusy = false;
   String? _updateStatusMessage;
+
+  /// Non-null only while an install is running; drives the progress bar.
+  UpdateProgress? _updateProgress;
 
   Future<void> _checkForUpdates() async {
     final l10n = AppLocalizations.of(context);
@@ -71,7 +76,12 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
       final installer = ref.read(updateInstallerProvider);
       final db = ref.read(appDatabaseProvider);
       final writesFuture = ref.read(syncedWritesProvider.future);
-      final extracted = await installer.prepareUpdate(update);
+      final extracted = await installer.prepareUpdate(
+        update,
+        onProgress: (progress) {
+          if (mounted) setState(() => _updateProgress = progress);
+        },
+      );
       final writes = await writesFuture;
       await installer.quitAndSwap(extracted, db: db, writes: writes);
     } on UpdateInstallPermissionException catch (error) {
@@ -86,8 +96,36 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
         setState(() => _updateStatusMessage = l10n.settingsUpdateInstallError);
       }
     } finally {
-      if (mounted) setState(() => _updateBusy = false);
+      if (mounted) {
+        setState(() {
+          _updateBusy = false;
+          _updateProgress = null;
+        });
+      }
     }
+  }
+
+  /// Label for the current phase, or null when nothing is running. Only the
+  /// download has numbers to show -- see [UpdateProgress].
+  String? _progressLabel(AppLocalizations l10n, String localeName) {
+    final megabytes = NumberFormat.decimalPatternDigits(
+      locale: localeName,
+      decimalDigits: 1,
+    );
+    return switch (_updateProgress) {
+      null => null,
+      UpdateVerifying() => l10n.settingsUpdateVerifying,
+      UpdateExtracting() => l10n.settingsUpdateExtracting,
+      UpdateDownloading(:final receivedBytes, :final totalBytes) =>
+        totalBytes == null || totalBytes <= 0
+            ? l10n.settingsUpdateDownloadingUnknownSize(
+                megabytes.format(receivedBytes / _bytesPerMegabyte),
+              )
+            : l10n.settingsUpdateDownloading(
+                megabytes.format(receivedBytes / _bytesPerMegabyte),
+                megabytes.format(totalBytes / _bytesPerMegabyte),
+              ),
+    };
   }
 
   @override
@@ -95,6 +133,10 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
     final l10n = AppLocalizations.of(context);
     final currentVersionAsync = ref.watch(currentAppVersionProvider);
     final availableUpdate = ref.watch(availableUpdateProvider);
+    final progressLabel = _progressLabel(
+      l10n,
+      Localizations.localeOf(context).languageCode,
+    );
 
     return SettingsSubPage(
       child: SizedBox(
@@ -118,7 +160,23 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
                   loading: () => const SizedBox.shrink(),
                   error: (_, _) => const SizedBox.shrink(),
                 ),
-                if (_updateStatusMessage != null) ...[
+                if (progressLabel != null) ...[
+                  const SizedBox(height: 12),
+                  // Null value means indeterminate, which is exactly right for
+                  // the verify and extract phases and for a download whose size
+                  // the server didn't announce.
+                  LinearProgressIndicator(
+                    value: switch (_updateProgress) {
+                      UpdateDownloading(:final fraction) => fraction,
+                      _ => null,
+                    },
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    progressLabel,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ] else if (_updateStatusMessage != null) ...[
                   const SizedBox(height: 8),
                   Text(
                     _updateStatusMessage!,
@@ -155,3 +213,5 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
     );
   }
 }
+
+const _bytesPerMegabyte = 1024 * 1024;

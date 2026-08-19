@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/native.dart';
@@ -10,6 +11,7 @@ import 'package:hickory/core/di/update_providers.dart';
 import 'package:hickory/core/update/github_release_client.dart';
 import 'package:hickory/core/update/update_checker.dart';
 import 'package:hickory/core/update/update_installer.dart';
+import 'package:hickory/core/update/update_progress.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
@@ -30,13 +32,35 @@ class _FakeUpdateChecker extends UpdateChecker {
 }
 
 class _FakeUpdateInstaller extends UpdateInstaller {
-  _FakeUpdateInstaller(this.extractedDir);
+  _FakeUpdateInstaller(
+    this.extractedDir, {
+    this.progressToEmit = const [],
+    this.holdUntil,
+  });
 
   final Directory extractedDir;
+
+  /// Progress the fake reports before returning, so a test can assert what the
+  /// screen renders mid-install.
+  final List<UpdateProgress> progressToEmit;
+
+  /// Blocks the fake after reporting, so the install stays in flight. Without
+  /// it the whole install completes in one microtask drain and the finally
+  /// block clears the progress before the test can pump a frame.
+  final Future<void>? holdUntil;
   bool quitAndSwapCalled = false;
 
   @override
-  Future<Directory> prepareUpdate(UpdateInfo update) async => extractedDir;
+  Future<Directory> prepareUpdate(
+    UpdateInfo update, {
+    void Function(UpdateProgress)? onProgress,
+  }) async {
+    for (final progress in progressToEmit) {
+      onProgress?.call(progress);
+    }
+    if (holdUntil != null) await holdUntil;
+    return extractedDir;
+  }
 
   @override
   Future<void> quitAndSwap(
@@ -154,4 +178,77 @@ void main() {
       expect(installer.quitAndSwapCalled, isTrue);
     },
   );
+
+  testWidgets(
+    'shows a determinate bar with megabytes while downloading',
+    (tester) async {
+      // The fake reports download progress and then stops, so the screen stays
+      // on the phase the assertion is about.
+      final hold = Completer<void>();
+      installer = _FakeUpdateInstaller(
+        extractedDir,
+        progressToEmit: const [
+          UpdateDownloading(receivedBytes: 5 * 1024 * 1024, totalBytes: 20 * 1024 * 1024),
+        ],
+        holdUntil: hold.future,
+      );
+      const update = UpdateInfo(
+        version: '1.2.0',
+        notes: '',
+        downloadUrl: 'https://example.com/a.zip',
+        checksumUrl: 'https://example.com/a.sha256',
+        size: 1024,
+      );
+      await tester.pumpWidget(makeApp(checkResult: update));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Check for updates'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Install now'));
+      await tester.pump();
+
+      expect(find.text('Downloading update … 5.0 of 20.0 MB'), findsOneWidget);
+      expect(
+        tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator)).value,
+        0.25,
+      );
+
+      // Let the install finish so no work is left pending at teardown.
+      hold.complete();
+      await tester.pumpAndSettle();
+    },
+  );
+
+  testWidgets('shows an indeterminate bar while verifying', (tester) async {
+    final hold = Completer<void>();
+    installer = _FakeUpdateInstaller(
+      extractedDir,
+      progressToEmit: const [UpdateVerifying()],
+      holdUntil: hold.future,
+    );
+    const update = UpdateInfo(
+      version: '1.2.0',
+      notes: '',
+      downloadUrl: 'https://example.com/a.zip',
+      checksumUrl: 'https://example.com/a.sha256',
+      size: 1024,
+    );
+    await tester.pumpWidget(makeApp(checkResult: update));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Check for updates'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Install now'));
+    await tester.pump();
+
+    expect(find.text('Verifying checksum …'), findsOneWidget);
+    // No invented percentage for a phase that cannot report one.
+    expect(
+      tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator)).value,
+      isNull,
+    );
+
+    hold.complete();
+    await tester.pumpAndSettle();
+  });
 }
