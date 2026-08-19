@@ -12,8 +12,8 @@ See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ### Prerequisites
 
-- [Flutter](https://docs.flutter.dev/get-started/install) 3.38+ (Dart 3.12+), stable channel
-- macOS or Windows (required to run and test the desktop-only features: activity tracking, sync-folder access)
+- [Flutter](https://docs.flutter.dev/get-started/install) stable channel with Dart `^3.12.2` — the constraint `pubspec.yaml` enforces
+- macOS 12+ or Windows (required to run and test the desktop-only features: activity tracking, sync-folder access)
 
 ### Setup
 
@@ -21,6 +21,10 @@ See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 git clone https://github.com/mordilion/Hickory.git
 cd Hickory
 flutter pub get
+# Riverpod and Drift generate code; regenerate after touching a provider or table:
+dart run build_runner build --delete-conflicting-outputs
+# Localized strings are generated from lib/l10n/*.arb:
+flutter gen-l10n
 ```
 
 If you change any `@riverpod`- or Drift-annotated code, regenerate the generated sources:

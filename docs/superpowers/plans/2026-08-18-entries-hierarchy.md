@@ -2,6 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Historical (2026-08-19):** tasks 1-3 and 5-8 shipped, but the expanding-tree approach in
+> tasks 4 and 7 was replaced by drill-down navigation after the partner saw it running.
+> `flattenEntryTree`, its row types and the expansion notifier no longer exist. The revision
+> note at the top of the spec is authoritative; do not implement task 4 from here.
+
 **Goal:** Replace the flat day list in `EntriesList` with a collapsible Year › Month › ISO week › Day › Entries hierarchy where every header row shows rolled-up worked and break time on the right.
 
 **Architecture:** All grouping, key building, roll-up and flattening are pure functions in `lib/features/entries/entry_tree.dart` and `lib/core/format/iso_week.dart`, unit-tested without a widget tree. Expansion state is a `Set<String>` of node keys in a keep-alive Riverpod notifier, seeded to the path to today. `EntriesList` flattens (tree, expansion set) into a row list and renders it through the existing `ListView.builder`, so only visible rows are built.

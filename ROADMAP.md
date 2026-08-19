@@ -8,6 +8,11 @@ document only captures the agreed sequencing and scope at a high level.
 
 ## v1.3 — Migration
 
+> **Note (2026-08-19):** the shipped 1.3.x releases did *not* contain this milestone. 1.3.0
+> brought the drill-down entries overview, 1.3.1 removed the macOS App Sandbox to fix
+> self-updating, and 1.3.2 corrected the resulting error message. The CSV import below is
+> still open and needs a new version number when it is picked up.
+
 **Goal:** make switching to Hickory from another time tracker low-friction.
 
 - Generic CSV import for time entries, including duplicate detection and project/client
@@ -21,7 +26,11 @@ document only captures the agreed sequencing and scope at a high level.
 - Microsoft Store listing (MSIX packaging) — Microsoft signs the package during store
   certification, so this does **not** depend on v1.5's own code signing
 - Mac App Store listing — blocked on v1.5 (needs our own signing plus a
-  sandboxing/entitlements review), so out of scope until then
+  sandboxing/entitlements review), so out of scope until then. **Harder since 1.3.1:** the App
+  Sandbox was removed to make self-updating work
+  (`docs/superpowers/specs/2026-08-19-macos-sandbox-removal-design.md`), and the store requires
+  it. A listing means re-adding the sandbox for that build, which in turn disables the in-app
+  updater — so the two distribution paths need separate entitlements, not one shared build.
 - Landing page skeleton — not version-bound, can start anytime in parallel
 - Store listing copy, screenshots, feature list — not version-bound, can start anytime in
   parallel; publishing still waits on the store-specific packaging work above
