@@ -46,6 +46,19 @@
   `docs/superpowers/specs/2026-08-19-macos-sandbox-removal-design.md`. Keychain access for
   Jira/Personio credentials is an open risk to verify against a copied container before
   release.
+- **Keychain after unsandboxing: UNVERIFIED as of 2026-08-19.** The check could not be run:
+  `security find-generic-password` finds no item for any plausible service name, i.e. the dev
+  machine has never had Jira or Personio credentials configured, so there was nothing for the
+  unsandboxed build to fail at reading. Creating an item with the `security` CLI would not
+  reproduce the condition — its ACL differs from one written by a sandboxed app, so a passing
+  test would prove nothing.
+  - To actually verify: configure Jira in the installed *sandboxed* build (1.3.0 or earlier),
+    quit it, then start an unsandboxed build and open the Sync tab. Fields still filled means
+    the Keychain carried over; empty means it did not.
+  - No mitigation was built, on purpose: the absent-credentials path is already graceful.
+    `SecureJiraCredentialsStore.read` returns null when any key is missing and
+    `SyncScreen._loadJiraCredentials` then simply leaves the fields empty — no exception, no
+    error dialog. Worst case a user re-enters credentials once, which the changelog names.
 - The migration cannot ship through the built-in updater: the installed sandboxed build is
   what cannot install it. That one update has to be manual.
 

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix automatic updates on macOS. The app no longer runs in the App Sandbox, which was what prevented it from replacing itself, and it carries existing data over to its new location on first start. This one update has to be installed by hand — the version that would have delivered it is the one that cannot. Check the Sync tab afterwards: if the Jira or Personio fields are empty, enter the credentials once more.
+
 - Explain the real reason automatic updates fail on macOS. The message used to suggest moving the app to a writable folder, which cannot work: the sandboxed build may only write inside its own container, so it now points at the manual download instead.
 
 ## [1.3.0] - 2026-08-19
