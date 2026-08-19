@@ -62,6 +62,11 @@
     `SecureJiraCredentialsStore.read` returns null when any key is missing and
     `SyncScreen._loadJiraCredentials` then simply leaves the fields empty — no exception, no
     error dialog. Worst case a user re-enters credentials once, which the changelog names.
+- **Verified end to end 2026-08-19 (1.3.1 → 1.3.2):** the in-app updater downloaded, verified,
+  swapped and relaunched from `/Applications` on the reporter's machine. Afterwards the
+  installed bundle reported 1.3.2, carried no `app-sandbox` entitlement, and the migrated
+  database at `~/Library/Application Support/com.hickory.hickory` still held all twelve
+  entries. That closes the original report; the sandbox was the whole cause.
 - The migration cannot ship through the built-in updater: the installed sandboxed build is
   what cannot install it. That one update has to be manual.
 
