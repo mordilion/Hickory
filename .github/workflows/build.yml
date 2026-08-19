@@ -14,8 +14,16 @@ concurrency:
 
 jobs:
   test:
-    name: Analyze & Test
-    runs-on: ubuntu-latest
+    # Runs on both platforms on purpose: the update installer's tests skip
+    # themselves where updates aren't supported (see update_installer_test.dart),
+    # so an ubuntu-only job left the entire download/checksum/swap path
+    # unexercised while reporting green.
+    name: Analyze & Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
@@ -23,7 +31,10 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      # Analysis is platform-independent -- the analyzer excludes the platform
+      # directories -- so it runs once rather than burning macOS minutes twice.
       - run: flutter analyze
+        if: matrix.os == 'ubuntu-latest'
       - run: flutter test
 
   build-macos:
