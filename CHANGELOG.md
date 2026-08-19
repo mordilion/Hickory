@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add a drill-down hierarchy to the entries overview: years contain months, months contain calendar weeks with their date range, and a week lists its days with their entries. Every row shows the worked and break time below it, and a breadcrumb navigates back up. The app opens on the current week.
+
 ### Changed
 
 - Give the manual entry's add button the same full-width gradient pill styling as the timer's Start button, replacing the small round icon button.

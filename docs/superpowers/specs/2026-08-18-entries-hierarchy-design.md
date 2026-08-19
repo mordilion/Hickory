@@ -1,7 +1,40 @@
 # Collapsible Entries Hierarchy — Design
 
 Date: 2026-08-18
-Status: Approved for planning
+Status: Implemented, revised 2026-08-19
+
+## Revision — expanding tree replaced by drill-down
+
+The first implementation was a tree that expanded in place. Seeing it running, the
+partner found it wasteful of space and dated: four look-alike rows, the same sums
+repeated at every level, and week labels wrapping onto a second line. The list now
+**drills into one level at a time** — years, then months, then one week — with a
+breadcrumb carrying the path back up.
+
+What changed against the sections below:
+
+- The **week is the deepest level** and lists its days with their entries, so a week
+  reads in one view. There is no separate day level and no per-day drill-in; a day
+  sub-header labels its entries and is not tappable. (This supersedes §1's decision to
+  make the day a fourth clickable level, which existed to keep the day's totals and
+  break warning — those now live on the day sub-header instead.)
+- `flattenEntryTree`, its row types, the expansion-key builders and the expansion
+  notifier are **gone**. Navigation state is one `EntriesLocation` in
+  `lib/features/entries/entries_location.dart`, which also holds `initialLocation`,
+  `viewFor` and `parentOf` as pure functions.
+- The list **opens on the week holding today**, falling back to the newest week that
+  has entries, then to the years list when there are none. Null state means "not
+  navigated yet" and is resolved by the widget, which is the only place that knows
+  what data exists.
+- `viewFor` falls back to the nearest surviving ancestor, so deleting a week's last
+  entry cannot strand the list on an empty view.
+- A rolled-up row marks a short break with a **dot plus a counting tooltip**; the
+  triangle stays on the day sub-header, where the rule actually applies.
+
+The data model in §2, the ISO week helpers in §3 and the month-boundary split are
+unchanged — they carried over intact.
+
+Original design follows.
 
 ## 1. Goal & Scope
 
