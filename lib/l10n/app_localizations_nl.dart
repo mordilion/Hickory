@@ -353,6 +353,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get entriesYesterday => 'Gisteren';
 
   @override
+  String get migrationFailedTitle => 'Gegevens konden niet worden overgezet';
+
+  @override
+  String migrationFailedMessage(String path, String error) {
+    return 'Hickory heeft je bestaande gegevens gevonden maar kon ze niet naar de nieuwe locatie kopiëren. De app gaat opzettelijk niet verder, zodat er geen lege database ontstaat en de oude gegevens bereikbaar blijven. Ze staan in:\n\n$path\n\nDe vorige versie kan ze nog openen. Fout: $error';
+  }
+
+  @override
   String entriesWeekLabel(int week) {
     return 'Week $week';
   }

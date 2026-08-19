@@ -116,6 +116,8 @@
   "entriesBreakInsufficientTooltip": "Break too short",
   "entriesToday": "Today",
   "entriesYesterday": "Yesterday",
+  "migrationFailedTitle": "Couldn't carry your data over",
+  "migrationFailedMessage": "Hickory found your existing data but couldn't copy it to its new location. It is deliberately not starting further, so no empty database is created and the old data stays reachable. You'll find it at:\n\n{path}\n\nThe previous version can still open it. Error: {error}",
   "entriesWeekLabel": "Week {week}",
   "entriesUpOneLevelTooltip": "Up one level",
   "entriesAllYearsLabel": "All years",

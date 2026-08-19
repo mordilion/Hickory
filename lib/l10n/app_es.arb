@@ -116,6 +116,8 @@
   "entriesBreakInsufficientTooltip": "Pausa demasiado corta",
   "entriesToday": "Hoy",
   "entriesYesterday": "Ayer",
+  "migrationFailedTitle": "No se pudieron trasladar los datos",
+  "migrationFailedMessage": "Hickory encontró tus datos existentes pero no pudo copiarlos a su nueva ubicación. No continúa a propósito, para no crear una base de datos vacía y mantener accesibles los datos antiguos. Están en:\n\n{path}\n\nLa versión anterior todavía puede abrirlos. Error: {error}",
   "entriesWeekLabel": "Semana {week}",
   "entriesUpOneLevelTooltip": "Subir un nivel",
   "entriesAllYearsLabel": "Todos los años",

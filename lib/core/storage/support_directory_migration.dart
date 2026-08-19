@@ -11,6 +11,10 @@ enum SupportMigrationOutcome {
   /// Neither legacy directory exists — a fresh install.
   skippedNoLegacyData,
 
+  /// The target *is* the container: this build is still sandboxed, so there is
+  /// nothing to migrate out of and copying would only touch live files.
+  skippedStillSandboxed,
+
   /// Legacy data was copied into the target.
   copied,
 }
@@ -45,6 +49,14 @@ Future<SupportMigrationOutcome> migrateOutOfSandboxContainer({
   required Directory target,
   required String databaseFileName,
 }) async {
+  // Sandboxed, path_provider resolves the support directory to the container
+  // itself, making source and target the same place. Copying a directory onto
+  // itself is at best pointless and at worst destructive, and this ordering is
+  // easy to hit: the entitlement change and this code ship in the same release
+  // but a developer runs the old build in between.
+  if (p.equals(legacySupport.path, target.path)) {
+    return SupportMigrationOutcome.skippedStillSandboxed;
+  }
   if (await File(p.join(target.path, databaseFileName)).exists()) {
     return SupportMigrationOutcome.skippedAlreadyMigrated;
   }

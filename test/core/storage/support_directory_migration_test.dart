@@ -75,4 +75,21 @@ void main() {
     expect(await migrate(), SupportMigrationOutcome.copied);
     expect(File('${target.path}/device_id').existsSync(), isTrue);
   });
+
+  test('does nothing while the app is still sandboxed', () async {
+    // Sandboxed, path_provider resolves the support directory *to* the
+    // container, so source and target are the same directory. Copying it onto
+    // itself would at best be pointless and at worst corrupt live files.
+    File('${legacySupport.path}/device_id').writeAsStringSync('device-1');
+
+    final outcome = await migrateOutOfSandboxContainer(
+      legacySupport: legacySupport,
+      legacyDocuments: legacyDocuments,
+      target: legacySupport,
+      databaseFileName: 'hickory.sqlite',
+    );
+
+    expect(outcome, SupportMigrationOutcome.skippedStillSandboxed);
+    expect(File('${legacySupport.path}/device_id').readAsStringSync(), 'device-1');
+  });
 }

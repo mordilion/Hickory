@@ -350,6 +350,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get entriesYesterday => 'Yesterday';
 
   @override
+  String get migrationFailedTitle => 'Couldn\'t carry your data over';
+
+  @override
+  String migrationFailedMessage(String path, String error) {
+    return 'Hickory found your existing data but couldn\'t copy it to its new location. It is deliberately not starting further, so no empty database is created and the old data stays reachable. You\'ll find it at:\n\n$path\n\nThe previous version can still open it. Error: $error';
+  }
+
+  @override
   String entriesWeekLabel(int week) {
     return 'Week $week';
   }

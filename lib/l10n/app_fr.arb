@@ -116,6 +116,8 @@
   "entriesBreakInsufficientTooltip": "Pause trop courte",
   "entriesToday": "Aujourd'hui",
   "entriesYesterday": "Hier",
+  "migrationFailedTitle": "Impossible de reprendre vos données",
+  "migrationFailedMessage": "Hickory a trouvé vos données existantes mais n'a pas pu les copier vers leur nouvel emplacement. L'app s'arrête volontairement ici, afin de ne pas créer une base vide et de garder les anciennes données accessibles. Elles se trouvent dans :\n\n{path}\n\nLa version précédente peut toujours les ouvrir. Erreur : {error}",
   "entriesWeekLabel": "Semaine {week}",
   "entriesUpOneLevelTooltip": "Remonter d’un niveau",
   "entriesAllYearsLabel": "Toutes les années",

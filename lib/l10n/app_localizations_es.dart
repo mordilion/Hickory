@@ -352,6 +352,14 @@ class AppLocalizationsEs extends AppLocalizations {
   String get entriesYesterday => 'Ayer';
 
   @override
+  String get migrationFailedTitle => 'No se pudieron trasladar los datos';
+
+  @override
+  String migrationFailedMessage(String path, String error) {
+    return 'Hickory encontró tus datos existentes pero no pudo copiarlos a su nueva ubicación. No continúa a propósito, para no crear una base de datos vacía y mantener accesibles los datos antiguos. Están en:\n\n$path\n\nLa versión anterior todavía puede abrirlos. Error: $error';
+  }
+
+  @override
   String entriesWeekLabel(int week) {
     return 'Semana $week';
   }

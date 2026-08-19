@@ -116,6 +116,8 @@
   "entriesBreakInsufficientTooltip": "Pauze te kort",
   "entriesToday": "Vandaag",
   "entriesYesterday": "Gisteren",
+  "migrationFailedTitle": "Gegevens konden niet worden overgezet",
+  "migrationFailedMessage": "Hickory heeft je bestaande gegevens gevonden maar kon ze niet naar de nieuwe locatie kopiëren. De app gaat opzettelijk niet verder, zodat er geen lege database ontstaat en de oude gegevens bereikbaar blijven. Ze staan in:\n\n{path}\n\nDe vorige versie kan ze nog openen. Fout: {error}",
   "entriesWeekLabel": "Week {week}",
   "entriesUpOneLevelTooltip": "Eén niveau omhoog",
   "entriesAllYearsLabel": "Alle jaren",

@@ -711,6 +711,18 @@ abstract class AppLocalizations {
   /// **'Gestern'**
   String get entriesYesterday;
 
+  /// No description provided for @migrationFailedTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Daten konnten nicht übernommen werden'**
+  String get migrationFailedTitle;
+
+  /// No description provided for @migrationFailedMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Hickory hat seine bisherigen Daten gefunden, konnte sie aber nicht an den neuen Ort kopieren. Die App startet absichtlich nicht weiter, damit keine leere Datenbank entsteht und die alten Daten erreichbar bleiben. Sie liegen unter:\n\n{path}\n\nDie vorherige Version kann sie weiterhin öffnen. Fehler: {error}'**
+  String migrationFailedMessage(String path, String error);
+
   /// No description provided for @entriesWeekLabel.
   ///
   /// In de, this message translates to:

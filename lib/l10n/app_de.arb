@@ -156,6 +156,14 @@
   "entriesBreakInsufficientTooltip": "Pause zu kurz",
   "entriesToday": "Heute",
   "entriesYesterday": "Gestern",
+  "migrationFailedTitle": "Daten konnten nicht übernommen werden",
+  "migrationFailedMessage": "Hickory hat seine bisherigen Daten gefunden, konnte sie aber nicht an den neuen Ort kopieren. Die App startet absichtlich nicht weiter, damit keine leere Datenbank entsteht und die alten Daten erreichbar bleiben. Sie liegen unter:\n\n{path}\n\nDie vorherige Version kann sie weiterhin öffnen. Fehler: {error}",
+  "@migrationFailedMessage": {
+    "placeholders": {
+      "path": { "type": "String" },
+      "error": { "type": "String" }
+    }
+  },
   "entriesWeekLabel": "KW {week}",
   "@entriesWeekLabel": {
     "placeholders": {

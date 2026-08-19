@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
+
+import '../../core/storage/app_directories.dart';
 
 import 'daos/activity_samples_dao.dart';
 import 'daos/app_settings_dao.dart';
@@ -94,10 +95,16 @@ class AppDatabase extends _$AppDatabase {
     },
   );
 
+  /// Shared with the sandbox-container migration, which has to name the file to
+  /// know whether the target directory already holds live data.
+  static const databaseFileName = 'hickory.sqlite';
+
   static LazyDatabase _openConnection() {
     return LazyDatabase(() async {
-      final dbFolder = await getApplicationDocumentsDirectory();
-      final file = File(p.join(dbFolder.path, 'hickory.sqlite'));
+      // Not getApplicationDocumentsDirectory() any more: on macOS that now
+      // means the user's own ~/Documents. See appDataDirectory().
+      final dbFolder = await appDataDirectory();
+      final file = File(p.join(dbFolder.path, databaseFileName));
       return NativeDatabase.createInBackground(file);
     });
   }
