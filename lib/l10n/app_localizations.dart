@@ -711,6 +711,30 @@ abstract class AppLocalizations {
   /// **'Gestern'**
   String get entriesYesterday;
 
+  /// No description provided for @entriesWeekLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'KW {week}'**
+  String entriesWeekLabel(int week);
+
+  /// No description provided for @entriesUpOneLevelTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Eine Ebene höher'**
+  String get entriesUpOneLevelTooltip;
+
+  /// No description provided for @entriesAllYearsLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Jahre'**
+  String get entriesAllYearsLabel;
+
+  /// No description provided for @entriesWeekDayRange.
+  ///
+  /// In de, this message translates to:
+  /// **'{first}.–{last}.'**
+  String entriesWeekDayRange(int first, int last);
+
   /// No description provided for @entriesWeekHeader.
   ///
   /// In de, this message translates to:

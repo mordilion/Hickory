@@ -9,12 +9,12 @@ import 'package:hickory/core/di/break_rule_tiers_provider.dart';
 import 'package:hickory/core/di/device_id_provider.dart';
 import 'package:hickory/core/di/jira_providers.dart';
 import 'package:hickory/core/di/sync_providers.dart';
+import 'package:hickory/core/theme/app_theme.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
 import 'package:hickory/features/entries/entries_list.dart';
-import 'package:hickory/features/entries/entry_tree.dart';
-import 'package:hickory/features/entries/entry_tree_expansion.dart';
+import 'package:hickory/features/entries/entries_location.dart';
 import 'package:hickory/features/projects/projects_providers.dart';
 import 'package:hickory/features/timer/timer_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
@@ -42,13 +42,13 @@ void main() {
   // deviceIdProvider/syncedWritesProvider are static Stream.value overrides
   // rather than real drift streams, to avoid a known flutter_test false
   // positive with live QueryStreams at teardown.
-  Widget makeApp(List<TimeEntry> entries, {Set<String>? expanded}) => ProviderScope(
+  Widget makeApp(List<TimeEntry> entries, {EntriesLocation? location}) => ProviderScope(
         overrides: [
-          // EntriesList only renders an entry whose day is expanded, and the
-          // default seed opens today's path -- which a fixed 2026-07-01 entry
-          // is not on. Such a test has to name its own path.
-          if (expanded != null)
-            entryTreeExpansionProvider.overrideWith(() => _FixedExpansion(expanded)),
+          // EntriesList drills to one week at a time and opens on the current
+          // one, which a fixed 2026-07-01 entry is not in. Such a test has to
+          // name the week it wants.
+          if (location != null)
+            entriesLocationControllerProvider.overrideWith(() => _FixedLocation(location)),
           allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
           activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
           jiraWorklogsByEntryIdProvider.overrideWith((ref) => Stream.value(const {})),
@@ -69,6 +69,9 @@ void main() {
           syncedWritesProvider.overrideWith((ref) async => writes),
         ],
         child: MaterialApp(
+          // The list reads its muted and accent colors from HickoryColors,
+          // which only exists as a ThemeExtension on the app's own theme.
+          theme: AppTheme.light,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           locale: const Locale('en'),
@@ -276,7 +279,12 @@ void main() {
       );
 
       await tester.pumpWidget(
-        makeApp([entry!], expanded: defaultExpandedKeys(DateTime(2026, 7, 1))),
+        makeApp(
+          [entry!],
+          // 2026-07-01 is a Wednesday, so its ISO week starts on 29 June; the
+          // June days form their own node, making this half July's.
+          location: EntriesWeekLocation(monday: DateTime(2026, 6, 29), year: 2026, month: 7),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -315,7 +323,12 @@ void main() {
       );
 
       await tester.pumpWidget(
-        makeApp([entry!], expanded: defaultExpandedKeys(DateTime(2026, 7, 1))),
+        makeApp(
+          [entry!],
+          // 2026-07-01 is a Wednesday, so its ISO week starts on 29 June; the
+          // June days form their own node, making this half July's.
+          location: EntriesWeekLocation(monday: DateTime(2026, 6, 29), year: 2026, month: 7),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -365,7 +378,12 @@ void main() {
       );
 
       await tester.pumpWidget(
-        makeApp([entry!], expanded: defaultExpandedKeys(DateTime(2026, 7, 1))),
+        makeApp(
+          [entry!],
+          // 2026-07-01 is a Wednesday, so its ISO week starts on 29 June; the
+          // June days form their own node, making this half July's.
+          location: EntriesWeekLocation(monday: DateTime(2026, 6, 29), year: 2026, month: 7),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -413,12 +431,12 @@ void main() {
   );
 }
 
-/// Pins the expansion set so a test doesn't silently depend on today's date.
-class _FixedExpansion extends EntryTreeExpansion {
-  _FixedExpansion(this._initial);
+/// Pins the location so a test doesn't silently depend on today's date.
+class _FixedLocation extends EntriesLocationController {
+  _FixedLocation(this._initial);
 
-  final Set<String> _initial;
+  final EntriesLocation? _initial;
 
   @override
-  Set<String> build() => _initial;
+  EntriesLocation? build() => _initial;
 }

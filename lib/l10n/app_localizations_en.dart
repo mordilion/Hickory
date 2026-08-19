@@ -350,6 +350,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get entriesYesterday => 'Yesterday';
 
   @override
+  String entriesWeekLabel(int week) {
+    return 'Week $week';
+  }
+
+  @override
+  String get entriesUpOneLevelTooltip => 'Up one level';
+
+  @override
+  String get entriesAllYearsLabel => 'All years';
+
+  @override
+  String entriesWeekDayRange(int first, int last) {
+    return '$first–$last';
+  }
+
+  @override
   String entriesWeekHeader(int week, String range) {
     return 'Week $week · $range';
   }

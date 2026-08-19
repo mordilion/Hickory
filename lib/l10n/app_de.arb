@@ -156,6 +156,21 @@
   "entriesBreakInsufficientTooltip": "Pause zu kurz",
   "entriesToday": "Heute",
   "entriesYesterday": "Gestern",
+  "entriesWeekLabel": "KW {week}",
+  "@entriesWeekLabel": {
+    "placeholders": {
+      "week": { "type": "int" }
+    }
+  },
+  "entriesUpOneLevelTooltip": "Eine Ebene höher",
+  "entriesAllYearsLabel": "Alle Jahre",
+  "entriesWeekDayRange": "{first}.–{last}.",
+  "@entriesWeekDayRange": {
+    "placeholders": {
+      "first": { "type": "int" },
+      "last": { "type": "int" }
+    }
+  },
   "entriesWeekHeader": "KW {week} · {range}",
   "@entriesWeekHeader": {
     "placeholders": {

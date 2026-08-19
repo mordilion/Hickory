@@ -87,15 +87,6 @@ String weekTreeKey(DateTime monday, int year, int month) =>
 
 String dayTreeKey(DateTime day) => 'd${isoDayKey(day)}';
 
-/// Expansion keys for the path to [today]: its year, month, ISO week and the
-/// day itself.
-Set<String> defaultExpandedKeys(DateTime today) => {
-  yearTreeKey(today.year),
-  monthTreeKey(today.year, today.month),
-  weekTreeKey(mondayOf(today), today.year, today.month),
-  dayTreeKey(DateTime(today.year, today.month, today.day)),
-};
-
 /// Groups [entries] into Year > Month > ISO week > Day, newest first at every
 /// level, with worked/break totals and offending-day counts rolled up.
 ///
@@ -183,74 +174,3 @@ EntryYearGroup _yearGroup(List<EntryMonthGroup> months) => EntryYearGroup(
 
 Duration _sum(Iterable<Duration> durations) =>
     durations.fold(Duration.zero, (sum, duration) => sum + duration);
-
-/// One rendered line of the entries list. [EntryTreeEntriesRow] is the card of
-/// entry tiles that follows an expanded day's header.
-sealed class EntryTreeRow {
-  const EntryTreeRow();
-}
-
-class EntryTreeYearRow extends EntryTreeRow {
-  const EntryTreeYearRow(this.year);
-
-  final EntryYearGroup year;
-}
-
-class EntryTreeMonthRow extends EntryTreeRow {
-  const EntryTreeMonthRow(this.month);
-
-  final EntryMonthGroup month;
-}
-
-class EntryTreeWeekRow extends EntryTreeRow {
-  const EntryTreeWeekRow(this.week);
-
-  final EntryWeekGroup week;
-}
-
-class EntryTreeDayRow extends EntryTreeRow {
-  const EntryTreeDayRow(this.day);
-
-  final EntryDayGroup day;
-}
-
-class EntryTreeEntriesRow extends EntryTreeRow {
-  const EntryTreeEntriesRow(this.day);
-
-  final EntryDayGroup day;
-}
-
-/// Flattens [years] into the rows currently visible for [expanded] (keys from
-/// [yearTreeKey] and friends).
-///
-/// A node's children are emitted only while its own key is present, so a
-/// collapsed year costs one row no matter how much sits below it. Keys naming
-/// nodes that no longer exist are ignored.
-List<EntryTreeRow> flattenEntryTree(
-  List<EntryYearGroup> years,
-  Set<String> expanded,
-) {
-  final rows = <EntryTreeRow>[];
-  for (final year in years) {
-    rows.add(EntryTreeYearRow(year));
-    if (!expanded.contains(yearTreeKey(year.year))) continue;
-    for (final month in year.months) {
-      rows.add(EntryTreeMonthRow(month));
-      if (!expanded.contains(monthTreeKey(month.year, month.month))) continue;
-      for (final week in month.weeks) {
-        rows.add(EntryTreeWeekRow(week));
-        if (!expanded.contains(
-          weekTreeKey(week.monday, week.year, week.month),
-        )) {
-          continue;
-        }
-        for (final day in week.days) {
-          rows.add(EntryTreeDayRow(day));
-          if (!expanded.contains(dayTreeKey(day.day))) continue;
-          rows.add(EntryTreeEntriesRow(day));
-        }
-      }
-    }
-  }
-  return rows;
-}

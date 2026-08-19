@@ -4,10 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/core/di/break_rule_tiers_provider.dart';
 import 'package:hickory/core/di/jira_providers.dart';
+import 'package:hickory/core/theme/app_theme.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/features/entries/entries_list.dart';
-import 'package:hickory/features/entries/entry_tree.dart';
-import 'package:hickory/features/entries/entry_tree_expansion.dart';
+import 'package:hickory/features/entries/entries_location.dart';
 import 'package:hickory/features/projects/projects_providers.dart';
 import 'package:hickory/features/timer/timer_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
@@ -58,11 +58,11 @@ void main() {
     List<TimeEntry> entries, {
     List<BreakRuleTier> tiers = const [],
     bool countPausedTimeAsBreak = false,
-    Set<String>? expanded,
+    EntriesLocation? location,
   }) => ProviderScope(
         overrides: [
-          if (expanded != null)
-            entryTreeExpansionProvider.overrideWith(() => _FixedExpansion(expanded)),
+          if (location != null)
+            entriesLocationControllerProvider.overrideWith(() => _FixedLocation(location)),
           allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
           activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
           jiraWorklogsByEntryIdProvider.overrideWith((ref) => Stream.value(const {})),
@@ -81,6 +81,9 @@ void main() {
           ),
         ],
         child: MaterialApp(
+          // The list reads its muted and accent colors from HickoryColors,
+          // which only exists as a ThemeExtension on the app's own theme.
+          theme: AppTheme.light,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           locale: const Locale('en'),
@@ -88,11 +91,11 @@ void main() {
         ),
       );
 
-  // Break and worked sums appear on the year, month and week rows as well as
-  // the day's, so a bare find.text matches four times over single-day data.
-  // Scope to the row carrying [label] to assert about one level only.
+  // A day's sums sit in the same Row as its label. Scoping to that Row keeps an
+  // assertion about one day from also matching a rolled-up row's identical
+  // numbers. Day sub-headers aren't tappable, so this is a Row, not an InkWell.
   Finder row(String label) =>
-      find.ancestor(of: find.text(label), matching: find.byType(InkWell));
+      find.ancestor(of: find.text(label), matching: find.byType(Row));
 
   testWidgets('groups entries under Today/Yesterday headers with totals', (tester) async {
     final now = DateTime.now();
@@ -104,9 +107,6 @@ void main() {
           _entry(id: '1', startAt: today, endAt: today.add(const Duration(hours: 1))),
           _entry(id: '2', startAt: yesterday, endAt: yesterday.add(const Duration(minutes: 30))),
         ],
-        // Both days explicitly: the default seed opens only today's path, and
-        // on a Monday (or the 1st) yesterday sits in a collapsed week or month.
-        expanded: {...defaultExpandedKeys(today), ...defaultExpandedKeys(yesterday)},
       ),
     );
     await tester.pumpAndSettle();
@@ -166,7 +166,7 @@ void main() {
             endAt: today.add(const Duration(hours: 3)),
           ),
           _entry(id: '3', startAt: yesterday, endAt: yesterday.add(const Duration(minutes: 30))),
-        ], expanded: {...defaultExpandedKeys(today), ...defaultExpandedKeys(yesterday)}),
+        ]),
       );
       await tester.pumpAndSettle();
 
@@ -233,16 +233,27 @@ void main() {
         find.descendant(of: row('Today'), matching: find.byIcon(Icons.warning_amber_rounded)),
         findsOneWidget,
       );
-      // The warning bubbles up, so a collapsed list still shows where to look.
-      expect(
-        find.descendant(
-          of: row('${today.year}'),
-          matching: find.byIcon(Icons.warning_amber_rounded),
-        ),
-        findsOneWidget,
-      );
+
     },
   );
+
+  testWidgets('a rolled-up row marks that a day below it fell short', (tester) async {
+    await tester.pumpWidget(
+      makeApp(
+        [
+          _entry(id: '1', startAt: DateTime(2024, 5, 6, 8), endAt: DateTime(2024, 5, 6, 15)),
+        ],
+        tiers: [_tier(afterMinutes: 360, requiredBreakMinutes: 30)],
+        location: const EntriesYearsLocation(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // A marker with a counting tooltip, rather than the day's own triangle:
+    // one offending day would otherwise shout from every level above it.
+    expect(find.byTooltip('1 day with a break that is too short'), findsOneWidget);
+    expect(find.byIcon(Icons.warning_amber_rounded), findsNothing);
+  });
 
   testWidgets('does not mark the break red when it meets the required tier', (tester) async {
     final now = DateTime.now();
@@ -322,11 +333,11 @@ void main() {
     },
   );
 
-  testWidgets('shows only year rows when everything is collapsed', (tester) async {
+  testWidgets('lists years and nothing deeper at the top level', (tester) async {
     await tester.pumpWidget(
       makeApp(
         [_entry(id: '1', startAt: DateTime(2024, 5, 6, 9), endAt: DateTime(2024, 5, 6, 10))],
-        expanded: const <String>{},
+        location: const EntriesYearsLocation(),
       ),
     );
     await tester.pumpAndSettle();
@@ -334,13 +345,15 @@ void main() {
     expect(find.text('2024'), findsOneWidget);
     expect(find.text('May'), findsNothing);
     expect(find.byType(Dismissible), findsNothing);
+    // No path to show at the top, so no breadcrumb eats the space.
+    expect(find.byTooltip('Up one level'), findsNothing);
   });
 
-  testWidgets('tapping a year row reveals its months', (tester) async {
+  testWidgets('tapping a year drills into its months', (tester) async {
     await tester.pumpWidget(
       makeApp(
         [_entry(id: '1', startAt: DateTime(2024, 5, 6, 9), endAt: DateTime(2024, 5, 6, 10))],
-        expanded: const <String>{},
+        location: const EntriesYearsLocation(),
       ),
     );
     await tester.pumpAndSettle();
@@ -349,8 +362,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('May'), findsOneWidget);
-    // One level only: the week below stays collapsed.
+    // One level at a time: the weeks below are a further tap away.
     expect(find.textContaining('Week 19'), findsNothing);
+    expect(find.byTooltip('Up one level'), findsOneWidget);
   });
 
   testWidgets('a year row carries worked and break sums', (tester) async {
@@ -360,7 +374,7 @@ void main() {
           _entry(id: '1', startAt: DateTime(2024, 5, 6, 8), endAt: DateTime(2024, 5, 6, 10)),
           _entry(id: '2', startAt: DateTime(2024, 5, 6, 11), endAt: DateTime(2024, 5, 6, 12)),
         ],
-        expanded: const <String>{},
+        location: const EntriesYearsLocation(),
       ),
     );
     await tester.pumpAndSettle();
@@ -369,7 +383,31 @@ void main() {
     expect(find.text('Break: 01:00'), findsOneWidget);
   });
 
-  testWidgets("the default expansion shows today's entries", (tester) async {
+  testWidgets('drills back up through the breadcrumb', (tester) async {
+    // 2024-05-06 is a Monday, so its week sits entirely inside May.
+    await tester.pumpWidget(
+      makeApp(
+        [_entry(id: '1', startAt: DateTime(2024, 5, 6, 9), endAt: DateTime(2024, 5, 6, 10))],
+        location: EntriesWeekLocation(monday: DateTime(2024, 5, 6), year: 2024, month: 5),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Deepest level: the day and its entry, no chevron rows.
+    expect(find.byType(Dismissible), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Up one level'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Week 19'), findsOneWidget);
+    expect(find.byType(Dismissible), findsNothing);
+
+    // The breadcrumb's year segment jumps two levels at once.
+    await tester.tap(find.text('2024'));
+    await tester.pumpAndSettle();
+    expect(find.text('May'), findsOneWidget);
+  });
+
+  testWidgets("opens on the current week, showing today's entries", (tester) async {
     final now = DateTime.now();
     final start = DateTime(now.year, now.month, now.day, 9);
     await tester.pumpWidget(
@@ -384,12 +422,12 @@ void main() {
   });
 }
 
-/// Pins the expansion set so a test doesn't silently depend on today's date.
-class _FixedExpansion extends EntryTreeExpansion {
-  _FixedExpansion(this._initial);
+/// Pins the location so a test doesn't silently depend on today's date.
+class _FixedLocation extends EntriesLocationController {
+  _FixedLocation(this._initial);
 
-  final Set<String> _initial;
+  final EntriesLocation? _initial;
 
   @override
-  Set<String> build() => _initial;
+  EntriesLocation? build() => _initial;
 }
