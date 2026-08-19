@@ -49,15 +49,25 @@ updater already works), any change to the update mechanism itself.
 
 ## 3. The migration is the actual work
 
-`path_provider` resolves `getApplicationSupportDirectory()` differently depending on the
-sandbox:
+`path_provider` resolves differently depending on the sandbox, and the app uses **two**
+directories — corrected 2026-08-19 while writing the plan, having first assumed the database
+sat in Application Support:
 
-| Build | Resolves to |
-|---|---|
-| Sandboxed (today) | `~/Library/Containers/com.hickory.hickory/Data/Library/Application Support/com.hickory.hickory` |
-| Unsandboxed (after this change) | `~/Library/Application Support/com.hickory.hickory` |
+| What | Call | Sandboxed (today) | Unsandboxed |
+|---|---|---|---|
+| Database `hickory.sqlite` | `getApplicationDocumentsDirectory()` (`data/drift/database.dart:99`) | `…/Containers/com.hickory.hickory/Data/Documents/` | **`~/Documents/`** |
+| device id, sync config, window bounds, font cache | `getApplicationSupportDirectory()` | `…/Containers/…/Data/Library/Application Support/com.hickory.hickory/` | `~/Library/Application Support/com.hickory.hickory/` |
 
-Verified 2026-08-19: the container path holds the live data and **nothing exists outside it**.
+Verified 2026-08-19: both container paths hold live data (the database was 151 KB, modified
+that morning) and **nothing exists outside the container**.
+
+The Documents row is a problem beyond migration. Unsandboxed, `hickory.sqlite` would land
+directly in the user's own `~/Documents` folder — visible, in every backup selection dialog,
+and easy to delete by accident. So dropping the sandbox forces a second decision: on macOS the
+database moves to Application Support, where application data belongs, and the migration
+copies it there from the container's Documents directory. Windows keeps
+`getApplicationDocumentsDirectory()`, because nothing forces its path to change and moving a
+working install's database earns nothing but risk.
 Shipping the entitlement change alone would therefore present every existing user with what
 looks like a factory-reset app — database, device id, locale and sync configuration all
 appear gone while actually sitting in the container.
