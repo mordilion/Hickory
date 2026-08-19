@@ -87,7 +87,9 @@ void main() {
           }
           return http.Response.bytes(zipBytes, 200);
         }),
-        installDirOverride: Directory(p.join(installParent.path, 'Hickory.app')),
+        installDirOverride: Directory(
+          p.join(installParent.path, 'Hickory.app'),
+        ),
       );
 
       final topLevel = await installer.prepareUpdate(update);
@@ -107,22 +109,36 @@ void main() {
     },
   );
 
-  test('prepareUpdate throws on a checksum mismatch', () async {
-    final zipBytes = buildFixtureZip();
-    final installer = UpdateInstaller(
-      httpClient: MockClient((request) async {
-        if (request.url.path.endsWith('.sha256')) {
-          return http.Response('0' * 64, 200);
-        }
-        return http.Response.bytes(zipBytes, 200);
-      }),
-    );
+  test(
+    'prepareUpdate throws on a checksum mismatch',
+    skip: Platform.isMacOS || Platform.isWindows
+        ? null
+        : 'prepareUpdate only supports macOS and Windows; the CI test job '
+              'runs on ubuntu-latest, where it throws before reaching this '
+              'behavior.',
+    () async {
+      final zipBytes = buildFixtureZip();
+      final installer = UpdateInstaller(
+        httpClient: MockClient((request) async {
+          if (request.url.path.endsWith('.sha256')) {
+            return http.Response('0' * 64, 200);
+          }
+          return http.Response.bytes(zipBytes, 200);
+        }),
+      );
 
-    expect(
-      () => installer.prepareUpdate(update),
-      throwsA(isA<UpdateInstallException>()),
-    );
-  });
+      expect(
+        () => installer.prepareUpdate(update),
+        throwsA(
+          isA<UpdateInstallException>().having(
+            (e) => e.message,
+            'message',
+            contains('checksum'),
+          ),
+        ),
+      );
+    },
+  );
 
   test(
     'prepareUpdate throws when the archive has no executable at the expected path',
@@ -145,16 +161,24 @@ void main() {
     },
   );
 
-  test('prepareUpdate throws when the download itself fails', () async {
-    final installer = UpdateInstaller(
-      httpClient: MockClient((request) async => http.Response('', 500)),
-    );
+  test(
+    'prepareUpdate throws when the download itself fails',
+    skip: Platform.isMacOS || Platform.isWindows
+        ? null
+        : 'prepareUpdate only supports macOS and Windows; the CI test job '
+              'runs on ubuntu-latest, where it throws before reaching this '
+              'behavior.',
+    () async {
+      final installer = UpdateInstaller(
+        httpClient: MockClient((request) async => http.Response('', 500)),
+      );
 
-    expect(
-      () => installer.prepareUpdate(update),
-      throwsA(isA<UpdateInstallException>()),
-    );
-  });
+      expect(
+        () => installer.prepareUpdate(update),
+        throwsA(isA<UpdateInstallException>()),
+      );
+    },
+  );
 
   test(
     'prepareUpdate throws UpdateInstallPermissionException when the install '
@@ -182,7 +206,9 @@ void main() {
           }
           return http.Response.bytes(zipBytes, 200);
         }),
-        installDirOverride: Directory(p.join(missingParent.path, 'Hickory.app')),
+        installDirOverride: Directory(
+          p.join(missingParent.path, 'Hickory.app'),
+        ),
       );
 
       expect(
@@ -205,6 +231,11 @@ void main() {
   // entries tests document.
   test(
     'reports rising download progress and then the later phases',
+    skip: Platform.isMacOS || Platform.isWindows
+        ? null
+        : 'prepareUpdate only supports macOS and Windows; the CI test job '
+              'runs on ubuntu-latest, where it throws before reaching this '
+              'behavior.',
     () async {
       final zipBytes = buildFixtureZip();
       final checksum = sha256.convert(zipBytes).toString();
