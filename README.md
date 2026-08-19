@@ -33,7 +33,7 @@ A local-first, privacy-friendly time tracking desktop app with Jira worklog sync
 ### Prerequisites
 
 - [Flutter](https://docs.flutter.dev/get-started/install) 3.38+ (Dart 3.12+), stable channel
-- macOS or Windows for the desktop-only features (activity tracking, folder sync); other platforms are not currently supported
+- macOS 12+ or Windows for the desktop-only features (activity tracking, folder sync); other platforms are not currently supported
 - A Jira Cloud account with an [API token](https://id.atlassian.com/manage-profile/security/api-tokens) if you want to use the Jira sync feature (optional)
 
 ### Pre-built artifacts

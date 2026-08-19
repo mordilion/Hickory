@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Raise the minimum macOS version to 12.0. The current Flutter toolchain requires it, so macOS 10.15 and 11 are no longer supported.
 - Give the manual entry's add button the same full-width gradient pill styling as the timer's Start button, replacing the small round icon button.
 - Make the end of a manual entry follow its start: picking a start date pulls the end date onto the same day, and picking a start time shifts the end time by the same amount, so the entry keeps its duration and the end fields rarely need touching. Picking an end date or time still only changes the end.
 
