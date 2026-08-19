@@ -38,7 +38,10 @@
   owning the bundle, where the same `mkdir` succeeds from a shell and fails from the app.
 - `UpdateInstallPermissionException` is therefore the *normal* macOS outcome, not an edge
   case, and its old message ("move the app somewhere writable") named a place that does not
-  exist under the sandbox. Corrected to point at the manual download.
+  exist under the sandbox. Corrected to point at the manual download — and then corrected
+  again in 1.3.2, because 1.3.1 dropped the sandbox and the message still blamed it. It now
+  names the directory it could not write to. Wording that describes a build's environment ages
+  with that build; when an entitlement changes, grep the strings that explain it.
 - Removing the write probe would not help: `quitAndSwap`'s detached script is a child of the
   sandboxed app and inherits the sandbox.
 - Fix decided: drop the sandbox, which forces a data migration out of the container because

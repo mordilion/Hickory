@@ -185,7 +185,15 @@ void main() {
 
       expect(
         () => installer.prepareUpdate(update),
-        throwsA(isA<UpdateInstallPermissionException>()),
+        throwsA(
+          isA<UpdateInstallPermissionException>().having(
+            (e) => e.installParentPath,
+            'installParentPath',
+            // The Settings screen names this directory, so it has to be the
+            // one that actually failed rather than the .app inside it.
+            missingParent.path,
+          ),
+        ),
       );
     },
   );

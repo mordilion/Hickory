@@ -81,8 +81,9 @@ class AppLocalizationsNl extends AppLocalizations {
       'Installatie mislukt. Probeer het opnieuw of download de nieuwe versie handmatig van GitHub.';
 
   @override
-  String get settingsUpdateInstallErrorPermission =>
-      'Hickory kan niet naar zijn installatiemap schrijven: de app draait in de macOS-sandbox, die dat blokkeert ongeacht de maprechten. Download de nieuwe versie van GitHub en vervang de app in de Finder.';
+  String settingsUpdateInstallErrorPermission(String path) {
+    return 'Hickory kan zijn installatiemap niet vervangen ($path). Dat gebeurt wanneer de app van een ander gebruikersaccount is. Verplaats hem naar je eigen Programma\'s-map of werk handmatig bij via GitHub.';
+  }
 
   @override
   String get syncTitle => 'Synchronisatie-instellingen';

@@ -81,8 +81,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Installazione non riuscita. Riprova o scarica la nuova versione manualmente da GitHub.';
 
   @override
-  String get settingsUpdateInstallErrorPermission =>
-      'Hickory non può scrivere nella sua cartella di installazione: l\'app gira nella sandbox di macOS, che lo impedisce indipendentemente dai permessi della cartella. Scarica la nuova versione da GitHub e sostituisci l\'app nel Finder.';
+  String settingsUpdateInstallErrorPermission(String path) {
+    return 'Hickory non può sostituire la sua cartella di installazione ($path). Succede quando l\'app appartiene a un altro account utente. Spostala nella tua cartella Applicazioni oppure aggiorna manualmente da GitHub.';
+  }
 
   @override
   String get syncTitle => 'Impostazioni di sincronizzazione';

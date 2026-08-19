@@ -23,23 +23,21 @@ class UpdateInstallException implements Exception {
 
 /// Raised when the install directory's parent can't be written to.
 ///
-/// On macOS this is currently the *normal* outcome, not an edge case: the app
-/// ships with `com.apple.security.app-sandbox` (see
-/// macos/Runner/Release.entitlements), and a sandboxed app may only write
-/// inside its container. `/Applications` is therefore denied no matter who
-/// owns the bundle or which groups the account is in — verified 2026-08-19 on
-/// an admin account owning the bundle, where the same mkdir succeeds from a
-/// shell and fails from the app. [quitAndSwap]'s detached script inherits the
-/// sandbox too, so removing this probe would only move the failure past the
-/// point of no return.
+/// Up to 1.3.0 this was the *normal* macOS outcome, because the App Sandbox
+/// denied `/Applications` however the bundle was owned. 1.3.1 dropped the
+/// sandbox (docs/superpowers/specs/2026-08-19-macos-sandbox-removal-design.md),
+/// so this is an edge case again: it now means what it says — the account
+/// running the app cannot write there, typically because the bundle belongs to
+/// a different user.
 ///
 /// Distinct from [UpdateInstallException] so the Settings UI can name the
-/// manual download instead of the generic install-failed message. Revisit the
-/// wording once the sandbox is dropped (docs/superpowers/specs/
-/// 2026-08-19-macos-sandbox-removal-design.md), after which a genuine
-/// permission problem becomes the real cause again.
+/// offending directory and a remedy instead of the generic install-failed
+/// message.
 class UpdateInstallPermissionException extends UpdateInstallException {
-  UpdateInstallPermissionException(super.message);
+  UpdateInstallPermissionException(super.message, {required this.installParentPath});
+
+  /// The directory that could not be written to, so the UI can name it.
+  final String installParentPath;
 }
 
 /// Downloads, verifies, extracts, and installs an [UpdateInfo] on macOS/
@@ -217,6 +215,7 @@ class UpdateInstaller {
       throw UpdateInstallPermissionException(
         "Hickory can't write to its installation folder "
         '(${installDir.parent.path}).',
+        installParentPath: installDir.parent.path,
       );
     }
   }

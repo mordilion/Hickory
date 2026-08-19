@@ -21,7 +21,7 @@
   "settingsUpdateInstallButton": "Install now",
   "settingsUpdateInstalling": "Installing update...",
   "settingsUpdateInstallError": "Installation failed. Please try again or download the new version manually from GitHub.",
-  "settingsUpdateInstallErrorPermission": "Hickory can't write to its installation folder: the app runs in the macOS sandbox, which blocks that regardless of folder permissions. Download the new version from GitHub and replace the app in Finder.",
+  "settingsUpdateInstallErrorPermission": "Hickory can't replace its installation folder ({path}). That happens when the app belongs to a different user account. Move it to your own Applications folder, or update manually from GitHub.",
   "syncTitle": "Sync settings",
   "syncNoFolderSelected": "No folder selected – data stays only on this device.",
   "syncFolderPath": "Sync folder: {path}",

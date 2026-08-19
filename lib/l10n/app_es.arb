@@ -21,7 +21,7 @@
   "settingsUpdateInstallButton": "Instalar ahora",
   "settingsUpdateInstalling": "Instalando actualización...",
   "settingsUpdateInstallError": "La instalación falló. Inténtalo de nuevo o descarga la nueva versión manualmente desde GitHub.",
-  "settingsUpdateInstallErrorPermission": "Hickory no puede escribir en su carpeta de instalación: la app se ejecuta en la sandbox de macOS, que lo impide independientemente de los permisos de la carpeta. Descarga la nueva versión desde GitHub y reemplaza la app en el Finder.",
+  "settingsUpdateInstallErrorPermission": "Hickory no puede reemplazar su carpeta de instalación ({path}). Ocurre cuando la app pertenece a otra cuenta de usuario. Muévela a tu propia carpeta de Aplicaciones o actualiza manualmente desde GitHub.",
   "syncTitle": "Ajustes de sincronización",
   "syncNoFolderSelected": "Ninguna carpeta seleccionada: los datos permanecen solo en este dispositivo.",
   "syncFolderPath": "Carpeta de sincronización: {path}",

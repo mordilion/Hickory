@@ -74,11 +74,11 @@ class _UpdateSettingsScreenState extends ConsumerState<UpdateSettingsScreen> {
       final extracted = await installer.prepareUpdate(update);
       final writes = await writesFuture;
       await installer.quitAndSwap(extracted, db: db, writes: writes);
-    } on UpdateInstallPermissionException {
+    } on UpdateInstallPermissionException catch (error) {
       if (mounted) {
         setState(
-          () =>
-              _updateStatusMessage = l10n.settingsUpdateInstallErrorPermission,
+          () => _updateStatusMessage = l10n
+              .settingsUpdateInstallErrorPermission(error.installParentPath),
         );
       }
     } catch (_) {

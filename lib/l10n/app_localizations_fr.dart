@@ -81,8 +81,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'L\'installation a échoué. Veuillez réessayer ou télécharger la nouvelle version manuellement depuis GitHub.';
 
   @override
-  String get settingsUpdateInstallErrorPermission =>
-      'Hickory ne peut pas écrire dans son dossier d\'installation : l\'app fonctionne dans la sandbox macOS, ce qui l\'empêche quels que soient les droits du dossier. Téléchargez la nouvelle version depuis GitHub et remplacez l\'app dans le Finder.';
+  String settingsUpdateInstallErrorPermission(String path) {
+    return 'Hickory ne peut pas remplacer son dossier d\'installation ($path). Cela arrive lorsque l\'app appartient à un autre compte utilisateur. Déplacez-la dans votre propre dossier Applications, ou mettez à jour manuellement depuis GitHub.';
+  }
 
   @override
   String get syncTitle => 'Paramètres de synchronisation';

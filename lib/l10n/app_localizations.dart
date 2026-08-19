@@ -235,8 +235,8 @@ abstract class AppLocalizations {
   /// No description provided for @settingsUpdateInstallErrorPermission.
   ///
   /// In de, this message translates to:
-  /// **'Hickory kann nicht in seinen Installationsordner schreiben: Die App läuft in der macOS-Sandbox, die das unabhängig von den Ordnerrechten verhindert. Lade die neue Version von GitHub herunter und ersetze die App im Finder.'**
-  String get settingsUpdateInstallErrorPermission;
+  /// **'Hickory kann seinen Installationsordner nicht ersetzen ({path}). Das passiert, wenn die App einem anderen Benutzerkonto gehört. Verschiebe sie in deinen eigenen Programme-Ordner oder aktualisiere manuell über GitHub.'**
+  String settingsUpdateInstallErrorPermission(String path);
 
   /// No description provided for @syncTitle.
   ///
