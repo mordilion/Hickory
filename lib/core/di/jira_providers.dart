@@ -6,6 +6,8 @@ import '../../features/jira/jira_client.dart';
 import '../../features/jira/jira_credentials_store.dart';
 import '../../features/jira/jira_sync_service.dart';
 import '../../features/jira/secure_jira_credentials_store.dart';
+import '../../data/sync/auto_sync_trigger.dart';
+import '../../features/timer/timer_providers.dart';
 import 'database_provider.dart';
 import 'sync_providers.dart';
 
@@ -50,4 +52,48 @@ final jiraWorklogsByEntryIdProvider = StreamProvider<Map<String, JiraWorklogRow>
       .jiraWorklogsDao
       .watchAll()
       .map((rows) => {for (final row in rows) row.id: row});
+});
+
+/// How long the automatic reconciliation waits after a change before it
+/// runs, so editing several entries in a row costs one run instead of one
+/// per edit. Overridden in tests to keep them fast.
+final jiraAutoSyncDebounceProvider = Provider<Duration>(
+  (ref) => const Duration(seconds: 3),
+);
+
+/// Runs [JiraSyncService.syncNow] at app start and, debounced, after every
+/// time-entry write — otherwise a user who never opens the Sync tab never
+/// books to Jira, and an edit to an already-booked entry is never pushed
+/// (see docs/superpowers/specs/2026-08-19-sync-error-visibility-design.md
+/// §3). Deliberately no periodic timer: every run answers a real change,
+/// which keeps the load on Jira's per-account rate limit proportional to
+/// what the user actually did.
+///
+/// Silent by design. `syncNow` is idempotent and records its own per-entry
+/// outcome in the worklog row, which the entries list already shows, so a
+/// background run needs no dialog and a redundant one cannot corrupt
+/// state. Does nothing while Jira is unconfigured: no credentials must
+/// mean "skip", never an error written to every row.
+///
+/// Activated by watching it for the app's lifetime (see TimerScreen, which
+/// does the same for [syncWatcherProvider]).
+final jiraAutoSyncProvider = Provider<AutoSyncTrigger>((ref) {
+  final trigger = AutoSyncTrigger(
+    () async {
+      final service = await ref.read(jiraSyncServiceProvider.future);
+      if (service == null) return;
+      await service.syncNow();
+    },
+    debounce: ref.watch(jiraAutoSyncDebounceProvider),
+  );
+  ref.onDispose(trigger.dispose);
+
+  // Every local write lands in this stream, as does every entry ingested
+  // from another device — both are changes this device may have to push.
+  ref.listen(allEntriesProvider, (previous, next) {
+    if (next.hasValue) trigger.schedule();
+  });
+
+  trigger.schedule();
+  return trigger;
 });

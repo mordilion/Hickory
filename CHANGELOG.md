@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Book to Jira on its own. The reconciliation now runs at app start and, coalesced into one run per few seconds, after every entry that is created, stopped, edited or deleted — until now it only ever ran when the user pressed the button on the Sync tab, so an edit to an already-booked entry never reached Jira. It stays silent: the outcome shows up in each entry's status icon, and nothing happens at all while Jira is unconfigured.
 - Name the reason a Jira booking failed. The entry's red cloud icon carries the stored error message instead of the generic "Jira booking failed", which stays the tooltip for a failure recorded before this version.
 
 ## [1.3.2] - 2026-08-19

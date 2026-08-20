@@ -59,6 +59,12 @@ and on file-system events), so the app is inconsistent with itself here.
   periodic interval? Jira Cloud rate limits per account, and a user editing a week of entries
   could otherwise produce a burst. Recommendation: startup plus a debounced trigger on writes,
   no periodic timer.
+- **Decided 2026-08-20 (delegated to the implementer): the recommendation, i.e. startup plus a
+  debounced trigger on writes, no periodic timer.** Every run then answers a real change, so
+  the load on the rate limit stays proportional to what the user did, and there is no second
+  scheduling mechanism whose interval has to be reasoned about. The debounce window opens with
+  the first trigger and is not extended by later ones, so continuous editing cannot starve the
+  run.
 
 ## 4. Gap 3 — Personio has no per-entry status in the list
 

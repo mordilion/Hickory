@@ -9,6 +9,7 @@ import 'package:hickory/core/di/break_rule_tiers_provider.dart';
 import 'package:hickory/core/di/database_provider.dart';
 import 'package:hickory/core/di/device_id_provider.dart';
 import 'package:hickory/core/di/jira_providers.dart';
+import 'package:hickory/data/sync/auto_sync_trigger.dart';
 import 'package:hickory/core/di/sync_providers.dart';
 import 'package:hickory/core/theme/app_theme.dart';
 import 'package:hickory/core/widgets/gradient_buttons.dart';
@@ -50,6 +51,11 @@ void main() {
           allEntriesProvider.overrideWith((ref) => Stream.value(const [])),
           activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
           jiraWorklogsByEntryIdProvider.overrideWith((ref) => Stream.value(const {})),
+          // TimerScreen activates the background Jira reconciliation for the
+          // app's lifetime. A no-op trigger keeps it out of the test: the
+          // real one would reach the live database and leave its debounce
+          // timer pending past the end of the test.
+          jiraAutoSyncProvider.overrideWithValue(AutoSyncTrigger(() async {})),
           breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),
           appSettingsProvider.overrideWith(
             (ref) => Stream.value(

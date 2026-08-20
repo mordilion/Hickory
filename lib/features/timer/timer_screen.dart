@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/device_id_provider.dart';
+import '../../core/di/jira_providers.dart';
 import '../../core/di/sync_providers.dart';
 import '../../core/format/duration_format.dart';
 import '../../core/theme/hickory_colors.dart';
@@ -119,6 +120,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
     final runningAsync = ref.watch(runningEntryProvider);
     ref.watch(timerTickProvider);
     ref.watch(syncWatcherProvider);
+    // Both background triggers are activated here, from the tab that is
+    // always mounted (AppShell uses an IndexedStack), so they live as long
+    // as the app does.
+    ref.watch(jiraAutoSyncProvider);
 
     ref.listen<AsyncValue<int>>(idleSecondsProvider, (previous, next) {
       final idleSeconds = next.value;
