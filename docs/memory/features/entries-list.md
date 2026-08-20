@@ -36,6 +36,11 @@ the existing delete/edit paths. This feature is UI plus pure grouping logic.
   triangle: one offending day used to shout from every level above it.
 - **The break-rule verdict is computed once**, on the day group, because the roll-up counts
   offending days and the sub-header renders the warning.
+- **The Jira error tooltip shows the stored `lastError`**, not a generic string. The message
+  is already sanitised of credentials by `JiraSyncService._safeErrorMessage`, so the UI can
+  render it verbatim; the localised generic string is only the fallback for a row without a
+  stored message (an older row, or state received from another device before the message).
+  See docs/superpowers/specs/2026-08-19-sync-error-visibility-design.md §2.
 - Opening on the current week (falling back to the newest week with entries) replaced the
   earlier "expand the path to today" seed. Same intent, no stored expansion state.
 

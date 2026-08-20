@@ -6,6 +6,7 @@ import 'package:hickory/core/di/break_rule_tiers_provider.dart';
 import 'package:hickory/core/di/jira_providers.dart';
 import 'package:hickory/core/theme/app_theme.dart';
 import 'package:hickory/data/drift/database.dart';
+import 'package:hickory/data/drift/tables/jira_worklogs_table.dart';
 import 'package:hickory/features/entries/entries_list.dart';
 import 'package:hickory/features/entries/entries_location.dart';
 import 'package:hickory/features/projects/projects_providers.dart';
@@ -18,6 +19,7 @@ TimeEntry _entry({
   required DateTime startAt,
   required DateTime endAt,
   int totalPausedSeconds = 0,
+  String? jiraTicketKey,
 }) {
   final now = DateTime.utc(2026, 1, 1);
   return TimeEntry(
@@ -31,11 +33,21 @@ TimeEntry _entry({
     billableOverride: null,
     source: 'manual',
     deviceId: 'device-1',
-    jiraTicketKey: null,
+    jiraTicketKey: jiraTicketKey,
     createdAt: now,
     updatedAt: now,
   );
 }
+
+JiraWorklogRow _worklog({required String entryId, required String status, String? lastError}) =>
+    JiraWorklogRow(
+      id: entryId,
+      syncedTicketKey: null,
+      jiraWorklogId: null,
+      status: status,
+      lastError: lastError,
+      syncedAt: null,
+    );
 
 BreakRuleTier _tier({required int afterMinutes, required int requiredBreakMinutes}) {
   final now = DateTime.utc(2026, 1, 1);
@@ -59,13 +71,14 @@ void main() {
     List<BreakRuleTier> tiers = const [],
     bool countPausedTimeAsBreak = false,
     EntriesLocation? location,
+    Map<String, JiraWorklogRow> jiraWorklogs = const {},
   }) => ProviderScope(
         overrides: [
           if (location != null)
             entriesLocationControllerProvider.overrideWith(() => _FixedLocation(location)),
           allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
           activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
-          jiraWorklogsByEntryIdProvider.overrideWith((ref) => Stream.value(const {})),
+          jiraWorklogsByEntryIdProvider.overrideWith((ref) => Stream.value(jiraWorklogs)),
           breakRuleTiersProvider.overrideWith((ref) => Stream.value(tiers)),
           appSettingsProvider.overrideWith(
             (ref) => Stream.value(
@@ -405,6 +418,57 @@ void main() {
     await tester.tap(find.text('2024'));
     await tester.pumpAndSettle();
     expect(find.text('May'), findsOneWidget);
+  });
+
+  testWidgets("shows the stored Jira error in the failed entry's tooltip", (tester) async {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day, 9);
+    await tester.pumpWidget(
+      makeApp(
+        [
+          _entry(
+            id: '1',
+            startAt: start,
+            endAt: start.add(const Duration(hours: 1)),
+            jiraTicketKey: 'ABC-1',
+          ),
+        ],
+        jiraWorklogs: {
+          '1': _worklog(
+            entryId: '1',
+            status: JiraWorklogStatus.error,
+            lastError: 'Issue does not exist or you do not have permission',
+          ),
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byTooltip('Issue does not exist or you do not have permission'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('falls back to the generic message when no Jira error is stored', (tester) async {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day, 9);
+    await tester.pumpWidget(
+      makeApp(
+        [
+          _entry(
+            id: '1',
+            startAt: start,
+            endAt: start.add(const Duration(hours: 1)),
+            jiraTicketKey: 'ABC-1',
+          ),
+        ],
+        jiraWorklogs: {'1': _worklog(entryId: '1', status: JiraWorklogStatus.error)},
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Jira booking failed'), findsOneWidget);
   });
 
   testWidgets("opens on the current week, showing today's entries", (tester) async {

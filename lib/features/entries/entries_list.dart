@@ -187,6 +187,13 @@ class EntriesList extends ConsumerWidget {
   }
 }
 
+/// The stored sync error, or [fallback] when the row carries none.
+String _errorTooltip(String? lastError, String fallback) {
+  final message = lastError?.trim();
+  if (message == null || message.isEmpty) return fallback;
+  return message;
+}
+
 Widget? _jiraStatusIcon(
   AppLocalizations l10n,
   String? jiraTicketKey,
@@ -204,7 +211,11 @@ Widget? _jiraStatusIcon(
       ),
     ),
     JiraWorklogStatus.error => Tooltip(
-      message: l10n.entriesJiraStatusError,
+      // The reason is already stored -- and sanitised of credentials by
+      // JiraSyncService._safeErrorMessage -- so show it instead of the
+      // generic string. That stays the fallback for a row without one: an
+      // older row, or a device that received the state before the message.
+      message: _errorTooltip(worklog?.lastError, l10n.entriesJiraStatusError),
       child: const Icon(Icons.cloud_off_outlined, size: 18, color: Colors.red),
     ),
     _ => Tooltip(
