@@ -749,6 +749,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Registrazione Personio non riuscita';
 
   @override
+  String get syncFailedEntriesTitle => 'Voci non riuscite';
+
+  @override
   String get settingsResetTitle => 'Ripristina';
 
   @override

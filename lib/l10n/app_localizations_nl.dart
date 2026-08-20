@@ -752,6 +752,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get entriesPersonioStatusError => 'Personio-registratie mislukt';
 
   @override
+  String get syncFailedEntriesTitle => 'Mislukte vermeldingen';
+
+  @override
   String get settingsResetTitle => 'Resetten';
 
   @override

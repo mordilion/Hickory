@@ -1407,6 +1407,12 @@ abstract class AppLocalizations {
   /// **'Personio-Erfassung fehlgeschlagen'**
   String get entriesPersonioStatusError;
 
+  /// No description provided for @syncFailedEntriesTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Fehlgeschlagene Einträge'**
+  String get syncFailedEntriesTitle;
+
   /// No description provided for @settingsResetTitle.
   ///
   /// In de, this message translates to:

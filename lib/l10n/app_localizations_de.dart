@@ -751,6 +751,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get entriesPersonioStatusError => 'Personio-Erfassung fehlgeschlagen';
 
   @override
+  String get syncFailedEntriesTitle => 'Fehlgeschlagene Einträge';
+
+  @override
   String get settingsResetTitle => 'Zurücksetzen';
 
   @override

@@ -747,6 +747,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get entriesPersonioStatusError => 'Error al registrar en Personio';
 
   @override
+  String get syncFailedEntriesTitle => 'Entradas con errores';
+
+  @override
   String get settingsResetTitle => 'Restablecer';
 
   @override

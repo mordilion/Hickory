@@ -743,6 +743,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get entriesPersonioStatusError => 'Personio record failed';
 
   @override
+  String get syncFailedEntriesTitle => 'Failed entries';
+
+  @override
   String get settingsResetTitle => 'Reset';
 
   @override

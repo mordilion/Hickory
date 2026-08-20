@@ -242,6 +242,7 @@
   "entriesPersonioStatusSynced": "Enregistré dans Personio",
   "entriesPersonioStatusPending": "Enregistrement Personio en attente",
   "entriesPersonioStatusError": "Échec de l'enregistrement Personio",
+  "syncFailedEntriesTitle": "Entrées en échec",
   "settingsResetTitle": "Réinitialiser",
   "settingsResetDescription": "Supprime toutes les données locales de cet appareil (projets, clients, saisies de temps, paramètres, liens Jira/Personio), retire définitivement l'historique propre à cet appareil du dossier de synchronisation, puis le déconnecte. Les autres appareils ne sont pas concernés, mais ne pourront plus non plus voir l'historique retiré.",
   "settingsResetButton": "Tout réinitialiser",

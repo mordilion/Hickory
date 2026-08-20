@@ -757,6 +757,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec de l\'enregistrement Personio';
 
   @override
+  String get syncFailedEntriesTitle => 'Entrées en échec';
+
+  @override
   String get settingsResetTitle => 'Réinitialiser';
 
   @override

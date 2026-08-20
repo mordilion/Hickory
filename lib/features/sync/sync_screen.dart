@@ -2,12 +2,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/di/app_settings_provider.dart';
 import '../../core/di/jira_providers.dart';
 import '../../core/di/personio_providers.dart';
 import '../../core/di/sync_providers.dart';
+import '../../core/format/date_format.dart';
+import '../../data/drift/database.dart';
 import '../../l10n/app_localizations.dart';
+import '../entries/manual_entry_dialog.dart';
 import '../jira/jira_credentials_store.dart';
 import '../personio/personio_credentials_store.dart';
+import '../timer/timer_providers.dart';
+import 'failed_pushes.dart';
+import 'failed_pushes_list.dart';
 
 class SyncScreen extends ConsumerStatefulWidget {
   const SyncScreen({super.key});
@@ -390,10 +397,40 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
     return '${date.year}-${two(date.month)}-${two(date.day)}';
   }
 
+  /// The entries whose last Jira push failed. Read from the stored state
+  /// rather than from the last run's counts, so a failure from an automatic
+  /// background run is visible too -- most runs are automatic now (see
+  /// jiraAutoSyncProvider).
+  List<FailedPush> _failedJiraPushes() {
+    final worklogs =
+        ref.watch(jiraWorklogsByEntryIdProvider).value ??
+        const <String, JiraWorklogRow>{};
+    return failedPushes(
+      ref.watch(allEntriesProvider).value ?? const [],
+      jiraFailures(worklogs),
+    );
+  }
+
+  /// The entries whose last Personio push failed. Personio has no automatic
+  /// trigger, so these are always from a run the user started.
+  List<FailedPush> _failedPersonioPushes() {
+    final attendances =
+        ref.watch(personioAttendancesByEntryIdProvider).value ??
+        const <String, PersonioAttendanceRow>{};
+    return failedPushes(
+      ref.watch(allEntriesProvider).value ?? const [],
+      personioFailures(attendances),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final folderAsync = ref.watch(configuredSyncFolderPathProvider);
+    // Assigned first because AppSettingsStyles extends the *nullable* row.
+    final settings = ref.watch(appSettingsProvider).value;
+    final dateStyle = settings.dateStyle;
+    final localeName = Localizations.localeOf(context).languageCode;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -505,6 +542,14 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
+                        FailedPushesList(
+                          failed: _failedJiraPushes(),
+                          fallbackError: l10n.entriesJiraStatusError,
+                          dateStyle: dateStyle,
+                          localeName: localeName,
+                          onTapEntry: (entry) =>
+                              showManualEntryDialog(context, ref, existing: entry),
+                        ),
                         const SizedBox(height: 16),
                         Wrap(
                           spacing: 12,
@@ -635,6 +680,14 @@ class _SyncScreenState extends ConsumerState<SyncScreen> {
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
+                        FailedPushesList(
+                          failed: _failedPersonioPushes(),
+                          fallbackError: l10n.entriesPersonioStatusError,
+                          dateStyle: dateStyle,
+                          localeName: localeName,
+                          onTapEntry: (entry) =>
+                              showManualEntryDialog(context, ref, existing: entry),
+                        ),
                         const SizedBox(height: 16),
                         FilledButton(
                           onPressed: _personioBusy ? null : _pushPersonio,

@@ -242,6 +242,7 @@
   "entriesPersonioStatusSynced": "Registrato su Personio",
   "entriesPersonioStatusPending": "Registrazione Personio in sospeso",
   "entriesPersonioStatusError": "Registrazione Personio non riuscita",
+  "syncFailedEntriesTitle": "Voci non riuscite",
   "settingsResetTitle": "Ripristina",
   "settingsResetDescription": "Elimina tutti i dati locali di questo dispositivo (progetti, clienti, voci di tempo, impostazioni, collegamenti Jira/Personio), rimuove definitivamente la cronologia di questo dispositivo dalla cartella di sincronizzazione e lo disconnette. Gli altri dispositivi non vengono interessati, ma non potranno più vedere la cronologia rimossa.",
   "settingsResetButton": "Ripristina tutto",

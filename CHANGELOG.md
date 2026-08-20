@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Name what failed on the Sync tab. Under each service's result, the entries whose last push failed are listed with their date and the stored reason, and tapping one opens it for editing — the counts said that something went wrong but never what or where. The list is driven by the stored state, so a failure from an automatic background run shows up too.
 - Show each entry's Personio state in the list, next to the Jira one: a calendar icon that is green once the entry has been recorded and red when the push failed, carrying the reason. Entries that were never pushed stay unmarked — Personio has no per-entry opt-in, so an icon on every row would say nothing.
 
 ### Changed

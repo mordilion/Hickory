@@ -242,6 +242,7 @@
   "entriesPersonioStatusSynced": "Recorded in Personio",
   "entriesPersonioStatusPending": "Personio record pending",
   "entriesPersonioStatusError": "Personio record failed",
+  "syncFailedEntriesTitle": "Failed entries",
   "settingsResetTitle": "Reset",
   "settingsResetDescription": "Deletes all of this device's local data (projects, clients, time entries, settings, Jira/Personio links), permanently removes this device's own history from the sync folder, and disconnects it. Other devices are not affected, but can no longer see the removed history either.",
   "settingsResetButton": "Reset everything",
