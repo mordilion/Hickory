@@ -41,6 +41,14 @@ the existing delete/edit paths. This feature is UI plus pure grouping logic.
   render it verbatim; the localised generic string is only the fallback for a row without a
   stored message (an older row, or state received from another device before the message).
   See docs/superpowers/specs/2026-08-19-sync-error-visibility-design.md §2.
+- **The Personio icon appears only once an attendance row exists**, unlike the Jira one, which
+  keys off the entry's `jiraTicketKey`. Personio has no per-entry opt-in, so "no row" is the
+  only available signal for "never pushed" — and a permanent pending icon on every entry would
+  carry no information. Rows only ever reach `synced` or `error` in practice.
+- **The two services use different icon families** (Jira: cloud, Personio: calendar) because
+  both icons can sit side by side in the same row, where two clouds would be indistinguishable.
+  The shared `_statusIcon` helper renders them; each service keeps its own status → icon switch,
+  which is per-service configuration rather than duplication.
 - Opening on the current week (falling back to the newest week with entries) replaced the
   earlier "expand the path to today" seed. Same intent, no stored expansion state.
 
@@ -63,6 +71,13 @@ the existing delete/edit paths. This feature is UI plus pure grouping logic.
   so `find.ancestor(of: find.text('Today'), matching: find.byType(Row))` pins an assertion
   to that day. Over single-level data the identical numbers also appear on rolled-up rows,
   and a bare `find.text` matches several times.
+- **Any widget test that mounts `EntriesList` must override *both*
+  `jiraWorklogsByEntryIdProvider` and `personioAttendancesByEntryIdProvider`** with static
+  streams. Leaving one out makes the tree subscribe to a live drift `QueryStream` against a real
+  database, and the failure surfaces as flutter_test's "A Timer is still pending even after the
+  widget tree was disposed" — which points nowhere near the missing override. The same applies
+  to `TimerScreen`, which additionally needs `jiraAutoSyncProvider` overridden with an inert
+  `AutoSyncTrigger(() async {})`.
 - `formatDuration` output is compared verbatim in tests (`'01:00'`), which depends on the
   `24h` setting the test harnesses override. Changing that override changes those strings.
 

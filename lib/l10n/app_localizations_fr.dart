@@ -746,6 +746,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get entriesJiraStatusError => 'Échec de l\'enregistrement Jira';
 
   @override
+  String get entriesPersonioStatusSynced => 'Enregistré dans Personio';
+
+  @override
+  String get entriesPersonioStatusPending =>
+      'Enregistrement Personio en attente';
+
+  @override
+  String get entriesPersonioStatusError =>
+      'Échec de l\'enregistrement Personio';
+
+  @override
   String get settingsResetTitle => 'Réinitialiser';
 
   @override

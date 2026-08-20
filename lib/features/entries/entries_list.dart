@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../core/di/app_settings_provider.dart';
 import '../../core/di/break_rule_tiers_provider.dart';
 import '../../core/di/jira_providers.dart';
+import '../../core/di/personio_providers.dart';
 import '../../core/di/sync_providers.dart';
 import '../../core/format/date_format.dart';
 import '../../core/format/duration_format.dart';
@@ -12,6 +13,7 @@ import '../../core/format/iso_week.dart';
 import '../../core/theme/hickory_colors.dart';
 import '../../data/drift/database.dart';
 import '../../data/drift/tables/jira_worklogs_table.dart';
+import '../../data/drift/tables/personio_attendances_table.dart';
 import '../../data/drift/time_entry_extensions.dart';
 import '../../l10n/app_localizations.dart';
 import '../projects/projects_providers.dart';
@@ -29,6 +31,7 @@ class EntriesList extends ConsumerWidget {
     final entriesAsync = ref.watch(allEntriesProvider);
     final projectsAsync = ref.watch(activeProjectsProvider);
     final jiraWorklogsAsync = ref.watch(jiraWorklogsByEntryIdProvider);
+    final personioAttendancesAsync = ref.watch(personioAttendancesByEntryIdProvider);
     final tiersAsync = ref.watch(breakRuleTiersProvider);
     final settings = ref.watch(appSettingsProvider).value;
     final dateStyle = settings.dateStyle;
@@ -46,6 +49,8 @@ class EntriesList extends ConsumerWidget {
         };
         final jiraWorklogsById =
             jiraWorklogsAsync.value ?? const <String, JiraWorklogRow>{};
+        final personioAttendancesById =
+            personioAttendancesAsync.value ?? const <String, PersonioAttendanceRow>{};
         final tiers = tiersAsync.value ?? const <BreakRuleTier>[];
         final years = buildEntryTree(
           finished,
@@ -168,6 +173,7 @@ class EntriesList extends ConsumerWidget {
                           entries: day.entries,
                           projectsById: projectsById,
                           jiraWorklogsById: jiraWorklogsById,
+                          personioAttendancesById: personioAttendancesById,
                           timeStyle: timeStyle,
                           l10n: l10n,
                         ),
@@ -194,37 +200,66 @@ String _errorTooltip(String? lastError, String fallback) {
   return message;
 }
 
+Widget _statusIcon(IconData icon, Color color, String tooltip) =>
+    Tooltip(message: tooltip, child: Icon(icon, size: 18, color: color));
+
+/// The entry's Jira booking state, or null when it carries no ticket and so
+/// was never meant to be booked. Cloud icons; Personio uses the calendar
+/// family so the two are told apart at a glance when both are shown.
 Widget? _jiraStatusIcon(
   AppLocalizations l10n,
   String? jiraTicketKey,
   JiraWorklogRow? worklog,
 ) {
   if (jiraTicketKey == null) return null;
-  final status = worklog?.status;
-  return switch (status) {
-    JiraWorklogStatus.synced => Tooltip(
-      message: l10n.entriesJiraStatusSynced,
-      child: const Icon(
-        Icons.cloud_done_outlined,
-        size: 18,
-        color: Colors.green,
-      ),
+  return switch (worklog?.status) {
+    JiraWorklogStatus.synced => _statusIcon(
+      Icons.cloud_done_outlined,
+      Colors.green,
+      l10n.entriesJiraStatusSynced,
     ),
-    JiraWorklogStatus.error => Tooltip(
-      // The reason is already stored -- and sanitised of credentials by
-      // JiraSyncService._safeErrorMessage -- so show it instead of the
-      // generic string. That stays the fallback for a row without one: an
-      // older row, or a device that received the state before the message.
-      message: _errorTooltip(worklog?.lastError, l10n.entriesJiraStatusError),
-      child: const Icon(Icons.cloud_off_outlined, size: 18, color: Colors.red),
+    // The reason is already stored -- and sanitised of credentials by
+    // JiraSyncService._safeErrorMessage -- so show it instead of the
+    // generic string. That stays the fallback for a row without one: an
+    // older row, or a device that received the state before the message.
+    JiraWorklogStatus.error => _statusIcon(
+      Icons.cloud_off_outlined,
+      Colors.red,
+      _errorTooltip(worklog?.lastError, l10n.entriesJiraStatusError),
     ),
-    _ => Tooltip(
-      message: l10n.entriesJiraStatusPending,
-      child: Icon(
-        Icons.cloud_upload_outlined,
-        size: 18,
-        color: Colors.grey.shade600,
-      ),
+    _ => _statusIcon(
+      Icons.cloud_upload_outlined,
+      Colors.grey.shade600,
+      l10n.entriesJiraStatusPending,
+    ),
+  };
+}
+
+/// The entry's Personio state, or null when it has never been pushed.
+/// Personio has no per-entry opt-in like Jira's ticket key, so the absence
+/// of an attendance row is the only thing that distinguishes "not pushed"
+/// from "pushed" -- and a permanent pending icon on every entry would say
+/// nothing.
+Widget? _personioStatusIcon(
+  AppLocalizations l10n,
+  PersonioAttendanceRow? attendance,
+) {
+  if (attendance == null) return null;
+  return switch (attendance.status) {
+    PersonioAttendanceStatus.synced => _statusIcon(
+      Icons.event_available_outlined,
+      Colors.green,
+      l10n.entriesPersonioStatusSynced,
+    ),
+    PersonioAttendanceStatus.error => _statusIcon(
+      Icons.event_busy_outlined,
+      Colors.red,
+      _errorTooltip(attendance.lastError, l10n.entriesPersonioStatusError),
+    ),
+    _ => _statusIcon(
+      Icons.event_note_outlined,
+      Colors.grey.shade600,
+      l10n.entriesPersonioStatusPending,
     ),
   };
 }
@@ -239,6 +274,7 @@ class _DayEntriesBlock extends ConsumerWidget {
     required this.entries,
     required this.projectsById,
     required this.jiraWorklogsById,
+    required this.personioAttendancesById,
     required this.timeStyle,
     required this.l10n,
   });
@@ -246,6 +282,7 @@ class _DayEntriesBlock extends ConsumerWidget {
   final List<TimeEntry> entries;
   final Map<String, Project> projectsById;
   final Map<String, JiraWorklogRow> jiraWorklogsById;
+  final Map<String, PersonioAttendanceRow> personioAttendancesById;
   final TimeFormatStyle timeStyle;
   final AppLocalizations l10n;
 
@@ -264,6 +301,7 @@ class _DayEntriesBlock extends ConsumerWidget {
                   ? null
                   : projectsById[entry.projectId],
               jiraWorklog: jiraWorklogsById[entry.id],
+              personioAttendance: personioAttendancesById[entry.id],
               timeStyle: timeStyle,
               l10n: l10n,
               onTap: () => showManualEntryDialog(context, ref, existing: entry),
@@ -290,6 +328,7 @@ class _EntryTile extends StatelessWidget {
     required this.entry,
     required this.project,
     required this.jiraWorklog,
+    required this.personioAttendance,
     required this.timeStyle,
     required this.l10n,
     required this.onTap,
@@ -299,6 +338,7 @@ class _EntryTile extends StatelessWidget {
   final TimeEntry entry;
   final Project? project;
   final JiraWorklogRow? jiraWorklog;
+  final PersonioAttendanceRow? personioAttendance;
   final TimeFormatStyle timeStyle;
   final AppLocalizations l10n;
   final VoidCallback onTap;
@@ -311,6 +351,8 @@ class _EntryTile extends StatelessWidget {
       entry.jiraTicketKey,
       jiraWorklog,
     );
+    final personioStatusIcon = _personioStatusIcon(l10n, personioAttendance);
+    final statusIcons = [?jiraStatusIcon, ?personioStatusIcon];
     final duration = entry.workedDuration;
     return Dismissible(
       key: ValueKey(entry.id),
@@ -340,16 +382,13 @@ class _EntryTile extends StatelessWidget {
           '${formatTime(entry.startAt, timeStyle)} – '
           '${formatTime(entry.endAt!, timeStyle)}',
         ),
-        trailing: jiraStatusIcon == null
-            ? Text(formatDuration(duration, timeStyle))
-            : Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  jiraStatusIcon,
-                  const SizedBox(width: 6),
-                  Text(formatDuration(duration, timeStyle)),
-                ],
-              ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final icon in statusIcons) ...[icon, const SizedBox(width: 6)],
+            Text(formatDuration(duration, timeStyle)),
+          ],
+        ),
         onTap: onTap,
       ),
     );

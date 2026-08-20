@@ -1389,6 +1389,24 @@ abstract class AppLocalizations {
   /// **'Jira-Buchung fehlgeschlagen'**
   String get entriesJiraStatusError;
 
+  /// No description provided for @entriesPersonioStatusSynced.
+  ///
+  /// In de, this message translates to:
+  /// **'In Personio erfasst'**
+  String get entriesPersonioStatusSynced;
+
+  /// No description provided for @entriesPersonioStatusPending.
+  ///
+  /// In de, this message translates to:
+  /// **'Personio-Erfassung ausstehend'**
+  String get entriesPersonioStatusPending;
+
+  /// No description provided for @entriesPersonioStatusError.
+  ///
+  /// In de, this message translates to:
+  /// **'Personio-Erfassung fehlgeschlagen'**
+  String get entriesPersonioStatusError;
+
   /// No description provided for @settingsResetTitle.
   ///
   /// In de, this message translates to:

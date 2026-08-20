@@ -738,6 +738,17 @@ class AppLocalizationsIt extends AppLocalizations {
   String get entriesJiraStatusError => 'Registrazione Jira non riuscita';
 
   @override
+  String get entriesPersonioStatusSynced => 'Registrato su Personio';
+
+  @override
+  String get entriesPersonioStatusPending =>
+      'Registrazione Personio in sospeso';
+
+  @override
+  String get entriesPersonioStatusError =>
+      'Registrazione Personio non riuscita';
+
+  @override
   String get settingsResetTitle => 'Ripristina';
 
   @override

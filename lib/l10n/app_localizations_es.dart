@@ -738,6 +738,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get entriesJiraStatusError => 'Error al registrar en Jira';
 
   @override
+  String get entriesPersonioStatusSynced => 'Registrado en Personio';
+
+  @override
+  String get entriesPersonioStatusPending => 'Registro en Personio pendiente';
+
+  @override
+  String get entriesPersonioStatusError => 'Error al registrar en Personio';
+
+  @override
   String get settingsResetTitle => 'Restablecer';
 
   @override

@@ -742,6 +742,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get entriesJiraStatusError => 'Jira-boeking mislukt';
 
   @override
+  String get entriesPersonioStatusSynced => 'Geregistreerd in Personio';
+
+  @override
+  String get entriesPersonioStatusPending =>
+      'Personio-registratie in behandeling';
+
+  @override
+  String get entriesPersonioStatusError => 'Personio-registratie mislukt';
+
+  @override
   String get settingsResetTitle => 'Resetten';
 
   @override

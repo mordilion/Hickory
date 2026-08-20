@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/drift/database.dart';
 import '../../features/personio/http_personio_client.dart';
 import '../../features/personio/personio_client.dart';
 import '../../features/personio/personio_credentials_store.dart';
@@ -47,3 +48,17 @@ final personioSyncServiceProvider = FutureProvider<PersonioSyncService?>((ref) a
 final personioLatestSyncedAtProvider = FutureProvider<DateTime?>((ref) {
   return ref.watch(appDatabaseProvider).personioAttendancesDao.latestSyncedAt();
 });
+
+/// All Personio attendance tracking rows keyed by time-entry id, for the
+/// entries list's per-entry status indicator — the mirror of
+/// [jiraWorklogsByEntryIdProvider]. A missing row means the entry was never
+/// pushed: unlike Jira, Personio has no per-entry opt-in to distinguish
+/// "not wanted" from "not yet done".
+final personioAttendancesByEntryIdProvider =
+    StreamProvider<Map<String, PersonioAttendanceRow>>((ref) {
+      return ref
+          .watch(appDatabaseProvider)
+          .personioAttendancesDao
+          .watchAll()
+          .map((rows) => {for (final row in rows) row.id: row});
+    });

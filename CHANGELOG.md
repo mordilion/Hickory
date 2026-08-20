@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Show a progress bar while an update installs: a real percentage with megabytes during the download, then a labelled bar for verifying the checksum and unpacking, which cannot report progress.
 
+### Added
+
+- Show each entry's Personio state in the list, next to the Jira one: a calendar icon that is green once the entry has been recorded and red when the push failed, carrying the reason. Entries that were never pushed stay unmarked — Personio has no per-entry opt-in, so an icon on every row would say nothing.
+
 ### Changed
 
 - Book to Jira on its own. The reconciliation now runs at app start and, coalesced into one run per few seconds, after every entry that is created, stopped, edited or deleted — until now it only ever ran when the user pressed the button on the Sync tab, so an edit to an already-booked entry never reached Jira. It stays silent: the outcome shows up in each entry's status icon, and nothing happens at all while Jira is unconfigured.

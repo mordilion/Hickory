@@ -4,9 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/core/di/break_rule_tiers_provider.dart';
 import 'package:hickory/core/di/jira_providers.dart';
+import 'package:hickory/core/di/personio_providers.dart';
 import 'package:hickory/core/theme/app_theme.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/drift/tables/jira_worklogs_table.dart';
+import 'package:hickory/data/drift/tables/personio_attendances_table.dart';
 import 'package:hickory/features/entries/entries_list.dart';
 import 'package:hickory/features/entries/entries_location.dart';
 import 'package:hickory/features/projects/projects_providers.dart';
@@ -49,6 +51,18 @@ JiraWorklogRow _worklog({required String entryId, required String status, String
       syncedAt: null,
     );
 
+PersonioAttendanceRow _attendance({
+  required String entryId,
+  required String status,
+  String? lastError,
+}) => PersonioAttendanceRow(
+  id: entryId,
+  personioAttendanceId: null,
+  status: status,
+  lastError: lastError,
+  syncedAt: null,
+);
+
 BreakRuleTier _tier({required int afterMinutes, required int requiredBreakMinutes}) {
   final now = DateTime.utc(2026, 1, 1);
   return BreakRuleTier(
@@ -72,6 +86,7 @@ void main() {
     bool countPausedTimeAsBreak = false,
     EntriesLocation? location,
     Map<String, JiraWorklogRow> jiraWorklogs = const {},
+    Map<String, PersonioAttendanceRow> personioAttendances = const {},
   }) => ProviderScope(
         overrides: [
           if (location != null)
@@ -79,6 +94,9 @@ void main() {
           allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
           activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
           jiraWorklogsByEntryIdProvider.overrideWith((ref) => Stream.value(jiraWorklogs)),
+          personioAttendancesByEntryIdProvider.overrideWith(
+            (ref) => Stream.value(personioAttendances),
+          ),
           breakRuleTiersProvider.overrideWith((ref) => Stream.value(tiers)),
           appSettingsProvider.overrideWith(
             (ref) => Stream.value(
@@ -469,6 +487,113 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byTooltip('Jira booking failed'), findsOneWidget);
+  });
+
+  testWidgets('shows no Personio icon for an entry that was never pushed', (tester) async {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day, 9);
+    await tester.pumpWidget(
+      makeApp([
+        _entry(id: '1', startAt: start, endAt: start.add(const Duration(hours: 1))),
+      ]),
+    );
+    await tester.pumpAndSettle();
+
+    // Personio has no per-entry opt-in: without an attendance row the entry
+    // was simply never pushed, and a permanent "pending" icon on every row
+    // would be noise rather than information.
+    expect(find.byIcon(Icons.event_available_outlined), findsNothing);
+    expect(find.byIcon(Icons.event_busy_outlined), findsNothing);
+  });
+
+  testWidgets('marks a pushed entry as recorded in Personio', (tester) async {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day, 9);
+    await tester.pumpWidget(
+      makeApp(
+        [
+          _entry(id: '1', startAt: start, endAt: start.add(const Duration(hours: 1))),
+        ],
+        personioAttendances: {
+          '1': _attendance(entryId: '1', status: PersonioAttendanceStatus.synced),
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Recorded in Personio'), findsOneWidget);
+  });
+
+  testWidgets("shows the stored Personio error in the failed entry's tooltip", (tester) async {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day, 9);
+    await tester.pumpWidget(
+      makeApp(
+        [
+          _entry(id: '1', startAt: start, endAt: start.add(const Duration(hours: 1))),
+        ],
+        personioAttendances: {
+          '1': _attendance(
+            entryId: '1',
+            status: PersonioAttendanceStatus.error,
+            lastError: 'Attendance period overlaps an existing one',
+          ),
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byTooltip('Attendance period overlaps an existing one'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('falls back to the generic message when no Personio error is stored', (
+    tester,
+  ) async {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day, 9);
+    await tester.pumpWidget(
+      makeApp(
+        [
+          _entry(id: '1', startAt: start, endAt: start.add(const Duration(hours: 1))),
+        ],
+        personioAttendances: {
+          '1': _attendance(entryId: '1', status: PersonioAttendanceStatus.error),
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Personio record failed'), findsOneWidget);
+  });
+
+  testWidgets('shows the Jira and Personio status side by side', (tester) async {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day, 9);
+    await tester.pumpWidget(
+      makeApp(
+        [
+          _entry(
+            id: '1',
+            startAt: start,
+            endAt: start.add(const Duration(hours: 1)),
+            jiraTicketKey: 'ABC-1',
+          ),
+        ],
+        jiraWorklogs: {'1': _worklog(entryId: '1', status: JiraWorklogStatus.synced)},
+        personioAttendances: {
+          '1': _attendance(entryId: '1', status: PersonioAttendanceStatus.synced),
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Booked in Jira'), findsOneWidget);
+    expect(find.byTooltip('Recorded in Personio'), findsOneWidget);
+    // The duration keeps its place next to them.
+    expect(find.text('01:00'), findsWidgets);
   });
 
   testWidgets("opens on the current week, showing today's entries", (tester) async {

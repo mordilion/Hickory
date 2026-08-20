@@ -8,6 +8,7 @@ import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/core/di/break_rule_tiers_provider.dart';
 import 'package:hickory/core/di/device_id_provider.dart';
 import 'package:hickory/core/di/jira_providers.dart';
+import 'package:hickory/core/di/personio_providers.dart';
 import 'package:hickory/core/di/sync_providers.dart';
 import 'package:hickory/core/theme/app_theme.dart';
 import 'package:hickory/data/drift/database.dart';
@@ -70,6 +71,9 @@ void main() {
       archivedClientsProvider.overrideWith((ref) => Stream.value(const [])),
       allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
       jiraWorklogsByEntryIdProvider.overrideWith(
+        (ref) => Stream.value(const {}),
+      ),
+      personioAttendancesByEntryIdProvider.overrideWith(
         (ref) => Stream.value(const {}),
       ),
       breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),

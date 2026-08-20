@@ -742,6 +742,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get entriesJiraStatusError => 'Jira-Buchung fehlgeschlagen';
 
   @override
+  String get entriesPersonioStatusSynced => 'In Personio erfasst';
+
+  @override
+  String get entriesPersonioStatusPending => 'Personio-Erfassung ausstehend';
+
+  @override
+  String get entriesPersonioStatusError => 'Personio-Erfassung fehlgeschlagen';
+
+  @override
   String get settingsResetTitle => 'Zurücksetzen';
 
   @override
