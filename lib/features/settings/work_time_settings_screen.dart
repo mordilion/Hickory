@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
+import 'balance_rule_editor.dart';
 import 'settings_sub_page.dart';
 import 'work_time_targets_editor.dart';
 
@@ -20,6 +21,13 @@ class WorkTimeSettingsScreen extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(16),
               child: WorkTimeTargetsEditor(),
+            ),
+          ),
+          SizedBox(height: 16),
+          Card(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: BalanceRuleEditor(),
             ),
           ),
         ],

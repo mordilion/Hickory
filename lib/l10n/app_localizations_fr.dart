@@ -526,6 +526,40 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible d\'enregistrer le temps de travail.';
 
   @override
+  String get settingsBalanceTitle => 'Compteur';
+
+  @override
+  String get settingsBalanceDescription =>
+      'Définit ce qu\'il advient du solde accumulé à la date de clôture.';
+
+  @override
+  String get settingsBalanceModeNone => 'Aucune clôture';
+
+  @override
+  String get settingsBalanceModeReset => 'Remettre à zéro';
+
+  @override
+  String get settingsBalanceModeCarryOver => 'Report plafonné';
+
+  @override
+  String get settingsBalanceCutoff => 'Date de clôture';
+
+  @override
+  String get settingsBalanceCutoffMissing =>
+      'Veuillez choisir une date de clôture.';
+
+  @override
+  String get settingsBalanceCarryOverMax => 'Reporter au maximum (heures)';
+
+  @override
+  String get settingsBalanceCarryOverMin =>
+      'Reporter au maximum ce déficit (heures)';
+
+  @override
+  String get settingsBalanceBoundMissing =>
+      'Veuillez définir au moins une limite.';
+
+  @override
   String get settingsProjectsTitle => 'Projets';
 
   @override

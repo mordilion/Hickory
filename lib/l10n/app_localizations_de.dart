@@ -521,6 +521,39 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Arbeitszeit konnte nicht gespeichert werden.';
 
   @override
+  String get settingsBalanceTitle => 'Zeitkonto';
+
+  @override
+  String get settingsBalanceDescription =>
+      'Legt fest, was am Stichtag mit dem angesammelten Saldo passiert.';
+
+  @override
+  String get settingsBalanceModeNone => 'Kein Stichtag';
+
+  @override
+  String get settingsBalanceModeReset => 'Auf 0 setzen';
+
+  @override
+  String get settingsBalanceModeCarryOver => 'Übertrag mit Kappung';
+
+  @override
+  String get settingsBalanceCutoff => 'Stichtag';
+
+  @override
+  String get settingsBalanceCutoffMissing => 'Bitte einen Stichtag wählen.';
+
+  @override
+  String get settingsBalanceCarryOverMax => 'Höchstens übertragen (Stunden)';
+
+  @override
+  String get settingsBalanceCarryOverMin =>
+      'Höchstens Minus übertragen (Stunden)';
+
+  @override
+  String get settingsBalanceBoundMissing =>
+      'Bitte mindestens eine Grenze angeben.';
+
+  @override
   String get settingsProjectsTitle => 'Projekte';
 
   @override

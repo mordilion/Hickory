@@ -10,6 +10,7 @@ import '../../data/drift/database.dart';
 import '../../features/reports/balance_calculations.dart' show targetMinutesForWeekday;
 import '../../l10n/app_localizations.dart';
 import 'weekly_target_distribution.dart';
+import 'work_time_format.dart';
 
 /// Settings editor for the per-weekday work-time target. Two input modes
 /// over the same seven stored values: seven day fields, or one weekly
@@ -153,22 +154,6 @@ class _WorkTimeTargetsEditorState extends ConsumerState<WorkTimeTargetsEditor> {
 String weekdayName(BuildContext context, int weekday) {
   final localeName = Localizations.localeOf(context).toLanguageTag();
   return DateFormat.EEEE(localeName).format(DateTime(2024, 1, weekday));
-}
-
-/// Parses an hours field ("7,7" or "7.7") into whole minutes; null when the
-/// text is not a number.
-int? hoursTextToMinutes(String text) {
-  final hours = double.tryParse(text.trim().replaceAll(',', '.'));
-  if (hours == null) return null;
-  return (hours * 60).round();
-}
-
-String minutesToHoursText(int minutes) {
-  if (minutes == 0) return '';
-  final hours = minutes / 60;
-  return hours == hours.roundToDouble()
-      ? hours.round().toString()
-      : hours.toStringAsFixed(2).replaceAll('.', ',');
 }
 
 /// Seven day fields, one per weekday. Stateful (not a plain

@@ -521,6 +521,38 @@ class AppLocalizationsIt extends AppLocalizations {
       'Impossibile salvare l\'orario di lavoro.';
 
   @override
+  String get settingsBalanceTitle => 'Saldo ore';
+
+  @override
+  String get settingsBalanceDescription =>
+      'Definisce cosa accade al saldo accumulato alla data di chiusura.';
+
+  @override
+  String get settingsBalanceModeNone => 'Nessuna chiusura';
+
+  @override
+  String get settingsBalanceModeReset => 'Azzerare';
+
+  @override
+  String get settingsBalanceModeCarryOver => 'Riporto con tetto';
+
+  @override
+  String get settingsBalanceCutoff => 'Data di chiusura';
+
+  @override
+  String get settingsBalanceCutoffMissing => 'Scegli una data di chiusura.';
+
+  @override
+  String get settingsBalanceCarryOverMax => 'Riportare al massimo (ore)';
+
+  @override
+  String get settingsBalanceCarryOverMin =>
+      'Riportare al massimo questo deficit (ore)';
+
+  @override
+  String get settingsBalanceBoundMissing => 'Indica almeno un limite.';
+
+  @override
   String get settingsProjectsTitle => 'Progetti';
 
   @override

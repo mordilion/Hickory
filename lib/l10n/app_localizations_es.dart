@@ -521,6 +521,38 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsWorkTimeSaveError => 'No se pudo guardar la jornada.';
 
   @override
+  String get settingsBalanceTitle => 'Saldo horario';
+
+  @override
+  String get settingsBalanceDescription =>
+      'Define qué ocurre con el saldo acumulado en la fecha de corte.';
+
+  @override
+  String get settingsBalanceModeNone => 'Sin corte';
+
+  @override
+  String get settingsBalanceModeReset => 'Poner a cero';
+
+  @override
+  String get settingsBalanceModeCarryOver => 'Arrastre con tope';
+
+  @override
+  String get settingsBalanceCutoff => 'Fecha de corte';
+
+  @override
+  String get settingsBalanceCutoffMissing => 'Elige una fecha de corte.';
+
+  @override
+  String get settingsBalanceCarryOverMax => 'Arrastrar como máximo (horas)';
+
+  @override
+  String get settingsBalanceCarryOverMin =>
+      'Arrastrar como máximo este déficit (horas)';
+
+  @override
+  String get settingsBalanceBoundMissing => 'Indica al menos un límite.';
+
+  @override
   String get settingsProjectsTitle => 'Proyectos';
 
   @override

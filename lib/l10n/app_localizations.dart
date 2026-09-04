@@ -981,6 +981,66 @@ abstract class AppLocalizations {
   /// **'Die Arbeitszeit konnte nicht gespeichert werden.'**
   String get settingsWorkTimeSaveError;
 
+  /// No description provided for @settingsBalanceTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeitkonto'**
+  String get settingsBalanceTitle;
+
+  /// No description provided for @settingsBalanceDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Legt fest, was am Stichtag mit dem angesammelten Saldo passiert.'**
+  String get settingsBalanceDescription;
+
+  /// No description provided for @settingsBalanceModeNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Kein Stichtag'**
+  String get settingsBalanceModeNone;
+
+  /// No description provided for @settingsBalanceModeReset.
+  ///
+  /// In de, this message translates to:
+  /// **'Auf 0 setzen'**
+  String get settingsBalanceModeReset;
+
+  /// No description provided for @settingsBalanceModeCarryOver.
+  ///
+  /// In de, this message translates to:
+  /// **'Übertrag mit Kappung'**
+  String get settingsBalanceModeCarryOver;
+
+  /// No description provided for @settingsBalanceCutoff.
+  ///
+  /// In de, this message translates to:
+  /// **'Stichtag'**
+  String get settingsBalanceCutoff;
+
+  /// No description provided for @settingsBalanceCutoffMissing.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte einen Stichtag wählen.'**
+  String get settingsBalanceCutoffMissing;
+
+  /// No description provided for @settingsBalanceCarryOverMax.
+  ///
+  /// In de, this message translates to:
+  /// **'Höchstens übertragen (Stunden)'**
+  String get settingsBalanceCarryOverMax;
+
+  /// No description provided for @settingsBalanceCarryOverMin.
+  ///
+  /// In de, this message translates to:
+  /// **'Höchstens Minus übertragen (Stunden)'**
+  String get settingsBalanceCarryOverMin;
+
+  /// No description provided for @settingsBalanceBoundMissing.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte mindestens eine Grenze angeben.'**
+  String get settingsBalanceBoundMissing;
+
   /// No description provided for @settingsProjectsTitle.
   ///
   /// In de, this message translates to:

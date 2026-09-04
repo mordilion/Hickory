@@ -517,6 +517,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsWorkTimeSaveError => 'Could not save the work time.';
 
   @override
+  String get settingsBalanceTitle => 'Balance';
+
+  @override
+  String get settingsBalanceDescription =>
+      'Sets what happens to the accumulated balance on the cutoff date.';
+
+  @override
+  String get settingsBalanceModeNone => 'No cutoff';
+
+  @override
+  String get settingsBalanceModeReset => 'Reset to zero';
+
+  @override
+  String get settingsBalanceModeCarryOver => 'Carry over with caps';
+
+  @override
+  String get settingsBalanceCutoff => 'Cutoff date';
+
+  @override
+  String get settingsBalanceCutoffMissing => 'Please choose a cutoff date.';
+
+  @override
+  String get settingsBalanceCarryOverMax => 'Carry over at most (hours)';
+
+  @override
+  String get settingsBalanceCarryOverMin =>
+      'Carry over at most this deficit (hours)';
+
+  @override
+  String get settingsBalanceBoundMissing => 'Please set at least one bound.';
+
+  @override
   String get settingsProjectsTitle => 'Projects';
 
   @override

@@ -522,6 +522,38 @@ class AppLocalizationsNl extends AppLocalizations {
       'De werktijd kon niet worden opgeslagen.';
 
   @override
+  String get settingsBalanceTitle => 'Tijdsaldo';
+
+  @override
+  String get settingsBalanceDescription =>
+      'Bepaalt wat er op de peildatum met het opgebouwde saldo gebeurt.';
+
+  @override
+  String get settingsBalanceModeNone => 'Geen peildatum';
+
+  @override
+  String get settingsBalanceModeReset => 'Op nul zetten';
+
+  @override
+  String get settingsBalanceModeCarryOver => 'Overdracht met begrenzing';
+
+  @override
+  String get settingsBalanceCutoff => 'Peildatum';
+
+  @override
+  String get settingsBalanceCutoffMissing => 'Kies een peildatum.';
+
+  @override
+  String get settingsBalanceCarryOverMax => 'Hoogstens overdragen (uren)';
+
+  @override
+  String get settingsBalanceCarryOverMin =>
+      'Hoogstens dit tekort overdragen (uren)';
+
+  @override
+  String get settingsBalanceBoundMissing => 'Stel minstens één grens in.';
+
+  @override
   String get settingsProjectsTitle => 'Projecten';
 
   @override
