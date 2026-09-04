@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/di/absence_providers.dart';
 import '../../core/di/app_settings_provider.dart';
 import '../../core/di/break_rule_tiers_provider.dart';
 import '../../core/di/jira_providers.dart';
@@ -12,6 +13,7 @@ import '../../core/format/duration_format.dart';
 import '../../core/format/iso_week.dart';
 import '../../core/theme/hickory_colors.dart';
 import '../../data/drift/database.dart';
+import '../../data/drift/tables/absences_table.dart';
 import '../../data/drift/tables/jira_worklogs_table.dart';
 import '../../data/drift/tables/personio_attendances_table.dart';
 import '../../data/drift/time_entry_extensions.dart';
@@ -32,6 +34,8 @@ class EntriesList extends ConsumerWidget {
     final projectsAsync = ref.watch(activeProjectsProvider);
     final jiraWorklogsAsync = ref.watch(jiraWorklogsByEntryIdProvider);
     final personioAttendancesAsync = ref.watch(personioAttendancesByEntryIdProvider);
+    final absencesAsync = ref.watch(absencesProvider);
+    final absenceTypesById = ref.watch(absenceTypesByIdProvider);
     final tiersAsync = ref.watch(breakRuleTiersProvider);
     final settings = ref.watch(appSettingsProvider).value;
     final dateStyle = settings.dateStyle;
@@ -51,6 +55,12 @@ class EntriesList extends ConsumerWidget {
             jiraWorklogsAsync.value ?? const <String, JiraWorklogRow>{};
         final personioAttendancesById =
             personioAttendancesAsync.value ?? const <String, PersonioAttendanceRow>{};
+        final absencesByDay = <DateTime, List<Absence>>{};
+        for (final absence in absencesAsync.value ?? const <Absence>[]) {
+          final date = absence.date;
+          final day = DateTime(date.year, date.month, date.day);
+          absencesByDay.putIfAbsent(day, () => []).add(absence);
+        }
         final tiers = tiersAsync.value ?? const <BreakRuleTier>[];
         final years = buildEntryTree(
           finished,
@@ -171,6 +181,8 @@ class EntriesList extends ConsumerWidget {
                         ),
                         _DayEntriesBlock(
                           entries: day.entries,
+                          absences: absencesByDay[day.day] ?? const [],
+                          absenceTypesById: absenceTypesById,
                           projectsById: projectsById,
                           jiraWorklogsById: jiraWorklogsById,
                           personioAttendancesById: personioAttendancesById,
@@ -272,6 +284,8 @@ Widget? _personioStatusIcon(
 class _DayEntriesBlock extends ConsumerWidget {
   const _DayEntriesBlock({
     required this.entries,
+    required this.absences,
+    required this.absenceTypesById,
     required this.projectsById,
     required this.jiraWorklogsById,
     required this.personioAttendancesById,
@@ -280,6 +294,8 @@ class _DayEntriesBlock extends ConsumerWidget {
   });
 
   final List<TimeEntry> entries;
+  final List<Absence> absences;
+  final Map<String, AbsenceType> absenceTypesById;
   final Map<String, Project> projectsById;
   final Map<String, JiraWorklogRow> jiraWorklogsById;
   final Map<String, PersonioAttendanceRow> personioAttendancesById;
@@ -293,6 +309,20 @@ class _DayEntriesBlock extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: Column(
         children: [
+          for (final absence in absences) ...[
+            _AbsenceTile(
+              key: ValueKey(absence.id),
+              absence: absence,
+              type: absenceTypesById[absence.absenceTypeId],
+              l10n: l10n,
+              onDismissed: () {
+                ref
+                    .read(syncedWritesProvider.future)
+                    .then((w) => w.deleteAbsence(absence.id));
+              },
+            ),
+            const Divider(height: 1),
+          ],
           for (final (index, entry) in entries.indexed) ...[
             _EntryTile(
               key: ValueKey(entry.id),
@@ -390,6 +420,63 @@ class _EntryTile extends StatelessWidget {
           ],
         ),
         onTap: onTap,
+      ),
+    );
+  }
+}
+
+/// An absence inside a [_DayEntriesBlock]. Presentational only --
+/// [onDismissed] carries the Riverpod-dependent behaviour, the same split
+/// [_EntryTile] uses. An absence has no duration of its own to show: a
+/// full or half day is worth whatever the day's target is, which belongs
+/// to the balance rather than to this row.
+class _AbsenceTile extends StatelessWidget {
+  const _AbsenceTile({
+    super.key,
+    required this.absence,
+    required this.type,
+    required this.l10n,
+    required this.onDismissed,
+  });
+
+  final Absence absence;
+
+  /// Null while the types are still loading, or if the type was deleted on
+  /// another device before this row's own event arrived.
+  final AbsenceType? type;
+  final AppLocalizations l10n;
+  final VoidCallback onDismissed;
+
+  String _portionLabel() {
+    switch (absence.portion) {
+      case absencePortionFullDay:
+        return l10n.absencePortionFullDay;
+      case absencePortionHalfDay:
+        return l10n.absencePortionHalfDay;
+      case absencePortionRange:
+        return l10n.absencePortionRange;
+      default:
+        return absence.portion;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final subtitle = [_portionLabel(), ?absence.note].join(' · ');
+    return Dismissible(
+      key: ValueKey(absence.id),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        color: Theme.of(context).colorScheme.errorContainer,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Icon(Icons.delete_outline),
+      ),
+      onDismissed: (_) => onDismissed(),
+      child: ListTile(
+        leading: const Icon(Icons.event_busy_outlined),
+        title: Text(type?.name ?? _portionLabel()),
+        subtitle: Text(subtitle),
       ),
     );
   }

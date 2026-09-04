@@ -4,6 +4,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hickory/core/di/absence_providers.dart';
 import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/core/di/break_rule_tiers_provider.dart';
 import 'package:hickory/core/di/device_id_provider.dart';
@@ -79,6 +80,8 @@ void main() {
         (ref) => Stream.value(const {}),
       ),
       breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),
+      absencesProvider.overrideWith((ref) => Stream.value(const [])),
+      absenceTypesProvider.overrideWith((ref) => Stream.value(const [])),
       appSettingsProvider.overrideWith((ref) => Stream.value(appSettingsFixture())),
       deviceIdProvider.overrideWith((ref) async => 'device-1'),
       syncedWritesProvider.overrideWith(

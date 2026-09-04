@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hickory/core/di/absence_providers.dart';
 import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/core/di/break_rule_tiers_provider.dart';
 import 'package:hickory/core/di/jira_providers.dart';
 import 'package:hickory/core/di/personio_providers.dart';
 import 'package:hickory/core/theme/app_theme.dart';
 import 'package:hickory/data/drift/database.dart';
+import 'package:hickory/data/drift/tables/absences_table.dart';
 import 'package:hickory/data/drift/tables/jira_worklogs_table.dart';
 import 'package:hickory/data/drift/tables/personio_attendances_table.dart';
 import 'package:hickory/features/entries/entries_list.dart';
@@ -89,6 +91,8 @@ void main() {
     EntriesLocation? location,
     Map<String, JiraWorklogRow> jiraWorklogs = const {},
     Map<String, PersonioAttendanceRow> personioAttendances = const {},
+    List<Absence> absences = const [],
+    List<AbsenceType> absenceTypes = const [],
   }) => ProviderScope(
         overrides: [
           if (location != null)
@@ -105,6 +109,8 @@ void main() {
               appSettingsFixture(countPausedTimeAsBreak: countPausedTimeAsBreak),
             ),
           ),
+          absencesProvider.overrideWith((ref) => Stream.value(absences)),
+          absenceTypesProvider.overrideWith((ref) => Stream.value(absenceTypes)),
         ],
         child: MaterialApp(
           // The list reads its muted and accent colors from HickoryColors,
@@ -603,6 +609,63 @@ void main() {
 
     expect(find.text('Today'), findsOneWidget);
     expect(find.byType(Dismissible), findsOneWidget);
+  });
+
+  testWidgets('an absence appears as its own row in its day', (tester) async {
+    final type = AbsenceType(
+      id: 'type-1',
+      name: 'Urlaub',
+      paid: true,
+      sortOrder: 0,
+      deviceId: 'd',
+      createdAt: DateTime.utc(2026, 1, 1),
+      updatedAt: DateTime.utc(2026, 1, 1),
+    );
+    final absence = Absence(
+      id: 'absence-1',
+      date: DateTime(2026, 9, 7),
+      absenceTypeId: 'type-1',
+      portion: absencePortionFullDay,
+      startAt: null,
+      endAt: null,
+      note: null,
+      deviceId: 'd',
+      createdAt: DateTime.utc(2026, 1, 1),
+      updatedAt: DateTime.utc(2026, 1, 1),
+    );
+
+    await tester.pumpWidget(
+      makeApp(
+        [
+          _entry(
+            id: '1',
+            startAt: DateTime(2026, 9, 7, 9),
+            endAt: DateTime(2026, 9, 7, 10),
+          ),
+        ],
+        absences: [absence],
+        absenceTypes: [type],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Urlaub'), findsOneWidget);
+    expect(find.text('Full day'), findsOneWidget);
+  });
+
+  testWidgets('an absence row is not shown when there is none', (tester) async {
+    await tester.pumpWidget(
+      makeApp([
+        _entry(
+          id: '1',
+          startAt: DateTime(2026, 9, 7, 9),
+          endAt: DateTime(2026, 9, 7, 10),
+        ),
+      ]),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.event_busy_outlined), findsNothing);
   });
 }
 
