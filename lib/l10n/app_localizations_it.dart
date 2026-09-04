@@ -492,6 +492,35 @@ class AppLocalizationsIt extends AppLocalizations {
       'Conta il tempo in pausa tramite il pulsante pausa come pausa, oltre agli intervalli tra le voci.';
 
   @override
+  String get settingsCategoryWorkTime => 'Orario di lavoro e saldo';
+
+  @override
+  String get settingsWorkTimeTargetsTitle => 'Orario previsto';
+
+  @override
+  String get settingsWorkTimeTargetsDescription =>
+      'Definisce quanto lavoro è previsto al giorno. Senza un obiettivo non c\'è saldo da tenere.';
+
+  @override
+  String get settingsWorkTimeModePerWeekday => 'Per giorno della settimana';
+
+  @override
+  String get settingsWorkTimeModePerWeek => 'Per settimana';
+
+  @override
+  String get settingsWorkTimeWeeklyHours => 'Obiettivo settimanale in ore';
+
+  @override
+  String get settingsWorkTimeWorkDays => 'Giorni lavorativi';
+
+  @override
+  String get settingsWorkTimeHoursSuffix => 'h';
+
+  @override
+  String get settingsWorkTimeSaveError =>
+      'Impossibile salvare l\'orario di lavoro.';
+
+  @override
   String get settingsProjectsTitle => 'Progetti';
 
   @override

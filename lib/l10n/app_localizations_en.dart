@@ -489,6 +489,34 @@ class AppLocalizationsEn extends AppLocalizations {
       'Counts time paused via the Timer\'s pause button toward break time, in addition to gaps between entries.';
 
   @override
+  String get settingsCategoryWorkTime => 'Work time & balance';
+
+  @override
+  String get settingsWorkTimeTargetsTitle => 'Target work time';
+
+  @override
+  String get settingsWorkTimeTargetsDescription =>
+      'Sets how much work is expected per day. Without a target there is no balance to keep.';
+
+  @override
+  String get settingsWorkTimeModePerWeekday => 'Per weekday';
+
+  @override
+  String get settingsWorkTimeModePerWeek => 'Per week';
+
+  @override
+  String get settingsWorkTimeWeeklyHours => 'Weekly target in hours';
+
+  @override
+  String get settingsWorkTimeWorkDays => 'Work days';
+
+  @override
+  String get settingsWorkTimeHoursSuffix => 'h';
+
+  @override
+  String get settingsWorkTimeSaveError => 'Could not save the work time.';
+
+  @override
   String get settingsProjectsTitle => 'Projects';
 
   @override

@@ -493,6 +493,35 @@ class AppLocalizationsNl extends AppLocalizations {
       'Telt de tijd die via de pauzeknop is gepauzeerd mee als pauze, naast de hiaten tussen items.';
 
   @override
+  String get settingsCategoryWorkTime => 'Werktijd en saldo';
+
+  @override
+  String get settingsWorkTimeTargetsTitle => 'Streefwerktijd';
+
+  @override
+  String get settingsWorkTimeTargetsDescription =>
+      'Bepaalt hoeveel werk per dag wordt verwacht. Zonder streeftijd is er geen saldo bij te houden.';
+
+  @override
+  String get settingsWorkTimeModePerWeekday => 'Per weekdag';
+
+  @override
+  String get settingsWorkTimeModePerWeek => 'Per week';
+
+  @override
+  String get settingsWorkTimeWeeklyHours => 'Weekstreeftijd in uren';
+
+  @override
+  String get settingsWorkTimeWorkDays => 'Werkdagen';
+
+  @override
+  String get settingsWorkTimeHoursSuffix => 'u';
+
+  @override
+  String get settingsWorkTimeSaveError =>
+      'De werktijd kon niet worden opgeslagen.';
+
+  @override
   String get settingsProjectsTitle => 'Projecten';
 
   @override

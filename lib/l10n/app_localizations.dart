@@ -927,6 +927,60 @@ abstract class AppLocalizations {
   /// **'Zählt die über den Pause-Button pausierte Zeit zusätzlich zu Lücken zwischen Einträgen als Pause.'**
   String get settingsBreakRuleIncludePausedTimeDescription;
 
+  /// No description provided for @settingsCategoryWorkTime.
+  ///
+  /// In de, this message translates to:
+  /// **'Arbeitszeit & Zeitkonto'**
+  String get settingsCategoryWorkTime;
+
+  /// No description provided for @settingsWorkTimeTargetsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Soll-Arbeitszeit'**
+  String get settingsWorkTimeTargetsTitle;
+
+  /// No description provided for @settingsWorkTimeTargetsDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Legt fest, wie viel Arbeitszeit pro Tag erwartet wird. Ohne Soll-Zeit kann kein Zeitkonto geführt werden.'**
+  String get settingsWorkTimeTargetsDescription;
+
+  /// No description provided for @settingsWorkTimeModePerWeekday.
+  ///
+  /// In de, this message translates to:
+  /// **'Pro Wochentag'**
+  String get settingsWorkTimeModePerWeekday;
+
+  /// No description provided for @settingsWorkTimeModePerWeek.
+  ///
+  /// In de, this message translates to:
+  /// **'Pro Woche'**
+  String get settingsWorkTimeModePerWeek;
+
+  /// No description provided for @settingsWorkTimeWeeklyHours.
+  ///
+  /// In de, this message translates to:
+  /// **'Wochensoll in Stunden'**
+  String get settingsWorkTimeWeeklyHours;
+
+  /// No description provided for @settingsWorkTimeWorkDays.
+  ///
+  /// In de, this message translates to:
+  /// **'Arbeitstage'**
+  String get settingsWorkTimeWorkDays;
+
+  /// No description provided for @settingsWorkTimeHoursSuffix.
+  ///
+  /// In de, this message translates to:
+  /// **'h'**
+  String get settingsWorkTimeHoursSuffix;
+
+  /// No description provided for @settingsWorkTimeSaveError.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Arbeitszeit konnte nicht gespeichert werden.'**
+  String get settingsWorkTimeSaveError;
+
   /// No description provided for @settingsProjectsTitle.
   ///
   /// In de, this message translates to:

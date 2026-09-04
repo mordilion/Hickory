@@ -497,6 +497,35 @@ class AppLocalizationsFr extends AppLocalizations {
       'Compte le temps mis en pause via le bouton pause comme pause, en plus des écarts entre les entrées.';
 
   @override
+  String get settingsCategoryWorkTime => 'Temps de travail et compteur';
+
+  @override
+  String get settingsWorkTimeTargetsTitle => 'Temps de travail cible';
+
+  @override
+  String get settingsWorkTimeTargetsDescription =>
+      'Définit le temps de travail attendu par jour. Sans cible, aucun compteur n\'est possible.';
+
+  @override
+  String get settingsWorkTimeModePerWeekday => 'Par jour de semaine';
+
+  @override
+  String get settingsWorkTimeModePerWeek => 'Par semaine';
+
+  @override
+  String get settingsWorkTimeWeeklyHours => 'Cible hebdomadaire en heures';
+
+  @override
+  String get settingsWorkTimeWorkDays => 'Jours travaillés';
+
+  @override
+  String get settingsWorkTimeHoursSuffix => 'h';
+
+  @override
+  String get settingsWorkTimeSaveError =>
+      'Impossible d\'enregistrer le temps de travail.';
+
+  @override
   String get settingsProjectsTitle => 'Projets';
 
   @override

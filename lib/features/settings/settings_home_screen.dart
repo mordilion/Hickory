@@ -9,6 +9,7 @@ import 'projects_settings_screen.dart';
 import 'reset_settings_screen.dart';
 import 'time_tracking_settings_screen.dart';
 import 'update_settings_screen.dart';
+import 'work_time_settings_screen.dart';
 
 /// The Settings tab's landing page: a category list. Each row pushes its
 /// own sub-page onto this tab's local Navigator -- see settings_screen.dart
@@ -52,6 +53,17 @@ class SettingsHomeScreen extends StatelessWidget {
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => const TimeTrackingSettingsScreen(),
+                    ),
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.schedule_outlined),
+                  title: Text(l10n.settingsCategoryWorkTime),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const WorkTimeSettingsScreen(),
                     ),
                   ),
                 ),

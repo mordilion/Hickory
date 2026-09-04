@@ -492,6 +492,35 @@ class AppLocalizationsDe extends AppLocalizations {
       'Zählt die über den Pause-Button pausierte Zeit zusätzlich zu Lücken zwischen Einträgen als Pause.';
 
   @override
+  String get settingsCategoryWorkTime => 'Arbeitszeit & Zeitkonto';
+
+  @override
+  String get settingsWorkTimeTargetsTitle => 'Soll-Arbeitszeit';
+
+  @override
+  String get settingsWorkTimeTargetsDescription =>
+      'Legt fest, wie viel Arbeitszeit pro Tag erwartet wird. Ohne Soll-Zeit kann kein Zeitkonto geführt werden.';
+
+  @override
+  String get settingsWorkTimeModePerWeekday => 'Pro Wochentag';
+
+  @override
+  String get settingsWorkTimeModePerWeek => 'Pro Woche';
+
+  @override
+  String get settingsWorkTimeWeeklyHours => 'Wochensoll in Stunden';
+
+  @override
+  String get settingsWorkTimeWorkDays => 'Arbeitstage';
+
+  @override
+  String get settingsWorkTimeHoursSuffix => 'h';
+
+  @override
+  String get settingsWorkTimeSaveError =>
+      'Die Arbeitszeit konnte nicht gespeichert werden.';
+
+  @override
   String get settingsProjectsTitle => 'Projekte';
 
   @override

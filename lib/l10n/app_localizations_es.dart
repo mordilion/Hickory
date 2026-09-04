@@ -493,6 +493,34 @@ class AppLocalizationsEs extends AppLocalizations {
       'Cuenta el tiempo pausado con el botón de pausa como descanso, además de los huecos entre entradas.';
 
   @override
+  String get settingsCategoryWorkTime => 'Jornada y saldo horario';
+
+  @override
+  String get settingsWorkTimeTargetsTitle => 'Jornada objetivo';
+
+  @override
+  String get settingsWorkTimeTargetsDescription =>
+      'Define cuánto trabajo se espera al día. Sin objetivo no hay saldo que llevar.';
+
+  @override
+  String get settingsWorkTimeModePerWeekday => 'Por día de la semana';
+
+  @override
+  String get settingsWorkTimeModePerWeek => 'Por semana';
+
+  @override
+  String get settingsWorkTimeWeeklyHours => 'Objetivo semanal en horas';
+
+  @override
+  String get settingsWorkTimeWorkDays => 'Días laborables';
+
+  @override
+  String get settingsWorkTimeHoursSuffix => 'h';
+
+  @override
+  String get settingsWorkTimeSaveError => 'No se pudo guardar la jornada.';
+
+  @override
   String get settingsProjectsTitle => 'Proyectos';
 
   @override
