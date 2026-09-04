@@ -172,7 +172,12 @@ class SyncIngestor {
           // breaks sync. (Every other non-nullable column added to an
           // already-synced entity — e.g. TimeEntries.totalPausedSeconds in
           // v2 — has the same exposure and isn't guarded; not addressed
-          // here, out of scope for this fix.)
+          // here, out of scope for this fix.) Note what the backfill
+          // cannot save: if such an older peer's settings event *wins*
+          // last-write-wins, these defaults are what gets applied, so the
+          // seven configured targets are reset to 0 — whole-row
+          // last-write-wins across a mixed-version fleet, the same
+          // exposure countPausedTimeAsBreak has had since v7.
           final payload = {
             'quickAddDurationsMinutes': '15,30,45,60',
             'countPausedTimeAsBreak': false,

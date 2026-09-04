@@ -28,8 +28,15 @@
   way the per-weekday editor does — there is no separate "weekly target" value stored
   anywhere, so a switch back to per-weekday shows exactly what per-week last wrote.
 - `lib/features/settings/balance_rule_editor.dart`: the cutoff-rule editor. Keeps an
-  incomplete selection (mode chosen but no date, or carry-over with no bound) local and
-  never persists it — `SyncedWrites` only ever sees a complete rule.
+  incomplete selection local and never persists it — `SyncedWrites` only ever sees a
+  complete rule. Complete means: any mode other than `none` has **both** a cutoff day and
+  a cutoff month, and `carryOver` additionally has at least one bound. Nothing is
+  defaulted; a cutoff the user never picked would reset or clamp the balance on a date of
+  the app's choosing.
+- `lib/features/settings/settings_editor_support.dart`: shared by both editors above.
+  `SettingsWriteGuard` queues writes to the singleton settings row (never drops them) and
+  turns a failure into a SnackBar; `CommitOnFocusLoss` is what makes the text fields
+  commit without an Enter key.
 - `lib/features/reports/reports_providers.dart`'s `workTimeBalanceProvider` and
   `lib/features/reports/balance_card.dart`'s `BalanceCard`: the Reports-tab display.
 
@@ -59,6 +66,24 @@
 
 ## Gotchas
 
+- **An older peer's settings write wipes the seven targets, and nothing prevents it.**
+  `materialize` picks one winning event by timestamp and applies its whole payload; a
+  device still on schema 8 that writes any settings change after targets were configured
+  elsewhere produces a winner with no target keys, the ingestor's backfill supplies `0`
+  for all seven, and the upsert applies them. This is inherent to whole-row
+  last-write-wins across a mixed-version fleet — `countPausedTimeAsBreak` has had the same
+  exposure since v7 — and field-level merge is deliberately **not** built for it. Upgrade
+  every device before configuring targets.
+- **The `EntityTypes.appSettings` case in `sync_ingestor.dart` decodes with
+  `toCompanion(false)`, unlike every other case.** With `true` a null nullable field
+  becomes `Value.absent()` and `insertOnConflictUpdate` leaves that column unchanged, so
+  clearing `carryOverMaxMinutes` would never reach the peer and the two devices would
+  compute different balances. This is the first row on which `null` is semantically
+  meaningful; do not "harmonize" it back to `true`.
+- **The text fields in both settings editors are never disabled while a write is in
+  flight** (only the chips, dropdowns and the mode toggle are). Disabling a focused field
+  takes its focus away, and focus loss is exactly what commits it — tabbing from one day
+  field to the next would break. `SettingsWriteGuard` queues concurrent writes instead.
 - **Do not overlay `appDatabaseProvider` in a widget test that mounts anything watching
   both `appSettingsProvider` and `allEntriesProvider`.** That combination deadlocks
   `flutter_test`: drift's debounced stream-close leaves a pending timer, and `tearDown`'s

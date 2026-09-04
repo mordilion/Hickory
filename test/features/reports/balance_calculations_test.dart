@@ -245,6 +245,10 @@ void main() {
     );
   });
 
+  // Pins the *detection* of every crossing in the gap, not the fact that
+  // the rule is applied once per crossing: _afterCutoff is idempotent, so
+  // no assertion can tell one application from three. The value is in
+  // catching a walk that skips a crossing altogether.
   test('several cutoffs in a gap between worked days all apply', () {
     final settings = settingsWith(
       monday: 480,

@@ -1,16 +1,16 @@
+// Flex-time ("Gleitzeit") balance arithmetic. Pure: no Riverpod, no
+// Flutter, no database access beyond drift's row types — the same shape as
+// report_calculations.dart, and testable with plain in-memory lists.
+//
+// Nothing here is materialized in the database on purpose: a cached
+// balance would need recomputation after every cross-device event-log
+// merge, and those merges happen at arbitrary times.
+
 import '../../data/drift/database.dart';
 import 'report_calculations.dart' show totalsByDay;
 
 /// Target work minutes for [weekday] (`DateTime.monday` … `DateTime.sunday`).
 /// `0` means the day is not a work day.
-///
-/// Flex-time ("Gleitzeit") balance arithmetic. Pure: no Riverpod, no
-/// Flutter, no database access beyond drift's row types — the same shape as
-/// report_calculations.dart, and testable with plain in-memory lists.
-///
-/// Nothing here is materialized in the database on purpose: a cached
-/// balance would need recomputation after every cross-device event-log
-/// merge, and those merges happen at arbitrary times.
 int targetMinutesForWeekday(AppSettingsRow settings, int weekday) {
   switch (weekday) {
     case DateTime.monday:

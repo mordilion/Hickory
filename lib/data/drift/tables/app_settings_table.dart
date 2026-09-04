@@ -34,10 +34,10 @@ class AppSettings extends Table {
   IntColumn get targetMinutesFriday => integer().withDefault(const Constant(0))();
   IntColumn get targetMinutesSaturday => integer().withDefault(const Constant(0))();
   IntColumn get targetMinutesSunday => integer().withDefault(const Constant(0))();
-  // 'perWeekday' | 'perWeek' -- affects only how the settings screen
+  // 'perWeekday' | 'perWeek' — affects only how the settings screen
   // renders and reopens, never the calculation.
   TextColumn get targetInputMode => text().withDefault(const Constant('perWeekday'))();
-  // 'none' | 'resetToZero' | 'carryOver' -- what happens to the accumulated
+  // 'none' | 'resetToZero' | 'carryOver' — what happens to the accumulated
   // balance when the yearly cutoff is crossed.
   TextColumn get balanceResetMode => text().withDefault(const Constant('none'))();
   // The recurring cutoff, so a fiscal year end works as well as a calendar
