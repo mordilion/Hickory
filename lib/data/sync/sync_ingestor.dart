@@ -188,9 +188,18 @@ class SyncIngestor {
             'absenceTrackingEnabled': false,
             ...entity.payload!,
           };
+          // toCompanion(false), unlike every other case here: with `true`
+          // a null nullable field becomes Value.absent(), and
+          // insertOnConflictUpdate leaves an absent column untouched, so a
+          // payload that clears carryOverMaxMinutes would leave the peer's
+          // stale bound in place and the two devices would compute
+          // different balances from the same entries. This payload is a
+          // whole row under last-write-wins, so an explicit null is
+          // exactly what should be written; the backfill above guarantees
+          // every non-nullable field is present.
           await db
               .into(db.appSettings)
-              .insertOnConflictUpdate(AppSettingsRow.fromJson(payload).toCompanion(true));
+              .insertOnConflictUpdate(AppSettingsRow.fromJson(payload).toCompanion(false));
         }
       case EntityTypes.jiraWorklog:
         if (entity.isDeleted) {

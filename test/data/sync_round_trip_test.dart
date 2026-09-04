@@ -408,6 +408,46 @@ void main() {
     expect(row.balanceResetMonth, 1);
   });
 
+  test('clearing a nullable settings field clears it on the second device', () async {
+    final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(writerDb.close);
+    final writes = SyncedWrites(
+      db: writerDb,
+      logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'writer'),
+    );
+    await writes.updateAppSettings(
+      balanceResetMode: 'carryOver',
+      balanceResetDay: const Value(1),
+      balanceResetMonth: const Value(1),
+      carryOverMaxMinutes: const Value(300),
+      carryOverMinMinutes: const Value(-120),
+    );
+
+    final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(readerDb.close);
+    final ingestor = SyncIngestor(db: readerDb, syncRoot: syncRoot);
+    await ingestor.syncNow();
+    expect(
+      (await readerDb.select(readerDb.appSettings).get()).single.carryOverMaxMinutes,
+      300,
+      reason: 'the peer has to hold the bound before clearing it can be observed',
+    );
+
+    // The upper bound is dropped on the writing device. Null here is a
+    // value the user chose, not "this field was not part of the change" --
+    // the payload is the whole row.
+    await writes.updateAppSettings(carryOverMaxMinutes: const Value(null));
+    await ingestor.syncNow();
+
+    final row = (await readerDb.select(readerDb.appSettings).get()).single;
+    expect(
+      row.carryOverMaxMinutes,
+      isNull,
+      reason: 'a cleared bound must not leave the peer computing a different balance',
+    );
+    expect(row.carryOverMinMinutes, -120, reason: 'the untouched bound must survive');
+  });
+
   test(
     'ingesting an app_settings event from a peer that predates the target '
     'columns backfills their defaults instead of throwing',
