@@ -364,6 +364,51 @@ void main() {
   );
 
   test(
+    'rebuildFromScratch clears absences that no event backs',
+    () async {
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
+      final writes = SyncedWrites(
+        db: db,
+        logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'dev_a'),
+      );
+      final ingestor = SyncIngestor(db: db, syncRoot: syncRoot);
+
+      final type = await writes.createAbsenceType(
+        deviceId: 'dev_a',
+        name: 'Vacation',
+        paid: true,
+        sortOrder: 0,
+      );
+      final absence = await writes.createAbsence(
+        deviceId: 'dev_a',
+        date: DateTime(2026, 9, 7),
+        absenceTypeId: type.id,
+        portion: absencePortionFullDay,
+      );
+      // Straight into the cache, no event written: the shape a half-applied
+      // merge leaves behind, and the only thing a rebuild can clean up.
+      await db.absencesDao.createAbsence(
+        deviceId: 'dev_a',
+        date: DateTime(2026, 9, 8),
+        absenceTypeId: type.id,
+        portion: absencePortionFullDay,
+      );
+
+      await ingestor.rebuildFromScratch();
+
+      expect(
+        (await db.select(db.absences).get()).map((row) => row.id),
+        [absence.id],
+      );
+      expect(
+        (await db.select(db.absenceTypes).get()).map((row) => row.id),
+        [type.id],
+      );
+    },
+  );
+
+  test(
     'rebuildFromScratch clears and re-derives clients too',
     () async {
       final db = AppDatabase.forTesting(NativeDatabase.memory());

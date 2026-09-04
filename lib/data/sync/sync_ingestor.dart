@@ -53,6 +53,8 @@ class SyncIngestor {
       await db.delete(db.jiraWorklogs).go();
       await db.delete(db.breakRuleTiers).go();
       await db.delete(db.personioAttendances).go();
+      await db.delete(db.absences).go();
+      await db.delete(db.absenceTypes).go();
     });
     await syncNow();
   }
@@ -235,9 +237,12 @@ class SyncIngestor {
           await (db.delete(db.absences)..where((a) => a.id.equals(entity.entityId))).go();
         } else {
           // toCompanion(false): startAt, endAt and note are nullable and
-          // null is meaningful here -- a row that switched from a range to
-          // a full day has no start time, and with `true` that null would
-          // become Value.absent() and leave the peer's stale time in place.
+          // null is meaningful here -- it means "this absence has no start
+          // time", not "leave whatever is stored". With `true` a null
+          // would become Value.absent() and the peer's own value would
+          // survive the update. Nothing edits an absence today, so no
+          // payload can currently carry that null over a non-null row;
+          // `false` is what keeps this correct the day one does.
           await db
               .into(db.absences)
               .insertOnConflictUpdate(Absence.fromJson(entity.payload!).toCompanion(false));

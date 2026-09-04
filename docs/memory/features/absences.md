@@ -21,7 +21,7 @@
   (`lib/core/di/absence_providers.dart`): plain (non-`@riverpod`) providers, for the same
   reason as `appSettingsProvider` and `workTimeBalanceProvider` — mixing riverpod_generator
   with drift's generator in one build_runner pass trips rrousselGit/riverpod#4323.
-  `absenceTypesByIdProvider` derives its map from `absenceTypesByIdProvider`'s `.value`,
+  `absenceTypesByIdProvider` derives its map from `absenceTypesProvider`'s `.value`,
   defaulting to `{}` while types are still loading; an absence whose type does not resolve
   contributes nothing rather than being guessed at (see below).
 - `AppSettingsRow.absenceTrackingEnabled`: the single global switch. Off by default.
@@ -41,7 +41,12 @@
   `absencesProvider` and `absenceTypesByIdProvider` into `dayBalances`, gated by
   `absenceTrackingEnabled` (see "The switch" below).
 - `lib/features/entries/entries_list.dart` and its row widgets render an absence's portion
-  label alongside ordinary entries, reading the same two providers.
+  label alongside ordinary entries, reading the same two providers. The days holding
+  absences are passed to `buildEntryTree`/`groupEntriesByDay` as `extraDays`, so a day
+  whose only record is an absence still gets a node (and a year/month/week above it) —
+  without that the row, and with it the only delete affordance an absence has, would be
+  unreachable. For the same reason the empty state needs both entries *and* absences to
+  be missing.
 
 ## Decisions
 
@@ -91,10 +96,32 @@
   work day between the first known day and `through` is enumerated, entry or not,
   because a work day with neither a booking nor an absence is now genuinely a deficit —
   making that visible is the point of turning the feature on. `workTimeBalanceProvider`
-  mirrors the same gate at the provider level: it only watches `absencesProvider` (and
-  only lets a failure there propagate) while the switch is on, so a broken absences
-  stream can never take down a balance that does not read absences in the first place.
-  See `work-time-balance.md` for the balance side of this.
+  mirrors the same gate at the provider level: it watches `absencesProvider`
+  unconditionally — a provider cannot decide what to watch after reading the settings —
+  but only *waits for* it and only lets a failure there propagate while the switch is on,
+  so a broken absences stream can never take down a balance that does not read absences
+  in the first place. See `work-time-balance.md` for the balance side of this.
+
+## Spec deviations
+
+Against `docs/superpowers/specs/2026-09-02-worktime-balance-dashboard-design.md`:
+
+- **An absence can be deleted but not edited**, where §5 says absences are "edited and
+  deleted" in the entries list. An absence carries no free-form content worth amending —
+  a wrong day, type or portion is a different absence — so deleting the row and
+  recording the right one is both fewer moving parts and the same number of gestures.
+  An edit path would also need `SyncedWrites.updateAbsence` and an update event the
+  ingestor's `toCompanion(false)` branch was written for but nothing yet emits.
+- **The paid flag lives in the type's edit dialog, not on each list row**, where §4
+  describes "add, rename, reorder, delete and a paid toggle each". Paid is a property of
+  the *type*, changed roughly once when the type is created, and an always-live switch on
+  every row invites a mis-tap that silently re-scores every absence of that kind across
+  the whole history. The dialog keeps it beside the name it belongs to.
+- **The schema landed across versions 10 and 11**, where §2 anticipated a single 10 for
+  "the tables added in phases 2 and 3". `absenceTypes` and `absences` shipped in separate
+  steps, each independently demonstrable, and a migration step is cheap; folding two
+  `createTable` calls into one version afterwards would have meant rewriting a migration
+  already applied on the developer's own database.
 
 ## Gotchas
 
