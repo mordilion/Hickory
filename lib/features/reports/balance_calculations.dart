@@ -77,3 +77,76 @@ List<DayBalance> dayBalances(List<TimeEntry> entries, AppSettingsRow settings) {
       ),
   ];
 }
+
+/// The cutoff date falling in [year], with the configured day clamped to
+/// that month's length — a 29 February rule becomes 28 February in a
+/// non-leap year rather than silently rolling into March.
+DateTime? _cutoffInYear(AppSettingsRow settings, int year) {
+  final month = settings.balanceResetMonth;
+  final day = settings.balanceResetDay;
+  if (month == null || day == null) return null;
+  if (month < 1 || month > 12 || day < 1) return null;
+  final daysInMonth = DateTime(year, month + 1, 0).day;
+  return DateTime(year, month, day > daysInMonth ? daysInMonth : day);
+}
+
+/// The most recent cutoff on or before [day], or null when no usable rule
+/// is configured. A rule with `balanceResetMode == 'none'`, or one missing
+/// its date, has no cutoff at all.
+DateTime? lastCutoffOnOrBefore(AppSettingsRow settings, DateTime day) {
+  if (settings.balanceResetMode == 'none') return null;
+  final thisYear = _cutoffInYear(settings, day.year);
+  if (thisYear == null) return null;
+  if (!thisYear.isAfter(day)) return thisYear;
+  return _cutoffInYear(settings, day.year - 1);
+}
+
+/// Applies the reset rule to a balance that has just crossed a cutoff.
+Duration _afterCutoff(Duration balance, AppSettingsRow settings) {
+  if (settings.balanceResetMode == 'resetToZero') return Duration.zero;
+  final max = settings.carryOverMaxMinutes;
+  final min = settings.carryOverMinMinutes;
+  if (max != null && balance.inMinutes > max) return Duration(minutes: max);
+  if (min != null && balance.inMinutes < min) return Duration(minutes: min);
+  return balance;
+}
+
+/// The running balance up to and including [asOf].
+///
+/// Applied as a single forward pass: days are added in order, and whenever
+/// one or more cutoffs fall between the previous day and the current one
+/// the accumulated balance is reset or clamped first. Deterministic and
+/// linear in the number of worked days, no matter how long the history —
+/// a recursive "balance of the previous period" formulation would re-walk
+/// the same years once per cutoff.
+Duration runningBalance(
+  List<DayBalance> balances,
+  AppSettingsRow settings, {
+  required DateTime asOf,
+}) {
+  var total = Duration.zero;
+  // Seeded with the first worked day (or asOf, if there is none) rather
+  // than the epoch — starting at 1970 would walk every no-op cutoff year
+  // between then and the first real day for no reason.
+  var previous = balances.isNotEmpty ? balances.first.day : asOf;
+
+  void applyCutoffsBetween(DateTime from, DateTime to) {
+    if (settings.balanceResetMode == 'none') return;
+    for (var year = from.year; year <= to.year; year++) {
+      final cutoff = _cutoffInYear(settings, year);
+      if (cutoff == null) return;
+      if (cutoff.isAfter(from) && !cutoff.isAfter(to)) {
+        total = _afterCutoff(total, settings);
+      }
+    }
+  }
+
+  for (final day in balances) {
+    if (day.day.isAfter(asOf)) break;
+    applyCutoffsBetween(previous, day.day);
+    total += day.balance;
+    previous = day.day;
+  }
+  applyCutoffsBetween(previous, asOf);
+  return total;
+}
