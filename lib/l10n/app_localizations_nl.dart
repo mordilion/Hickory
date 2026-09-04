@@ -313,6 +313,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get commonDelete => 'Verwijderen';
 
   @override
+  String get commonEdit => 'Bewerken';
+
+  @override
   String get commonClose => 'Sluiten';
 
   @override
@@ -566,6 +569,61 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settingsBalanceBoundMissing => 'Stel minstens één grens in.';
+
+  @override
+  String get settingsCategoryAbsences => 'Afwezigheden';
+
+  @override
+  String get settingsAbsencesEnabled => 'Afwezigheden vastleggen';
+
+  @override
+  String get settingsAbsencesEnabledDescription =>
+      'Voegt een derde invoerwijze toe op het hoofdscherm. Staat vastleggen uit, dan tellen alleen dagen met een boeking mee voor het saldo.';
+
+  @override
+  String get settingsAbsenceTypesTitle => 'Afwezigheidstypen';
+
+  @override
+  String get settingsAbsenceTypeAdd => 'Type toevoegen';
+
+  @override
+  String get settingsAbsenceTypeName => 'Naam';
+
+  @override
+  String get settingsAbsenceTypePaid => 'Betaald';
+
+  @override
+  String get settingsAbsenceTypeUnpaid => 'Onbetaald';
+
+  @override
+  String get settingsAbsenceTypeAddStandard => 'Standaardtypen toevoegen';
+
+  @override
+  String settingsAbsenceTypeInUse(int count) {
+    return 'Wordt door $count dagen gebruikt en kan niet worden verwijderd.';
+  }
+
+  @override
+  String get settingsAbsenceTypeDefaultVacation => 'Vakantie';
+
+  @override
+  String get settingsAbsenceTypeDefaultSick => 'Ziekte';
+
+  @override
+  String get settingsAbsenceTypeDefaultHoliday => 'Feestdag';
+
+  @override
+  String get settingsAbsenceTypeDefaultUnpaid => 'Onbetaald verlof';
+
+  @override
+  String get settingsAbsenceTypeMoveUp => 'Omhoog';
+
+  @override
+  String get settingsAbsenceTypeMoveDown => 'Omlaag';
+
+  @override
+  String get settingsAbsencesSaveError =>
+      'De afwezigheidsinstelling kon niet worden opgeslagen.';
 
   @override
   String get settingsProjectsTitle => 'Projecten';

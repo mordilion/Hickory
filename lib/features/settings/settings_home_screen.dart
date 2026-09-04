@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
+import 'absences_settings_screen.dart';
 import 'clients_settings_screen.dart';
 import 'general_settings_screen.dart';
 import 'projects_settings_screen.dart';
@@ -32,94 +33,112 @@ class SettingsHomeScreen extends StatelessWidget {
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 16),
-          Card(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.tune),
-                  title: Text(l10n.settingsCategoryGeneral),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const GeneralSettingsScreen(),
-                    ),
-                  ),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.timer_outlined),
-                  title: Text(l10n.settingsCategoryTimeTracking),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const TimeTrackingSettingsScreen(),
-                    ),
-                  ),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.schedule_outlined),
-                  title: Text(l10n.settingsCategoryWorkTime),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const WorkTimeSettingsScreen(),
-                    ),
-                  ),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.folder_outlined),
-                  title: Text(l10n.settingsProjectsTitle),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const ProjectsSettingsScreen(),
-                    ),
-                  ),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.business_outlined),
-                  title: Text(l10n.settingsClientsTitle),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const ClientsSettingsScreen(),
-                    ),
-                  ),
-                ),
-                if (Platform.isMacOS || Platform.isWindows) ...[
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.system_update_outlined),
-                    title: Text(l10n.settingsUpdateTitle),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const UpdateSettingsScreen(),
+          // Scrollable: the category list has grown past what fits a
+          // compact window in one screen (e.g. the default test surface),
+          // and a fixed Column would clip or overflow the last rows.
+          Expanded(
+            child: SingleChildScrollView(
+              child: Card(
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.tune),
+                      title: Text(l10n.settingsCategoryGeneral),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const GeneralSettingsScreen(),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-                const Divider(height: 1),
-                ListTile(
-                  leading: Icon(
-                    Icons.warning_amber_outlined,
-                    color: colorScheme.error,
-                  ),
-                  title: Text(
-                    l10n.settingsResetTitle,
-                    style: TextStyle(color: colorScheme.error),
-                  ),
-                  trailing: Icon(Icons.chevron_right, color: colorScheme.error),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const ResetSettingsScreen(),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.timer_outlined),
+                      title: Text(l10n.settingsCategoryTimeTracking),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const TimeTrackingSettingsScreen(),
+                        ),
+                      ),
                     ),
-                  ),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.schedule_outlined),
+                      title: Text(l10n.settingsCategoryWorkTime),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const WorkTimeSettingsScreen(),
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.event_busy_outlined),
+                      title: Text(l10n.settingsCategoryAbsences),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const AbsencesSettingsScreen(),
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.folder_outlined),
+                      title: Text(l10n.settingsProjectsTitle),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ProjectsSettingsScreen(),
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.business_outlined),
+                      title: Text(l10n.settingsClientsTitle),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ClientsSettingsScreen(),
+                        ),
+                      ),
+                    ),
+                    if (Platform.isMacOS || Platform.isWindows) ...[
+                      const Divider(height: 1),
+                      ListTile(
+                        leading: const Icon(Icons.system_update_outlined),
+                        title: Text(l10n.settingsUpdateTitle),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const UpdateSettingsScreen(),
+                          ),
+                        ),
+                      ),
+                    ],
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: Icon(
+                        Icons.warning_amber_outlined,
+                        color: colorScheme.error,
+                      ),
+                      title: Text(
+                        l10n.settingsResetTitle,
+                        style: TextStyle(color: colorScheme.error),
+                      ),
+                      trailing: Icon(Icons.chevron_right, color: colorScheme.error),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ResetSettingsScreen(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ],

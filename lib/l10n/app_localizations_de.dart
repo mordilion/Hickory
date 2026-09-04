@@ -312,6 +312,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get commonDelete => 'Löschen';
 
   @override
+  String get commonEdit => 'Bearbeiten';
+
+  @override
   String get commonClose => 'Schließen';
 
   @override
@@ -566,6 +569,61 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settingsBalanceBoundMissing =>
       'Bitte mindestens eine Grenze angeben.';
+
+  @override
+  String get settingsCategoryAbsences => 'Abwesenheiten';
+
+  @override
+  String get settingsAbsencesEnabled => 'Abwesenheiten erfassen';
+
+  @override
+  String get settingsAbsencesEnabledDescription =>
+      'Blendet auf der Hauptseite einen dritten Erfassungsweg ein. Ist die Erfassung aus, zählen für das Zeitkonto nur Tage mit Buchung.';
+
+  @override
+  String get settingsAbsenceTypesTitle => 'Abwesenheitstypen';
+
+  @override
+  String get settingsAbsenceTypeAdd => 'Typ hinzufügen';
+
+  @override
+  String get settingsAbsenceTypeName => 'Name';
+
+  @override
+  String get settingsAbsenceTypePaid => 'Bezahlt';
+
+  @override
+  String get settingsAbsenceTypeUnpaid => 'Unbezahlt';
+
+  @override
+  String get settingsAbsenceTypeAddStandard => 'Standardtypen anlegen';
+
+  @override
+  String settingsAbsenceTypeInUse(int count) {
+    return 'Wird von $count Tagen verwendet und kann nicht gelöscht werden.';
+  }
+
+  @override
+  String get settingsAbsenceTypeDefaultVacation => 'Urlaub';
+
+  @override
+  String get settingsAbsenceTypeDefaultSick => 'Krank';
+
+  @override
+  String get settingsAbsenceTypeDefaultHoliday => 'Feiertag';
+
+  @override
+  String get settingsAbsenceTypeDefaultUnpaid => 'Unbezahlter Urlaub';
+
+  @override
+  String get settingsAbsenceTypeMoveUp => 'Nach oben';
+
+  @override
+  String get settingsAbsenceTypeMoveDown => 'Nach unten';
+
+  @override
+  String get settingsAbsencesSaveError =>
+      'Die Abwesenheitseinstellung konnte nicht gespeichert werden.';
 
   @override
   String get settingsProjectsTitle => 'Projekte';

@@ -633,6 +633,12 @@ abstract class AppLocalizations {
   /// **'Löschen'**
   String get commonDelete;
 
+  /// No description provided for @commonEdit.
+  ///
+  /// In de, this message translates to:
+  /// **'Bearbeiten'**
+  String get commonEdit;
+
   /// No description provided for @commonClose.
   ///
   /// In de, this message translates to:
@@ -1064,6 +1070,108 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Bitte mindestens eine Grenze angeben.'**
   String get settingsBalanceBoundMissing;
+
+  /// No description provided for @settingsCategoryAbsences.
+  ///
+  /// In de, this message translates to:
+  /// **'Abwesenheiten'**
+  String get settingsCategoryAbsences;
+
+  /// No description provided for @settingsAbsencesEnabled.
+  ///
+  /// In de, this message translates to:
+  /// **'Abwesenheiten erfassen'**
+  String get settingsAbsencesEnabled;
+
+  /// No description provided for @settingsAbsencesEnabledDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Blendet auf der Hauptseite einen dritten Erfassungsweg ein. Ist die Erfassung aus, zählen für das Zeitkonto nur Tage mit Buchung.'**
+  String get settingsAbsencesEnabledDescription;
+
+  /// No description provided for @settingsAbsenceTypesTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Abwesenheitstypen'**
+  String get settingsAbsenceTypesTitle;
+
+  /// No description provided for @settingsAbsenceTypeAdd.
+  ///
+  /// In de, this message translates to:
+  /// **'Typ hinzufügen'**
+  String get settingsAbsenceTypeAdd;
+
+  /// No description provided for @settingsAbsenceTypeName.
+  ///
+  /// In de, this message translates to:
+  /// **'Name'**
+  String get settingsAbsenceTypeName;
+
+  /// No description provided for @settingsAbsenceTypePaid.
+  ///
+  /// In de, this message translates to:
+  /// **'Bezahlt'**
+  String get settingsAbsenceTypePaid;
+
+  /// No description provided for @settingsAbsenceTypeUnpaid.
+  ///
+  /// In de, this message translates to:
+  /// **'Unbezahlt'**
+  String get settingsAbsenceTypeUnpaid;
+
+  /// No description provided for @settingsAbsenceTypeAddStandard.
+  ///
+  /// In de, this message translates to:
+  /// **'Standardtypen anlegen'**
+  String get settingsAbsenceTypeAddStandard;
+
+  /// No description provided for @settingsAbsenceTypeInUse.
+  ///
+  /// In de, this message translates to:
+  /// **'Wird von {count} Tagen verwendet und kann nicht gelöscht werden.'**
+  String settingsAbsenceTypeInUse(int count);
+
+  /// No description provided for @settingsAbsenceTypeDefaultVacation.
+  ///
+  /// In de, this message translates to:
+  /// **'Urlaub'**
+  String get settingsAbsenceTypeDefaultVacation;
+
+  /// No description provided for @settingsAbsenceTypeDefaultSick.
+  ///
+  /// In de, this message translates to:
+  /// **'Krank'**
+  String get settingsAbsenceTypeDefaultSick;
+
+  /// No description provided for @settingsAbsenceTypeDefaultHoliday.
+  ///
+  /// In de, this message translates to:
+  /// **'Feiertag'**
+  String get settingsAbsenceTypeDefaultHoliday;
+
+  /// No description provided for @settingsAbsenceTypeDefaultUnpaid.
+  ///
+  /// In de, this message translates to:
+  /// **'Unbezahlter Urlaub'**
+  String get settingsAbsenceTypeDefaultUnpaid;
+
+  /// No description provided for @settingsAbsenceTypeMoveUp.
+  ///
+  /// In de, this message translates to:
+  /// **'Nach oben'**
+  String get settingsAbsenceTypeMoveUp;
+
+  /// No description provided for @settingsAbsenceTypeMoveDown.
+  ///
+  /// In de, this message translates to:
+  /// **'Nach unten'**
+  String get settingsAbsenceTypeMoveDown;
+
+  /// No description provided for @settingsAbsencesSaveError.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Abwesenheitseinstellung konnte nicht gespeichert werden.'**
+  String get settingsAbsencesSaveError;
 
   /// No description provided for @settingsProjectsTitle.
   ///

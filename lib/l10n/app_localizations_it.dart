@@ -311,6 +311,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get commonDelete => 'Elimina';
 
   @override
+  String get commonEdit => 'Modifica';
+
+  @override
   String get commonClose => 'Chiudi';
 
   @override
@@ -565,6 +568,61 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settingsBalanceBoundMissing => 'Indica almeno un limite.';
+
+  @override
+  String get settingsCategoryAbsences => 'Assenze';
+
+  @override
+  String get settingsAbsencesEnabled => 'Registrare le assenze';
+
+  @override
+  String get settingsAbsencesEnabledDescription =>
+      'Aggiunge un terzo modo di registrazione nella schermata principale. Senza registrazione, per il saldo contano solo i giorni con una timbratura.';
+
+  @override
+  String get settingsAbsenceTypesTitle => 'Tipi di assenza';
+
+  @override
+  String get settingsAbsenceTypeAdd => 'Aggiungi tipo';
+
+  @override
+  String get settingsAbsenceTypeName => 'Nome';
+
+  @override
+  String get settingsAbsenceTypePaid => 'Retribuita';
+
+  @override
+  String get settingsAbsenceTypeUnpaid => 'Non retribuita';
+
+  @override
+  String get settingsAbsenceTypeAddStandard => 'Aggiungi i tipi standard';
+
+  @override
+  String settingsAbsenceTypeInUse(int count) {
+    return 'Usato da $count giorni e non può essere eliminato.';
+  }
+
+  @override
+  String get settingsAbsenceTypeDefaultVacation => 'Ferie';
+
+  @override
+  String get settingsAbsenceTypeDefaultSick => 'Malattia';
+
+  @override
+  String get settingsAbsenceTypeDefaultHoliday => 'Festività';
+
+  @override
+  String get settingsAbsenceTypeDefaultUnpaid => 'Aspettativa non retribuita';
+
+  @override
+  String get settingsAbsenceTypeMoveUp => 'Sposta su';
+
+  @override
+  String get settingsAbsenceTypeMoveDown => 'Sposta giù';
+
+  @override
+  String get settingsAbsencesSaveError =>
+      'Impossibile salvare l\'impostazione delle assenze.';
 
   @override
   String get settingsProjectsTitle => 'Progetti';

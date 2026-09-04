@@ -315,6 +315,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get commonDelete => 'Supprimer';
 
   @override
+  String get commonEdit => 'Modifier';
+
+  @override
   String get commonClose => 'Fermer';
 
   @override
@@ -572,6 +575,61 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settingsBalanceBoundMissing =>
       'Veuillez définir au moins une limite.';
+
+  @override
+  String get settingsCategoryAbsences => 'Absences';
+
+  @override
+  String get settingsAbsencesEnabled => 'Enregistrer les absences';
+
+  @override
+  String get settingsAbsencesEnabledDescription =>
+      'Ajoute une troisième saisie sur l\'écran principal. Sans enregistrement, seuls les jours pointés comptent pour le compteur.';
+
+  @override
+  String get settingsAbsenceTypesTitle => 'Types d\'absence';
+
+  @override
+  String get settingsAbsenceTypeAdd => 'Ajouter un type';
+
+  @override
+  String get settingsAbsenceTypeName => 'Nom';
+
+  @override
+  String get settingsAbsenceTypePaid => 'Payé';
+
+  @override
+  String get settingsAbsenceTypeUnpaid => 'Non payé';
+
+  @override
+  String get settingsAbsenceTypeAddStandard => 'Ajouter les types standard';
+
+  @override
+  String settingsAbsenceTypeInUse(int count) {
+    return 'Utilisé par $count jours et ne peut pas être supprimé.';
+  }
+
+  @override
+  String get settingsAbsenceTypeDefaultVacation => 'Congés';
+
+  @override
+  String get settingsAbsenceTypeDefaultSick => 'Maladie';
+
+  @override
+  String get settingsAbsenceTypeDefaultHoliday => 'Jour férié';
+
+  @override
+  String get settingsAbsenceTypeDefaultUnpaid => 'Congé sans solde';
+
+  @override
+  String get settingsAbsenceTypeMoveUp => 'Monter';
+
+  @override
+  String get settingsAbsenceTypeMoveDown => 'Descendre';
+
+  @override
+  String get settingsAbsencesSaveError =>
+      'Le réglage d\'absence n\'a pas pu être enregistré.';
 
   @override
   String get settingsProjectsTitle => 'Projets';

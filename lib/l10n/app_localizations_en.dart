@@ -311,6 +311,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonDelete => 'Delete';
 
   @override
+  String get commonEdit => 'Edit';
+
+  @override
   String get commonClose => 'Close';
 
   @override
@@ -560,6 +563,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsBalanceBoundMissing => 'Please set at least one bound.';
+
+  @override
+  String get settingsCategoryAbsences => 'Absences';
+
+  @override
+  String get settingsAbsencesEnabled => 'Record absences';
+
+  @override
+  String get settingsAbsencesEnabledDescription =>
+      'Adds a third way to record on the main screen. With recording off, only days with a booking count toward the balance.';
+
+  @override
+  String get settingsAbsenceTypesTitle => 'Absence types';
+
+  @override
+  String get settingsAbsenceTypeAdd => 'Add type';
+
+  @override
+  String get settingsAbsenceTypeName => 'Name';
+
+  @override
+  String get settingsAbsenceTypePaid => 'Paid';
+
+  @override
+  String get settingsAbsenceTypeUnpaid => 'Unpaid';
+
+  @override
+  String get settingsAbsenceTypeAddStandard => 'Add standard types';
+
+  @override
+  String settingsAbsenceTypeInUse(int count) {
+    return 'Used by $count days and cannot be deleted.';
+  }
+
+  @override
+  String get settingsAbsenceTypeDefaultVacation => 'Vacation';
+
+  @override
+  String get settingsAbsenceTypeDefaultSick => 'Sick leave';
+
+  @override
+  String get settingsAbsenceTypeDefaultHoliday => 'Public holiday';
+
+  @override
+  String get settingsAbsenceTypeDefaultUnpaid => 'Unpaid leave';
+
+  @override
+  String get settingsAbsenceTypeMoveUp => 'Move up';
+
+  @override
+  String get settingsAbsenceTypeMoveDown => 'Move down';
+
+  @override
+  String get settingsAbsencesSaveError =>
+      'The absence setting could not be saved.';
 
   @override
   String get settingsProjectsTitle => 'Projects';
