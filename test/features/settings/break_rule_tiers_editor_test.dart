@@ -14,6 +14,8 @@ import 'package:hickory/data/sync/synced_writes.dart';
 import 'package:hickory/features/settings/break_rule_tiers_editor.dart';
 import 'package:hickory/l10n/app_localizations.dart';
 
+import '../../support/app_settings_fixture.dart';
+
 // NOTE: SyncedWrites' real SyncLogWriter performs real file I/O
 // (File.writeAsString) when logging each event. flutter_test's
 // TestWidgetsFlutterBinding does not service real (non-fake-clock) async
@@ -81,14 +83,7 @@ void main() {
       breakRuleTiersProvider.overrideWith((ref) => Stream.value(tiers)),
       appSettingsProvider.overrideWith(
         (ref) => Stream.value(
-          AppSettingsRow(
-            id: 'default',
-            dateFormat: 'iso',
-            timeFormat: '24h',
-            quickAddDurationsMinutes: '15,30,45,60',
-            countPausedTimeAsBreak: countPausedTimeAsBreak,
-            updatedAt: DateTime.utc(2026, 1, 1),
-          ),
+          appSettingsFixture(countPausedTimeAsBreak: countPausedTimeAsBreak),
         ),
       ),
       deviceIdProvider.overrideWith((ref) async => 'device-1'),

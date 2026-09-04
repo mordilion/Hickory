@@ -13,6 +13,8 @@ import 'package:hickory/data/sync/sync_log_writer.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
 import 'package:sync_engine/sync_engine.dart' show EventOp;
 
+import '../support/app_settings_fixture.dart';
+
 // Plain test() (not testWidgets): no widget pumping needed, so this runs as
 // a normal fast Dart VM test rather than spinning up flutter_tester.
 void main() {
@@ -147,14 +149,7 @@ void main() {
       // real row's .toJson() (matching the exact wire format the app
       // actually produces, including its DateTime encoding) with the new
       // column removed, rather than hand-writing the payload's shape.
-      final v4Payload = AppSettingsRow(
-        id: appSettingsRowId,
-        dateFormat: 'de',
-        timeFormat: '12h',
-        quickAddDurationsMinutes: '15,30,45,60',
-        countPausedTimeAsBreak: false,
-        updatedAt: DateTime.utc(2026, 1, 1),
-      ).toJson()
+      final v4Payload = appSettingsFixture(dateFormat: 'de', timeFormat: '12h').toJson()
         ..remove('quickAddDurationsMinutes');
 
       final peerLogWriter = SyncLogWriter(syncRoot: syncRoot, deviceId: 'dev_old');

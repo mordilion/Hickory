@@ -13,6 +13,8 @@ import 'package:hickory/data/sync/synced_writes.dart';
 import 'package:hickory/features/settings/quick_add_durations_editor.dart';
 import 'package:hickory/l10n/app_localizations.dart';
 
+import '../../support/app_settings_fixture.dart';
+
 Future<void> pumpUntilTrue(
   WidgetTester tester,
   Future<bool> Function() condition, {
@@ -58,13 +60,8 @@ void main() {
         overrides: [
           appSettingsProvider.overrideWith(
             (ref) => Stream.value(
-              AppSettingsRow(
-                id: 'default',
-                dateFormat: 'iso',
-                timeFormat: '24h',
+              appSettingsFixture(
                 quickAddDurationsMinutes: formatQuickAddDurations(durations),
-                countPausedTimeAsBreak: false,
-                updatedAt: DateTime.utc(2026, 1, 1),
               ),
             ),
           ),

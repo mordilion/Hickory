@@ -17,6 +17,8 @@ import 'package:hickory/features/settings/general_settings_screen.dart';
 import 'package:hickory/l10n/app_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import '../../support/app_settings_fixture.dart';
+
 class _FakeAutostartService extends AutostartService {
   bool enabled = false;
 
@@ -73,18 +75,7 @@ void main() {
 
   Widget makeApp() => ProviderScope(
     overrides: [
-      appSettingsProvider.overrideWith(
-        (ref) => Stream.value(
-          AppSettingsRow(
-            id: 'default',
-            dateFormat: 'iso',
-            timeFormat: '24h',
-            quickAddDurationsMinutes: '15,30,45,60',
-            countPausedTimeAsBreak: false,
-            updatedAt: DateTime.utc(2026, 1, 1),
-          ),
-        ),
-      ),
+      appSettingsProvider.overrideWith((ref) => Stream.value(appSettingsFixture())),
       syncedWritesProvider.overrideWith(
         (ref) async => SyncedWrites(
           db: db,

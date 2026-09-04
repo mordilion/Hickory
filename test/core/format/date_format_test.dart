@@ -3,6 +3,8 @@ import 'package:hickory/core/format/date_format.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import '../../support/app_settings_fixture.dart';
+
 void main() {
   setUpAll(() async {
     await initializeDateFormatting('de_DE');
@@ -60,12 +62,9 @@ void main() {
     });
 
     test('resolves via fromWireName when settings row is present', () {
-      final settings = AppSettingsRow(
-        id: 'default',
+      final settings = appSettingsFixture(
         dateFormat: 'de',
         timeFormat: '12h_sec',
-        quickAddDurationsMinutes: '15,30,45,60',
-                countPausedTimeAsBreak: false,
         updatedAt: DateTime(2026, 1, 1),
       );
       expect(settings.dateStyle, DateFormatStyle.de);

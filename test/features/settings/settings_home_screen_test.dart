@@ -9,7 +9,6 @@ import 'package:hickory/core/di/break_rule_tiers_provider.dart';
 import 'package:hickory/core/di/locale_provider.dart';
 import 'package:hickory/core/di/update_providers.dart';
 import 'package:hickory/core/locale/locale_store.dart';
-import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/features/clients/clients_providers.dart';
 import 'package:hickory/features/projects/projects_providers.dart';
 import 'package:hickory/features/settings/clients_settings_screen.dart';
@@ -22,6 +21,8 @@ import 'package:hickory/features/settings/update_settings_screen.dart';
 import 'package:hickory/features/shell/nav_shell.dart';
 import 'package:hickory/l10n/app_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
+
+import '../../support/app_settings_fixture.dart';
 
 class _FakeAutostartService extends AutostartService {
   @override
@@ -51,18 +52,7 @@ void main() {
 
   Widget makeApp() => ProviderScope(
     overrides: [
-      appSettingsProvider.overrideWith(
-        (ref) => Stream.value(
-          AppSettingsRow(
-            id: 'default',
-            dateFormat: 'iso',
-            timeFormat: '24h',
-            quickAddDurationsMinutes: '15,30,45,60',
-            countPausedTimeAsBreak: false,
-            updatedAt: DateTime.utc(2026, 1, 1),
-          ),
-        ),
-      ),
+      appSettingsProvider.overrideWith((ref) => Stream.value(appSettingsFixture())),
       breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),
       activeProjectsProvider.overrideWith((ref) => Stream.value(const [])),
       archivedProjectsProvider.overrideWith((ref) => Stream.value(const [])),

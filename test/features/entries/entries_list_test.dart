@@ -16,6 +16,8 @@ import 'package:hickory/features/timer/timer_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import '../../support/app_settings_fixture.dart';
+
 TimeEntry _entry({
   required String id,
   required DateTime startAt,
@@ -100,14 +102,7 @@ void main() {
           breakRuleTiersProvider.overrideWith((ref) => Stream.value(tiers)),
           appSettingsProvider.overrideWith(
             (ref) => Stream.value(
-              AppSettingsRow(
-                id: 'default',
-                dateFormat: 'iso',
-                timeFormat: '24h',
-                quickAddDurationsMinutes: '15,30,45,60',
-                countPausedTimeAsBreak: countPausedTimeAsBreak,
-                updatedAt: DateTime.utc(2026, 1, 1),
-              ),
+              appSettingsFixture(countPausedTimeAsBreak: countPausedTimeAsBreak),
             ),
           ),
         ],

@@ -20,6 +20,8 @@ import 'package:hickory/features/projects/projects_providers.dart';
 import 'package:hickory/features/timer/timer_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
 
+import '../../support/app_settings_fixture.dart';
+
 void main() {
   late AppDatabase db;
   late Directory syncRoot;
@@ -57,18 +59,7 @@ void main() {
             (ref) => Stream.value(const {}),
           ),
           breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),
-          appSettingsProvider.overrideWith(
-            (ref) => Stream.value(
-              AppSettingsRow(
-                id: 'default',
-                dateFormat: 'iso',
-                timeFormat: '24h',
-                quickAddDurationsMinutes: '15,30,45,60',
-                countPausedTimeAsBreak: false,
-                updatedAt: DateTime.utc(2026, 1, 1),
-              ),
-            ),
-          ),
+          appSettingsProvider.overrideWith((ref) => Stream.value(appSettingsFixture())),
           deviceIdProvider.overrideWith((ref) async => 'device-1'),
           syncedWritesProvider.overrideWith((ref) async => writes),
         ],

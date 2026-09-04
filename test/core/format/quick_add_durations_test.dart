@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/core/format/quick_add_durations.dart';
 import 'package:hickory/data/drift/database.dart';
 
+import '../../support/app_settings_fixture.dart';
+
 void main() {
   test('parseQuickAddDurations returns the default list when raw is null', () {
     expect(parseQuickAddDurations(null), [15, 30, 45, 60]);
@@ -41,14 +43,7 @@ void main() {
   });
 
   test('quickAddDurations extension parses the settings row field', () {
-    final row = AppSettingsRow(
-      id: 'default',
-      dateFormat: 'iso',
-      timeFormat: '24h',
-      quickAddDurationsMinutes: '20,40',
-      countPausedTimeAsBreak: false,
-      updatedAt: DateTime.utc(2026, 1, 1),
-    );
+    final row = appSettingsFixture(quickAddDurationsMinutes: '20,40');
     expect(row.quickAddDurations, [20, 40]);
   });
 
