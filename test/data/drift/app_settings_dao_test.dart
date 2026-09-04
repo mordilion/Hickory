@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/data/drift/database.dart';
@@ -53,5 +54,50 @@ void main() {
 
     final second = await db.appSettingsDao.updateSettings(dateFormat: 'de');
     expect(second.quickAddDurationsMinutes, '10,20', reason: 'must not be reset by an unrelated update');
+  });
+
+  test('new settings columns start at their documented defaults', () async {
+    final settings = await db.appSettingsDao.watchSettings().first;
+    expect(settings.targetMinutesMonday, 0);
+    expect(settings.targetMinutesSunday, 0);
+    expect(settings.targetInputMode, 'perWeekday');
+    expect(settings.balanceResetMode, 'none');
+    expect(settings.balanceResetDay, isNull);
+    expect(settings.carryOverMaxMinutes, isNull);
+    expect(settings.absenceTrackingEnabled, isFalse);
+  });
+
+  test('updateSettings stores targets and the balance reset rule', () async {
+    final updated = await db.appSettingsDao.updateSettings(
+      targetMinutesMonday: 480,
+      targetMinutesFriday: 300,
+      targetInputMode: 'perWeek',
+      balanceResetMode: 'carryOver',
+      balanceResetDay: const Value(1),
+      balanceResetMonth: const Value(7),
+      carryOverMaxMinutes: const Value(1200),
+    );
+    expect(updated.targetMinutesMonday, 480);
+    expect(updated.targetMinutesFriday, 300);
+    expect(updated.targetMinutesTuesday, 0, reason: 'untouched days keep their value');
+    expect(updated.targetInputMode, 'perWeek');
+    expect(updated.balanceResetMode, 'carryOver');
+    expect(updated.balanceResetDay, 1);
+    expect(updated.balanceResetMonth, 7);
+    expect(updated.carryOverMaxMinutes, 1200);
+  });
+
+  test('a nullable balance field can be cleared back to null', () async {
+    await db.appSettingsDao.updateSettings(carryOverMaxMinutes: const Value(1200));
+    final cleared = await db.appSettingsDao.updateSettings(
+      carryOverMaxMinutes: const Value(null),
+    );
+    expect(cleared.carryOverMaxMinutes, isNull);
+  });
+
+  test('omitting a nullable balance field leaves it untouched', () async {
+    await db.appSettingsDao.updateSettings(carryOverMaxMinutes: const Value(1200));
+    final untouched = await db.appSettingsDao.updateSettings(dateFormat: 'de');
+    expect(untouched.carryOverMaxMinutes, 1200);
   });
 }

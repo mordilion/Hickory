@@ -63,7 +63,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.connection);
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -91,6 +91,22 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 8) {
         await m.createTable(personioAttendances);
+      }
+      if (from < 9) {
+        await m.addColumn(appSettings, appSettings.targetMinutesMonday);
+        await m.addColumn(appSettings, appSettings.targetMinutesTuesday);
+        await m.addColumn(appSettings, appSettings.targetMinutesWednesday);
+        await m.addColumn(appSettings, appSettings.targetMinutesThursday);
+        await m.addColumn(appSettings, appSettings.targetMinutesFriday);
+        await m.addColumn(appSettings, appSettings.targetMinutesSaturday);
+        await m.addColumn(appSettings, appSettings.targetMinutesSunday);
+        await m.addColumn(appSettings, appSettings.targetInputMode);
+        await m.addColumn(appSettings, appSettings.balanceResetMode);
+        await m.addColumn(appSettings, appSettings.balanceResetDay);
+        await m.addColumn(appSettings, appSettings.balanceResetMonth);
+        await m.addColumn(appSettings, appSettings.carryOverMaxMinutes);
+        await m.addColumn(appSettings, appSettings.carryOverMinMinutes);
+        await m.addColumn(appSettings, appSettings.absenceTrackingEnabled);
       }
     },
   );

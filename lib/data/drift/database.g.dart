@@ -3506,6 +3506,164 @@ class $AppSettingsTable extends AppSettings
         ),
         defaultValue: const Constant(false),
       );
+  static const VerificationMeta _targetMinutesMondayMeta =
+      const VerificationMeta('targetMinutesMonday');
+  @override
+  late final GeneratedColumn<int> targetMinutesMonday = GeneratedColumn<int>(
+    'target_minutes_monday',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _targetMinutesTuesdayMeta =
+      const VerificationMeta('targetMinutesTuesday');
+  @override
+  late final GeneratedColumn<int> targetMinutesTuesday = GeneratedColumn<int>(
+    'target_minutes_tuesday',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _targetMinutesWednesdayMeta =
+      const VerificationMeta('targetMinutesWednesday');
+  @override
+  late final GeneratedColumn<int> targetMinutesWednesday = GeneratedColumn<int>(
+    'target_minutes_wednesday',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _targetMinutesThursdayMeta =
+      const VerificationMeta('targetMinutesThursday');
+  @override
+  late final GeneratedColumn<int> targetMinutesThursday = GeneratedColumn<int>(
+    'target_minutes_thursday',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _targetMinutesFridayMeta =
+      const VerificationMeta('targetMinutesFriday');
+  @override
+  late final GeneratedColumn<int> targetMinutesFriday = GeneratedColumn<int>(
+    'target_minutes_friday',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _targetMinutesSaturdayMeta =
+      const VerificationMeta('targetMinutesSaturday');
+  @override
+  late final GeneratedColumn<int> targetMinutesSaturday = GeneratedColumn<int>(
+    'target_minutes_saturday',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _targetMinutesSundayMeta =
+      const VerificationMeta('targetMinutesSunday');
+  @override
+  late final GeneratedColumn<int> targetMinutesSunday = GeneratedColumn<int>(
+    'target_minutes_sunday',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _targetInputModeMeta = const VerificationMeta(
+    'targetInputMode',
+  );
+  @override
+  late final GeneratedColumn<String> targetInputMode = GeneratedColumn<String>(
+    'target_input_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('perWeekday'),
+  );
+  static const VerificationMeta _balanceResetModeMeta = const VerificationMeta(
+    'balanceResetMode',
+  );
+  @override
+  late final GeneratedColumn<String> balanceResetMode = GeneratedColumn<String>(
+    'balance_reset_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('none'),
+  );
+  static const VerificationMeta _balanceResetDayMeta = const VerificationMeta(
+    'balanceResetDay',
+  );
+  @override
+  late final GeneratedColumn<int> balanceResetDay = GeneratedColumn<int>(
+    'balance_reset_day',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _balanceResetMonthMeta = const VerificationMeta(
+    'balanceResetMonth',
+  );
+  @override
+  late final GeneratedColumn<int> balanceResetMonth = GeneratedColumn<int>(
+    'balance_reset_month',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _carryOverMaxMinutesMeta =
+      const VerificationMeta('carryOverMaxMinutes');
+  @override
+  late final GeneratedColumn<int> carryOverMaxMinutes = GeneratedColumn<int>(
+    'carry_over_max_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _carryOverMinMinutesMeta =
+      const VerificationMeta('carryOverMinMinutes');
+  @override
+  late final GeneratedColumn<int> carryOverMinMinutes = GeneratedColumn<int>(
+    'carry_over_min_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _absenceTrackingEnabledMeta =
+      const VerificationMeta('absenceTrackingEnabled');
+  @override
+  late final GeneratedColumn<bool> absenceTrackingEnabled =
+      GeneratedColumn<bool>(
+        'absence_tracking_enabled',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("absence_tracking_enabled" IN (0, 1))',
+        ),
+        defaultValue: const Constant(false),
+      );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -3524,6 +3682,20 @@ class $AppSettingsTable extends AppSettings
     timeFormat,
     quickAddDurationsMinutes,
     countPausedTimeAsBreak,
+    targetMinutesMonday,
+    targetMinutesTuesday,
+    targetMinutesWednesday,
+    targetMinutesThursday,
+    targetMinutesFriday,
+    targetMinutesSaturday,
+    targetMinutesSunday,
+    targetInputMode,
+    balanceResetMode,
+    balanceResetDay,
+    balanceResetMonth,
+    carryOverMaxMinutes,
+    carryOverMinMinutes,
+    absenceTrackingEnabled,
     updatedAt,
   ];
   @override
@@ -3573,6 +3745,132 @@ class $AppSettingsTable extends AppSettings
         ),
       );
     }
+    if (data.containsKey('target_minutes_monday')) {
+      context.handle(
+        _targetMinutesMondayMeta,
+        targetMinutesMonday.isAcceptableOrUnknown(
+          data['target_minutes_monday']!,
+          _targetMinutesMondayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('target_minutes_tuesday')) {
+      context.handle(
+        _targetMinutesTuesdayMeta,
+        targetMinutesTuesday.isAcceptableOrUnknown(
+          data['target_minutes_tuesday']!,
+          _targetMinutesTuesdayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('target_minutes_wednesday')) {
+      context.handle(
+        _targetMinutesWednesdayMeta,
+        targetMinutesWednesday.isAcceptableOrUnknown(
+          data['target_minutes_wednesday']!,
+          _targetMinutesWednesdayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('target_minutes_thursday')) {
+      context.handle(
+        _targetMinutesThursdayMeta,
+        targetMinutesThursday.isAcceptableOrUnknown(
+          data['target_minutes_thursday']!,
+          _targetMinutesThursdayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('target_minutes_friday')) {
+      context.handle(
+        _targetMinutesFridayMeta,
+        targetMinutesFriday.isAcceptableOrUnknown(
+          data['target_minutes_friday']!,
+          _targetMinutesFridayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('target_minutes_saturday')) {
+      context.handle(
+        _targetMinutesSaturdayMeta,
+        targetMinutesSaturday.isAcceptableOrUnknown(
+          data['target_minutes_saturday']!,
+          _targetMinutesSaturdayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('target_minutes_sunday')) {
+      context.handle(
+        _targetMinutesSundayMeta,
+        targetMinutesSunday.isAcceptableOrUnknown(
+          data['target_minutes_sunday']!,
+          _targetMinutesSundayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('target_input_mode')) {
+      context.handle(
+        _targetInputModeMeta,
+        targetInputMode.isAcceptableOrUnknown(
+          data['target_input_mode']!,
+          _targetInputModeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('balance_reset_mode')) {
+      context.handle(
+        _balanceResetModeMeta,
+        balanceResetMode.isAcceptableOrUnknown(
+          data['balance_reset_mode']!,
+          _balanceResetModeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('balance_reset_day')) {
+      context.handle(
+        _balanceResetDayMeta,
+        balanceResetDay.isAcceptableOrUnknown(
+          data['balance_reset_day']!,
+          _balanceResetDayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('balance_reset_month')) {
+      context.handle(
+        _balanceResetMonthMeta,
+        balanceResetMonth.isAcceptableOrUnknown(
+          data['balance_reset_month']!,
+          _balanceResetMonthMeta,
+        ),
+      );
+    }
+    if (data.containsKey('carry_over_max_minutes')) {
+      context.handle(
+        _carryOverMaxMinutesMeta,
+        carryOverMaxMinutes.isAcceptableOrUnknown(
+          data['carry_over_max_minutes']!,
+          _carryOverMaxMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('carry_over_min_minutes')) {
+      context.handle(
+        _carryOverMinMinutesMeta,
+        carryOverMinMinutes.isAcceptableOrUnknown(
+          data['carry_over_min_minutes']!,
+          _carryOverMinMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('absence_tracking_enabled')) {
+      context.handle(
+        _absenceTrackingEnabledMeta,
+        absenceTrackingEnabled.isAcceptableOrUnknown(
+          data['absence_tracking_enabled']!,
+          _absenceTrackingEnabledMeta,
+        ),
+      );
+    }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
@@ -3610,6 +3908,62 @@ class $AppSettingsTable extends AppSettings
         DriftSqlType.bool,
         data['${effectivePrefix}count_paused_time_as_break'],
       )!,
+      targetMinutesMonday: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_minutes_monday'],
+      )!,
+      targetMinutesTuesday: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_minutes_tuesday'],
+      )!,
+      targetMinutesWednesday: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_minutes_wednesday'],
+      )!,
+      targetMinutesThursday: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_minutes_thursday'],
+      )!,
+      targetMinutesFriday: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_minutes_friday'],
+      )!,
+      targetMinutesSaturday: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_minutes_saturday'],
+      )!,
+      targetMinutesSunday: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_minutes_sunday'],
+      )!,
+      targetInputMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}target_input_mode'],
+      )!,
+      balanceResetMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}balance_reset_mode'],
+      )!,
+      balanceResetDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}balance_reset_day'],
+      ),
+      balanceResetMonth: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}balance_reset_month'],
+      ),
+      carryOverMaxMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}carry_over_max_minutes'],
+      ),
+      carryOverMinMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}carry_over_min_minutes'],
+      ),
+      absenceTrackingEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}absence_tracking_enabled'],
+      )!,
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -3629,6 +3983,20 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
   final String timeFormat;
   final String quickAddDurationsMinutes;
   final bool countPausedTimeAsBreak;
+  final int targetMinutesMonday;
+  final int targetMinutesTuesday;
+  final int targetMinutesWednesday;
+  final int targetMinutesThursday;
+  final int targetMinutesFriday;
+  final int targetMinutesSaturday;
+  final int targetMinutesSunday;
+  final String targetInputMode;
+  final String balanceResetMode;
+  final int? balanceResetDay;
+  final int? balanceResetMonth;
+  final int? carryOverMaxMinutes;
+  final int? carryOverMinMinutes;
+  final bool absenceTrackingEnabled;
   final DateTime updatedAt;
   const AppSettingsRow({
     required this.id,
@@ -3636,6 +4004,20 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
     required this.timeFormat,
     required this.quickAddDurationsMinutes,
     required this.countPausedTimeAsBreak,
+    required this.targetMinutesMonday,
+    required this.targetMinutesTuesday,
+    required this.targetMinutesWednesday,
+    required this.targetMinutesThursday,
+    required this.targetMinutesFriday,
+    required this.targetMinutesSaturday,
+    required this.targetMinutesSunday,
+    required this.targetInputMode,
+    required this.balanceResetMode,
+    this.balanceResetDay,
+    this.balanceResetMonth,
+    this.carryOverMaxMinutes,
+    this.carryOverMinMinutes,
+    required this.absenceTrackingEnabled,
     required this.updatedAt,
   });
   @override
@@ -3648,6 +4030,28 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
       quickAddDurationsMinutes,
     );
     map['count_paused_time_as_break'] = Variable<bool>(countPausedTimeAsBreak);
+    map['target_minutes_monday'] = Variable<int>(targetMinutesMonday);
+    map['target_minutes_tuesday'] = Variable<int>(targetMinutesTuesday);
+    map['target_minutes_wednesday'] = Variable<int>(targetMinutesWednesday);
+    map['target_minutes_thursday'] = Variable<int>(targetMinutesThursday);
+    map['target_minutes_friday'] = Variable<int>(targetMinutesFriday);
+    map['target_minutes_saturday'] = Variable<int>(targetMinutesSaturday);
+    map['target_minutes_sunday'] = Variable<int>(targetMinutesSunday);
+    map['target_input_mode'] = Variable<String>(targetInputMode);
+    map['balance_reset_mode'] = Variable<String>(balanceResetMode);
+    if (!nullToAbsent || balanceResetDay != null) {
+      map['balance_reset_day'] = Variable<int>(balanceResetDay);
+    }
+    if (!nullToAbsent || balanceResetMonth != null) {
+      map['balance_reset_month'] = Variable<int>(balanceResetMonth);
+    }
+    if (!nullToAbsent || carryOverMaxMinutes != null) {
+      map['carry_over_max_minutes'] = Variable<int>(carryOverMaxMinutes);
+    }
+    if (!nullToAbsent || carryOverMinMinutes != null) {
+      map['carry_over_min_minutes'] = Variable<int>(carryOverMinMinutes);
+    }
+    map['absence_tracking_enabled'] = Variable<bool>(absenceTrackingEnabled);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
@@ -3659,6 +4063,28 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
       timeFormat: Value(timeFormat),
       quickAddDurationsMinutes: Value(quickAddDurationsMinutes),
       countPausedTimeAsBreak: Value(countPausedTimeAsBreak),
+      targetMinutesMonday: Value(targetMinutesMonday),
+      targetMinutesTuesday: Value(targetMinutesTuesday),
+      targetMinutesWednesday: Value(targetMinutesWednesday),
+      targetMinutesThursday: Value(targetMinutesThursday),
+      targetMinutesFriday: Value(targetMinutesFriday),
+      targetMinutesSaturday: Value(targetMinutesSaturday),
+      targetMinutesSunday: Value(targetMinutesSunday),
+      targetInputMode: Value(targetInputMode),
+      balanceResetMode: Value(balanceResetMode),
+      balanceResetDay: balanceResetDay == null && nullToAbsent
+          ? const Value.absent()
+          : Value(balanceResetDay),
+      balanceResetMonth: balanceResetMonth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(balanceResetMonth),
+      carryOverMaxMinutes: carryOverMaxMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(carryOverMaxMinutes),
+      carryOverMinMinutes: carryOverMinMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(carryOverMinMinutes),
+      absenceTrackingEnabled: Value(absenceTrackingEnabled),
       updatedAt: Value(updatedAt),
     );
   }
@@ -3678,6 +4104,40 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
       countPausedTimeAsBreak: serializer.fromJson<bool>(
         json['countPausedTimeAsBreak'],
       ),
+      targetMinutesMonday: serializer.fromJson<int>(
+        json['targetMinutesMonday'],
+      ),
+      targetMinutesTuesday: serializer.fromJson<int>(
+        json['targetMinutesTuesday'],
+      ),
+      targetMinutesWednesday: serializer.fromJson<int>(
+        json['targetMinutesWednesday'],
+      ),
+      targetMinutesThursday: serializer.fromJson<int>(
+        json['targetMinutesThursday'],
+      ),
+      targetMinutesFriday: serializer.fromJson<int>(
+        json['targetMinutesFriday'],
+      ),
+      targetMinutesSaturday: serializer.fromJson<int>(
+        json['targetMinutesSaturday'],
+      ),
+      targetMinutesSunday: serializer.fromJson<int>(
+        json['targetMinutesSunday'],
+      ),
+      targetInputMode: serializer.fromJson<String>(json['targetInputMode']),
+      balanceResetMode: serializer.fromJson<String>(json['balanceResetMode']),
+      balanceResetDay: serializer.fromJson<int?>(json['balanceResetDay']),
+      balanceResetMonth: serializer.fromJson<int?>(json['balanceResetMonth']),
+      carryOverMaxMinutes: serializer.fromJson<int?>(
+        json['carryOverMaxMinutes'],
+      ),
+      carryOverMinMinutes: serializer.fromJson<int?>(
+        json['carryOverMinMinutes'],
+      ),
+      absenceTrackingEnabled: serializer.fromJson<bool>(
+        json['absenceTrackingEnabled'],
+      ),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
@@ -3692,6 +4152,20 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
         quickAddDurationsMinutes,
       ),
       'countPausedTimeAsBreak': serializer.toJson<bool>(countPausedTimeAsBreak),
+      'targetMinutesMonday': serializer.toJson<int>(targetMinutesMonday),
+      'targetMinutesTuesday': serializer.toJson<int>(targetMinutesTuesday),
+      'targetMinutesWednesday': serializer.toJson<int>(targetMinutesWednesday),
+      'targetMinutesThursday': serializer.toJson<int>(targetMinutesThursday),
+      'targetMinutesFriday': serializer.toJson<int>(targetMinutesFriday),
+      'targetMinutesSaturday': serializer.toJson<int>(targetMinutesSaturday),
+      'targetMinutesSunday': serializer.toJson<int>(targetMinutesSunday),
+      'targetInputMode': serializer.toJson<String>(targetInputMode),
+      'balanceResetMode': serializer.toJson<String>(balanceResetMode),
+      'balanceResetDay': serializer.toJson<int?>(balanceResetDay),
+      'balanceResetMonth': serializer.toJson<int?>(balanceResetMonth),
+      'carryOverMaxMinutes': serializer.toJson<int?>(carryOverMaxMinutes),
+      'carryOverMinMinutes': serializer.toJson<int?>(carryOverMinMinutes),
+      'absenceTrackingEnabled': serializer.toJson<bool>(absenceTrackingEnabled),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
@@ -3702,6 +4176,20 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
     String? timeFormat,
     String? quickAddDurationsMinutes,
     bool? countPausedTimeAsBreak,
+    int? targetMinutesMonday,
+    int? targetMinutesTuesday,
+    int? targetMinutesWednesday,
+    int? targetMinutesThursday,
+    int? targetMinutesFriday,
+    int? targetMinutesSaturday,
+    int? targetMinutesSunday,
+    String? targetInputMode,
+    String? balanceResetMode,
+    Value<int?> balanceResetDay = const Value.absent(),
+    Value<int?> balanceResetMonth = const Value.absent(),
+    Value<int?> carryOverMaxMinutes = const Value.absent(),
+    Value<int?> carryOverMinMinutes = const Value.absent(),
+    bool? absenceTrackingEnabled,
     DateTime? updatedAt,
   }) => AppSettingsRow(
     id: id ?? this.id,
@@ -3711,6 +4199,30 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
         quickAddDurationsMinutes ?? this.quickAddDurationsMinutes,
     countPausedTimeAsBreak:
         countPausedTimeAsBreak ?? this.countPausedTimeAsBreak,
+    targetMinutesMonday: targetMinutesMonday ?? this.targetMinutesMonday,
+    targetMinutesTuesday: targetMinutesTuesday ?? this.targetMinutesTuesday,
+    targetMinutesWednesday:
+        targetMinutesWednesday ?? this.targetMinutesWednesday,
+    targetMinutesThursday: targetMinutesThursday ?? this.targetMinutesThursday,
+    targetMinutesFriday: targetMinutesFriday ?? this.targetMinutesFriday,
+    targetMinutesSaturday: targetMinutesSaturday ?? this.targetMinutesSaturday,
+    targetMinutesSunday: targetMinutesSunday ?? this.targetMinutesSunday,
+    targetInputMode: targetInputMode ?? this.targetInputMode,
+    balanceResetMode: balanceResetMode ?? this.balanceResetMode,
+    balanceResetDay: balanceResetDay.present
+        ? balanceResetDay.value
+        : this.balanceResetDay,
+    balanceResetMonth: balanceResetMonth.present
+        ? balanceResetMonth.value
+        : this.balanceResetMonth,
+    carryOverMaxMinutes: carryOverMaxMinutes.present
+        ? carryOverMaxMinutes.value
+        : this.carryOverMaxMinutes,
+    carryOverMinMinutes: carryOverMinMinutes.present
+        ? carryOverMinMinutes.value
+        : this.carryOverMinMinutes,
+    absenceTrackingEnabled:
+        absenceTrackingEnabled ?? this.absenceTrackingEnabled,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   AppSettingsRow copyWithCompanion(AppSettingsCompanion data) {
@@ -3728,6 +4240,48 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
       countPausedTimeAsBreak: data.countPausedTimeAsBreak.present
           ? data.countPausedTimeAsBreak.value
           : this.countPausedTimeAsBreak,
+      targetMinutesMonday: data.targetMinutesMonday.present
+          ? data.targetMinutesMonday.value
+          : this.targetMinutesMonday,
+      targetMinutesTuesday: data.targetMinutesTuesday.present
+          ? data.targetMinutesTuesday.value
+          : this.targetMinutesTuesday,
+      targetMinutesWednesday: data.targetMinutesWednesday.present
+          ? data.targetMinutesWednesday.value
+          : this.targetMinutesWednesday,
+      targetMinutesThursday: data.targetMinutesThursday.present
+          ? data.targetMinutesThursday.value
+          : this.targetMinutesThursday,
+      targetMinutesFriday: data.targetMinutesFriday.present
+          ? data.targetMinutesFriday.value
+          : this.targetMinutesFriday,
+      targetMinutesSaturday: data.targetMinutesSaturday.present
+          ? data.targetMinutesSaturday.value
+          : this.targetMinutesSaturday,
+      targetMinutesSunday: data.targetMinutesSunday.present
+          ? data.targetMinutesSunday.value
+          : this.targetMinutesSunday,
+      targetInputMode: data.targetInputMode.present
+          ? data.targetInputMode.value
+          : this.targetInputMode,
+      balanceResetMode: data.balanceResetMode.present
+          ? data.balanceResetMode.value
+          : this.balanceResetMode,
+      balanceResetDay: data.balanceResetDay.present
+          ? data.balanceResetDay.value
+          : this.balanceResetDay,
+      balanceResetMonth: data.balanceResetMonth.present
+          ? data.balanceResetMonth.value
+          : this.balanceResetMonth,
+      carryOverMaxMinutes: data.carryOverMaxMinutes.present
+          ? data.carryOverMaxMinutes.value
+          : this.carryOverMaxMinutes,
+      carryOverMinMinutes: data.carryOverMinMinutes.present
+          ? data.carryOverMinMinutes.value
+          : this.carryOverMinMinutes,
+      absenceTrackingEnabled: data.absenceTrackingEnabled.present
+          ? data.absenceTrackingEnabled.value
+          : this.absenceTrackingEnabled,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -3740,6 +4294,20 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
           ..write('timeFormat: $timeFormat, ')
           ..write('quickAddDurationsMinutes: $quickAddDurationsMinutes, ')
           ..write('countPausedTimeAsBreak: $countPausedTimeAsBreak, ')
+          ..write('targetMinutesMonday: $targetMinutesMonday, ')
+          ..write('targetMinutesTuesday: $targetMinutesTuesday, ')
+          ..write('targetMinutesWednesday: $targetMinutesWednesday, ')
+          ..write('targetMinutesThursday: $targetMinutesThursday, ')
+          ..write('targetMinutesFriday: $targetMinutesFriday, ')
+          ..write('targetMinutesSaturday: $targetMinutesSaturday, ')
+          ..write('targetMinutesSunday: $targetMinutesSunday, ')
+          ..write('targetInputMode: $targetInputMode, ')
+          ..write('balanceResetMode: $balanceResetMode, ')
+          ..write('balanceResetDay: $balanceResetDay, ')
+          ..write('balanceResetMonth: $balanceResetMonth, ')
+          ..write('carryOverMaxMinutes: $carryOverMaxMinutes, ')
+          ..write('carryOverMinMinutes: $carryOverMinMinutes, ')
+          ..write('absenceTrackingEnabled: $absenceTrackingEnabled, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -3752,6 +4320,20 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
     timeFormat,
     quickAddDurationsMinutes,
     countPausedTimeAsBreak,
+    targetMinutesMonday,
+    targetMinutesTuesday,
+    targetMinutesWednesday,
+    targetMinutesThursday,
+    targetMinutesFriday,
+    targetMinutesSaturday,
+    targetMinutesSunday,
+    targetInputMode,
+    balanceResetMode,
+    balanceResetDay,
+    balanceResetMonth,
+    carryOverMaxMinutes,
+    carryOverMinMinutes,
+    absenceTrackingEnabled,
     updatedAt,
   );
   @override
@@ -3763,6 +4345,20 @@ class AppSettingsRow extends DataClass implements Insertable<AppSettingsRow> {
           other.timeFormat == this.timeFormat &&
           other.quickAddDurationsMinutes == this.quickAddDurationsMinutes &&
           other.countPausedTimeAsBreak == this.countPausedTimeAsBreak &&
+          other.targetMinutesMonday == this.targetMinutesMonday &&
+          other.targetMinutesTuesday == this.targetMinutesTuesday &&
+          other.targetMinutesWednesday == this.targetMinutesWednesday &&
+          other.targetMinutesThursday == this.targetMinutesThursday &&
+          other.targetMinutesFriday == this.targetMinutesFriday &&
+          other.targetMinutesSaturday == this.targetMinutesSaturday &&
+          other.targetMinutesSunday == this.targetMinutesSunday &&
+          other.targetInputMode == this.targetInputMode &&
+          other.balanceResetMode == this.balanceResetMode &&
+          other.balanceResetDay == this.balanceResetDay &&
+          other.balanceResetMonth == this.balanceResetMonth &&
+          other.carryOverMaxMinutes == this.carryOverMaxMinutes &&
+          other.carryOverMinMinutes == this.carryOverMinMinutes &&
+          other.absenceTrackingEnabled == this.absenceTrackingEnabled &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -3772,6 +4368,20 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
   final Value<String> timeFormat;
   final Value<String> quickAddDurationsMinutes;
   final Value<bool> countPausedTimeAsBreak;
+  final Value<int> targetMinutesMonday;
+  final Value<int> targetMinutesTuesday;
+  final Value<int> targetMinutesWednesday;
+  final Value<int> targetMinutesThursday;
+  final Value<int> targetMinutesFriday;
+  final Value<int> targetMinutesSaturday;
+  final Value<int> targetMinutesSunday;
+  final Value<String> targetInputMode;
+  final Value<String> balanceResetMode;
+  final Value<int?> balanceResetDay;
+  final Value<int?> balanceResetMonth;
+  final Value<int?> carryOverMaxMinutes;
+  final Value<int?> carryOverMinMinutes;
+  final Value<bool> absenceTrackingEnabled;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const AppSettingsCompanion({
@@ -3780,6 +4390,20 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
     this.timeFormat = const Value.absent(),
     this.quickAddDurationsMinutes = const Value.absent(),
     this.countPausedTimeAsBreak = const Value.absent(),
+    this.targetMinutesMonday = const Value.absent(),
+    this.targetMinutesTuesday = const Value.absent(),
+    this.targetMinutesWednesday = const Value.absent(),
+    this.targetMinutesThursday = const Value.absent(),
+    this.targetMinutesFriday = const Value.absent(),
+    this.targetMinutesSaturday = const Value.absent(),
+    this.targetMinutesSunday = const Value.absent(),
+    this.targetInputMode = const Value.absent(),
+    this.balanceResetMode = const Value.absent(),
+    this.balanceResetDay = const Value.absent(),
+    this.balanceResetMonth = const Value.absent(),
+    this.carryOverMaxMinutes = const Value.absent(),
+    this.carryOverMinMinutes = const Value.absent(),
+    this.absenceTrackingEnabled = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -3789,6 +4413,20 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
     this.timeFormat = const Value.absent(),
     this.quickAddDurationsMinutes = const Value.absent(),
     this.countPausedTimeAsBreak = const Value.absent(),
+    this.targetMinutesMonday = const Value.absent(),
+    this.targetMinutesTuesday = const Value.absent(),
+    this.targetMinutesWednesday = const Value.absent(),
+    this.targetMinutesThursday = const Value.absent(),
+    this.targetMinutesFriday = const Value.absent(),
+    this.targetMinutesSaturday = const Value.absent(),
+    this.targetMinutesSunday = const Value.absent(),
+    this.targetInputMode = const Value.absent(),
+    this.balanceResetMode = const Value.absent(),
+    this.balanceResetDay = const Value.absent(),
+    this.balanceResetMonth = const Value.absent(),
+    this.carryOverMaxMinutes = const Value.absent(),
+    this.carryOverMinMinutes = const Value.absent(),
+    this.absenceTrackingEnabled = const Value.absent(),
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -3799,6 +4437,20 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
     Expression<String>? timeFormat,
     Expression<String>? quickAddDurationsMinutes,
     Expression<bool>? countPausedTimeAsBreak,
+    Expression<int>? targetMinutesMonday,
+    Expression<int>? targetMinutesTuesday,
+    Expression<int>? targetMinutesWednesday,
+    Expression<int>? targetMinutesThursday,
+    Expression<int>? targetMinutesFriday,
+    Expression<int>? targetMinutesSaturday,
+    Expression<int>? targetMinutesSunday,
+    Expression<String>? targetInputMode,
+    Expression<String>? balanceResetMode,
+    Expression<int>? balanceResetDay,
+    Expression<int>? balanceResetMonth,
+    Expression<int>? carryOverMaxMinutes,
+    Expression<int>? carryOverMinMinutes,
+    Expression<bool>? absenceTrackingEnabled,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
@@ -3810,6 +4462,30 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
         'quick_add_durations_minutes': quickAddDurationsMinutes,
       if (countPausedTimeAsBreak != null)
         'count_paused_time_as_break': countPausedTimeAsBreak,
+      if (targetMinutesMonday != null)
+        'target_minutes_monday': targetMinutesMonday,
+      if (targetMinutesTuesday != null)
+        'target_minutes_tuesday': targetMinutesTuesday,
+      if (targetMinutesWednesday != null)
+        'target_minutes_wednesday': targetMinutesWednesday,
+      if (targetMinutesThursday != null)
+        'target_minutes_thursday': targetMinutesThursday,
+      if (targetMinutesFriday != null)
+        'target_minutes_friday': targetMinutesFriday,
+      if (targetMinutesSaturday != null)
+        'target_minutes_saturday': targetMinutesSaturday,
+      if (targetMinutesSunday != null)
+        'target_minutes_sunday': targetMinutesSunday,
+      if (targetInputMode != null) 'target_input_mode': targetInputMode,
+      if (balanceResetMode != null) 'balance_reset_mode': balanceResetMode,
+      if (balanceResetDay != null) 'balance_reset_day': balanceResetDay,
+      if (balanceResetMonth != null) 'balance_reset_month': balanceResetMonth,
+      if (carryOverMaxMinutes != null)
+        'carry_over_max_minutes': carryOverMaxMinutes,
+      if (carryOverMinMinutes != null)
+        'carry_over_min_minutes': carryOverMinMinutes,
+      if (absenceTrackingEnabled != null)
+        'absence_tracking_enabled': absenceTrackingEnabled,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -3821,6 +4497,20 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
     Value<String>? timeFormat,
     Value<String>? quickAddDurationsMinutes,
     Value<bool>? countPausedTimeAsBreak,
+    Value<int>? targetMinutesMonday,
+    Value<int>? targetMinutesTuesday,
+    Value<int>? targetMinutesWednesday,
+    Value<int>? targetMinutesThursday,
+    Value<int>? targetMinutesFriday,
+    Value<int>? targetMinutesSaturday,
+    Value<int>? targetMinutesSunday,
+    Value<String>? targetInputMode,
+    Value<String>? balanceResetMode,
+    Value<int?>? balanceResetDay,
+    Value<int?>? balanceResetMonth,
+    Value<int?>? carryOverMaxMinutes,
+    Value<int?>? carryOverMinMinutes,
+    Value<bool>? absenceTrackingEnabled,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
   }) {
@@ -3832,6 +4522,24 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
           quickAddDurationsMinutes ?? this.quickAddDurationsMinutes,
       countPausedTimeAsBreak:
           countPausedTimeAsBreak ?? this.countPausedTimeAsBreak,
+      targetMinutesMonday: targetMinutesMonday ?? this.targetMinutesMonday,
+      targetMinutesTuesday: targetMinutesTuesday ?? this.targetMinutesTuesday,
+      targetMinutesWednesday:
+          targetMinutesWednesday ?? this.targetMinutesWednesday,
+      targetMinutesThursday:
+          targetMinutesThursday ?? this.targetMinutesThursday,
+      targetMinutesFriday: targetMinutesFriday ?? this.targetMinutesFriday,
+      targetMinutesSaturday:
+          targetMinutesSaturday ?? this.targetMinutesSaturday,
+      targetMinutesSunday: targetMinutesSunday ?? this.targetMinutesSunday,
+      targetInputMode: targetInputMode ?? this.targetInputMode,
+      balanceResetMode: balanceResetMode ?? this.balanceResetMode,
+      balanceResetDay: balanceResetDay ?? this.balanceResetDay,
+      balanceResetMonth: balanceResetMonth ?? this.balanceResetMonth,
+      carryOverMaxMinutes: carryOverMaxMinutes ?? this.carryOverMaxMinutes,
+      carryOverMinMinutes: carryOverMinMinutes ?? this.carryOverMinMinutes,
+      absenceTrackingEnabled:
+          absenceTrackingEnabled ?? this.absenceTrackingEnabled,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -3859,6 +4567,56 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
         countPausedTimeAsBreak.value,
       );
     }
+    if (targetMinutesMonday.present) {
+      map['target_minutes_monday'] = Variable<int>(targetMinutesMonday.value);
+    }
+    if (targetMinutesTuesday.present) {
+      map['target_minutes_tuesday'] = Variable<int>(targetMinutesTuesday.value);
+    }
+    if (targetMinutesWednesday.present) {
+      map['target_minutes_wednesday'] = Variable<int>(
+        targetMinutesWednesday.value,
+      );
+    }
+    if (targetMinutesThursday.present) {
+      map['target_minutes_thursday'] = Variable<int>(
+        targetMinutesThursday.value,
+      );
+    }
+    if (targetMinutesFriday.present) {
+      map['target_minutes_friday'] = Variable<int>(targetMinutesFriday.value);
+    }
+    if (targetMinutesSaturday.present) {
+      map['target_minutes_saturday'] = Variable<int>(
+        targetMinutesSaturday.value,
+      );
+    }
+    if (targetMinutesSunday.present) {
+      map['target_minutes_sunday'] = Variable<int>(targetMinutesSunday.value);
+    }
+    if (targetInputMode.present) {
+      map['target_input_mode'] = Variable<String>(targetInputMode.value);
+    }
+    if (balanceResetMode.present) {
+      map['balance_reset_mode'] = Variable<String>(balanceResetMode.value);
+    }
+    if (balanceResetDay.present) {
+      map['balance_reset_day'] = Variable<int>(balanceResetDay.value);
+    }
+    if (balanceResetMonth.present) {
+      map['balance_reset_month'] = Variable<int>(balanceResetMonth.value);
+    }
+    if (carryOverMaxMinutes.present) {
+      map['carry_over_max_minutes'] = Variable<int>(carryOverMaxMinutes.value);
+    }
+    if (carryOverMinMinutes.present) {
+      map['carry_over_min_minutes'] = Variable<int>(carryOverMinMinutes.value);
+    }
+    if (absenceTrackingEnabled.present) {
+      map['absence_tracking_enabled'] = Variable<bool>(
+        absenceTrackingEnabled.value,
+      );
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -3876,6 +4634,20 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingsRow> {
           ..write('timeFormat: $timeFormat, ')
           ..write('quickAddDurationsMinutes: $quickAddDurationsMinutes, ')
           ..write('countPausedTimeAsBreak: $countPausedTimeAsBreak, ')
+          ..write('targetMinutesMonday: $targetMinutesMonday, ')
+          ..write('targetMinutesTuesday: $targetMinutesTuesday, ')
+          ..write('targetMinutesWednesday: $targetMinutesWednesday, ')
+          ..write('targetMinutesThursday: $targetMinutesThursday, ')
+          ..write('targetMinutesFriday: $targetMinutesFriday, ')
+          ..write('targetMinutesSaturday: $targetMinutesSaturday, ')
+          ..write('targetMinutesSunday: $targetMinutesSunday, ')
+          ..write('targetInputMode: $targetInputMode, ')
+          ..write('balanceResetMode: $balanceResetMode, ')
+          ..write('balanceResetDay: $balanceResetDay, ')
+          ..write('balanceResetMonth: $balanceResetMonth, ')
+          ..write('carryOverMaxMinutes: $carryOverMaxMinutes, ')
+          ..write('carryOverMinMinutes: $carryOverMinMinutes, ')
+          ..write('absenceTrackingEnabled: $absenceTrackingEnabled, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -7813,6 +8585,20 @@ typedef $$AppSettingsTableCreateCompanionBuilder =
       Value<String> timeFormat,
       Value<String> quickAddDurationsMinutes,
       Value<bool> countPausedTimeAsBreak,
+      Value<int> targetMinutesMonday,
+      Value<int> targetMinutesTuesday,
+      Value<int> targetMinutesWednesday,
+      Value<int> targetMinutesThursday,
+      Value<int> targetMinutesFriday,
+      Value<int> targetMinutesSaturday,
+      Value<int> targetMinutesSunday,
+      Value<String> targetInputMode,
+      Value<String> balanceResetMode,
+      Value<int?> balanceResetDay,
+      Value<int?> balanceResetMonth,
+      Value<int?> carryOverMaxMinutes,
+      Value<int?> carryOverMinMinutes,
+      Value<bool> absenceTrackingEnabled,
       required DateTime updatedAt,
       Value<int> rowid,
     });
@@ -7823,6 +8609,20 @@ typedef $$AppSettingsTableUpdateCompanionBuilder =
       Value<String> timeFormat,
       Value<String> quickAddDurationsMinutes,
       Value<bool> countPausedTimeAsBreak,
+      Value<int> targetMinutesMonday,
+      Value<int> targetMinutesTuesday,
+      Value<int> targetMinutesWednesday,
+      Value<int> targetMinutesThursday,
+      Value<int> targetMinutesFriday,
+      Value<int> targetMinutesSaturday,
+      Value<int> targetMinutesSunday,
+      Value<String> targetInputMode,
+      Value<String> balanceResetMode,
+      Value<int?> balanceResetDay,
+      Value<int?> balanceResetMonth,
+      Value<int?> carryOverMaxMinutes,
+      Value<int?> carryOverMinMinutes,
+      Value<bool> absenceTrackingEnabled,
       Value<DateTime> updatedAt,
       Value<int> rowid,
     });
@@ -7858,6 +8658,76 @@ class $$AppSettingsTableFilterComposer
 
   ColumnFilters<bool> get countPausedTimeAsBreak => $composableBuilder(
     column: $table.countPausedTimeAsBreak,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetMinutesMonday => $composableBuilder(
+    column: $table.targetMinutesMonday,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetMinutesTuesday => $composableBuilder(
+    column: $table.targetMinutesTuesday,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetMinutesWednesday => $composableBuilder(
+    column: $table.targetMinutesWednesday,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetMinutesThursday => $composableBuilder(
+    column: $table.targetMinutesThursday,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetMinutesFriday => $composableBuilder(
+    column: $table.targetMinutesFriday,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetMinutesSaturday => $composableBuilder(
+    column: $table.targetMinutesSaturday,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetMinutesSunday => $composableBuilder(
+    column: $table.targetMinutesSunday,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get targetInputMode => $composableBuilder(
+    column: $table.targetInputMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get balanceResetMode => $composableBuilder(
+    column: $table.balanceResetMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get balanceResetDay => $composableBuilder(
+    column: $table.balanceResetDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get balanceResetMonth => $composableBuilder(
+    column: $table.balanceResetMonth,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get carryOverMaxMinutes => $composableBuilder(
+    column: $table.carryOverMaxMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get carryOverMinMinutes => $composableBuilder(
+    column: $table.carryOverMinMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get absenceTrackingEnabled => $composableBuilder(
+    column: $table.absenceTrackingEnabled,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7901,6 +8771,76 @@ class $$AppSettingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get targetMinutesMonday => $composableBuilder(
+    column: $table.targetMinutesMonday,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetMinutesTuesday => $composableBuilder(
+    column: $table.targetMinutesTuesday,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetMinutesWednesday => $composableBuilder(
+    column: $table.targetMinutesWednesday,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetMinutesThursday => $composableBuilder(
+    column: $table.targetMinutesThursday,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetMinutesFriday => $composableBuilder(
+    column: $table.targetMinutesFriday,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetMinutesSaturday => $composableBuilder(
+    column: $table.targetMinutesSaturday,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetMinutesSunday => $composableBuilder(
+    column: $table.targetMinutesSunday,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get targetInputMode => $composableBuilder(
+    column: $table.targetInputMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get balanceResetMode => $composableBuilder(
+    column: $table.balanceResetMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get balanceResetDay => $composableBuilder(
+    column: $table.balanceResetDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get balanceResetMonth => $composableBuilder(
+    column: $table.balanceResetMonth,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get carryOverMaxMinutes => $composableBuilder(
+    column: $table.carryOverMaxMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get carryOverMinMinutes => $composableBuilder(
+    column: $table.carryOverMinMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get absenceTrackingEnabled => $composableBuilder(
+    column: $table.absenceTrackingEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -7936,6 +8876,76 @@ class $$AppSettingsTableAnnotationComposer
 
   GeneratedColumn<bool> get countPausedTimeAsBreak => $composableBuilder(
     column: $table.countPausedTimeAsBreak,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get targetMinutesMonday => $composableBuilder(
+    column: $table.targetMinutesMonday,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get targetMinutesTuesday => $composableBuilder(
+    column: $table.targetMinutesTuesday,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get targetMinutesWednesday => $composableBuilder(
+    column: $table.targetMinutesWednesday,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get targetMinutesThursday => $composableBuilder(
+    column: $table.targetMinutesThursday,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get targetMinutesFriday => $composableBuilder(
+    column: $table.targetMinutesFriday,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get targetMinutesSaturday => $composableBuilder(
+    column: $table.targetMinutesSaturday,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get targetMinutesSunday => $composableBuilder(
+    column: $table.targetMinutesSunday,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get targetInputMode => $composableBuilder(
+    column: $table.targetInputMode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get balanceResetMode => $composableBuilder(
+    column: $table.balanceResetMode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get balanceResetDay => $composableBuilder(
+    column: $table.balanceResetDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get balanceResetMonth => $composableBuilder(
+    column: $table.balanceResetMonth,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get carryOverMaxMinutes => $composableBuilder(
+    column: $table.carryOverMaxMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get carryOverMinMinutes => $composableBuilder(
+    column: $table.carryOverMinMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get absenceTrackingEnabled => $composableBuilder(
+    column: $table.absenceTrackingEnabled,
     builder: (column) => column,
   );
 
@@ -7979,6 +8989,20 @@ class $$AppSettingsTableTableManager
                 Value<String> timeFormat = const Value.absent(),
                 Value<String> quickAddDurationsMinutes = const Value.absent(),
                 Value<bool> countPausedTimeAsBreak = const Value.absent(),
+                Value<int> targetMinutesMonday = const Value.absent(),
+                Value<int> targetMinutesTuesday = const Value.absent(),
+                Value<int> targetMinutesWednesday = const Value.absent(),
+                Value<int> targetMinutesThursday = const Value.absent(),
+                Value<int> targetMinutesFriday = const Value.absent(),
+                Value<int> targetMinutesSaturday = const Value.absent(),
+                Value<int> targetMinutesSunday = const Value.absent(),
+                Value<String> targetInputMode = const Value.absent(),
+                Value<String> balanceResetMode = const Value.absent(),
+                Value<int?> balanceResetDay = const Value.absent(),
+                Value<int?> balanceResetMonth = const Value.absent(),
+                Value<int?> carryOverMaxMinutes = const Value.absent(),
+                Value<int?> carryOverMinMinutes = const Value.absent(),
+                Value<bool> absenceTrackingEnabled = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => AppSettingsCompanion(
@@ -7987,6 +9011,20 @@ class $$AppSettingsTableTableManager
                 timeFormat: timeFormat,
                 quickAddDurationsMinutes: quickAddDurationsMinutes,
                 countPausedTimeAsBreak: countPausedTimeAsBreak,
+                targetMinutesMonday: targetMinutesMonday,
+                targetMinutesTuesday: targetMinutesTuesday,
+                targetMinutesWednesday: targetMinutesWednesday,
+                targetMinutesThursday: targetMinutesThursday,
+                targetMinutesFriday: targetMinutesFriday,
+                targetMinutesSaturday: targetMinutesSaturday,
+                targetMinutesSunday: targetMinutesSunday,
+                targetInputMode: targetInputMode,
+                balanceResetMode: balanceResetMode,
+                balanceResetDay: balanceResetDay,
+                balanceResetMonth: balanceResetMonth,
+                carryOverMaxMinutes: carryOverMaxMinutes,
+                carryOverMinMinutes: carryOverMinMinutes,
+                absenceTrackingEnabled: absenceTrackingEnabled,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
@@ -7997,6 +9035,20 @@ class $$AppSettingsTableTableManager
                 Value<String> timeFormat = const Value.absent(),
                 Value<String> quickAddDurationsMinutes = const Value.absent(),
                 Value<bool> countPausedTimeAsBreak = const Value.absent(),
+                Value<int> targetMinutesMonday = const Value.absent(),
+                Value<int> targetMinutesTuesday = const Value.absent(),
+                Value<int> targetMinutesWednesday = const Value.absent(),
+                Value<int> targetMinutesThursday = const Value.absent(),
+                Value<int> targetMinutesFriday = const Value.absent(),
+                Value<int> targetMinutesSaturday = const Value.absent(),
+                Value<int> targetMinutesSunday = const Value.absent(),
+                Value<String> targetInputMode = const Value.absent(),
+                Value<String> balanceResetMode = const Value.absent(),
+                Value<int?> balanceResetDay = const Value.absent(),
+                Value<int?> balanceResetMonth = const Value.absent(),
+                Value<int?> carryOverMaxMinutes = const Value.absent(),
+                Value<int?> carryOverMinMinutes = const Value.absent(),
+                Value<bool> absenceTrackingEnabled = const Value.absent(),
                 required DateTime updatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => AppSettingsCompanion.insert(
@@ -8005,6 +9057,20 @@ class $$AppSettingsTableTableManager
                 timeFormat: timeFormat,
                 quickAddDurationsMinutes: quickAddDurationsMinutes,
                 countPausedTimeAsBreak: countPausedTimeAsBreak,
+                targetMinutesMonday: targetMinutesMonday,
+                targetMinutesTuesday: targetMinutesTuesday,
+                targetMinutesWednesday: targetMinutesWednesday,
+                targetMinutesThursday: targetMinutesThursday,
+                targetMinutesFriday: targetMinutesFriday,
+                targetMinutesSaturday: targetMinutesSaturday,
+                targetMinutesSunday: targetMinutesSunday,
+                targetInputMode: targetInputMode,
+                balanceResetMode: balanceResetMode,
+                balanceResetDay: balanceResetDay,
+                balanceResetMonth: balanceResetMonth,
+                carryOverMaxMinutes: carryOverMaxMinutes,
+                carryOverMinMinutes: carryOverMinMinutes,
+                absenceTrackingEnabled: absenceTrackingEnabled,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),

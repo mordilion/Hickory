@@ -22,6 +22,35 @@ class AppSettings extends Table {
   // is an opt-in for users who track lunch via the pause button instead of
   // stop/restart. See break_rule_calculations.dart's dayBreakDuration.
   BoolColumn get countPausedTimeAsBreak => boolean().withDefault(const Constant(false))();
+  // Per-weekday target work time in minutes. 0 means "not a work day" and
+  // doubles as the free-day marker, so no separate flag is needed. These
+  // seven values are the single source of truth for every target and
+  // balance calculation; a weekly figure entered in Settings is
+  // distributed across them on save and never stored separately.
+  IntColumn get targetMinutesMonday => integer().withDefault(const Constant(0))();
+  IntColumn get targetMinutesTuesday => integer().withDefault(const Constant(0))();
+  IntColumn get targetMinutesWednesday => integer().withDefault(const Constant(0))();
+  IntColumn get targetMinutesThursday => integer().withDefault(const Constant(0))();
+  IntColumn get targetMinutesFriday => integer().withDefault(const Constant(0))();
+  IntColumn get targetMinutesSaturday => integer().withDefault(const Constant(0))();
+  IntColumn get targetMinutesSunday => integer().withDefault(const Constant(0))();
+  // 'perWeekday' | 'perWeek' -- affects only how the settings screen
+  // renders and reopens, never the calculation.
+  TextColumn get targetInputMode => text().withDefault(const Constant('perWeekday'))();
+  // 'none' | 'resetToZero' | 'carryOver' -- what happens to the accumulated
+  // balance when the yearly cutoff is crossed.
+  TextColumn get balanceResetMode => text().withDefault(const Constant('none'))();
+  // The recurring cutoff, so a fiscal year end works as well as a calendar
+  // one. Both null while balanceResetMode is 'none'.
+  IntColumn get balanceResetDay => integer().nullable()();
+  IntColumn get balanceResetMonth => integer().nullable()();
+  // Bounds of what survives a cutoff in 'carryOver' mode; null means
+  // unbounded on that side.
+  IntColumn get carryOverMaxMinutes => integer().nullable()();
+  IntColumn get carryOverMinMinutes => integer().nullable()();
+  // Global switch for the absence feature (phase 2). Declared here so the
+  // AppSettings row needs only one migration across the whole design.
+  BoolColumn get absenceTrackingEnabled => boolean().withDefault(const Constant(false))();
   DateTimeColumn get updatedAt => dateTime()();
 
   @override

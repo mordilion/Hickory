@@ -19,11 +19,31 @@ class AppSettingsDao extends DatabaseAccessor<AppDatabase> with _$AppSettingsDao
         .map((row) => row ?? _defaultRow());
   }
 
+  /// Upserts the singleton row, changing only the fields passed in.
+  ///
+  /// Non-nullable fields take a plain nullable parameter (`null` = leave
+  /// alone). The four nullable balance fields take a [Value] instead,
+  /// because `null` there has to stay usable as a real value — clearing a
+  /// carry-over bound is a legitimate edit, and `??` could never express it.
   Future<AppSettingsRow> updateSettings({
     String? dateFormat,
     String? timeFormat,
     String? quickAddDurationsMinutes,
     bool? countPausedTimeAsBreak,
+    int? targetMinutesMonday,
+    int? targetMinutesTuesday,
+    int? targetMinutesWednesday,
+    int? targetMinutesThursday,
+    int? targetMinutesFriday,
+    int? targetMinutesSaturday,
+    int? targetMinutesSunday,
+    String? targetInputMode,
+    String? balanceResetMode,
+    Value<int?> balanceResetDay = const Value.absent(),
+    Value<int?> balanceResetMonth = const Value.absent(),
+    Value<int?> carryOverMaxMinutes = const Value.absent(),
+    Value<int?> carryOverMinMinutes = const Value.absent(),
+    bool? absenceTrackingEnabled,
   }) async {
     final current =
         await (select(appSettings)..where((s) => s.id.equals(appSettingsRowId))).getSingleOrNull() ??
@@ -34,6 +54,24 @@ class AppSettingsDao extends DatabaseAccessor<AppDatabase> with _$AppSettingsDao
       timeFormat: timeFormat ?? current.timeFormat,
       quickAddDurationsMinutes: quickAddDurationsMinutes ?? current.quickAddDurationsMinutes,
       countPausedTimeAsBreak: countPausedTimeAsBreak ?? current.countPausedTimeAsBreak,
+      targetMinutesMonday: targetMinutesMonday ?? current.targetMinutesMonday,
+      targetMinutesTuesday: targetMinutesTuesday ?? current.targetMinutesTuesday,
+      targetMinutesWednesday: targetMinutesWednesday ?? current.targetMinutesWednesday,
+      targetMinutesThursday: targetMinutesThursday ?? current.targetMinutesThursday,
+      targetMinutesFriday: targetMinutesFriday ?? current.targetMinutesFriday,
+      targetMinutesSaturday: targetMinutesSaturday ?? current.targetMinutesSaturday,
+      targetMinutesSunday: targetMinutesSunday ?? current.targetMinutesSunday,
+      targetInputMode: targetInputMode ?? current.targetInputMode,
+      balanceResetMode: balanceResetMode ?? current.balanceResetMode,
+      balanceResetDay:
+          balanceResetDay.present ? balanceResetDay.value : current.balanceResetDay,
+      balanceResetMonth:
+          balanceResetMonth.present ? balanceResetMonth.value : current.balanceResetMonth,
+      carryOverMaxMinutes:
+          carryOverMaxMinutes.present ? carryOverMaxMinutes.value : current.carryOverMaxMinutes,
+      carryOverMinMinutes:
+          carryOverMinMinutes.present ? carryOverMinMinutes.value : current.carryOverMinMinutes,
+      absenceTrackingEnabled: absenceTrackingEnabled ?? current.absenceTrackingEnabled,
       updatedAt: DateTime.now().toUtc(),
     );
     await into(appSettings).insertOnConflictUpdate(updated);
@@ -46,6 +84,16 @@ class AppSettingsDao extends DatabaseAccessor<AppDatabase> with _$AppSettingsDao
         timeFormat: '24h',
         quickAddDurationsMinutes: '15,30,45,60',
         countPausedTimeAsBreak: false,
+        targetMinutesMonday: 0,
+        targetMinutesTuesday: 0,
+        targetMinutesWednesday: 0,
+        targetMinutesThursday: 0,
+        targetMinutesFriday: 0,
+        targetMinutesSaturday: 0,
+        targetMinutesSunday: 0,
+        targetInputMode: 'perWeekday',
+        balanceResetMode: 'none',
+        absenceTrackingEnabled: false,
         updatedAt: DateTime.now().toUtc(),
       );
 }
