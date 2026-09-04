@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/data/drift/database.dart';
+import 'package:hickory/data/drift/tables/absences_table.dart';
 import 'package:hickory/features/reports/balance_calculations.dart';
 
 import '../../support/app_settings_fixture.dart';
@@ -17,6 +18,7 @@ AppSettingsRow settingsWith({
   int? balanceResetMonth,
   int? carryOverMaxMinutes,
   int? carryOverMinMinutes,
+  bool absenceTracking = false,
 }) {
   return appSettingsFixture(
     targetMinutesMonday: monday,
@@ -31,6 +33,7 @@ AppSettingsRow settingsWith({
     balanceResetMonth: balanceResetMonth,
     carryOverMaxMinutes: carryOverMaxMinutes,
     carryOverMinMinutes: carryOverMinMinutes,
+    absenceTrackingEnabled: absenceTracking,
   );
 }
 
@@ -43,6 +46,44 @@ TimeEntry entryOn(DateTime day, int minutes, {String id = 'e'}) {
     endAt: start.add(Duration(minutes: minutes)).toUtc(),
     totalPausedSeconds: 0,
     source: 'manual',
+    deviceId: 'test',
+    createdAt: DateTime.utc(2026, 1, 1),
+    updatedAt: DateTime.utc(2026, 1, 1),
+  );
+}
+
+AbsenceType typeFixture({
+  String id = 'type-1',
+  String name = 'Vacation',
+  bool paid = true,
+}) {
+  return AbsenceType(
+    id: id,
+    name: name,
+    paid: paid,
+    sortOrder: 0,
+    deviceId: 'test',
+    createdAt: DateTime.utc(2026, 1, 1),
+    updatedAt: DateTime.utc(2026, 1, 1),
+  );
+}
+
+Absence absenceOn(
+  DateTime day, {
+  String id = 'absence-1',
+  String typeId = 'type-1',
+  String portion = absencePortionFullDay,
+  DateTime? startAt,
+  DateTime? endAt,
+}) {
+  return Absence(
+    id: id,
+    date: DateTime(day.year, day.month, day.day),
+    absenceTypeId: typeId,
+    portion: portion,
+    startAt: startAt,
+    endAt: endAt,
+    note: null,
     deviceId: 'test',
     createdAt: DateTime.utc(2026, 1, 1),
     updatedAt: DateTime.utc(2026, 1, 1),
@@ -274,5 +315,209 @@ void main() {
       settings,
     );
     expect(runningBalance(balances, settings, asOf: monday), const Duration(minutes: 60));
+  });
+
+  final friday = DateTime(2026, 9, 11);
+
+  test('absences are ignored while absence tracking is off', () {
+    final balances = dayBalances(
+      [entryOn(monday, 420)],
+      settingsWith(monday: 480),
+      absences: [absenceOn(monday)],
+      absenceTypesById: {'type-1': typeFixture()},
+    );
+    expect(balances.single.absenceCredit, Duration.zero);
+    expect(balances.single.balance, const Duration(minutes: -60));
+  });
+
+  test('a paid full-day absence makes the day neutral', () {
+    final balances = dayBalances(
+      const [],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [absenceOn(monday)],
+      absenceTypesById: {'type-1': typeFixture(paid: true)},
+      through: monday,
+    );
+    expect(balances.single.worked, Duration.zero);
+    expect(balances.single.target, const Duration(minutes: 480));
+    expect(balances.single.absenceCredit, const Duration(minutes: 480));
+    expect(balances.single.balance, Duration.zero);
+  });
+
+  test('an unpaid full-day absence is neutral and reports no target', () {
+    final balances = dayBalances(
+      const [],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [absenceOn(monday)],
+      absenceTypesById: {'type-1': typeFixture(paid: false)},
+      through: monday,
+    );
+    expect(balances.single.target, Duration.zero, reason: 'unpaid time is taken off the target');
+    expect(balances.single.absenceCredit, Duration.zero);
+    expect(balances.single.balance, Duration.zero);
+  });
+
+  test('a paid half day plus half a day of work is neutral', () {
+    final balances = dayBalances(
+      [entryOn(monday, 240)],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [absenceOn(monday, portion: absencePortionHalfDay)],
+      absenceTypesById: {'type-1': typeFixture(paid: true)},
+      through: monday,
+    );
+    expect(balances.single.absenceCredit, const Duration(minutes: 240));
+    expect(balances.single.balance, Duration.zero);
+  });
+
+  test('an unpaid half day halves the target', () {
+    final balances = dayBalances(
+      [entryOn(monday, 240)],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [absenceOn(monday, portion: absencePortionHalfDay)],
+      absenceTypesById: {'type-1': typeFixture(paid: false)},
+      through: monday,
+    );
+    expect(balances.single.target, const Duration(minutes: 240));
+    expect(balances.single.balance, Duration.zero);
+  });
+
+  test('a paid range credits its own length', () {
+    final balances = dayBalances(
+      const [],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [
+        absenceOn(
+          monday,
+          portion: absencePortionRange,
+          startAt: DateTime(2026, 9, 7, 9).toUtc(),
+          endAt: DateTime(2026, 9, 7, 11).toUtc(),
+        ),
+      ],
+      absenceTypesById: {'type-1': typeFixture(paid: true)},
+      through: monday,
+    );
+    expect(balances.single.absenceCredit, const Duration(minutes: 120));
+    expect(balances.single.balance, const Duration(minutes: -360));
+  });
+
+  test('a paid range does not credit minutes also tracked as work', () {
+    // entryOn starts at 09:00 local, so 60 minutes of it sit inside the
+    // 09:00-11:00 absence.
+    final balances = dayBalances(
+      [entryOn(monday, 60)],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [
+        absenceOn(
+          monday,
+          portion: absencePortionRange,
+          startAt: DateTime(2026, 9, 7, 9).toUtc(),
+          endAt: DateTime(2026, 9, 7, 11).toUtc(),
+        ),
+      ],
+      absenceTypesById: {'type-1': typeFixture(paid: true)},
+      through: monday,
+    );
+    expect(balances.single.absenceCredit, const Duration(minutes: 60));
+    expect(balances.single.worked, const Duration(minutes: 60));
+    expect(balances.single.balance, const Duration(minutes: -360));
+  });
+
+  test('two overlapping entries do not subtract the same minute twice', () {
+    final balances = dayBalances(
+      [entryOn(monday, 60, id: 'a'), entryOn(monday, 30, id: 'b')],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [
+        absenceOn(
+          monday,
+          portion: absencePortionRange,
+          startAt: DateTime(2026, 9, 7, 9).toUtc(),
+          endAt: DateTime(2026, 9, 7, 11).toUtc(),
+        ),
+      ],
+      absenceTypesById: {'type-1': typeFixture(paid: true)},
+      through: monday,
+    );
+    expect(
+      balances.single.absenceCredit,
+      const Duration(minutes: 60),
+      reason: 'both entries start at 09:00, so together they cover 60 minutes, not 90',
+    );
+  });
+
+  test('work on a paid full-day absence counts as a plus', () {
+    final balances = dayBalances(
+      [entryOn(monday, 120)],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [absenceOn(monday)],
+      absenceTypesById: {'type-1': typeFixture(paid: true)},
+      through: monday,
+    );
+    expect(balances.single.balance, const Duration(minutes: 120));
+  });
+
+  test('a work day with neither entries nor absence is a deficit while tracking is on', () {
+    final balances = dayBalances(
+      [entryOn(monday, 480)],
+      settingsWith(monday: 480, tuesday: 480, absenceTracking: true),
+      through: tuesday,
+    );
+    expect(balances.map((b) => b.day), [monday, tuesday]);
+    expect(balances.last.balance, const Duration(minutes: -480));
+  });
+
+  test('a day with no target and no entries is skipped even while tracking is on', () {
+    final balances = dayBalances(
+      [entryOn(monday, 480)],
+      settingsWith(monday: 480, absenceTracking: true),
+      through: saturday,
+    );
+    expect(balances.map((b) => b.day), [monday]);
+  });
+
+  test('an absence whose type is unknown contributes nothing', () {
+    final balances = dayBalances(
+      const [],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [absenceOn(monday, typeId: 'deleted-type')],
+      absenceTypesById: const {},
+      through: monday,
+    );
+    expect(balances.single.absenceCredit, Duration.zero);
+    expect(balances.single.target, const Duration(minutes: 480));
+    expect(balances.single.balance, const Duration(minutes: -480));
+  });
+
+  test('through extends the enumerated range past the last known day', () {
+    final balances = dayBalances(
+      [entryOn(monday, 480)],
+      settingsWith(
+        monday: 480, tuesday: 480, wednesday: 480, thursday: 480, friday: 480,
+        absenceTracking: true,
+      ),
+      through: friday,
+    );
+    expect(balances, hasLength(5));
+    expect(balances.last.day, friday);
+  });
+
+  test('a running entry still contributes no day while tracking is on', () {
+    final running = TimeEntry(
+      id: 'running',
+      startAt: DateTime(monday.year, monday.month, monday.day, 9).toUtc(),
+      endAt: null,
+      totalPausedSeconds: 0,
+      source: 'manual',
+      deviceId: 'test',
+      createdAt: DateTime.utc(2026, 1, 1),
+      updatedAt: DateTime.utc(2026, 1, 1),
+    );
+    expect(
+      dayBalances(
+        [running],
+        settingsWith(monday: 480, absenceTracking: true),
+      ),
+      isEmpty,
+      reason: 'with no finished entry and no absence there is no known day to start from',
+    );
   });
 }
