@@ -414,6 +414,104 @@ class SyncedWrites {
     }
   }
 
+  /// Creates an absence type and logs it, so it propagates to the user's
+  /// other devices the same way every other entity does.
+  Future<AbsenceType> createAbsenceType({
+    required String deviceId,
+    required String name,
+    required bool paid,
+    required int sortOrder,
+  }) async {
+    final type = await db.absenceTypesDao.createType(
+      deviceId: deviceId,
+      name: name,
+      paid: paid,
+      sortOrder: sortOrder,
+    );
+    await logWriter.appendEvent(
+      entityType: EntityTypes.absenceType,
+      entityId: type.id,
+      op: EventOp.create,
+      payload: type.toJson(),
+    );
+    return type;
+  }
+
+  Future<AbsenceType> updateAbsenceType(
+    String id, {
+    String? name,
+    bool? paid,
+    int? sortOrder,
+  }) async {
+    final type = await db.absenceTypesDao.updateType(
+      id,
+      name: name,
+      paid: paid,
+      sortOrder: sortOrder,
+    );
+    await logWriter.appendEvent(
+      entityType: EntityTypes.absenceType,
+      entityId: type.id,
+      op: EventOp.update,
+      payload: type.toJson(),
+    );
+    return type;
+  }
+
+  /// Deletes an absence type and logs the tombstone. Callers must refuse
+  /// this while absence rows still reference the type -- see
+  /// AbsencesDao.countByType; nothing at the database level enforces it.
+  Future<void> deleteAbsenceType(String id) async {
+    await db.absenceTypesDao.deleteType(id);
+    await logWriter.appendEvent(
+      entityType: EntityTypes.absenceType,
+      entityId: id,
+      op: EventOp.delete,
+      payload: null,
+    );
+  }
+
+  /// Creates one day of absence and logs it. A multi-day entry calls this
+  /// once per day, logging one event each -- the same shape as
+  /// replaceBreakRuleTiers, which logs one event per DAO call rather than
+  /// inventing a batch-event concept.
+  Future<Absence> createAbsence({
+    required String deviceId,
+    required DateTime date,
+    required String absenceTypeId,
+    required String portion,
+    DateTime? startAt,
+    DateTime? endAt,
+    String? note,
+  }) async {
+    final absence = await db.absencesDao.createAbsence(
+      deviceId: deviceId,
+      date: date,
+      absenceTypeId: absenceTypeId,
+      portion: portion,
+      startAt: startAt,
+      endAt: endAt,
+      note: note,
+    );
+    await logWriter.appendEvent(
+      entityType: EntityTypes.absence,
+      entityId: absence.id,
+      op: EventOp.create,
+      payload: absence.toJson(),
+    );
+    return absence;
+  }
+
+  Future<void> deleteAbsence(String id) async {
+    await db.absencesDao.deleteAbsence(id);
+    await logWriter.appendEvent(
+      entityType: EntityTypes.absence,
+      entityId: id,
+      op: EventOp.delete,
+      payload: null,
+    );
+  }
+
   /// Writes the given Jira sync-tracking row and logs it, so the state
   /// (e.g. "this entry now has a Jira worklog") propagates to the user's
   /// other devices the same way every other entity does.

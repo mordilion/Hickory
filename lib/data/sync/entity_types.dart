@@ -11,4 +11,6 @@ abstract final class EntityTypes {
   static const jiraWorklog = 'jira_worklog';
   static const breakRuleTier = 'break_rule_tier';
   static const personioAttendance = 'personio_attendance';
+  static const absenceType = 'absence_type';
+  static const absence = 'absence';
 }

@@ -222,6 +222,26 @@ class SyncIngestor {
               .into(db.breakRuleTiers)
               .insertOnConflictUpdate(BreakRuleTier.fromJson(entity.payload!).toCompanion(true));
         }
+      case EntityTypes.absenceType:
+        if (entity.isDeleted) {
+          await (db.delete(db.absenceTypes)..where((t) => t.id.equals(entity.entityId))).go();
+        } else {
+          await db
+              .into(db.absenceTypes)
+              .insertOnConflictUpdate(AbsenceType.fromJson(entity.payload!).toCompanion(true));
+        }
+      case EntityTypes.absence:
+        if (entity.isDeleted) {
+          await (db.delete(db.absences)..where((a) => a.id.equals(entity.entityId))).go();
+        } else {
+          // toCompanion(false): startAt, endAt and note are nullable and
+          // null is meaningful here -- a row that switched from a range to
+          // a full day has no start time, and with `true` that null would
+          // become Value.absent() and leave the peer's stale time in place.
+          await db
+              .into(db.absences)
+              .insertOnConflictUpdate(Absence.fromJson(entity.payload!).toCompanion(false));
+        }
       case EntityTypes.personioAttendance:
         if (entity.isDeleted) {
           await (db.delete(db.personioAttendances)..where((a) => a.id.equals(entity.entityId))).go();

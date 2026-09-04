@@ -4,6 +4,7 @@ import 'package:drift/drift.dart' show Value, driftRuntimeOptions;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/data/drift/database.dart';
+import 'package:hickory/data/drift/tables/absences_table.dart';
 import 'package:hickory/data/drift/tables/app_settings_table.dart' show appSettingsRowId;
 import 'package:hickory/data/drift/tables/jira_worklogs_table.dart';
 import 'package:hickory/data/drift/tables/personio_attendances_table.dart';
@@ -485,4 +486,125 @@ void main() {
       expect(row.absenceTrackingEnabled, isFalse);
     },
   );
+
+  test('an absence type reaches a second device', () async {
+    final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(writerDb.close);
+    final writes = SyncedWrites(
+      db: writerDb,
+      logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'writer'),
+    );
+    await writes.createAbsenceType(
+      deviceId: 'writer', name: 'Vacation', paid: true, sortOrder: 0,
+    );
+
+    final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(readerDb.close);
+    await SyncIngestor(db: readerDb, syncRoot: syncRoot).syncNow();
+
+    final types = await readerDb.absenceTypesDao.getAllTypes();
+    expect(types, hasLength(1));
+    expect(types.single.name, 'Vacation');
+    expect(types.single.paid, isTrue);
+  });
+
+  test('renaming an absence type reaches a second device', () async {
+    final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(writerDb.close);
+    final writes = SyncedWrites(
+      db: writerDb,
+      logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'writer'),
+    );
+    final created = await writes.createAbsenceType(
+      deviceId: 'writer', name: 'Vacaton', paid: true, sortOrder: 0,
+    );
+    await writes.updateAbsenceType(created.id, name: 'Vacation');
+
+    final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(readerDb.close);
+    await SyncIngestor(db: readerDb, syncRoot: syncRoot).syncNow();
+
+    final types = await readerDb.absenceTypesDao.getAllTypes();
+    expect(types.single.name, 'Vacation');
+  });
+
+  test('deleting an absence type reaches a second device', () async {
+    final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(writerDb.close);
+    final writes = SyncedWrites(
+      db: writerDb,
+      logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'writer'),
+    );
+    final created = await writes.createAbsenceType(
+      deviceId: 'writer', name: 'Vacation', paid: true, sortOrder: 0,
+    );
+    await writes.deleteAbsenceType(created.id);
+
+    final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(readerDb.close);
+    await SyncIngestor(db: readerDb, syncRoot: syncRoot).syncNow();
+
+    expect(await readerDb.absenceTypesDao.getAllTypes(), isEmpty);
+  });
+
+  test('an absence, including its range and note, reaches a second device', () async {
+    final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(writerDb.close);
+    final writes = SyncedWrites(
+      db: writerDb,
+      logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'writer'),
+    );
+    final type = await writes.createAbsenceType(
+      deviceId: 'writer', name: 'Vacation', paid: true, sortOrder: 0,
+    );
+    final from = DateTime(2026, 9, 7, 9).toUtc();
+    await writes.createAbsence(
+      deviceId: 'writer',
+      date: DateTime(2026, 9, 7),
+      absenceTypeId: type.id,
+      portion: absencePortionRange,
+      startAt: from,
+      endAt: from.add(const Duration(hours: 2)),
+      note: 'Doctor',
+    );
+
+    final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(readerDb.close);
+    await SyncIngestor(db: readerDb, syncRoot: syncRoot).syncNow();
+
+    final rows = await readerDb.absencesDao.watchAllAbsences().first;
+    expect(rows, hasLength(1));
+    expect(rows.single.date, DateTime(2026, 9, 7));
+    expect(rows.single.portion, absencePortionRange);
+    // Drift hands a stored DateTime back as local regardless of how it was
+    // written, so comparing instants (not DateTime.== , which also checks
+    // the isUtc flag) is required here even though the code is correct.
+    expect(rows.single.startAt?.toUtc(), from);
+    expect(rows.single.note, 'Doctor');
+  });
+
+  test('deleting an absence reaches a second device', () async {
+    final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(writerDb.close);
+    final writes = SyncedWrites(
+      db: writerDb,
+      logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'writer'),
+    );
+    final type = await writes.createAbsenceType(
+      deviceId: 'writer', name: 'Vacation', paid: true, sortOrder: 0,
+    );
+    final absence = await writes.createAbsence(
+      deviceId: 'writer',
+      date: DateTime(2026, 9, 7),
+      absenceTypeId: type.id,
+      portion: absencePortionFullDay,
+    );
+    await writes.deleteAbsence(absence.id);
+
+    final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(readerDb.close);
+    await SyncIngestor(db: readerDb, syncRoot: syncRoot).syncNow();
+
+    expect(await readerDb.absencesDao.watchAllAbsences().first, isEmpty);
+  });
 }
