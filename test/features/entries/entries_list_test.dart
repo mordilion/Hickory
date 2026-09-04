@@ -611,29 +611,30 @@ void main() {
     expect(find.byType(Dismissible), findsOneWidget);
   });
 
-  testWidgets('an absence appears as its own row in its day', (tester) async {
-    final type = AbsenceType(
-      id: 'type-1',
-      name: 'Urlaub',
-      paid: true,
-      sortOrder: 0,
-      deviceId: 'd',
-      createdAt: DateTime.utc(2026, 1, 1),
-      updatedAt: DateTime.utc(2026, 1, 1),
-    );
-    final absence = Absence(
-      id: 'absence-1',
-      date: DateTime(2026, 9, 7),
-      absenceTypeId: 'type-1',
-      portion: absencePortionFullDay,
-      startAt: null,
-      endAt: null,
-      note: null,
-      deviceId: 'd',
-      createdAt: DateTime.utc(2026, 1, 1),
-      updatedAt: DateTime.utc(2026, 1, 1),
-    );
+  AbsenceType vacationType() => AbsenceType(
+        id: 'type-1',
+        name: 'Urlaub',
+        paid: true,
+        sortOrder: 0,
+        deviceId: 'd',
+        createdAt: DateTime.utc(2026, 1, 1),
+        updatedAt: DateTime.utc(2026, 1, 1),
+      );
 
+  Absence vacationOn(DateTime day, {String id = 'absence-1'}) => Absence(
+        id: id,
+        date: day,
+        absenceTypeId: 'type-1',
+        portion: absencePortionFullDay,
+        startAt: null,
+        endAt: null,
+        note: null,
+        deviceId: 'd',
+        createdAt: DateTime.utc(2026, 1, 1),
+        updatedAt: DateTime.utc(2026, 1, 1),
+      );
+
+  testWidgets('an absence appears as its own row in its day', (tester) async {
     await tester.pumpWidget(
       makeApp(
         [
@@ -643,14 +644,54 @@ void main() {
             endAt: DateTime(2026, 9, 7, 10),
           ),
         ],
-        absences: [absence],
-        absenceTypes: [type],
+        absences: [vacationOn(DateTime(2026, 9, 7))],
+        absenceTypes: [vacationType()],
       ),
     );
     await tester.pumpAndSettle();
 
     expect(find.text('Urlaub'), findsOneWidget);
     expect(find.text('Full day'), findsOneWidget);
+  });
+
+  testWidgets('an absence on a day with no entry still gets a row', (tester) async {
+    // The whole point of the feature: a week of vacation is booked and
+    // nothing is worked. Without a day node of its own the row would be
+    // invisible -- and, since swiping it away is the only delete
+    // affordance there is, unremovable.
+    await tester.pumpWidget(
+      makeApp(
+        const [],
+        absences: [vacationOn(DateTime(2026, 9, 7))],
+        absenceTypes: [vacationType()],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Urlaub'), findsOneWidget);
+    expect(find.text('Full day'), findsOneWidget);
+    expect(
+      find.byType(Dismissible),
+      findsOneWidget,
+      reason: 'the row has to be swipeable, or the absence can never be deleted',
+    );
+  });
+
+  testWidgets('is not empty when absences exist but entries do not', (tester) async {
+    await tester.pumpWidget(
+      makeApp(
+        const [],
+        absences: [
+          vacationOn(DateTime(2026, 9, 7)),
+          vacationOn(DateTime(2026, 9, 8), id: 'absence-2'),
+        ],
+        absenceTypes: [vacationType()],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('No entries yet.'), findsNothing);
+    expect(find.text('Urlaub'), findsNWidgets(2));
   });
 
   testWidgets('an absence row is not shown when there is none', (tester) async {

@@ -41,12 +41,23 @@ class EntryDayGroup {
 /// `includePausedTime` (see its doc comment). [tiers] drives each group's
 /// [EntryDayGroup.requiredBreak]; the default empty list means "no break rule
 /// configured", which leaves that field null.
+///
+/// [extraDays] names calendar days that must appear even though no entry
+/// falls on them; each yields a group with an empty [EntryDayGroup.entries]
+/// and zero totals. A day that also carries entries is unaffected. This is
+/// what lets a caller show a day whose only record is an absence -- without
+/// it such a day would have no node at all, and the rows hanging off it
+/// would be unreachable.
 List<EntryDayGroup> groupEntriesByDay(
   List<TimeEntry> entries, {
   List<BreakRuleTier> tiers = const [],
   bool includePausedTimeInBreak = false,
+  Iterable<DateTime> extraDays = const [],
 }) {
   final entriesByDay = <DateTime, List<TimeEntry>>{};
+  for (final day in extraDays) {
+    entriesByDay.putIfAbsent(DateTime(day.year, day.month, day.day), () => []);
+  }
   for (final entry in entries) {
     final local = entry.startAt.toLocal();
     final day = DateTime(local.year, local.month, local.day);

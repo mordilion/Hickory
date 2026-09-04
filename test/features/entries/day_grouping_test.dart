@@ -139,4 +139,34 @@ void main() {
       expect(groups.single.isBreakInsufficient, isFalse);
     });
   });
+
+  group('extraDays', () {
+    test('yields an empty group for a day no entry falls on', () {
+      final groups = groupEntriesByDay(
+        [_entry(id: '1', startAt: DateTime(2026, 8, 18, 9), endAt: DateTime(2026, 8, 18, 10))],
+        extraDays: [DateTime(2026, 8, 19)],
+      );
+
+      expect(groups.map((group) => group.day), [
+        DateTime(2026, 8, 19),
+        DateTime(2026, 8, 18),
+      ]);
+      expect(groups.first.entries, isEmpty);
+      expect(groups.first.totalDuration, Duration.zero);
+      expect(groups.first.breakDuration, Duration.zero);
+    });
+
+    test('leaves a day that already carries entries untouched', () {
+      final groups = groupEntriesByDay(
+        [_entry(id: '1', startAt: DateTime(2026, 8, 18, 9), endAt: DateTime(2026, 8, 18, 10))],
+        // Noon, not midnight: the day is keyed by its calendar date, so a
+        // caller need not normalise before passing one in.
+        extraDays: [DateTime(2026, 8, 18, 12)],
+      );
+
+      expect(groups, hasLength(1));
+      expect(groups.single.entries, hasLength(1));
+      expect(groups.single.totalDuration, const Duration(hours: 1));
+    });
+  });
 }

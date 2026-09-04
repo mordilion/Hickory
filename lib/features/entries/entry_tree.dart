@@ -90,18 +90,22 @@ String dayTreeKey(DateTime day) => 'd${isoDayKey(day)}';
 /// Groups [entries] into Year > Month > ISO week > Day, newest first at every
 /// level, with worked/break totals and offending-day counts rolled up.
 ///
-/// [tiers] and [includePausedTimeInBreak] pass straight through to
-/// [groupEntriesByDay]. A week spanning a month boundary is split at that
-/// boundary (see [EntryWeekGroup]).
+/// [tiers], [includePausedTimeInBreak] and [extraDays] pass straight through
+/// to [groupEntriesByDay] -- [extraDays] seeds the tree with days that carry
+/// no entry of their own (an absence-only day), so every level above them
+/// exists too. A week spanning a month boundary is split at that boundary
+/// (see [EntryWeekGroup]).
 List<EntryYearGroup> buildEntryTree(
   List<TimeEntry> entries, {
   required List<BreakRuleTier> tiers,
   bool includePausedTimeInBreak = false,
+  Iterable<DateTime> extraDays = const [],
 }) {
   final days = groupEntriesByDay(
     entries,
     tiers: tiers,
     includePausedTimeInBreak: includePausedTimeInBreak,
+    extraDays: extraDays,
   );
 
   // Dart maps keep insertion order and `days` is newest-first, so the first

@@ -45,7 +45,15 @@ class EntriesList extends ConsumerWidget {
     return entriesAsync.when(
       data: (entries) {
         final finished = entries.where((e) => e.endAt != null).toList();
-        if (finished.isEmpty) {
+        final absencesByDay = <DateTime, List<Absence>>{};
+        for (final absence in absencesAsync.value ?? const <Absence>[]) {
+          final date = absence.date;
+          final day = DateTime(date.year, date.month, date.day);
+          absencesByDay.putIfAbsent(day, () => []).add(absence);
+        }
+        // An absence is a record in its own right: a week of vacation with
+        // no tracked work still has to show -- and be deletable -- here.
+        if (finished.isEmpty && absencesByDay.isEmpty) {
           return Center(child: Text(l10n.entriesEmpty));
         }
         final projectsById = {
@@ -55,17 +63,15 @@ class EntriesList extends ConsumerWidget {
             jiraWorklogsAsync.value ?? const <String, JiraWorklogRow>{};
         final personioAttendancesById =
             personioAttendancesAsync.value ?? const <String, PersonioAttendanceRow>{};
-        final absencesByDay = <DateTime, List<Absence>>{};
-        for (final absence in absencesAsync.value ?? const <Absence>[]) {
-          final date = absence.date;
-          final day = DateTime(date.year, date.month, date.day);
-          absencesByDay.putIfAbsent(day, () => []).add(absence);
-        }
         final tiers = tiersAsync.value ?? const <BreakRuleTier>[];
         final years = buildEntryTree(
           finished,
           tiers: tiers,
           includePausedTimeInBreak: countPausedTimeAsBreak,
+          // Days that hold only an absence get a node of their own, so the
+          // year/month/week levels above them exist and the absence row is
+          // reachable at all.
+          extraDays: absencesByDay.keys,
         );
         // Null means "not navigated yet": resolve it here, where the data is
         // known, instead of seeding the controller blind.
@@ -309,7 +315,7 @@ class _DayEntriesBlock extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: Column(
         children: [
-          for (final absence in absences) ...[
+          for (final (index, absence) in absences.indexed) ...[
             _AbsenceTile(
               key: ValueKey(absence.id),
               absence: absence,
@@ -321,7 +327,10 @@ class _DayEntriesBlock extends ConsumerWidget {
                     .then((w) => w.deleteAbsence(absence.id));
               },
             ),
-            const Divider(height: 1),
+            // No divider after the card's last row -- on a day whose only
+            // record is an absence, that is the last absence.
+            if (index != absences.length - 1 || entries.isNotEmpty)
+              const Divider(height: 1),
           ],
           for (final (index, entry) in entries.indexed) ...[
             _EntryTile(
