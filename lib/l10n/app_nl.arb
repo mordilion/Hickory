@@ -244,7 +244,6 @@
   "reportsFilterBillableOnly": "Alleen factureerbaar",
   "reportsFilterBillableNonOnly": "Alleen niet-factureerbaar",
   "reportsFilterReset": "Filters resetten",
-  "reportsBalanceTitle": "Tijdsaldo",
   "reportsBalanceSince": "Saldo sinds {date}",
   "@reportsBalanceSince": {
     "placeholders": {

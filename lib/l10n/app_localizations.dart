@@ -1419,12 +1419,6 @@ abstract class AppLocalizations {
   /// **'Filter zurücksetzen'**
   String get reportsFilterReset;
 
-  /// No description provided for @reportsBalanceTitle.
-  ///
-  /// In de, this message translates to:
-  /// **'Zeitkonto'**
-  String get reportsBalanceTitle;
-
   /// No description provided for @reportsBalanceSince.
   ///
   /// In de, this message translates to:

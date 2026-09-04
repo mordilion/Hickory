@@ -761,9 +761,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get reportsFilterReset => 'Filters resetten';
 
   @override
-  String get reportsBalanceTitle => 'Tijdsaldo';
-
-  @override
   String reportsBalanceSince(String date) {
     return 'Saldo sinds $date';
   }

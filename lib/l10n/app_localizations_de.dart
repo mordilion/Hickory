@@ -762,9 +762,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get reportsFilterReset => 'Filter zurücksetzen';
 
   @override
-  String get reportsBalanceTitle => 'Zeitkonto';
-
-  @override
   String reportsBalanceSince(String date) {
     return 'Saldo seit $date';
   }

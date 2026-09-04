@@ -354,7 +354,6 @@
   "reportsFilterBillableOnly": "Nur abrechenbar",
   "reportsFilterBillableNonOnly": "Nur nicht abrechenbar",
   "reportsFilterReset": "Filter zurücksetzen",
-  "reportsBalanceTitle": "Zeitkonto",
   "reportsBalanceSince": "Saldo seit {date}",
   "@reportsBalanceSince": {
     "placeholders": {

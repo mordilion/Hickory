@@ -767,9 +767,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reportsFilterReset => 'Réinitialiser les filtres';
 
   @override
-  String get reportsBalanceTitle => 'Compteur';
-
-  @override
   String reportsBalanceSince(String date) {
     return 'Solde depuis le $date';
   }

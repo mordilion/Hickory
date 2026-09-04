@@ -67,6 +67,17 @@ final reportProjectsProvider = StreamProvider<List<Project>>((ref) {
 final workTimeBalanceProvider = Provider<AsyncValue<Duration>>((ref) {
   final entries = ref.watch(allEntriesProvider);
   final settings = ref.watch(appSettingsProvider);
+  // Checked before the loading/null checks below: AsyncError's `isLoading`
+  // is always false and its `.value` carries forward the previous data (or
+  // null) on purpose, so an error here would otherwise either be
+  // mistaken for "still loading" (no prior data) or silently masked by a
+  // stale balance (prior data present) instead of reaching the UI.
+  if (entries is AsyncError<List<TimeEntry>>) {
+    return AsyncValue.error(entries.error, entries.stackTrace);
+  }
+  if (settings is AsyncError<AppSettingsRow>) {
+    return AsyncValue.error(settings.error, settings.stackTrace);
+  }
   if (entries.isLoading || settings.isLoading) return const AsyncValue.loading();
   final entryList = entries.value;
   final settingsRow = settings.value;

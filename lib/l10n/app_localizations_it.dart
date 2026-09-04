@@ -757,9 +757,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get reportsFilterReset => 'Reimposta filtri';
 
   @override
-  String get reportsBalanceTitle => 'Saldo ore';
-
-  @override
   String reportsBalanceSince(String date) {
     return 'Saldo dal $date';
   }

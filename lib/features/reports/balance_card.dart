@@ -24,56 +24,80 @@ String formatSignedDuration(Duration balance) {
 class BalanceCard extends ConsumerWidget {
   const BalanceCard({super.key});
 
+  /// A card shaped like the loaded state (same padding, same min height via
+  /// the spinner) so the tile doesn't collapse to nothing or jump size once
+  /// data arrives.
+  static Widget _loadingCard() => const Card(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      );
+
+  static Widget _errorCard(AppLocalizations l10n, Object error) => Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(l10n.reportsError('$error')),
+        ),
+      );
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final settings = ref.watch(appSettingsProvider).value;
-    if (settings == null) return const SizedBox.shrink();
-
-    if (!hasAnyTarget(settings)) {
-      return Card(
-        child: ListTile(
-          leading: const Icon(Icons.schedule_outlined),
-          title: Text(l10n.reportsBalanceNoTargets),
-          subtitle: Text(l10n.reportsBalanceConfigure),
-        ),
-      );
-    }
-
-    final cutoff = lastCutoffOnOrBefore(settings, DateTime.now());
-    final localeName = Localizations.localeOf(context).toLanguageTag();
-    final label = cutoff == null
-        ? l10n.reportsBalanceAllTime
-        : l10n.reportsBalanceSince(DateFormat.yMd(localeName).format(cutoff));
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ref.watch(workTimeBalanceProvider).when(
-              data: (balance) {
-                // Icon and colour together, never colour alone.
-                final isDeficit = balance.isNegative;
-                final color = isDeficit ? theme.colorScheme.error : theme.colorScheme.primary;
-                return Row(
-                  children: [
-                    Icon(
-                      isDeficit ? Icons.trending_down : Icons.trending_up,
-                      color: color,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(child: Text(label, style: theme.textTheme.titleMedium)),
-                    Text(
-                      formatSignedDuration(balance),
-                      style: theme.textTheme.headlineSmall?.copyWith(color: color),
-                    ),
-                  ],
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Text(l10n.reportsError('$e')),
+    // Watched via .when rather than `.value` so a stream error is shown as
+    // an error card instead of being read back as null and mistaken for
+    // "still loading" (AsyncError's own isLoading/value are not useful
+    // signals here — see workTimeBalanceProvider's doc comment).
+    return ref.watch(appSettingsProvider).when(
+      loading: _loadingCard,
+      error: (error, _) => _errorCard(l10n, error),
+      data: (settings) {
+        if (!hasAnyTarget(settings)) {
+          return Card(
+            child: ListTile(
+              leading: const Icon(Icons.schedule_outlined),
+              title: Text(l10n.reportsBalanceNoTargets),
+              subtitle: Text(l10n.reportsBalanceConfigure),
             ),
-      ),
+          );
+        }
+
+        final cutoff = lastCutoffOnOrBefore(settings, DateTime.now());
+        final localeName = Localizations.localeOf(context).toLanguageTag();
+        final label = cutoff == null
+            ? l10n.reportsBalanceAllTime
+            : l10n.reportsBalanceSince(DateFormat.yMd(localeName).format(cutoff));
+
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: ref.watch(workTimeBalanceProvider).when(
+                  data: (balance) {
+                    // Icon and colour together, never colour alone.
+                    final isDeficit = balance.isNegative;
+                    final color = isDeficit ? theme.colorScheme.error : theme.colorScheme.primary;
+                    return Row(
+                      children: [
+                        Icon(
+                          isDeficit ? Icons.trending_down : Icons.trending_up,
+                          color: color,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(label, style: theme.textTheme.titleMedium)),
+                        Text(
+                          formatSignedDuration(balance),
+                          style: theme.textTheme.headlineSmall?.copyWith(color: color),
+                        ),
+                      ],
+                    );
+                  },
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Text(l10n.reportsError('$e')),
+                ),
+          ),
+        );
+      },
     );
   }
 }

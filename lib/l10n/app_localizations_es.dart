@@ -756,9 +756,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reportsFilterReset => 'Restablecer filtros';
 
   @override
-  String get reportsBalanceTitle => 'Saldo horario';
-
-  @override
   String reportsBalanceSince(String date) {
     return 'Saldo desde el $date';
   }

@@ -244,7 +244,6 @@
   "reportsFilterBillableOnly": "Billable only",
   "reportsFilterBillableNonOnly": "Non-billable only",
   "reportsFilterReset": "Reset filters",
-  "reportsBalanceTitle": "Balance",
   "reportsBalanceSince": "Balance since {date}",
   "@reportsBalanceSince": {
     "placeholders": {

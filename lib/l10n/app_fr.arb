@@ -244,7 +244,6 @@
   "reportsFilterBillableOnly": "Facturable uniquement",
   "reportsFilterBillableNonOnly": "Non facturable uniquement",
   "reportsFilterReset": "Réinitialiser les filtres",
-  "reportsBalanceTitle": "Compteur",
   "reportsBalanceSince": "Solde depuis le {date}",
   "@reportsBalanceSince": {
     "placeholders": {

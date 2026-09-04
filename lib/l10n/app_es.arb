@@ -244,7 +244,6 @@
   "reportsFilterBillableOnly": "Solo facturable",
   "reportsFilterBillableNonOnly": "Solo no facturable",
   "reportsFilterReset": "Restablecer filtros",
-  "reportsBalanceTitle": "Saldo horario",
   "reportsBalanceSince": "Saldo desde el {date}",
   "@reportsBalanceSince": {
     "placeholders": {
