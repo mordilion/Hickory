@@ -83,16 +83,24 @@ Map<DateTime, List<TimeEntry>> _entriesByDay(List<TimeEntry> entries) {
 
 /// Minutes between [from] and [to] already covered by tracked work.
 /// Overlapping entries are merged first, so two entries covering the same
-/// minute do not subtract it twice.
+/// minute do not subtract it twice. Each entry's clipped span is shortened
+/// by that entry's own paused time before merging: a pause carries no
+/// timestamps of its own, only a total, so there is no way to know whether
+/// it fell inside the absence window. Crediting the whole pause as absence
+/// rather than overlap favours the user — the alternative would charge
+/// them for minutes they demonstrably did not work.
 int _overlapMinutes(DateTime from, DateTime to, List<TimeEntry> dayEntries) {
   final spans = <(DateTime, DateTime)>[];
   for (final entry in dayEntries) {
     final end = entry.endAt;
     if (end == null) continue;
     final start = entry.startAt.isAfter(from) ? entry.startAt : from;
-    final stop = end.isBefore(to) ? end : to;
-    if (!stop.isAfter(start)) continue;
-    spans.add((start, stop));
+    final clippedEnd = end.isBefore(to) ? end : to;
+    if (!clippedEnd.isAfter(start)) continue;
+    final worked =
+        clippedEnd.difference(start) - Duration(seconds: entry.totalPausedSeconds);
+    if (worked <= Duration.zero) continue;
+    spans.add((start, start.add(worked)));
   }
   if (spans.isEmpty) return 0;
   spans.sort((a, b) => a.$1.compareTo(b.$1));
@@ -223,13 +231,19 @@ List<DayBalance> dayBalances(
       }
     }
 
-    final effectiveTarget = target - unpaidMinutes;
+    final effectiveTargetRaw = target - unpaidMinutes;
+    final effectiveTarget = effectiveTargetRaw < 0 ? 0 : effectiveTargetRaw;
+    // Being absent excuses work; it cannot earn overtime. Capping at the
+    // effective target keeps a paid absence at neutral at most, whether
+    // that is a range far longer than the day or any absence on a
+    // non-work day (effective target zero).
+    final cappedPaidMinutes = paidMinutes > effectiveTarget ? effectiveTarget : paidMinutes;
     result.add(
       DayBalance(
         day: day,
         worked: worked,
-        target: Duration(minutes: effectiveTarget < 0 ? 0 : effectiveTarget),
-        absenceCredit: Duration(minutes: paidMinutes),
+        target: Duration(minutes: effectiveTarget),
+        absenceCredit: Duration(minutes: cappedPaidMinutes),
       ),
     );
   }

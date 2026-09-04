@@ -520,4 +520,92 @@ void main() {
       reason: 'with no finished entry and no absence there is no known day to start from',
     );
   });
+
+  test('a paused entry inside a paid range is not charged for the pause', () {
+    // 09:00-11:00, but with the middle hour paused: only 60 minutes were
+    // actually worked, so only 60 minutes should count as overlap with the
+    // absence, leaving the other 60 minutes of the range as credit.
+    final pausedEntry = TimeEntry(
+      id: 'paused',
+      startAt: DateTime(2026, 9, 7, 9).toUtc(),
+      endAt: DateTime(2026, 9, 7, 11).toUtc(),
+      totalPausedSeconds: 3600,
+      source: 'manual',
+      deviceId: 'test',
+      createdAt: DateTime.utc(2026, 1, 1),
+      updatedAt: DateTime.utc(2026, 1, 1),
+    );
+    final balances = dayBalances(
+      [pausedEntry],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [
+        absenceOn(
+          monday,
+          portion: absencePortionRange,
+          startAt: DateTime(2026, 9, 7, 9).toUtc(),
+          endAt: DateTime(2026, 9, 7, 11).toUtc(),
+        ),
+      ],
+      absenceTypesById: {'type-1': typeFixture(paid: true)},
+      through: monday,
+    );
+    expect(balances.single.worked, const Duration(minutes: 60));
+    expect(balances.single.absenceCredit, const Duration(minutes: 60));
+    expect(
+      balances.single.balance,
+      const Duration(minutes: -360),
+      reason: 'the paused hour was never worked, so it is absence credit, not overlap',
+    );
+  });
+
+  test('a paid range on a day with a zero target yields a zero balance and no credit', () {
+    final balances = dayBalances(
+      const [],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [
+        absenceOn(
+          saturday,
+          portion: absencePortionRange,
+          startAt: DateTime(2026, 9, 12, 9).toUtc(),
+          endAt: DateTime(2026, 9, 12, 11).toUtc(),
+        ),
+      ],
+      absenceTypesById: {'type-1': typeFixture(paid: true)},
+      through: saturday,
+    );
+    expect(balances.single.target, Duration.zero);
+    expect(
+      balances.single.absenceCredit,
+      Duration.zero,
+      reason: 'being absent on a non-work day cannot earn a credit',
+    );
+    expect(balances.single.balance, Duration.zero);
+  });
+
+  test('a paid range longer than the target yields a neutral day rather than a surplus', () {
+    final balances = dayBalances(
+      const [],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [
+        absenceOn(
+          monday,
+          portion: absencePortionRange,
+          startAt: DateTime(2026, 9, 7, 8).toUtc(),
+          endAt: DateTime(2026, 9, 7, 20).toUtc(),
+        ),
+      ],
+      absenceTypesById: {'type-1': typeFixture(paid: true)},
+      through: monday,
+    );
+    expect(
+      balances.single.absenceCredit,
+      const Duration(minutes: 480),
+      reason: 'credit is capped at the effective target, not the raw 720-minute span',
+    );
+    expect(
+      balances.single.balance,
+      Duration.zero,
+      reason: 'being absent cannot earn overtime',
+    );
+  });
 }
