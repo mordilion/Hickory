@@ -54,6 +54,7 @@ void main() {
     // listened to" -- a fresh Stream.error(...) per invocation avoids that.
     Stream<AppSettingsRow> Function()? settingsStream,
     Stream<List<TimeEntry>> Function()? entriesStream,
+    Stream<List<Absence>> Function()? absencesStream,
   }) async {
     await tester.pumpWidget(
       ProviderScope(
@@ -64,7 +65,9 @@ void main() {
           allEntriesProvider.overrideWith(
             (ref) => entriesStream?.call() ?? Stream.value(entries),
           ),
-          absencesProvider.overrideWith((ref) => Stream.value(absences)),
+          absencesProvider.overrideWith(
+            (ref) => absencesStream?.call() ?? Stream.value(absences),
+          ),
           absenceTypesProvider.overrideWith((ref) => Stream.value(absenceTypes)),
         ],
         child: MaterialApp(
@@ -132,6 +135,34 @@ void main() {
     await pumpCard(
       tester,
       settingsStream: () => Stream<AppSettingsRow>.error(Exception('boom')),
+    );
+    expect(find.textContaining('boom'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+  });
+
+  testWidgets('a failing absences stream is ignored while the feature is off', (tester) async {
+    // The one assertion behind workTimeBalanceProvider's conditional gate:
+    // with absence tracking off the balance never reads an absence, so a
+    // broken absences stream must not take the number down with it.
+    await pumpCard(
+      tester,
+      settings: appSettingsFixture(targetMinutesMonday: 480),
+      entries: [_entryOn(monday, 9 * 60)],
+      absencesStream: () => Stream<List<Absence>>.error(Exception('boom')),
+    );
+    expect(find.textContaining('boom'), findsNothing);
+    expect(find.text('+1:00'), findsOneWidget);
+  });
+
+  testWidgets('a failing absences stream surfaces once the feature is on', (tester) async {
+    await pumpCard(
+      tester,
+      settings: appSettingsFixture(
+        absenceTrackingEnabled: true,
+        targetMinutesMonday: 480,
+      ),
+      entries: [_entryOn(monday, 9 * 60)],
+      absencesStream: () => Stream<List<Absence>>.error(Exception('boom')),
     );
     expect(find.textContaining('boom'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);

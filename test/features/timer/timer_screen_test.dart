@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/native.dart';
@@ -48,7 +49,13 @@ void main() {
   // riverpod 3.x's `Override` type isn't part of its public export surface,
   // so a standalone `List<Override>` declaration doesn't compile here even
   // though `ProviderScope.overrides` itself is typed that way internally.
-  Widget makeApp({TimeEntry? running}) => ProviderScope(
+  Widget makeApp({
+    TimeEntry? running,
+    bool absenceTrackingEnabled = false,
+    // A live settings stream, for the one test that has to change a
+    // setting while the tab is already mounted.
+    Stream<AppSettingsRow>? settingsStream,
+  }) => ProviderScope(
         overrides: [
           appDatabaseProvider.overrideWithValue(db),
           runningEntryProvider.overrideWith((ref) => Stream.value(running)),
@@ -66,7 +73,13 @@ void main() {
           breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),
           absencesProvider.overrideWith((ref) => Stream.value(const [])),
           absenceTypesProvider.overrideWith((ref) => Stream.value(const [])),
-          appSettingsProvider.overrideWith((ref) => Stream.value(appSettingsFixture())),
+          appSettingsProvider.overrideWith(
+            (ref) =>
+                settingsStream ??
+                Stream.value(
+                  appSettingsFixture(absenceTrackingEnabled: absenceTrackingEnabled),
+                ),
+          ),
           deviceIdProvider.overrideWith((ref) async => 'device-1'),
           syncedWritesProvider.overrideWith(
             (ref) async => SyncedWrites(
@@ -150,6 +163,52 @@ void main() {
     expect(find.text('Add entry'), findsOneWidget);
     expect(find.text('What are you working on?'), findsNothing);
   });
+
+  testWidgets('the Absence segment is absent while the feature is off', (tester) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+
+    // "Ships off, changes nothing" is the whole promise of the switch.
+    expect(find.text('Absence'), findsNothing);
+  });
+
+  testWidgets('the Absence segment appears once the feature is on', (tester) async {
+    await tester.pumpWidget(makeApp(absenceTrackingEnabled: true));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Absence'), findsOneWidget);
+
+    await tester.tap(find.text('Absence'));
+    await tester.pumpAndSettle();
+
+    // The absence form, standing in for AbsenceBar itself: with no types
+    // configured it points at the settings instead of showing a form.
+    expect(find.text('Add an absence type in Settings first.'), findsOneWidget);
+  });
+
+  testWidgets(
+    'turning the feature off while the tab sits on Absence falls back to Timer',
+    (tester) async {
+      final settings = StreamController<AppSettingsRow>.broadcast();
+      addTearDown(settings.close);
+      await tester.pumpWidget(makeApp(settingsStream: settings.stream));
+      settings.add(appSettingsFixture(absenceTrackingEnabled: true));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Absence'));
+      await tester.pumpAndSettle();
+      expect(find.text('Add an absence type in Settings first.'), findsOneWidget);
+
+      settings.add(appSettingsFixture());
+      await tester.pumpAndSettle();
+
+      // The segment is gone, and the body no longer renders a mode the bar
+      // does not offer.
+      expect(find.text('Absence'), findsNothing);
+      expect(find.text('Add an absence type in Settings first.'), findsNothing);
+      expect(find.text('Start'), findsOneWidget);
+    },
+  );
 
   testWidgets('with a running entry, Manual is disabled and Timer mode stays forced', (tester) async {
     await tester.pumpWidget(makeApp(running: runningEntry()));

@@ -455,6 +455,69 @@ void main() {
     expect(balances.single.balance, const Duration(minutes: 120));
   });
 
+  // Two absences on one day is the only shape in which the paid/unpaid
+  // split and the credit cap interact at all: with a single absence each
+  // is applied on its own.
+  test('a paid and an unpaid half day on one day cancel out', () {
+    final balances = dayBalances(
+      const [],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [
+        absenceOn(monday, id: 'paid', portion: absencePortionHalfDay),
+        absenceOn(monday, id: 'unpaid', typeId: 'type-2', portion: absencePortionHalfDay),
+      ],
+      absenceTypesById: {
+        'type-1': typeFixture(paid: true),
+        'type-2': typeFixture(id: 'type-2', paid: false),
+      },
+      through: monday,
+    );
+    // The unpaid half takes 240 minutes off the target; the paid half
+    // credits the other 240 and is not capped away by it.
+    expect(balances.single.target, const Duration(minutes: 240));
+    expect(balances.single.absenceCredit, const Duration(minutes: 240));
+    expect(balances.single.balance, Duration.zero);
+  });
+
+  test('two paid absences on one day are capped at the day\'s target together', () {
+    final balances = dayBalances(
+      const [],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [
+        absenceOn(monday, id: 'full'),
+        absenceOn(monday, id: 'half', portion: absencePortionHalfDay),
+      ],
+      absenceTypesById: {'type-1': typeFixture(paid: true)},
+      through: monday,
+    );
+    // 480 + 240 claimed, 480 credited: absence excuses work, it never
+    // manufactures overtime.
+    expect(balances.single.absenceCredit, const Duration(minutes: 480));
+    expect(balances.single.balance, Duration.zero);
+  });
+
+  test('an unpaid full day leaves a paid absence beside it nothing to credit', () {
+    final balances = dayBalances(
+      const [],
+      settingsWith(monday: 480, absenceTracking: true),
+      absences: [
+        absenceOn(monday, id: 'unpaid', typeId: 'type-2'),
+        absenceOn(monday, id: 'paid', portion: absencePortionHalfDay),
+      ],
+      absenceTypesById: {
+        'type-1': typeFixture(paid: true),
+        'type-2': typeFixture(id: 'type-2', paid: false),
+      },
+      through: monday,
+    );
+    // The unpaid day already removed the whole target, so the cap —
+    // effective target, not the raw one — holds the paid credit at zero
+    // rather than turning it into overtime.
+    expect(balances.single.target, Duration.zero);
+    expect(balances.single.absenceCredit, Duration.zero);
+    expect(balances.single.balance, Duration.zero);
+  });
+
   test('a work day with neither entries nor absence is a deficit while tracking is on', () {
     final balances = dayBalances(
       [entryOn(monday, 480)],
