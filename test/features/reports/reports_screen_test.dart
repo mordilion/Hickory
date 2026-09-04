@@ -79,7 +79,7 @@ void main() {
   // appSettingsProvider/allEntriesProvider are overridden too now that
   // ReportsScreen mounts BalanceCard, which watches both: without this the
   // card subscribes to the same live drift stream this comment warns about.
-  Widget makeApp() => ProviderScope(
+  Widget makeApp({AppSettingsRow? settings}) => ProviderScope(
     overrides: [
       reportEntriesProvider.overrideWith((ref, range) => Stream.value(entries)),
       reportProjectsProvider.overrideWith(
@@ -88,7 +88,9 @@ void main() {
       reportViewStateStoreProvider.overrideWith(
         (ref) async => ReportViewStateStore(supportDirectory: tempDir),
       ),
-      appSettingsProvider.overrideWith((ref) => Stream.value(appSettingsFixture())),
+      appSettingsProvider.overrideWith(
+        (ref) => Stream.value(settings ?? appSettingsFixture()),
+      ),
       allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
     ],
     child: MaterialApp(
@@ -115,9 +117,9 @@ void main() {
   // tightly around just the widget construction (where AppTheme.light gets
   // evaluated) rather than the whole test body, since it doesn't need to
   // wrap tester.runAsync()/pumpAndSettle() at all.
-  Widget buildAppIsolatingFontErrors() {
+  Widget buildAppIsolatingFontErrors({AppSettingsRow? settings}) {
     late Widget app;
-    runZonedGuarded(() => app = makeApp(), (error, stack) {
+    runZonedGuarded(() => app = makeApp(settings: settings), (error, stack) {
       if (!error.toString().contains('Failed to load font with url')) {
         Error.throwWithStackTrace(error, stack);
       }
@@ -255,5 +257,32 @@ void main() {
 
     expect(find.text('Project A'), findsOneWidget);
     expect(find.text('Project B'), findsOneWidget);
+  });
+
+  testWidgets('the balance tile says so once a filter is active', (tester) async {
+    // A target is needed for the tile to show a balance at all -- with the
+    // all-zero default it shows the "configure a target" empty state, which
+    // has nothing for a filter to be misread against.
+    await tester.pumpWidget(
+      buildAppIsolatingFontErrors(
+        settings: appSettingsFixture(targetMinutesFriday: 480),
+      ),
+    );
+    await pumpUntilReady(tester);
+
+    const note = 'The balance covers all entries, regardless of the filter.';
+    expect(find.text(note), findsNothing, reason: 'no note while nothing is filtered');
+
+    await tester.tap(find.byIcon(Icons.filter_list));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(CheckboxListTile, 'Project A'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Close'));
+    await tester.pumpAndSettle();
+
+    // The list below has narrowed to one project; the balance has not, and
+    // now says why.
+    expect(find.text('Project B'), findsNothing);
+    expect(find.text(note), findsOneWidget);
   });
 }

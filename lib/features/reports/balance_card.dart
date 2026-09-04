@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../core/di/app_settings_provider.dart';
 import '../../l10n/app_localizations.dart';
 import 'balance_calculations.dart';
+import 'report_view_controller.dart';
 import 'reports_providers.dart';
 
 /// "+1:30" / "-0:45" — the sign is always explicit, because a balance of
@@ -45,6 +46,15 @@ class BalanceCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    // The balance covers every entry, whatever the tab's filters say (see
+    // workTimeBalanceProvider): "overtime, but only for project X" is not
+    // a meaningful number. With the filter button sitting right above this
+    // tile, that has to be said out loud -- an entry list that narrows
+    // while the balance stays put otherwise reads as a bug. Via `.value`,
+    // so a state that is still loading (or failed to load) simply carries
+    // no note: no filter can be active before it arrives.
+    final filterActive =
+        (ref.watch(reportViewControllerProvider).value?.activeFilterCount ?? 0) > 0;
     // Watched via .when rather than `.value` so a stream error is shown as
     // an error card instead of being read back as null and mistaken for
     // "still loading" (AsyncError's own isLoading/value are not useful
@@ -77,18 +87,31 @@ class BalanceCard extends ConsumerWidget {
                     // Icon and colour together, never colour alone.
                     final isDeficit = balance.isNegative;
                     final color = isDeficit ? theme.colorScheme.error : theme.colorScheme.primary;
-                    return Row(
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          isDeficit ? Icons.trending_down : Icons.trending_up,
-                          color: color,
+                        Row(
+                          children: [
+                            Icon(
+                              isDeficit ? Icons.trending_down : Icons.trending_up,
+                              color: color,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(child: Text(label, style: theme.textTheme.titleMedium)),
+                            Text(
+                              formatSignedDuration(balance),
+                              style: theme.textTheme.headlineSmall?.copyWith(color: color),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(child: Text(label, style: theme.textTheme.titleMedium)),
-                        Text(
-                          formatSignedDuration(balance),
-                          style: theme.textTheme.headlineSmall?.copyWith(color: color),
-                        ),
+                        if (filterActive) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            l10n.reportsBalanceIgnoresFilter,
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        ],
                       ],
                     );
                   },
