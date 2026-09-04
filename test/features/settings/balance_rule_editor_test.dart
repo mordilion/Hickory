@@ -168,4 +168,108 @@ void main() {
     expect(row.balanceResetMonth, 7);
     expect(row.balanceResetDay, 1, reason: 'the day defaults to the 1st until changed');
   });
+
+  testWidgets('carry-over with a cutoff but no bound is not persisted', (tester) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+    await chooseMode(tester, 'Übertrag mit Kappung');
+
+    await tester.tap(find.byKey(const ValueKey('balanceCutoffMonth')));
+    await tester.pumpAndSettle();
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Juli').last);
+      await tester.pumpAndSettle();
+      // There is no write to poll for here -- the point of this test is
+      // that none happens. Settle the pumps and give any (wrongly) started
+      // write a moment to land before asserting it did not.
+      await Future.delayed(const Duration(milliseconds: 200));
+    });
+
+    late AppSettingsRow row;
+    await tester.runAsync(() async {
+      row = await db.appSettingsDao.watchSettings().first;
+    });
+    expect(
+      row.balanceResetMode,
+      'none',
+      reason: 'a carry-over with a cutoff but no bound must not reach the database',
+    );
+    expect(find.text('Bitte mindestens eine Grenze angeben.'), findsOneWidget);
+  });
+
+  testWidgets('a carry-over bound persists with the cutoff defaulted to 1 January', (
+    tester,
+  ) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+    await chooseMode(tester, 'Übertrag mit Kappung');
+
+    await tester.enterText(find.byKey(const ValueKey('carryOverMax')), '5');
+    late AppSettingsRow row;
+    await tester.runAsync(() async {
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await waitFor(
+        () async => (await db.appSettingsDao.watchSettings().first).carryOverMaxMinutes == 300,
+      );
+      row = await db.appSettingsDao.watchSettings().first;
+    });
+    expect(row.balanceResetMode, 'carryOver');
+    expect(row.balanceResetMonth, 1, reason: 'the cutoff defaults to 1 January once a bound is set');
+    expect(row.balanceResetDay, 1, reason: 'the cutoff defaults to 1 January once a bound is set');
+    expect(row.carryOverMaxMinutes, 300);
+  });
+
+  testWidgets('a carry-over minimum bound persists as a negative number', (tester) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+    await chooseMode(tester, 'Übertrag mit Kappung');
+
+    await tester.enterText(find.byKey(const ValueKey('carryOverMin')), '2');
+    late AppSettingsRow row;
+    await tester.runAsync(() async {
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await waitFor(
+        () async => (await db.appSettingsDao.watchSettings().first).carryOverMinMinutes == -120,
+      );
+      row = await db.appSettingsDao.watchSettings().first;
+    });
+    expect(
+      row.carryOverMinMinutes,
+      -120,
+      reason: 'the deficit bound is entered as a positive magnitude but stored negative',
+    );
+  });
+
+  testWidgets('switching from a configured carry-over to none clears cutoff and bounds', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      makeApp(
+        settings: appSettingsFixture(
+          balanceResetMode: 'carryOver',
+          balanceResetDay: 1,
+          balanceResetMonth: 1,
+          carryOverMaxMinutes: 300,
+          carryOverMinMinutes: -120,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    late AppSettingsRow row;
+    await tester.runAsync(() async {
+      await tester.tap(find.byKey(const ValueKey('balanceMode')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Kein Stichtag').last);
+      await waitFor(
+        () async => (await db.appSettingsDao.watchSettings().first).balanceResetMode == 'none',
+      );
+      row = await db.appSettingsDao.watchSettings().first;
+    });
+    expect(row.balanceResetMode, 'none');
+    expect(row.balanceResetDay, null, reason: 'switching to none clears the stale cutoff day');
+    expect(row.balanceResetMonth, null, reason: 'switching to none clears the stale cutoff month');
+    expect(row.carryOverMaxMinutes, null, reason: 'switching to none clears the stale max bound');
+    expect(row.carryOverMinMinutes, null, reason: 'switching to none clears the stale min bound');
+  });
 }
