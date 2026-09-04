@@ -73,6 +73,12 @@ class CommitOnFocusLoss extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Focus(
+        // An observer, not a stop of its own: a Focus node that can take
+        // focus would sit in the traversal order in front of the field it
+        // wraps, so Tab would need two presses per field. onFocusChange
+        // still fires, because a node's hasFocus covers its descendants.
+        canRequestFocus: false,
+        skipTraversal: true,
         onFocusChange: (hasFocus) {
           if (!hasFocus) onCommit();
         },

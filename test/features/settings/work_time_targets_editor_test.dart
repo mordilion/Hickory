@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/core/di/app_settings_provider.dart';
@@ -137,10 +138,11 @@ void main() {
     await tester.enterText(find.byKey(const ValueKey('workTimeTarget1')), '8');
     late AppSettingsRow row;
     await tester.runAsync(() async {
-      // Leaving the field is the whole point: on desktop, Tab and a click
-      // into the next field both move focus without ever firing
-      // onSubmitted, and there is no Save button to fall back on.
-      await tester.tap(find.byKey(const ValueKey('workTimeTarget2')));
+      // Tab, the gesture this is really about: on desktop it moves focus
+      // to the next field without ever firing onSubmitted, and there is no
+      // Save button to fall back on. Clicking into another field is the
+      // same path.
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
       await tester.pumpAndSettle();
       await waitFor(
         () async => (await db.appSettingsDao.watchSettings().first).targetMinutesMonday == 480,
@@ -153,6 +155,16 @@ void main() {
       480,
       reason: 'a value abandoned by moving focus must still be saved',
     );
+    // That one Tab landed on Tuesday, not on the Focus wrapper that
+    // watches Monday: the wrapper must stay out of the traversal order, or
+    // every field would cost two presses.
+    final tuesday = tester.widget<EditableText>(
+      find.descendant(
+        of: find.byKey(const ValueKey('workTimeTarget2')),
+        matching: find.byType(EditableText),
+      ),
+    );
+    expect(tuesday.focusNode.hasPrimaryFocus, isTrue);
   });
 
   testWidgets('weekly mode shows one field and the work-day toggles', (tester) async {
