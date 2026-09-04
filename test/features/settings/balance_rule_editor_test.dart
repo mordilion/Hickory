@@ -291,6 +291,37 @@ void main() {
     expect(row.balanceResetMode, 'carryOver');
   });
 
+  testWidgets('a failed write is reported instead of being swallowed', (tester) async {
+    // A plain file where the sync log needs its `entries` directory: the
+    // settings row is written, the log append then throws, and the editor
+    // goes on showing a selection the user's other devices will never see
+    // unless it says so.
+    File('${syncRoot.path}/entries').createSync();
+
+    await tester.pumpWidget(
+      makeApp(
+        settings: appSettingsFixture(
+          balanceResetMode: 'carryOver',
+          balanceResetDay: 1,
+          balanceResetMonth: 1,
+          carryOverMaxMinutes: 300,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.runAsync(() async {
+      await tester.tap(find.byKey(const ValueKey('balanceMode')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Kein Stichtag').last);
+      await tester.pumpAndSettle();
+      await Future.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pumpAndSettle();
+
+    expect(find.text('Das Zeitkonto konnte nicht gespeichert werden.'), findsOneWidget);
+  });
+
   testWidgets('switching from a configured carry-over to none clears cutoff and bounds', (
     tester,
   ) async {

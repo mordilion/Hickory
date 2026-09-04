@@ -167,6 +167,20 @@ void main() {
     expect(tuesday.focusNode.hasPrimaryFocus, isTrue);
   });
 
+  testWidgets('text that is not a number is reported, not dropped', (tester) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+
+    // No write can follow, so there is nothing to await here -- the point
+    // is that the user hears about it rather than watching the field empty
+    // itself on the next stream emission.
+    await tester.enterText(find.byKey(const ValueKey('workTimeTarget1')), 'acht');
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Bitte eine Stundenzahl von 0 oder mehr eingeben.'), findsOneWidget);
+  });
+
   testWidgets('weekly mode shows one field and the work-day toggles', (tester) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
