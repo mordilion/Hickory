@@ -130,6 +130,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('absenceStartTime')), findsNothing);
+    expect(
+      find.text('Umfang'),
+      findsOneWidget,
+      reason: 'the portion control needs a visible label, not just the segment names',
+    );
 
     await tester.tap(find.text('Zeitraum'));
     await tester.pumpAndSettle();

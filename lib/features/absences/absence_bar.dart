@@ -49,7 +49,7 @@ class _AbsenceBarState extends ConsumerState<AbsenceBar> {
       firstDate: DateTime(initial.year - 5),
       lastDate: DateTime(initial.year + 5),
     );
-    if (picked == null) return;
+    if (picked == null || !mounted) return;
     setState(() {
       if (isStart) {
         _from = picked;
@@ -67,7 +67,7 @@ class _AbsenceBarState extends ConsumerState<AbsenceBar> {
       context: context,
       initialTime: isStart ? _startTime : _endTime,
     );
-    if (picked == null) return;
+    if (picked == null || !mounted) return;
     setState(() {
       if (isStart) {
         _startTime = picked;
@@ -162,24 +162,29 @@ class _AbsenceBarState extends ConsumerState<AbsenceBar> {
           onChanged: _busy ? null : (id) => setState(() => _typeId = id),
         ),
         const SizedBox(height: 12),
-        SegmentedButton<String>(
-          segments: [
-            ButtonSegment(
-              value: absencePortionFullDay,
-              label: Text(l10n.absencePortionFullDay),
-            ),
-            ButtonSegment(
-              value: absencePortionHalfDay,
-              label: Text(l10n.absencePortionHalfDay),
-            ),
-            ButtonSegment(
-              value: absencePortionRange,
-              label: Text(l10n.absencePortionRange),
-            ),
-          ],
-          selected: {_portion},
-          onSelectionChanged:
-              _busy ? null : (selection) => setState(() => _portion = selection.first),
+        Text(l10n.absenceFormPortion, style: Theme.of(context).textTheme.labelMedium),
+        const SizedBox(height: 4),
+        Semantics(
+          label: l10n.absenceFormPortion,
+          child: SegmentedButton<String>(
+            segments: [
+              ButtonSegment(
+                value: absencePortionFullDay,
+                label: Text(l10n.absencePortionFullDay),
+              ),
+              ButtonSegment(
+                value: absencePortionHalfDay,
+                label: Text(l10n.absencePortionHalfDay),
+              ),
+              ButtonSegment(
+                value: absencePortionRange,
+                label: Text(l10n.absencePortionRange),
+              ),
+            ],
+            selected: {_portion},
+            onSelectionChanged:
+                _busy ? null : (selection) => setState(() => _portion = selection.first),
+          ),
         ),
         const SizedBox(height: 12),
         Row(
