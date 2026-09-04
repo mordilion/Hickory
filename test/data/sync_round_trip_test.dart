@@ -382,4 +382,67 @@ void main() {
       expect(clients.single.id, client.id);
     },
   );
+
+  test('per-weekday targets and the reset rule reach a second device', () async {
+    final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(writerDb.close);
+    final writes = SyncedWrites(
+      db: writerDb,
+      logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'writer'),
+    );
+    await writes.updateAppSettings(
+      targetMinutesMonday: 480,
+      balanceResetMode: 'resetToZero',
+      balanceResetDay: const Value(1),
+      balanceResetMonth: const Value(1),
+    );
+
+    final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(readerDb.close);
+    await SyncIngestor(db: readerDb, syncRoot: syncRoot).syncNow();
+
+    final row = (await readerDb.select(readerDb.appSettings).get()).single;
+    expect(row.targetMinutesMonday, 480);
+    expect(row.balanceResetMode, 'resetToZero');
+    expect(row.balanceResetDay, 1);
+    expect(row.balanceResetMonth, 1);
+  });
+
+  test(
+    'ingesting an app_settings event from a peer that predates the target '
+    'columns backfills their defaults instead of throwing',
+    () async {
+      final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(writerDb.close);
+      final full = await writerDb.appSettingsDao.updateSettings(dateFormat: 'de');
+      final v8Payload = full.toJson()
+        ..remove('targetMinutesMonday')
+        ..remove('targetMinutesTuesday')
+        ..remove('targetMinutesWednesday')
+        ..remove('targetMinutesThursday')
+        ..remove('targetMinutesFriday')
+        ..remove('targetMinutesSaturday')
+        ..remove('targetMinutesSunday')
+        ..remove('targetInputMode')
+        ..remove('balanceResetMode')
+        ..remove('absenceTrackingEnabled');
+      await SyncLogWriter(syncRoot: syncRoot, deviceId: 'old-peer').appendEvent(
+        entityType: EntityTypes.appSettings,
+        entityId: appSettingsRowId,
+        op: EventOp.update,
+        payload: v8Payload,
+      );
+
+      final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(readerDb.close);
+      await SyncIngestor(db: readerDb, syncRoot: syncRoot).syncNow();
+
+      final row = (await readerDb.select(readerDb.appSettings).get()).single;
+      expect(row.dateFormat, 'de');
+      expect(row.targetMinutesMonday, 0);
+      expect(row.targetInputMode, 'perWeekday');
+      expect(row.balanceResetMode, 'none');
+      expect(row.absenceTrackingEnabled, isFalse);
+    },
+  );
 }

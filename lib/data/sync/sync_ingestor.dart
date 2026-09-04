@@ -163,19 +163,29 @@ class SyncIngestor {
         // every other case here.
         if (!entity.isDeleted) {
           // A payload written by a peer on an older app version may predate
-          // quickAddDurationsMinutes (v5) or countPausedTimeAsBreak (v7):
-          // fromJson's generated deserializer requires every non-nullable
-          // field to be present and throws otherwise, which would abort
-          // this entire sync transaction. Backfill each such field's table
-          // default before decoding, so ingesting an older peer's settings
-          // event never breaks sync. (Every other non-nullable column
-          // added to an already-synced entity — e.g.
-          // TimeEntries.totalPausedSeconds in v2 — has the same exposure
-          // and isn't guarded; not addressed here, out of scope for this
-          // fix.)
+          // quickAddDurationsMinutes (v5), countPausedTimeAsBreak (v7), or
+          // the target/balance columns (v9): fromJson's generated
+          // deserializer requires every non-nullable field to be present
+          // and throws otherwise, which would abort this entire sync
+          // transaction. Backfill each such field's table default before
+          // decoding, so ingesting an older peer's settings event never
+          // breaks sync. (Every other non-nullable column added to an
+          // already-synced entity — e.g. TimeEntries.totalPausedSeconds in
+          // v2 — has the same exposure and isn't guarded; not addressed
+          // here, out of scope for this fix.)
           final payload = {
             'quickAddDurationsMinutes': '15,30,45,60',
             'countPausedTimeAsBreak': false,
+            'targetMinutesMonday': 0,
+            'targetMinutesTuesday': 0,
+            'targetMinutesWednesday': 0,
+            'targetMinutesThursday': 0,
+            'targetMinutesFriday': 0,
+            'targetMinutesSaturday': 0,
+            'targetMinutesSunday': 0,
+            'targetInputMode': 'perWeekday',
+            'balanceResetMode': 'none',
+            'absenceTrackingEnabled': false,
             ...entity.payload!,
           };
           await db
