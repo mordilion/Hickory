@@ -5889,6 +5889,462 @@ class PersonioAttendancesCompanion
   }
 }
 
+class $AbsenceTypesTable extends AbsenceTypes
+    with TableInfo<$AbsenceTypesTable, AbsenceType> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AbsenceTypesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _paidMeta = const VerificationMeta('paid');
+  @override
+  late final GeneratedColumn<bool> paid = GeneratedColumn<bool>(
+    'paid',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("paid" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    paid,
+    sortOrder,
+    deviceId,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'absence_types';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AbsenceType> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('paid')) {
+      context.handle(
+        _paidMeta,
+        paid.isAcceptableOrUnknown(data['paid']!, _paidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_paidMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sortOrderMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AbsenceType map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AbsenceType(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      paid: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}paid'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AbsenceTypesTable createAlias(String alias) {
+    return $AbsenceTypesTable(attachedDatabase, alias);
+  }
+}
+
+class AbsenceType extends DataClass implements Insertable<AbsenceType> {
+  final String id;
+  final String name;
+  final bool paid;
+  final int sortOrder;
+  final String deviceId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const AbsenceType({
+    required this.id,
+    required this.name,
+    required this.paid,
+    required this.sortOrder,
+    required this.deviceId,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['paid'] = Variable<bool>(paid);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['device_id'] = Variable<String>(deviceId);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  AbsenceTypesCompanion toCompanion(bool nullToAbsent) {
+    return AbsenceTypesCompanion(
+      id: Value(id),
+      name: Value(name),
+      paid: Value(paid),
+      sortOrder: Value(sortOrder),
+      deviceId: Value(deviceId),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AbsenceType.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AbsenceType(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      paid: serializer.fromJson<bool>(json['paid']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'paid': serializer.toJson<bool>(paid),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  AbsenceType copyWith({
+    String? id,
+    String? name,
+    bool? paid,
+    int? sortOrder,
+    String? deviceId,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => AbsenceType(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    paid: paid ?? this.paid,
+    sortOrder: sortOrder ?? this.sortOrder,
+    deviceId: deviceId ?? this.deviceId,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  AbsenceType copyWithCompanion(AbsenceTypesCompanion data) {
+    return AbsenceType(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      paid: data.paid.present ? data.paid.value : this.paid,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AbsenceType(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('paid: $paid, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, name, paid, sortOrder, deviceId, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AbsenceType &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.paid == this.paid &&
+          other.sortOrder == this.sortOrder &&
+          other.deviceId == this.deviceId &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AbsenceTypesCompanion extends UpdateCompanion<AbsenceType> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<bool> paid;
+  final Value<int> sortOrder;
+  final Value<String> deviceId;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const AbsenceTypesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.paid = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AbsenceTypesCompanion.insert({
+    required String id,
+    required String name,
+    required bool paid,
+    required int sortOrder,
+    required String deviceId,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       paid = Value(paid),
+       sortOrder = Value(sortOrder),
+       deviceId = Value(deviceId),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<AbsenceType> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<bool>? paid,
+    Expression<int>? sortOrder,
+    Expression<String>? deviceId,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (paid != null) 'paid': paid,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (deviceId != null) 'device_id': deviceId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AbsenceTypesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<bool>? paid,
+    Value<int>? sortOrder,
+    Value<String>? deviceId,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return AbsenceTypesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      paid: paid ?? this.paid,
+      sortOrder: sortOrder ?? this.sortOrder,
+      deviceId: deviceId ?? this.deviceId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (paid.present) {
+      map['paid'] = Variable<bool>(paid.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AbsenceTypesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('paid: $paid, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -5907,6 +6363,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $BreakRuleTiersTable breakRuleTiers = $BreakRuleTiersTable(this);
   late final $PersonioAttendancesTable personioAttendances =
       $PersonioAttendancesTable(this);
+  late final $AbsenceTypesTable absenceTypes = $AbsenceTypesTable(this);
   late final Index idxEventsEntityId = Index(
     'idx_events_entity_id',
     'CREATE INDEX idx_events_entity_id ON events (entity_id)',
@@ -5931,6 +6388,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final PersonioAttendancesDao personioAttendancesDao =
       PersonioAttendancesDao(this as AppDatabase);
+  late final AbsenceTypesDao absenceTypesDao = AbsenceTypesDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5948,6 +6408,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     jiraWorklogs,
     breakRuleTiers,
     personioAttendances,
+    absenceTypes,
     idxEventsEntityId,
   ];
 }
@@ -9765,6 +10226,244 @@ typedef $$PersonioAttendancesTableProcessedTableManager =
       PersonioAttendanceRow,
       PrefetchHooks Function()
     >;
+typedef $$AbsenceTypesTableCreateCompanionBuilder =
+    AbsenceTypesCompanion Function({
+      required String id,
+      required String name,
+      required bool paid,
+      required int sortOrder,
+      required String deviceId,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$AbsenceTypesTableUpdateCompanionBuilder =
+    AbsenceTypesCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<bool> paid,
+      Value<int> sortOrder,
+      Value<String> deviceId,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$AbsenceTypesTableFilterComposer
+    extends Composer<_$AppDatabase, $AbsenceTypesTable> {
+  $$AbsenceTypesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get paid => $composableBuilder(
+    column: $table.paid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AbsenceTypesTableOrderingComposer
+    extends Composer<_$AppDatabase, $AbsenceTypesTable> {
+  $$AbsenceTypesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get paid => $composableBuilder(
+    column: $table.paid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AbsenceTypesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AbsenceTypesTable> {
+  $$AbsenceTypesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<bool> get paid =>
+      $composableBuilder(column: $table.paid, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$AbsenceTypesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AbsenceTypesTable,
+          AbsenceType,
+          $$AbsenceTypesTableFilterComposer,
+          $$AbsenceTypesTableOrderingComposer,
+          $$AbsenceTypesTableAnnotationComposer,
+          $$AbsenceTypesTableCreateCompanionBuilder,
+          $$AbsenceTypesTableUpdateCompanionBuilder,
+          (
+            AbsenceType,
+            BaseReferences<_$AppDatabase, $AbsenceTypesTable, AbsenceType>,
+          ),
+          AbsenceType,
+          PrefetchHooks Function()
+        > {
+  $$AbsenceTypesTableTableManager(_$AppDatabase db, $AbsenceTypesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AbsenceTypesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AbsenceTypesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AbsenceTypesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<bool> paid = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AbsenceTypesCompanion(
+                id: id,
+                name: name,
+                paid: paid,
+                sortOrder: sortOrder,
+                deviceId: deviceId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                required bool paid,
+                required int sortOrder,
+                required String deviceId,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => AbsenceTypesCompanion.insert(
+                id: id,
+                name: name,
+                paid: paid,
+                sortOrder: sortOrder,
+                deviceId: deviceId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AbsenceTypesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AbsenceTypesTable,
+      AbsenceType,
+      $$AbsenceTypesTableFilterComposer,
+      $$AbsenceTypesTableOrderingComposer,
+      $$AbsenceTypesTableAnnotationComposer,
+      $$AbsenceTypesTableCreateCompanionBuilder,
+      $$AbsenceTypesTableUpdateCompanionBuilder,
+      (
+        AbsenceType,
+        BaseReferences<_$AppDatabase, $AbsenceTypesTable, AbsenceType>,
+      ),
+      AbsenceType,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -9792,4 +10491,6 @@ class $AppDatabaseManager {
       $$BreakRuleTiersTableTableManager(_db, _db.breakRuleTiers);
   $$PersonioAttendancesTableTableManager get personioAttendances =>
       $$PersonioAttendancesTableTableManager(_db, _db.personioAttendances);
+  $$AbsenceTypesTableTableManager get absenceTypes =>
+      $$AbsenceTypesTableTableManager(_db, _db.absenceTypes);
 }
