@@ -35,19 +35,26 @@ mixin SettingsWriteGuard<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   /// reported through [saveErrorMessage] and swallowed, so callers can
   /// fire this and forget it without an unhandled error escaping.
   Future<void> guardedWrite(Future<void> Function() write) {
+    // Counted before the queue is joined, so the controls disable on the
+    // gesture rather than when this write's turn comes round.
     _inFlight++;
-    // setState rather than a bare increment: `busy` drives the enabled
-    // state of the controls above.
     if (mounted) setState(() {});
-    final done = _queue.then((_) => write()).catchError((Object error) {
+    // The tail must never carry an error: `then` would propagate it in
+    // place of running the next write's body, jamming the queue for good.
+    _queue = _queue.then((_) => _runGuarded(write)).catchError((Object _) {});
+    return _queue;
+  }
+
+  Future<void> _runGuarded(Future<void> Function() write) async {
+    try {
+      await write();
+    } catch (error) {
       debugPrint('${widget.runtimeType} failed to save: $error');
       if (mounted) showMessage(saveErrorMessage(AppLocalizations.of(context)));
-    }).whenComplete(() {
+    } finally {
       _inFlight--;
       if (mounted) setState(() {});
-    });
-    _queue = done;
-    return done;
+    }
   }
 
   /// Shows [message] as a SnackBar, the house pattern for a settings write
