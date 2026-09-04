@@ -191,7 +191,7 @@
   "settingsAbsenceTypePaid": "Paid",
   "settingsAbsenceTypeUnpaid": "Unpaid",
   "settingsAbsenceTypeAddStandard": "Add standard types",
-  "settingsAbsenceTypeInUse": "Used by {count} days and cannot be deleted.",
+  "settingsAbsenceTypeInUse": "{count, plural, =1{Used by 1 day and cannot be deleted.} other{Used by {count} days and cannot be deleted.}}",
   "@settingsAbsenceTypeInUse": {
     "placeholders": {
       "count": { "type": "int" }
@@ -215,7 +215,7 @@
   "absenceFormSubmit": "Record",
   "absenceFormNoTypes": "Add an absence type in Settings first.",
   "absenceFormNoWorkDays": "There is no work day in the selected span.",
-  "absenceFormSaved": "{count} days recorded.",
+  "absenceFormSaved": "{count, plural, =1{1 day recorded.} other{{count} days recorded.}}",
   "@absenceFormSaved": {
     "placeholders": {
       "count": { "type": "int" }

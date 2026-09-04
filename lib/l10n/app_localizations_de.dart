@@ -603,7 +603,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String settingsAbsenceTypeInUse(int count) {
-    return 'Wird von $count Tagen verwendet und kann nicht gelöscht werden.';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Wird von $count Tagen verwendet und kann nicht gelöscht werden.',
+      one: 'Wird von 1 Tag verwendet und kann nicht gelöscht werden.',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -665,7 +671,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String absenceFormSaved(int count) {
-    return '$count Tage eingetragen.';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tage eingetragen.',
+      one: '1 Tag eingetragen.',
+    );
+    return '$_temp0';
   }
 
   @override

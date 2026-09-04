@@ -191,7 +191,7 @@
   "settingsAbsenceTypePaid": "Betaald",
   "settingsAbsenceTypeUnpaid": "Onbetaald",
   "settingsAbsenceTypeAddStandard": "Standaardtypen toevoegen",
-  "settingsAbsenceTypeInUse": "Wordt door {count} dagen gebruikt en kan niet worden verwijderd.",
+  "settingsAbsenceTypeInUse": "{count, plural, =1{Wordt door 1 dag gebruikt en kan niet worden verwijderd.} other{Wordt door {count} dagen gebruikt en kan niet worden verwijderd.}}",
   "@settingsAbsenceTypeInUse": {
     "placeholders": {
       "count": { "type": "int" }
@@ -215,7 +215,7 @@
   "absenceFormSubmit": "Vastleggen",
   "absenceFormNoTypes": "Maak eerst een afwezigheidstype aan bij Instellingen.",
   "absenceFormNoWorkDays": "In de gekozen periode valt geen werkdag.",
-  "absenceFormSaved": "{count} dagen vastgelegd.",
+  "absenceFormSaved": "{count, plural, =1{1 dag vastgelegd.} other{{count} dagen vastgelegd.}}",
   "@absenceFormSaved": {
     "placeholders": {
       "count": { "type": "int" }

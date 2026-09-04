@@ -286,7 +286,7 @@
   "settingsAbsenceTypePaid": "Bezahlt",
   "settingsAbsenceTypeUnpaid": "Unbezahlt",
   "settingsAbsenceTypeAddStandard": "Standardtypen anlegen",
-  "settingsAbsenceTypeInUse": "Wird von {count} Tagen verwendet und kann nicht gelöscht werden.",
+  "settingsAbsenceTypeInUse": "{count, plural, =1{Wird von 1 Tag verwendet und kann nicht gelöscht werden.} other{Wird von {count} Tagen verwendet und kann nicht gelöscht werden.}}",
   "@settingsAbsenceTypeInUse": {
     "placeholders": {
       "count": { "type": "int" }
@@ -310,7 +310,7 @@
   "absenceFormSubmit": "Eintragen",
   "absenceFormNoTypes": "Lege zuerst in den Einstellungen einen Abwesenheitstyp an.",
   "absenceFormNoWorkDays": "Im gewählten Zeitraum liegt kein Arbeitstag.",
-  "absenceFormSaved": "{count} Tage eingetragen.",
+  "absenceFormSaved": "{count, plural, =1{1 Tag eingetragen.} other{{count} Tage eingetragen.}}",
   "@absenceFormSaved": {
     "placeholders": {
       "count": { "type": "int" }

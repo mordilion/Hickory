@@ -145,7 +145,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(await db.absenceTypesDao.getAllTypes(), hasLength(1));
-    expect(find.textContaining('1 Tagen'), findsOneWidget);
+    // Singular: one absence is the commonest case there is, and "1 Tagen"
+    // is not German.
+    expect(find.text('Wird von 1 Tag verwendet und kann nicht gelöscht werden.'), findsOneWidget);
   });
 
   testWidgets('an unused type is deleted', (tester) async {

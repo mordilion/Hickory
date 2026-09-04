@@ -123,6 +123,9 @@ void main() {
     expect(rows.single.absenceTypeId, 'type-1');
     expect(rows.single.portion, absencePortionFullDay);
     expect(rows.single.startAt, isNull);
+    // The single day is the form's default and so the commonest message
+    // there is: it has to read as German, not as "1 Tage".
+    expect(find.text('1 Tag eingetragen.'), findsOneWidget);
   });
 
   testWidgets('choosing the time-range extent reveals the two time fields', (tester) async {

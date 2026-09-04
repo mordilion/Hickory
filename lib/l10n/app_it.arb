@@ -191,7 +191,7 @@
   "settingsAbsenceTypePaid": "Retribuita",
   "settingsAbsenceTypeUnpaid": "Non retribuita",
   "settingsAbsenceTypeAddStandard": "Aggiungi i tipi standard",
-  "settingsAbsenceTypeInUse": "Usato da {count} giorni e non può essere eliminato.",
+  "settingsAbsenceTypeInUse": "{count, plural, =1{Usato da 1 giorno e non può essere eliminato.} other{Usato da {count} giorni e non può essere eliminato.}}",
   "@settingsAbsenceTypeInUse": {
     "placeholders": {
       "count": { "type": "int" }
@@ -215,7 +215,7 @@
   "absenceFormSubmit": "Registra",
   "absenceFormNoTypes": "Crea prima un tipo di assenza nelle impostazioni.",
   "absenceFormNoWorkDays": "Nel periodo scelto non c'è alcun giorno lavorativo.",
-  "absenceFormSaved": "{count} giorni registrati.",
+  "absenceFormSaved": "{count, plural, =1{1 giorno registrato.} other{{count} giorni registrati.}}",
   "@absenceFormSaved": {
     "placeholders": {
       "count": { "type": "int" }

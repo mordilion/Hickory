@@ -1134,7 +1134,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAbsenceTypeInUse.
   ///
   /// In de, this message translates to:
-  /// **'Wird von {count} Tagen verwendet und kann nicht gelöscht werden.'**
+  /// **'{count, plural, =1{Wird von 1 Tag verwendet und kann nicht gelöscht werden.} other{Wird von {count} Tagen verwendet und kann nicht gelöscht werden.}}'**
   String settingsAbsenceTypeInUse(int count);
 
   /// No description provided for @settingsAbsenceTypeDefaultVacation.
@@ -1248,7 +1248,7 @@ abstract class AppLocalizations {
   /// No description provided for @absenceFormSaved.
   ///
   /// In de, this message translates to:
-  /// **'{count} Tage eingetragen.'**
+  /// **'{count, plural, =1{1 Tag eingetragen.} other{{count} Tage eingetragen.}}'**
   String absenceFormSaved(int count);
 
   /// No description provided for @absenceFormSaveError.
