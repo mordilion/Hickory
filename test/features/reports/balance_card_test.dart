@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hickory/core/di/absence_providers.dart';
 import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/data/drift/database.dart';
+import 'package:hickory/data/drift/tables/absences_table.dart';
 import 'package:hickory/features/reports/balance_card.dart';
 import 'package:hickory/features/timer/timer_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
@@ -44,6 +46,8 @@ void main() {
     WidgetTester tester, {
     AppSettingsRow? settings,
     List<TimeEntry> entries = const [],
+    List<Absence> absences = const [],
+    List<AbsenceType> absenceTypes = const [],
     // Suppliers, not bare Streams: a StreamProvider override can be
     // invoked more than once, and re-returning the same single-subscription
     // Stream instance the second time throws "Stream has already been
@@ -60,6 +64,8 @@ void main() {
           allEntriesProvider.overrideWith(
             (ref) => entriesStream?.call() ?? Stream.value(entries),
           ),
+          absencesProvider.overrideWith((ref) => Stream.value(absences)),
+          absenceTypesProvider.overrideWith((ref) => Stream.value(absenceTypes)),
         ],
         child: MaterialApp(
           locale: const Locale('de'),
@@ -129,5 +135,66 @@ void main() {
     );
     expect(find.textContaining('boom'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
+  });
+
+  testWidgets('a paid full-day absence keeps the balance neutral', (tester) async {
+    // Pinned to today, not a fixed calendar date: workTimeBalanceProvider
+    // enumerates every work day through DateTime.now(), so a fixed past
+    // date would pick up later unexcused weekdays as the suite ages and
+    // the expected balance would drift away from zero. Every weekday
+    // carries a target so today -- whatever day it is -- is a work day;
+    // with no entry at all it would read -8:00 without the absence.
+    final today = DateTime.now();
+    final day = DateTime(today.year, today.month, today.day);
+    await pumpCard(
+      tester,
+      settings: appSettingsFixture(
+        absenceTrackingEnabled: true,
+        targetMinutesMonday: 480,
+        targetMinutesTuesday: 480,
+        targetMinutesWednesday: 480,
+        targetMinutesThursday: 480,
+        targetMinutesFriday: 480,
+        targetMinutesSaturday: 480,
+        targetMinutesSunday: 480,
+      ),
+      // Zero-duration, but still a finished entry: it exists only to place
+      // today into dayBalances' enumerated day set, so this test can fail
+      // before the absence-wiring exists. Pre-wiring, absences never reach
+      // dayBalances at all, so without an entry "today" has no worked time
+      // and no absence and is skipped entirely, and the assertion below
+      // would pass by vacuity. Zero duration keeps it inert once the
+      // wiring is in place: it contributes nothing to the +0:00 total,
+      // which then comes entirely from the paid full-day credit cancelling
+      // the target.
+      entries: [_entryOn(day, 0)],
+      absences: [
+        Absence(
+          id: 'a1',
+          date: day,
+          absenceTypeId: 'type-1',
+          portion: absencePortionFullDay,
+          startAt: null,
+          endAt: null,
+          note: null,
+          deviceId: 'd',
+          createdAt: DateTime.utc(2026, 1, 1),
+          updatedAt: DateTime.utc(2026, 1, 1),
+        ),
+      ],
+      absenceTypes: [
+        AbsenceType(
+          id: 'type-1',
+          name: 'Urlaub',
+          paid: true,
+          sortOrder: 0,
+          deviceId: 'd',
+          createdAt: DateTime.utc(2026, 1, 1),
+          updatedAt: DateTime.utc(2026, 1, 1),
+        ),
+      ],
+    );
+
+    expect(find.text('+0:00'), findsOneWidget);
   });
 }

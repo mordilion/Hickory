@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hickory/core/di/absence_providers.dart';
 import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/core/theme/app_theme.dart';
 import 'package:hickory/data/drift/database.dart';
@@ -79,6 +80,9 @@ void main() {
   // appSettingsProvider/allEntriesProvider are overridden too now that
   // ReportsScreen mounts BalanceCard, which watches both: without this the
   // card subscribes to the same live drift stream this comment warns about.
+  // absencesProvider/absenceTypesProvider joined them once
+  // workTimeBalanceProvider started watching absences for the balance
+  // calculation -- same trap, one provider later.
   Widget makeApp({AppSettingsRow? settings}) => ProviderScope(
     overrides: [
       reportEntriesProvider.overrideWith((ref, range) => Stream.value(entries)),
@@ -92,6 +96,8 @@ void main() {
         (ref) => Stream.value(settings ?? appSettingsFixture()),
       ),
       allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
+      absencesProvider.overrideWith((ref) => Stream.value(const [])),
+      absenceTypesProvider.overrideWith((ref) => Stream.value(const [])),
     ],
     child: MaterialApp(
       theme: AppTheme.light,

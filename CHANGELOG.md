@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Show each entry's Personio state in the list, next to the Jira one: a calendar icon that is green once the entry has been recorded and red when the push failed, carrying the reason. Entries that were never pushed stay unmarked — Personio has no per-entry opt-in, so an icon on every row would say nothing.
 - Set a target work time under Settings → Work time & balance, either as seven daily figures or as one weekly figure spread over the days you pick. Until now the app had nothing to measure tracked time against, so it could not say whether a week was over or under. The same screen holds the yearly cutoff rule: the balance can carry on untouched, be reset to zero on a date you choose, or be carried over capped at an upper and a lower bound.
 - Show the flex-time balance at the top of the Reports tab, counted from the last cutoff and always signed, so a surplus and a deficit cannot be confused. It covers every entry regardless of the tab's filters — "overtime, but only for project X" is not a meaningful number — and says so while a filter is active. With no target set yet it points at the settings screen instead of reading every tracked minute as overtime.
+- Absences can be recorded from the main screen against freely defined types, each marked paid or unpaid, and count toward the work-time balance accordingly. Recording is off by default; with it on, a work day with neither a booking nor an absence shows up as a deficit.
 
 ### Changed
 

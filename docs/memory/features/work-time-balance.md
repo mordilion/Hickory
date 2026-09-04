@@ -100,8 +100,13 @@
   rule becomes 28 February in a non-leap year) rather than letting `DateTime` roll the
   date into the next month.
 
-## Out of scope (phase 1)
+## Absences
 
-- Absence tracking: `dayBalances` only counts days with at least one finished entry: while
-  `absenceTrackingEnabled` is always off, a day off cannot be recorded, so counting empty
-  work days would manufacture a deficit. A later phase makes this conditional on that flag.
+- **`dayBalances` counting only days with at least one finished entry is now conditional
+  on `AppSettingsRow.absenceTrackingEnabled`, not a permanent rule.** With the switch off
+  it behaves exactly as before absences existed: an empty day cannot be recorded, so
+  counting it would manufacture a deficit. With it on, every work day up to `through` is
+  enumerated whether or not it carries an entry, because an unrecorded, unexcused day is
+  now a real deficit the feature exists to surface. `workTimeBalanceProvider` only reads
+  `absencesProvider` (and only lets a failure in it reach the UI) while the switch is on,
+  for the same reason. See `absences.md` for the recording side and the full reasoning.

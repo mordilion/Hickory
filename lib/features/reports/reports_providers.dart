@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' show DateTimeRange;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/di/absence_providers.dart';
 import '../../core/di/app_settings_provider.dart';
 import '../../core/di/database_provider.dart';
 import '../../data/drift/database.dart';
@@ -67,6 +68,7 @@ final reportProjectsProvider = StreamProvider<List<Project>>((ref) {
 final workTimeBalanceProvider = Provider<AsyncValue<Duration>>((ref) {
   final entries = ref.watch(allEntriesProvider);
   final settings = ref.watch(appSettingsProvider);
+  final absences = ref.watch(absencesProvider);
   // Checked before the loading/null checks below: AsyncError's `isLoading`
   // is always false and its `.value` carries forward the previous data (or
   // null) on purpose, so an error here would otherwise either be
@@ -82,11 +84,34 @@ final workTimeBalanceProvider = Provider<AsyncValue<Duration>>((ref) {
   final entryList = entries.value;
   final settingsRow = settings.value;
   if (entryList == null || settingsRow == null) return const AsyncValue.loading();
+
+  // Absences only matter, and only have to be waited for, while the
+  // feature is on. With it off a failing absence stream must not take
+  // down a balance that does not read absences at all.
+  var absenceList = const <Absence>[];
+  if (settingsRow.absenceTrackingEnabled) {
+    if (absences is AsyncError<List<Absence>>) {
+      return AsyncValue.error(absences.error, absences.stackTrace);
+    }
+    final loaded = absences.value;
+    if (loaded == null) return const AsyncValue.loading();
+    absenceList = loaded;
+  }
+
+  final now = DateTime.now();
   return AsyncValue.data(
     runningBalance(
-      dayBalances(entryList, settingsRow),
+      dayBalances(
+        entryList,
+        settingsRow,
+        absences: absenceList,
+        absenceTypesById: ref.watch(absenceTypesByIdProvider),
+        // Enumerate up to today, so a work day that was neither booked
+        // nor excused shows up as the deficit it is.
+        through: DateTime(now.year, now.month, now.day),
+      ),
       settingsRow,
-      asOf: DateTime.now(),
+      asOf: now,
     ),
   );
 });
