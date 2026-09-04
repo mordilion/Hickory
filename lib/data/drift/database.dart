@@ -7,6 +7,7 @@ import 'package:path/path.dart' as p;
 import '../../core/storage/app_directories.dart';
 
 import 'daos/absence_types_dao.dart';
+import 'daos/absences_dao.dart';
 import 'daos/activity_samples_dao.dart';
 import 'daos/app_settings_dao.dart';
 import 'daos/break_rule_tiers_dao.dart';
@@ -17,6 +18,7 @@ import 'daos/personio_attendances_dao.dart';
 import 'daos/projects_dao.dart';
 import 'daos/time_entries_dao.dart';
 import 'tables/absence_types_table.dart';
+import 'tables/absences_table.dart';
 import 'tables/activity_samples_table.dart';
 import 'tables/app_settings_table.dart';
 import 'tables/break_rule_tiers_table.dart';
@@ -47,6 +49,7 @@ part 'database.g.dart';
     BreakRuleTiers,
     PersonioAttendances,
     AbsenceTypes,
+    Absences,
   ],
   daos: [
     ClientsDao,
@@ -59,6 +62,7 @@ part 'database.g.dart';
     BreakRuleTiersDao,
     PersonioAttendancesDao,
     AbsenceTypesDao,
+    AbsencesDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -67,7 +71,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.connection);
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -114,6 +118,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 10) {
         await m.createTable(absenceTypes);
+      }
+      if (from < 11) {
+        await m.createTable(absences);
       }
     },
   );
