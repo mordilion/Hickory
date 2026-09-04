@@ -3,6 +3,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/di/app_settings_provider.dart';
 import '../../core/di/device_id_provider.dart';
 import '../../core/di/jira_providers.dart';
 import '../../core/di/sync_providers.dart';
@@ -12,6 +13,7 @@ import '../../core/widgets/gradient_buttons.dart';
 import '../../data/drift/database.dart';
 import '../../data/drift/time_entry_extensions.dart';
 import '../../l10n/app_localizations.dart';
+import '../absences/absence_bar.dart';
 import '../entries/entries_list.dart';
 import '../entries/quick_add_bar.dart';
 import '../jira/widgets/jira_ticket_field.dart';
@@ -25,7 +27,7 @@ import 'timer_providers.dart';
 /// only (see [isDesktopTrackingSupported]).
 const _idleThresholdSeconds = 5 * 60;
 
-enum _TimerTabMode { timer, manual }
+enum _TimerTabMode { timer, manual, absence }
 
 /// Timer tab content — hosted by the app shell (features/shell/app_shell.dart),
 /// which owns the Scaffold, AppBar, and bottom nav. Manual-entry creation
@@ -137,6 +139,15 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
     final isRunning = runningAsync.value != null;
     if (isRunning) _mode = _TimerTabMode.timer;
 
+    final absencesEnabled =
+        ref.watch(appSettingsProvider).value?.absenceTrackingEnabled ?? false;
+    // A mode that is no longer offered must not stay selected: turning the
+    // feature off in Settings while this tab sits on it would otherwise
+    // leave the body rendering a segment the bar no longer shows.
+    if (!absencesEnabled && _mode == _TimerTabMode.absence) {
+      _mode = _TimerTabMode.timer;
+    }
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -152,13 +163,19 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                 label: Text(l10n.timerModeManual),
                 enabled: !isRunning,
               ),
+              if (absencesEnabled)
+                ButtonSegment(
+                  value: _TimerTabMode.absence,
+                  label: Text(l10n.timerModeAbsence),
+                  enabled: !isRunning,
+                ),
             ],
             selected: {_mode},
             onSelectionChanged: (selection) => setState(() => _mode = selection.first),
           ),
           const SizedBox(height: 16),
-          if (_mode == _TimerTabMode.timer)
-            runningAsync.when(
+          switch (_mode) {
+            _TimerTabMode.timer => runningAsync.when(
               data: (running) => running != null
                   ? _RunningCard(
                       running: running,
@@ -176,9 +193,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                     ),
               loading: () => const CircularProgressIndicator(),
               error: (e, _) => Text(l10n.timerError('$e')),
-            )
-          else
-            const QuickAddBar(),
+            ),
+            _TimerTabMode.absence => const AbsenceBar(),
+            _TimerTabMode.manual => const QuickAddBar(),
+          },
           const SizedBox(height: 16),
           const Expanded(child: EntriesList()),
         ],

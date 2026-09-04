@@ -96,6 +96,7 @@
   "jiraTicketFieldLabel": "Ticket Jira",
   "timerStart": "Démarrer",
   "timerModeManual": "Manuel",
+  "timerModeAbsence": "Absence",
   "timerIdleTitle": "Inactivité détectée",
   "timerIdleMessage": "Vous êtes inactif(ve) depuis {minutes} minutes. Voulez-vous déduire ce temps de l'entrée en cours ?",
   "timerIdleKeepTime": "Conserver le temps",
@@ -203,6 +204,24 @@
   "settingsAbsenceTypeMoveUp": "Monter",
   "settingsAbsenceTypeMoveDown": "Descendre",
   "settingsAbsencesSaveError": "Le réglage d'absence n'a pas pu être enregistré.",
+  "absenceFormType": "Type",
+  "absenceFormPortion": "Étendue",
+  "absencePortionFullDay": "Journée entière",
+  "absencePortionHalfDay": "Demi-journée",
+  "absencePortionRange": "Plage horaire",
+  "absenceFormFrom": "Du",
+  "absenceFormTo": "Au",
+  "absenceFormNote": "Note",
+  "absenceFormSubmit": "Enregistrer",
+  "absenceFormNoTypes": "Créez d'abord un type d'absence dans les réglages.",
+  "absenceFormNoWorkDays": "Aucun jour travaillé dans la période choisie.",
+  "absenceFormSaved": "{count} jours enregistrés.",
+  "@absenceFormSaved": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "absenceFormSaveError": "L'absence n'a pas pu être enregistrée.",
   "settingsProjectsTitle": "Projets",
   "settingsProjectsDescription": "Créer, modifier et archiver des projets.",
   "settingsProjectsAddLabel": "Ajouter un projet",

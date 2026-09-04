@@ -591,6 +591,12 @@ abstract class AppLocalizations {
   /// **'Manuell'**
   String get timerModeManual;
 
+  /// No description provided for @timerModeAbsence.
+  ///
+  /// In de, this message translates to:
+  /// **'Abwesenheit'**
+  String get timerModeAbsence;
+
   /// No description provided for @timerIdleTitle.
   ///
   /// In de, this message translates to:
@@ -1172,6 +1178,84 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Die Abwesenheitseinstellung konnte nicht gespeichert werden.'**
   String get settingsAbsencesSaveError;
+
+  /// No description provided for @absenceFormType.
+  ///
+  /// In de, this message translates to:
+  /// **'Typ'**
+  String get absenceFormType;
+
+  /// No description provided for @absenceFormPortion.
+  ///
+  /// In de, this message translates to:
+  /// **'Umfang'**
+  String get absenceFormPortion;
+
+  /// No description provided for @absencePortionFullDay.
+  ///
+  /// In de, this message translates to:
+  /// **'Ganztags'**
+  String get absencePortionFullDay;
+
+  /// No description provided for @absencePortionHalfDay.
+  ///
+  /// In de, this message translates to:
+  /// **'Halbtags'**
+  String get absencePortionHalfDay;
+
+  /// No description provided for @absencePortionRange.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeitraum'**
+  String get absencePortionRange;
+
+  /// No description provided for @absenceFormFrom.
+  ///
+  /// In de, this message translates to:
+  /// **'Von'**
+  String get absenceFormFrom;
+
+  /// No description provided for @absenceFormTo.
+  ///
+  /// In de, this message translates to:
+  /// **'Bis'**
+  String get absenceFormTo;
+
+  /// No description provided for @absenceFormNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Notiz'**
+  String get absenceFormNote;
+
+  /// No description provided for @absenceFormSubmit.
+  ///
+  /// In de, this message translates to:
+  /// **'Eintragen'**
+  String get absenceFormSubmit;
+
+  /// No description provided for @absenceFormNoTypes.
+  ///
+  /// In de, this message translates to:
+  /// **'Lege zuerst in den Einstellungen einen Abwesenheitstyp an.'**
+  String get absenceFormNoTypes;
+
+  /// No description provided for @absenceFormNoWorkDays.
+  ///
+  /// In de, this message translates to:
+  /// **'Im gewählten Zeitraum liegt kein Arbeitstag.'**
+  String get absenceFormNoWorkDays;
+
+  /// No description provided for @absenceFormSaved.
+  ///
+  /// In de, this message translates to:
+  /// **'{count} Tage eingetragen.'**
+  String absenceFormSaved(int count);
+
+  /// No description provided for @absenceFormSaveError.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Abwesenheit konnte nicht gespeichert werden.'**
+  String get absenceFormSaveError;
 
   /// No description provided for @settingsProjectsTitle.
   ///

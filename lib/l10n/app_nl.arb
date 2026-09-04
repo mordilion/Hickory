@@ -96,6 +96,7 @@
   "jiraTicketFieldLabel": "Jira-ticket",
   "timerStart": "Starten",
   "timerModeManual": "Handmatig",
+  "timerModeAbsence": "Afwezigheid",
   "timerIdleTitle": "Inactiviteit gedetecteerd",
   "timerIdleMessage": "Je bent al {minutes} minuten inactief. Wil je deze tijd van de lopende invoer aftrekken?",
   "timerIdleKeepTime": "Tijd behouden",
@@ -203,6 +204,24 @@
   "settingsAbsenceTypeMoveUp": "Omhoog",
   "settingsAbsenceTypeMoveDown": "Omlaag",
   "settingsAbsencesSaveError": "De afwezigheidsinstelling kon niet worden opgeslagen.",
+  "absenceFormType": "Type",
+  "absenceFormPortion": "Omvang",
+  "absencePortionFullDay": "Hele dag",
+  "absencePortionHalfDay": "Halve dag",
+  "absencePortionRange": "Tijdvak",
+  "absenceFormFrom": "Van",
+  "absenceFormTo": "Tot",
+  "absenceFormNote": "Notitie",
+  "absenceFormSubmit": "Vastleggen",
+  "absenceFormNoTypes": "Maak eerst een afwezigheidstype aan bij Instellingen.",
+  "absenceFormNoWorkDays": "In de gekozen periode valt geen werkdag.",
+  "absenceFormSaved": "{count} dagen vastgelegd.",
+  "@absenceFormSaved": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "absenceFormSaveError": "De afwezigheid kon niet worden opgeslagen.",
   "settingsProjectsTitle": "Projecten",
   "settingsProjectsDescription": "Projecten aanmaken, bewerken en archiveren.",
   "settingsProjectsAddLabel": "Project toevoegen",

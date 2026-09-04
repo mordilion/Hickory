@@ -289,6 +289,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get timerModeManual => 'Manuell';
 
   @override
+  String get timerModeAbsence => 'Abwesenheit';
+
+  @override
   String get timerIdleTitle => 'Inaktiv erkannt';
 
   @override
@@ -624,6 +627,50 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settingsAbsencesSaveError =>
       'Die Abwesenheitseinstellung konnte nicht gespeichert werden.';
+
+  @override
+  String get absenceFormType => 'Typ';
+
+  @override
+  String get absenceFormPortion => 'Umfang';
+
+  @override
+  String get absencePortionFullDay => 'Ganztags';
+
+  @override
+  String get absencePortionHalfDay => 'Halbtags';
+
+  @override
+  String get absencePortionRange => 'Zeitraum';
+
+  @override
+  String get absenceFormFrom => 'Von';
+
+  @override
+  String get absenceFormTo => 'Bis';
+
+  @override
+  String get absenceFormNote => 'Notiz';
+
+  @override
+  String get absenceFormSubmit => 'Eintragen';
+
+  @override
+  String get absenceFormNoTypes =>
+      'Lege zuerst in den Einstellungen einen Abwesenheitstyp an.';
+
+  @override
+  String get absenceFormNoWorkDays =>
+      'Im gewählten Zeitraum liegt kein Arbeitstag.';
+
+  @override
+  String absenceFormSaved(int count) {
+    return '$count Tage eingetragen.';
+  }
+
+  @override
+  String get absenceFormSaveError =>
+      'Die Abwesenheit konnte nicht gespeichert werden.';
 
   @override
   String get settingsProjectsTitle => 'Projekte';

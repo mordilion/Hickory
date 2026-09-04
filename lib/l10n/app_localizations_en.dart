@@ -288,6 +288,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get timerModeManual => 'Manual';
 
   @override
+  String get timerModeAbsence => 'Absence';
+
+  @override
   String get timerIdleTitle => 'Idle detected';
 
   @override
@@ -618,6 +621,48 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsAbsencesSaveError =>
       'The absence setting could not be saved.';
+
+  @override
+  String get absenceFormType => 'Type';
+
+  @override
+  String get absenceFormPortion => 'Extent';
+
+  @override
+  String get absencePortionFullDay => 'Full day';
+
+  @override
+  String get absencePortionHalfDay => 'Half day';
+
+  @override
+  String get absencePortionRange => 'Time range';
+
+  @override
+  String get absenceFormFrom => 'From';
+
+  @override
+  String get absenceFormTo => 'To';
+
+  @override
+  String get absenceFormNote => 'Note';
+
+  @override
+  String get absenceFormSubmit => 'Record';
+
+  @override
+  String get absenceFormNoTypes => 'Add an absence type in Settings first.';
+
+  @override
+  String get absenceFormNoWorkDays =>
+      'There is no work day in the selected span.';
+
+  @override
+  String absenceFormSaved(int count) {
+    return '$count days recorded.';
+  }
+
+  @override
+  String get absenceFormSaveError => 'The absence could not be saved.';
 
   @override
   String get settingsProjectsTitle => 'Projects';

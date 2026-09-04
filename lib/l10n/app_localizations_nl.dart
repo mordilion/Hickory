@@ -290,6 +290,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get timerModeManual => 'Handmatig';
 
   @override
+  String get timerModeAbsence => 'Afwezigheid';
+
+  @override
   String get timerIdleTitle => 'Inactiviteit gedetecteerd';
 
   @override
@@ -624,6 +627,50 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settingsAbsencesSaveError =>
       'De afwezigheidsinstelling kon niet worden opgeslagen.';
+
+  @override
+  String get absenceFormType => 'Type';
+
+  @override
+  String get absenceFormPortion => 'Omvang';
+
+  @override
+  String get absencePortionFullDay => 'Hele dag';
+
+  @override
+  String get absencePortionHalfDay => 'Halve dag';
+
+  @override
+  String get absencePortionRange => 'Tijdvak';
+
+  @override
+  String get absenceFormFrom => 'Van';
+
+  @override
+  String get absenceFormTo => 'Tot';
+
+  @override
+  String get absenceFormNote => 'Notitie';
+
+  @override
+  String get absenceFormSubmit => 'Vastleggen';
+
+  @override
+  String get absenceFormNoTypes =>
+      'Maak eerst een afwezigheidstype aan bij Instellingen.';
+
+  @override
+  String get absenceFormNoWorkDays =>
+      'In de gekozen periode valt geen werkdag.';
+
+  @override
+  String absenceFormSaved(int count) {
+    return '$count dagen vastgelegd.';
+  }
+
+  @override
+  String get absenceFormSaveError =>
+      'De afwezigheid kon niet worden opgeslagen.';
 
   @override
   String get settingsProjectsTitle => 'Projecten';

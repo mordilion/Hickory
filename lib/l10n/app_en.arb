@@ -96,6 +96,7 @@
   "jiraTicketFieldLabel": "Jira ticket",
   "timerStart": "Start",
   "timerModeManual": "Manual",
+  "timerModeAbsence": "Absence",
   "timerIdleTitle": "Idle detected",
   "timerIdleMessage": "You've been idle for {minutes} minutes. Should this time be deducted from the running entry?",
   "timerIdleKeepTime": "Keep time",
@@ -203,6 +204,24 @@
   "settingsAbsenceTypeMoveUp": "Move up",
   "settingsAbsenceTypeMoveDown": "Move down",
   "settingsAbsencesSaveError": "The absence setting could not be saved.",
+  "absenceFormType": "Type",
+  "absenceFormPortion": "Extent",
+  "absencePortionFullDay": "Full day",
+  "absencePortionHalfDay": "Half day",
+  "absencePortionRange": "Time range",
+  "absenceFormFrom": "From",
+  "absenceFormTo": "To",
+  "absenceFormNote": "Note",
+  "absenceFormSubmit": "Record",
+  "absenceFormNoTypes": "Add an absence type in Settings first.",
+  "absenceFormNoWorkDays": "There is no work day in the selected span.",
+  "absenceFormSaved": "{count} days recorded.",
+  "@absenceFormSaved": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "absenceFormSaveError": "The absence could not be saved.",
   "settingsProjectsTitle": "Projects",
   "settingsProjectsDescription": "Create, edit, and archive projects.",
   "settingsProjectsAddLabel": "Add project",
