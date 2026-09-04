@@ -146,6 +146,60 @@ void main() {
     expect(find.byKey(const ValueKey('absenceEndTime')), findsOneWidget);
   });
 
+  // showTimePicker's dial cannot sensibly be tapped in a widget test, so
+  // this drives its keyboard-entry mode instead. [hour] has to be 1..12:
+  // the test platform reports a 12-hour clock, so the dialog's own field
+  // rejects anything above 12 even though the form's buttons render the
+  // picked time as 24-hour.
+  Future<void> pickTime(
+    WidgetTester tester, {
+    required String fieldKey,
+    required String hour,
+    required String minute,
+  }) async {
+    await tester.tap(find.byKey(ValueKey(fieldKey)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.keyboard_outlined));
+    await tester.pumpAndSettle();
+    final fields = find.descendant(
+      of: find.byType(TimePickerDialog),
+      matching: find.byType(TextField),
+    );
+    await tester.enterText(fields.first, hour);
+    await tester.enterText(fields.last, minute);
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('an end time before the start pulls the start back with it', (tester) async {
+    await tester.pumpWidget(makeApp(types: [vacation()]));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Zeitraum'));
+    await tester.pumpAndSettle();
+    expect(find.text('Von: 09:00'), findsOneWidget);
+
+    await pickTime(tester, fieldKey: 'absenceEndTime', hour: '08', minute: '00');
+
+    // Without the clamp the row would be written with endAt before
+    // startAt, which absenceMinutes scores as zero while the snackbar
+    // still reports the absence as recorded.
+    expect(find.text('Bis: 08:00'), findsOneWidget);
+    expect(find.text('Von: 08:00'), findsOneWidget);
+  });
+
+  testWidgets('a start time after the end pushes the end along with it', (tester) async {
+    await tester.pumpWidget(makeApp(types: [vacation()]));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Zeitraum'));
+    await tester.pumpAndSettle();
+    expect(find.text('Bis: 11:00'), findsOneWidget);
+
+    await pickTime(tester, fieldKey: 'absenceStartTime', hour: '11', minute: '30');
+
+    expect(find.text('Von: 11:30'), findsOneWidget);
+    expect(find.text('Bis: 11:30'), findsOneWidget);
+  });
+
   testWidgets('a half-day absence stores the portion, not a minute figure', (tester) async {
     await tester.pumpWidget(makeApp(types: [vacation()]));
     await tester.pumpAndSettle();

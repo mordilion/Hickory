@@ -11,6 +11,11 @@ import '../../data/drift/tables/absences_table.dart';
 import '../../l10n/app_localizations.dart';
 import 'absence_days.dart';
 
+/// True when [a] falls earlier in the day than [b]. [TimeOfDay] carries no
+/// ordering of its own.
+bool _isEarlier(TimeOfDay a, TimeOfDay b) =>
+    a.hour * 60 + a.minute < b.hour * 60 + b.minute;
+
 /// The third way to record on the main screen, beside the timer and a
 /// manual entry: a day (or a span of days) that was not worked.
 ///
@@ -71,9 +76,15 @@ class _AbsenceBarState extends ConsumerState<AbsenceBar> {
     setState(() {
       if (isStart) {
         _startTime = picked;
+        // The same clamping _pickDate does, and for a sharper reason: an
+        // end before the start is written as a row absenceMinutes scores
+        // as zero, so the snackbar would report a success that credits
+        // nothing.
+        if (_isEarlier(_endTime, picked)) _endTime = picked;
         return;
       }
       _endTime = picked;
+      if (_isEarlier(picked, _startTime)) _startTime = picked;
     });
   }
 
