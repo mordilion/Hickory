@@ -244,6 +244,16 @@
   "reportsFilterBillableOnly": "Solo fatturabile",
   "reportsFilterBillableNonOnly": "Solo non fatturabile",
   "reportsFilterReset": "Reimposta filtri",
+  "reportsBalanceTitle": "Saldo ore",
+  "reportsBalanceSince": "Saldo dal {date}",
+  "@reportsBalanceSince": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "reportsBalanceAllTime": "Saldo complessivo",
+  "reportsBalanceNoTargets": "Nessun orario previsto impostato.",
+  "reportsBalanceConfigure": "Impostalo in Impostazioni → Orario di lavoro e saldo.",
   "csvHeaderDate": "Data",
   "csvHeaderStart": "Inizio",
   "csvHeaderEnd": "Fine",

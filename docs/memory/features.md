@@ -5,3 +5,4 @@
 | Manual entry | QuickAddBar inline date/time pickers, ManualEntryDialog edit flow | [manual-entry.md](features/manual-entry.md) |
 | Jira sync | Worklog reconciliation, automatic triggering, per-entry status | [jira-sync.md](features/jira-sync.md) |
 | Sync screen | Sync tab: folder, Jira/Personio credentials, failed-entry lists | [sync-screen.md](features/sync-screen.md) |
+| Work-time balance | Target hours, cutoff rule, flex-time balance tile | [work-time-balance.md](features/work-time-balance.md) |

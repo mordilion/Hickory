@@ -767,6 +767,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reportsFilterReset => 'Réinitialiser les filtres';
 
   @override
+  String get reportsBalanceTitle => 'Compteur';
+
+  @override
+  String reportsBalanceSince(String date) {
+    return 'Solde depuis le $date';
+  }
+
+  @override
+  String get reportsBalanceAllTime => 'Solde total';
+
+  @override
+  String get reportsBalanceNoTargets => 'Aucun temps de travail cible défini.';
+
+  @override
+  String get reportsBalanceConfigure =>
+      'À définir dans Réglages → Temps de travail et compteur.';
+
+  @override
   String get csvHeaderDate => 'Date';
 
   @override

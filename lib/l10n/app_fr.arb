@@ -244,6 +244,16 @@
   "reportsFilterBillableOnly": "Facturable uniquement",
   "reportsFilterBillableNonOnly": "Non facturable uniquement",
   "reportsFilterReset": "Réinitialiser les filtres",
+  "reportsBalanceTitle": "Compteur",
+  "reportsBalanceSince": "Solde depuis le {date}",
+  "@reportsBalanceSince": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "reportsBalanceAllTime": "Solde total",
+  "reportsBalanceNoTargets": "Aucun temps de travail cible défini.",
+  "reportsBalanceConfigure": "À définir dans Réglages → Temps de travail et compteur.",
   "csvHeaderDate": "Date",
   "csvHeaderStart": "Début",
   "csvHeaderEnd": "Fin",

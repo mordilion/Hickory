@@ -752,6 +752,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportsFilterReset => 'Reset filters';
 
   @override
+  String get reportsBalanceTitle => 'Balance';
+
+  @override
+  String reportsBalanceSince(String date) {
+    return 'Balance since $date';
+  }
+
+  @override
+  String get reportsBalanceAllTime => 'Balance overall';
+
+  @override
+  String get reportsBalanceNoTargets => 'No target work time set yet.';
+
+  @override
+  String get reportsBalanceConfigure =>
+      'Set it under Settings → Work time & balance.';
+
+  @override
   String get csvHeaderDate => 'Date';
 
   @override

@@ -244,6 +244,16 @@
   "reportsFilterBillableOnly": "Alleen factureerbaar",
   "reportsFilterBillableNonOnly": "Alleen niet-factureerbaar",
   "reportsFilterReset": "Filters resetten",
+  "reportsBalanceTitle": "Tijdsaldo",
+  "reportsBalanceSince": "Saldo sinds {date}",
+  "@reportsBalanceSince": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "reportsBalanceAllTime": "Saldo totaal",
+  "reportsBalanceNoTargets": "Nog geen streefwerktijd ingesteld.",
+  "reportsBalanceConfigure": "Stel die in bij Instellingen → Werktijd en saldo.",
   "csvHeaderDate": "Datum",
   "csvHeaderStart": "Start",
   "csvHeaderEnd": "Einde",

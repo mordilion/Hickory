@@ -354,6 +354,16 @@
   "reportsFilterBillableOnly": "Nur abrechenbar",
   "reportsFilterBillableNonOnly": "Nur nicht abrechenbar",
   "reportsFilterReset": "Filter zurücksetzen",
+  "reportsBalanceTitle": "Zeitkonto",
+  "reportsBalanceSince": "Saldo seit {date}",
+  "@reportsBalanceSince": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "reportsBalanceAllTime": "Saldo gesamt",
+  "reportsBalanceNoTargets": "Noch keine Soll-Arbeitszeit hinterlegt.",
+  "reportsBalanceConfigure": "Unter Einstellungen → Arbeitszeit & Zeitkonto festlegen.",
   "csvHeaderDate": "Datum",
   "csvHeaderStart": "Start",
   "csvHeaderEnd": "Ende",

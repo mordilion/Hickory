@@ -11,6 +11,7 @@ import '../../core/format/duration_format.dart';
 import '../../core/theme/hickory_colors.dart';
 import '../../data/drift/database.dart';
 import '../../l10n/app_localizations.dart';
+import 'balance_card.dart';
 import 'csv_export.dart';
 import 'report_calculations.dart';
 import 'report_filter_dialog.dart';
@@ -209,6 +210,8 @@ class _ReportRangeAndBody extends ConsumerWidget {
             ),
           ],
         ),
+        const SizedBox(height: 16),
+        const BalanceCard(),
         const SizedBox(height: 16),
         Expanded(
           child: entriesAsync.when(

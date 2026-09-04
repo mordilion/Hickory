@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart' show DateTimeRange;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/di/app_settings_provider.dart';
 import '../../core/di/database_provider.dart';
 import '../../data/drift/database.dart';
+import '../timer/timer_providers.dart' show allEntriesProvider;
+import 'balance_calculations.dart';
 
 enum ReportRangePreset {
   today,
@@ -56,4 +59,23 @@ final reportEntriesProvider = StreamProvider.autoDispose
 
 final reportProjectsProvider = StreamProvider<List<Project>>((ref) {
   return ref.watch(appDatabaseProvider).projectsDao.watchAllProjects();
+});
+
+/// The flex-time balance as of today, over the whole history — deliberately
+/// not scoped to the report's selected range or its project/billable
+/// filters: "overtime, but only for project X" is not a meaningful number.
+final workTimeBalanceProvider = Provider<AsyncValue<Duration>>((ref) {
+  final entries = ref.watch(allEntriesProvider);
+  final settings = ref.watch(appSettingsProvider);
+  if (entries.isLoading || settings.isLoading) return const AsyncValue.loading();
+  final entryList = entries.value;
+  final settingsRow = settings.value;
+  if (entryList == null || settingsRow == null) return const AsyncValue.loading();
+  return AsyncValue.data(
+    runningBalance(
+      dayBalances(entryList, settingsRow),
+      settingsRow,
+      asOf: DateTime.now(),
+    ),
+  );
 });

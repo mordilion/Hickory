@@ -4,13 +4,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/core/theme/app_theme.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/features/reports/report_view_controller.dart';
 import 'package:hickory/features/reports/report_view_state_store.dart';
 import 'package:hickory/features/reports/reports_providers.dart';
 import 'package:hickory/features/reports/reports_screen.dart';
+import 'package:hickory/features/timer/timer_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
+
+import '../../support/app_settings_fixture.dart';
 
 Project _project({
   required String id,
@@ -72,6 +76,9 @@ void main() {
   // reportViewStateStoreProvider is left live (real file IO against tempDir,
   // not drift) so the test exercises real ReportViewController wiring, same
   // as language_dropdown_test.dart.
+  // appSettingsProvider/allEntriesProvider are overridden too now that
+  // ReportsScreen mounts BalanceCard, which watches both: without this the
+  // card subscribes to the same live drift stream this comment warns about.
   Widget makeApp() => ProviderScope(
     overrides: [
       reportEntriesProvider.overrideWith((ref, range) => Stream.value(entries)),
@@ -81,6 +88,8 @@ void main() {
       reportViewStateStoreProvider.overrideWith(
         (ref) async => ReportViewStateStore(supportDirectory: tempDir),
       ),
+      appSettingsProvider.overrideWith((ref) => Stream.value(appSettingsFixture())),
+      allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
     ],
     child: MaterialApp(
       theme: AppTheme.light,

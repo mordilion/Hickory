@@ -244,6 +244,16 @@
   "reportsFilterBillableOnly": "Solo facturable",
   "reportsFilterBillableNonOnly": "Solo no facturable",
   "reportsFilterReset": "Restablecer filtros",
+  "reportsBalanceTitle": "Saldo horario",
+  "reportsBalanceSince": "Saldo desde el {date}",
+  "@reportsBalanceSince": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "reportsBalanceAllTime": "Saldo total",
+  "reportsBalanceNoTargets": "Aún no hay jornada objetivo definida.",
+  "reportsBalanceConfigure": "Defínela en Ajustes → Jornada y saldo horario.",
   "csvHeaderDate": "Fecha",
   "csvHeaderStart": "Inicio",
   "csvHeaderEnd": "Fin",

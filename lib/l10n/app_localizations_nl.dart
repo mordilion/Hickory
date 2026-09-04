@@ -761,6 +761,24 @@ class AppLocalizationsNl extends AppLocalizations {
   String get reportsFilterReset => 'Filters resetten';
 
   @override
+  String get reportsBalanceTitle => 'Tijdsaldo';
+
+  @override
+  String reportsBalanceSince(String date) {
+    return 'Saldo sinds $date';
+  }
+
+  @override
+  String get reportsBalanceAllTime => 'Saldo totaal';
+
+  @override
+  String get reportsBalanceNoTargets => 'Nog geen streefwerktijd ingesteld.';
+
+  @override
+  String get reportsBalanceConfigure =>
+      'Stel die in bij Instellingen → Werktijd en saldo.';
+
+  @override
   String get csvHeaderDate => 'Datum';
 
   @override

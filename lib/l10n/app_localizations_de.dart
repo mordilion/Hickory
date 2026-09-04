@@ -762,6 +762,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get reportsFilterReset => 'Filter zurücksetzen';
 
   @override
+  String get reportsBalanceTitle => 'Zeitkonto';
+
+  @override
+  String reportsBalanceSince(String date) {
+    return 'Saldo seit $date';
+  }
+
+  @override
+  String get reportsBalanceAllTime => 'Saldo gesamt';
+
+  @override
+  String get reportsBalanceNoTargets =>
+      'Noch keine Soll-Arbeitszeit hinterlegt.';
+
+  @override
+  String get reportsBalanceConfigure =>
+      'Unter Einstellungen → Arbeitszeit & Zeitkonto festlegen.';
+
+  @override
   String get csvHeaderDate => 'Datum';
 
   @override

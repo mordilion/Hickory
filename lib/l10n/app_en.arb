@@ -244,6 +244,16 @@
   "reportsFilterBillableOnly": "Billable only",
   "reportsFilterBillableNonOnly": "Non-billable only",
   "reportsFilterReset": "Reset filters",
+  "reportsBalanceTitle": "Balance",
+  "reportsBalanceSince": "Balance since {date}",
+  "@reportsBalanceSince": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "reportsBalanceAllTime": "Balance overall",
+  "reportsBalanceNoTargets": "No target work time set yet.",
+  "reportsBalanceConfigure": "Set it under Settings → Work time & balance.",
   "csvHeaderDate": "Date",
   "csvHeaderStart": "Start",
   "csvHeaderEnd": "End",

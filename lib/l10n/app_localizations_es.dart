@@ -756,6 +756,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reportsFilterReset => 'Restablecer filtros';
 
   @override
+  String get reportsBalanceTitle => 'Saldo horario';
+
+  @override
+  String reportsBalanceSince(String date) {
+    return 'Saldo desde el $date';
+  }
+
+  @override
+  String get reportsBalanceAllTime => 'Saldo total';
+
+  @override
+  String get reportsBalanceNoTargets => 'Aún no hay jornada objetivo definida.';
+
+  @override
+  String get reportsBalanceConfigure =>
+      'Defínela en Ajustes → Jornada y saldo horario.';
+
+  @override
   String get csvHeaderDate => 'Fecha';
 
   @override

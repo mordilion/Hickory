@@ -1419,6 +1419,36 @@ abstract class AppLocalizations {
   /// **'Filter zurücksetzen'**
   String get reportsFilterReset;
 
+  /// No description provided for @reportsBalanceTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeitkonto'**
+  String get reportsBalanceTitle;
+
+  /// No description provided for @reportsBalanceSince.
+  ///
+  /// In de, this message translates to:
+  /// **'Saldo seit {date}'**
+  String reportsBalanceSince(String date);
+
+  /// No description provided for @reportsBalanceAllTime.
+  ///
+  /// In de, this message translates to:
+  /// **'Saldo gesamt'**
+  String get reportsBalanceAllTime;
+
+  /// No description provided for @reportsBalanceNoTargets.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Soll-Arbeitszeit hinterlegt.'**
+  String get reportsBalanceNoTargets;
+
+  /// No description provided for @reportsBalanceConfigure.
+  ///
+  /// In de, this message translates to:
+  /// **'Unter Einstellungen → Arbeitszeit & Zeitkonto festlegen.'**
+  String get reportsBalanceConfigure;
+
   /// No description provided for @csvHeaderDate.
   ///
   /// In de, this message translates to:
