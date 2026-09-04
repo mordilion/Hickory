@@ -526,6 +526,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible d\'enregistrer le temps de travail.';
 
   @override
+  String get settingsWorkTimeInvalidHours =>
+      'Veuillez saisir un nombre d\'heures supérieur ou égal à 0.';
+
+  @override
   String get settingsBalanceTitle => 'Compteur';
 
   @override
@@ -547,6 +551,16 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settingsBalanceCutoffMissing =>
       'Veuillez choisir une date de clôture.';
+
+  @override
+  String get settingsBalanceCutoffMonth => 'Mois';
+
+  @override
+  String get settingsBalanceCutoffDay => 'Jour';
+
+  @override
+  String get settingsBalanceSaveError =>
+      'Impossible d\'enregistrer la règle du compteur.';
 
   @override
   String get settingsBalanceCarryOverMax => 'Reporter au maximum (heures)';
@@ -780,6 +794,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get reportsBalanceConfigure =>
       'À définir dans Réglages → Temps de travail et compteur.';
+
+  @override
+  String get reportsBalanceIgnoresFilter =>
+      'Le compteur prend en compte toutes les entrées, indépendamment du filtre.';
 
   @override
   String get csvHeaderDate => 'Date';

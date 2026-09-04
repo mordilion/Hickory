@@ -130,6 +130,31 @@ void main() {
     expect(row.targetMinutesMonday, 480);
   });
 
+  testWidgets('a typed target is written when focus leaves without Enter', (tester) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(const ValueKey('workTimeTarget1')), '8');
+    late AppSettingsRow row;
+    await tester.runAsync(() async {
+      // Leaving the field is the whole point: on desktop, Tab and a click
+      // into the next field both move focus without ever firing
+      // onSubmitted, and there is no Save button to fall back on.
+      await tester.tap(find.byKey(const ValueKey('workTimeTarget2')));
+      await tester.pumpAndSettle();
+      await waitFor(
+        () async => (await db.appSettingsDao.watchSettings().first).targetMinutesMonday == 480,
+      );
+      row = await db.appSettingsDao.watchSettings().first;
+    });
+
+    expect(
+      row.targetMinutesMonday,
+      480,
+      reason: 'a value abandoned by moving focus must still be saved',
+    );
+  });
+
   testWidgets('weekly mode shows one field and the work-day toggles', (tester) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
@@ -175,5 +200,31 @@ void main() {
     expect(row.targetMinutesMonday, 480);
     expect(row.targetMinutesFriday, 480);
     expect(row.targetMinutesSaturday, 0);
+  });
+
+  testWidgets('toggling a work day distributes the weekly figure on screen, not the stored one', (
+    tester,
+  ) async {
+    await tester.pumpWidget(makeApp(settings: appSettingsFixture(targetInputMode: 'perWeek')));
+    await tester.pumpAndSettle();
+
+    // Typed but never submitted: the chip toggle has to pick this up from
+    // the field itself, because the stored sum is still zero and writing
+    // that would leave the field showing 40 over a database of zeros.
+    await tester.enterText(find.byKey(const ValueKey('workTimeWeekly')), '40');
+    late AppSettingsRow row;
+    await tester.runAsync(() async {
+      await tester.tap(find.widgetWithText(FilterChip, 'Samstag'));
+      await tester.pumpAndSettle();
+      await waitFor(
+        () async => (await db.appSettingsDao.watchSettings().first).targetMinutesSaturday == 400,
+      );
+      row = await db.appSettingsDao.watchSettings().first;
+    });
+
+    // 40 hours over Monday to Saturday.
+    expect(row.targetMinutesSaturday, 400);
+    expect(row.targetMinutesMonday, 400);
+    expect(row.targetMinutesSunday, 0);
   });
 }

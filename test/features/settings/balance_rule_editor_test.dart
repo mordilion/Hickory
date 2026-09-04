@@ -107,6 +107,19 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// Picks a cutoff. Both halves are always chosen together, because
+  /// neither on its own is a cutoff the editor will persist.
+  Future<void> chooseCutoff(WidgetTester tester, String month, String day) async {
+    await tester.tap(find.byKey(const ValueKey('balanceCutoffMonth')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(month).last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('balanceCutoffDay')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(day).last);
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('no cutoff hides the date and the bounds', (tester) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
@@ -145,28 +158,47 @@ void main() {
     expect(find.text('Bitte einen Stichtag wählen.'), findsOneWidget);
   });
 
-  testWidgets('picking a cutoff month persists the complete rule', (tester) async {
+  testWidgets('picking a cutoff month and day persists the complete rule', (tester) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
     await chooseMode(tester, 'Auf 0 setzen');
 
-    await tester.tap(find.byKey(const ValueKey('balanceCutoffMonth')));
-    await tester.pumpAndSettle();
+    late AppSettingsRow row;
     await tester.runAsync(() async {
-      await tester.tap(find.text('Juli').last);
-      await tester.pumpAndSettle();
+      await chooseCutoff(tester, 'Juli', '7');
       await waitFor(
         () async => (await db.appSettingsDao.watchSettings().first).balanceResetMonth == 7,
       );
-    });
-
-    late AppSettingsRow row;
-    await tester.runAsync(() async {
       row = await db.appSettingsDao.watchSettings().first;
     });
     expect(row.balanceResetMode, 'resetToZero');
     expect(row.balanceResetMonth, 7);
-    expect(row.balanceResetDay, 1, reason: 'the day defaults to the 1st until changed');
+    expect(row.balanceResetDay, 7);
+  });
+
+  testWidgets('a cutoff month without a day is not persisted', (tester) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+    await chooseMode(tester, 'Auf 0 setzen');
+
+    late AppSettingsRow row;
+    await tester.runAsync(() async {
+      await tester.tap(find.byKey(const ValueKey('balanceCutoffMonth')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Juli').last);
+      await tester.pumpAndSettle();
+      // There is no write to poll for here -- the point of this test is
+      // that none happens. Settle the pumps and give any (wrongly) started
+      // write a moment to land before asserting it did not.
+      await Future.delayed(const Duration(milliseconds: 200));
+      row = await db.appSettingsDao.watchSettings().first;
+    });
+    expect(
+      row.balanceResetMode,
+      'none',
+      reason: 'half a cutoff must not be completed with a day the user never picked',
+    );
+    expect(find.text('Bitte einen Stichtag wählen.'), findsOneWidget);
   });
 
   testWidgets('carry-over with a cutoff but no bound is not persisted', (tester) async {
@@ -174,19 +206,10 @@ void main() {
     await tester.pumpAndSettle();
     await chooseMode(tester, 'Übertrag mit Kappung');
 
-    await tester.tap(find.byKey(const ValueKey('balanceCutoffMonth')));
-    await tester.pumpAndSettle();
-    await tester.runAsync(() async {
-      await tester.tap(find.text('Juli').last);
-      await tester.pumpAndSettle();
-      // There is no write to poll for here -- the point of this test is
-      // that none happens. Settle the pumps and give any (wrongly) started
-      // write a moment to land before asserting it did not.
-      await Future.delayed(const Duration(milliseconds: 200));
-    });
-
     late AppSettingsRow row;
     await tester.runAsync(() async {
+      await chooseCutoff(tester, 'Juli', '7');
+      await Future.delayed(const Duration(milliseconds: 200));
       row = await db.appSettingsDao.watchSettings().first;
     });
     expect(
@@ -197,9 +220,7 @@ void main() {
     expect(find.text('Bitte mindestens eine Grenze angeben.'), findsOneWidget);
   });
 
-  testWidgets('a carry-over bound persists with the cutoff defaulted to 1 January', (
-    tester,
-  ) async {
+  testWidgets('a carry-over bound without a cutoff is not persisted', (tester) async {
     await tester.pumpWidget(makeApp());
     await tester.pumpAndSettle();
     await chooseMode(tester, 'Übertrag mit Kappung');
@@ -208,15 +229,17 @@ void main() {
     late AppSettingsRow row;
     await tester.runAsync(() async {
       await tester.testTextInput.receiveAction(TextInputAction.done);
-      await waitFor(
-        () async => (await db.appSettingsDao.watchSettings().first).carryOverMaxMinutes == 300,
-      );
+      await Future.delayed(const Duration(milliseconds: 200));
       row = await db.appSettingsDao.watchSettings().first;
     });
-    expect(row.balanceResetMode, 'carryOver');
-    expect(row.balanceResetMonth, 1, reason: 'the cutoff defaults to 1 January once a bound is set');
-    expect(row.balanceResetDay, 1, reason: 'the cutoff defaults to 1 January once a bound is set');
-    expect(row.carryOverMaxMinutes, 300);
+    expect(
+      row.balanceResetMode,
+      'none',
+      reason: 'a bound alone must not silently pick 1 January as the cutoff',
+    );
+    expect(row.balanceResetMonth, null);
+    expect(row.balanceResetDay, null);
+    expect(find.text('Bitte einen Stichtag wählen.'), findsOneWidget);
   });
 
   testWidgets('a carry-over minimum bound persists as a negative number', (tester) async {
@@ -224,8 +247,11 @@ void main() {
     await tester.pumpAndSettle();
     await chooseMode(tester, 'Übertrag mit Kappung');
 
-    await tester.enterText(find.byKey(const ValueKey('carryOverMin')), '2');
     late AppSettingsRow row;
+    await tester.runAsync(() async {
+      await chooseCutoff(tester, 'Juli', '7');
+    });
+    await tester.enterText(find.byKey(const ValueKey('carryOverMin')), '2');
     await tester.runAsync(() async {
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await waitFor(
@@ -238,6 +264,31 @@ void main() {
       -120,
       reason: 'the deficit bound is entered as a positive magnitude but stored negative',
     );
+  });
+
+  testWidgets('a bound typed and then left by moving focus still reaches the database', (
+    tester,
+  ) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+    await chooseMode(tester, 'Übertrag mit Kappung');
+
+    late AppSettingsRow row;
+    await tester.runAsync(() async {
+      await chooseCutoff(tester, 'Juli', '7');
+    });
+    await tester.enterText(find.byKey(const ValueKey('carryOverMax')), '5');
+    await tester.runAsync(() async {
+      // No Enter anywhere: moving to the next field is all the user does.
+      await tester.tap(find.byKey(const ValueKey('carryOverMin')));
+      await tester.pumpAndSettle();
+      await waitFor(
+        () async => (await db.appSettingsDao.watchSettings().first).carryOverMaxMinutes == 300,
+      );
+      row = await db.appSettingsDao.watchSettings().first;
+    });
+    expect(row.carryOverMaxMinutes, 300);
+    expect(row.balanceResetMode, 'carryOver');
   });
 
   testWidgets('switching from a configured carry-over to none clears cutoff and bounds', (

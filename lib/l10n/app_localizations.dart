@@ -981,6 +981,12 @@ abstract class AppLocalizations {
   /// **'Die Arbeitszeit konnte nicht gespeichert werden.'**
   String get settingsWorkTimeSaveError;
 
+  /// No description provided for @settingsWorkTimeInvalidHours.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte eine Stundenzahl von 0 oder mehr eingeben.'**
+  String get settingsWorkTimeInvalidHours;
+
   /// No description provided for @settingsBalanceTitle.
   ///
   /// In de, this message translates to:
@@ -1022,6 +1028,24 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Bitte einen Stichtag wählen.'**
   String get settingsBalanceCutoffMissing;
+
+  /// No description provided for @settingsBalanceCutoffMonth.
+  ///
+  /// In de, this message translates to:
+  /// **'Monat'**
+  String get settingsBalanceCutoffMonth;
+
+  /// No description provided for @settingsBalanceCutoffDay.
+  ///
+  /// In de, this message translates to:
+  /// **'Tag'**
+  String get settingsBalanceCutoffDay;
+
+  /// No description provided for @settingsBalanceSaveError.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Zeitkonto konnte nicht gespeichert werden.'**
+  String get settingsBalanceSaveError;
 
   /// No description provided for @settingsBalanceCarryOverMax.
   ///
@@ -1442,6 +1466,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Unter Einstellungen → Arbeitszeit & Zeitkonto festlegen.'**
   String get reportsBalanceConfigure;
+
+  /// No description provided for @reportsBalanceIgnoresFilter.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Zeitkonto berücksichtigt alle Einträge, unabhängig vom Filter.'**
+  String get reportsBalanceIgnoresFilter;
 
   /// No description provided for @csvHeaderDate.
   ///

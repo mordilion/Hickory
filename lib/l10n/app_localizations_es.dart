@@ -521,6 +521,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsWorkTimeSaveError => 'No se pudo guardar la jornada.';
 
   @override
+  String get settingsWorkTimeInvalidHours =>
+      'Introduce un número de horas igual o mayor que 0.';
+
+  @override
   String get settingsBalanceTitle => 'Saldo horario';
 
   @override
@@ -541,6 +545,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsBalanceCutoffMissing => 'Elige una fecha de corte.';
+
+  @override
+  String get settingsBalanceCutoffMonth => 'Mes';
+
+  @override
+  String get settingsBalanceCutoffDay => 'Día';
+
+  @override
+  String get settingsBalanceSaveError =>
+      'No se pudo guardar la regla del saldo horario.';
 
   @override
   String get settingsBalanceCarryOverMax => 'Arrastrar como máximo (horas)';
@@ -769,6 +783,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get reportsBalanceConfigure =>
       'Defínela en Ajustes → Jornada y saldo horario.';
+
+  @override
+  String get reportsBalanceIgnoresFilter =>
+      'El saldo incluye todas las entradas, independientemente del filtro.';
 
   @override
   String get csvHeaderDate => 'Fecha';

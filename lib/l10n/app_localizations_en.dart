@@ -517,6 +517,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsWorkTimeSaveError => 'Could not save the work time.';
 
   @override
+  String get settingsWorkTimeInvalidHours =>
+      'Please enter a number of hours of 0 or more.';
+
+  @override
   String get settingsBalanceTitle => 'Balance';
 
   @override
@@ -537,6 +541,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsBalanceCutoffMissing => 'Please choose a cutoff date.';
+
+  @override
+  String get settingsBalanceCutoffMonth => 'Month';
+
+  @override
+  String get settingsBalanceCutoffDay => 'Day';
+
+  @override
+  String get settingsBalanceSaveError => 'Could not save the balance rule.';
 
   @override
   String get settingsBalanceCarryOverMax => 'Carry over at most (hours)';
@@ -765,6 +778,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reportsBalanceConfigure =>
       'Set it under Settings → Work time & balance.';
+
+  @override
+  String get reportsBalanceIgnoresFilter =>
+      'The balance covers all entries, regardless of the filter.';
 
   @override
   String get csvHeaderDate => 'Date';

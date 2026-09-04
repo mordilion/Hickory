@@ -521,6 +521,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Arbeitszeit konnte nicht gespeichert werden.';
 
   @override
+  String get settingsWorkTimeInvalidHours =>
+      'Bitte eine Stundenzahl von 0 oder mehr eingeben.';
+
+  @override
   String get settingsBalanceTitle => 'Zeitkonto';
 
   @override
@@ -541,6 +545,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsBalanceCutoffMissing => 'Bitte einen Stichtag wählen.';
+
+  @override
+  String get settingsBalanceCutoffMonth => 'Monat';
+
+  @override
+  String get settingsBalanceCutoffDay => 'Tag';
+
+  @override
+  String get settingsBalanceSaveError =>
+      'Das Zeitkonto konnte nicht gespeichert werden.';
 
   @override
   String get settingsBalanceCarryOverMax => 'Höchstens übertragen (Stunden)';
@@ -776,6 +790,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get reportsBalanceConfigure =>
       'Unter Einstellungen → Arbeitszeit & Zeitkonto festlegen.';
+
+  @override
+  String get reportsBalanceIgnoresFilter =>
+      'Das Zeitkonto berücksichtigt alle Einträge, unabhängig vom Filter.';
 
   @override
   String get csvHeaderDate => 'Datum';

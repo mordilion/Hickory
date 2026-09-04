@@ -521,6 +521,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Impossibile salvare l\'orario di lavoro.';
 
   @override
+  String get settingsWorkTimeInvalidHours =>
+      'Inserisci un numero di ore pari o superiore a 0.';
+
+  @override
   String get settingsBalanceTitle => 'Saldo ore';
 
   @override
@@ -541,6 +545,16 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settingsBalanceCutoffMissing => 'Scegli una data di chiusura.';
+
+  @override
+  String get settingsBalanceCutoffMonth => 'Mese';
+
+  @override
+  String get settingsBalanceCutoffDay => 'Giorno';
+
+  @override
+  String get settingsBalanceSaveError =>
+      'Impossibile salvare la regola del saldo.';
 
   @override
   String get settingsBalanceCarryOverMax => 'Riportare al massimo (ore)';
@@ -770,6 +784,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get reportsBalanceConfigure =>
       'Impostalo in Impostazioni → Orario di lavoro e saldo.';
+
+  @override
+  String get reportsBalanceIgnoresFilter =>
+      'Il saldo considera tutte le voci, indipendentemente dal filtro.';
 
   @override
   String get csvHeaderDate => 'Data';

@@ -522,6 +522,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'De werktijd kon niet worden opgeslagen.';
 
   @override
+  String get settingsWorkTimeInvalidHours =>
+      'Voer een aantal uren van 0 of meer in.';
+
+  @override
   String get settingsBalanceTitle => 'Tijdsaldo';
 
   @override
@@ -542,6 +546,16 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settingsBalanceCutoffMissing => 'Kies een peildatum.';
+
+  @override
+  String get settingsBalanceCutoffMonth => 'Maand';
+
+  @override
+  String get settingsBalanceCutoffDay => 'Dag';
+
+  @override
+  String get settingsBalanceSaveError =>
+      'De saldoregel kon niet worden opgeslagen.';
 
   @override
   String get settingsBalanceCarryOverMax => 'Hoogstens overdragen (uren)';
@@ -774,6 +788,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get reportsBalanceConfigure =>
       'Stel die in bij Instellingen → Werktijd en saldo.';
+
+  @override
+  String get reportsBalanceIgnoresFilter =>
+      'Het saldo omvat alle registraties, ongeacht het filter.';
 
   @override
   String get csvHeaderDate => 'Datum';

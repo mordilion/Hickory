@@ -7,8 +7,9 @@ import 'package:intl/intl.dart';
 import '../../core/di/app_settings_provider.dart';
 import '../../core/di/sync_providers.dart';
 import '../../data/drift/database.dart';
-import '../../features/reports/balance_calculations.dart' show targetMinutesForWeekday;
 import '../../l10n/app_localizations.dart';
+import '../reports/balance_calculations.dart' show targetMinutesForWeekday;
+import 'settings_editor_support.dart';
 import 'weekly_target_distribution.dart';
 import 'work_time_format.dart';
 
@@ -24,12 +25,8 @@ class WorkTimeTargetsEditor extends ConsumerStatefulWidget {
   ConsumerState<WorkTimeTargetsEditor> createState() => _WorkTimeTargetsEditorState();
 }
 
-class _WorkTimeTargetsEditorState extends ConsumerState<WorkTimeTargetsEditor> {
-  /// True while a write is in flight — disables the inputs so a fast
-  /// double edit cannot interleave two read-modify-write cycles on the
-  /// singleton settings row.
-  bool _busy = false;
-
+class _WorkTimeTargetsEditorState extends ConsumerState<WorkTimeTargetsEditor>
+    with SettingsWriteGuard {
   /// The mode the user picked this session, overriding the stored value
   /// until the settings stream catches up. A `SegmentedButton` must flip
   /// instantly on tap; waiting for the write's round trip through the
@@ -37,23 +34,11 @@ class _WorkTimeTargetsEditorState extends ConsumerState<WorkTimeTargetsEditor> {
   /// otherwise lag a frame or more behind the tap.
   String? _selectedMode;
 
-  Future<void> _guardedWrite(Future<void> Function() write) async {
-    if (_busy) return;
-    setState(() => _busy = true);
-    try {
-      await write();
-    } catch (error) {
-      debugPrint('Failed to save work-time target: $error');
-      if (mounted) {
-        final l10n = AppLocalizations.of(context);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.settingsWorkTimeSaveError)));
-      }
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
+  @override
+  String saveErrorMessage(AppLocalizations l10n) => l10n.settingsWorkTimeSaveError;
+
+  void _reportInvalidHours() =>
+      showMessage(AppLocalizations.of(context).settingsWorkTimeInvalidHours);
 
   /// Flips the visible mode immediately (a segmented button must not wait on
   /// a database round trip) and writes the change through in the
@@ -63,7 +48,7 @@ class _WorkTimeTargetsEditorState extends ConsumerState<WorkTimeTargetsEditor> {
   void _setMode(String mode) {
     setState(() => _selectedMode = mode);
     unawaited(
-      _guardedWrite(() async {
+      guardedWrite(() async {
         final writes = await ref.read(syncedWritesProvider.future);
         await writes.updateAppSettings(targetInputMode: mode);
       }),
@@ -71,7 +56,7 @@ class _WorkTimeTargetsEditorState extends ConsumerState<WorkTimeTargetsEditor> {
   }
 
   Future<void> _setDayMinutes(int weekday, int minutes) async {
-    await _guardedWrite(() async {
+    await guardedWrite(() async {
       final writes = await ref.read(syncedWritesProvider.future);
       await writes.updateAppSettings(
         targetMinutesMonday: weekday == DateTime.monday ? minutes : null,
@@ -86,7 +71,7 @@ class _WorkTimeTargetsEditorState extends ConsumerState<WorkTimeTargetsEditor> {
   }
 
   Future<void> _setWeekly(int weeklyMinutes, Set<int> workDays) async {
-    await _guardedWrite(() async {
+    await guardedWrite(() async {
       final perDay = distributeWeeklyMinutes(weeklyMinutes, workDays);
       final writes = await ref.read(syncedWritesProvider.future);
       await writes.updateAppSettings(
@@ -130,7 +115,7 @@ class _WorkTimeTargetsEditorState extends ConsumerState<WorkTimeTargetsEditor> {
             ButtonSegment(value: true, label: Text(l10n.settingsWorkTimeModePerWeek)),
           ],
           selected: {isWeekly},
-          onSelectionChanged: _busy
+          onSelectionChanged: busy
               ? null
               : (selection) => _setMode(selection.first ? 'perWeek' : 'perWeekday'),
         ),
@@ -139,11 +124,16 @@ class _WorkTimeTargetsEditorState extends ConsumerState<WorkTimeTargetsEditor> {
           _WeeklyInput(
             settings: settings,
             workDays: workDays,
-            enabled: !_busy,
+            chipsEnabled: !busy,
             onChanged: _setWeekly,
+            onInvalidInput: _reportInvalidHours,
           )
         else
-          _PerWeekdayInput(settings: settings, enabled: !_busy, onChanged: _setDayMinutes),
+          _PerWeekdayInput(
+            settings: settings,
+            onChanged: _setDayMinutes,
+            onInvalidInput: _reportInvalidHours,
+          ),
       ],
     );
   }
@@ -161,16 +151,21 @@ String weekdayName(BuildContext context, int weekday) {
 /// this widget rebuilds on every emission of the settings stream, and a
 /// controller built fresh in `build()` would reset the field text on each
 /// rebuild -- including while the user is mid-keystroke in it.
+///
+/// The fields stay enabled while a write is in flight, unlike the chips and
+/// the mode toggle: disabling a focused field takes its focus away, which
+/// would break tabbing from one day to the next -- the very gesture that
+/// commits the previous field.
 class _PerWeekdayInput extends StatefulWidget {
   const _PerWeekdayInput({
     required this.settings,
-    required this.enabled,
     required this.onChanged,
+    required this.onInvalidInput,
   });
 
   final AppSettingsRow settings;
-  final bool enabled;
   final Future<void> Function(int weekday, int minutes) onChanged;
+  final VoidCallback onInvalidInput;
 
   @override
   State<_PerWeekdayInput> createState() => _PerWeekdayInputState();
@@ -188,9 +183,9 @@ class _PerWeekdayInputState extends State<_PerWeekdayInput> {
   void didUpdateWidget(_PerWeekdayInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Only push a stored value into its controller when that value actually
-    // changed -- otherwise every rebuild (e.g. the `_busy` flag toggling
-    // around this same field's own write) would reset the cursor and
-    // overwrite whatever the user is currently typing.
+    // changed -- otherwise every rebuild (e.g. another field's write
+    // settling) would reset the cursor and overwrite whatever the user is
+    // currently typing.
     for (var weekday = 1; weekday <= 7; weekday++) {
       final oldMinutes = targetMinutesForWeekday(oldWidget.settings, weekday);
       final newMinutes = targetMinutesForWeekday(widget.settings, weekday);
@@ -208,6 +203,23 @@ class _PerWeekdayInputState extends State<_PerWeekdayInput> {
     super.dispose();
   }
 
+  /// Persists what the field for [weekday] currently reads, if that is a
+  /// new and usable figure. Empty text is left alone rather than read as
+  /// zero: a zero target renders as an empty field, so every pass through
+  /// an untouched free day would otherwise be a write. Text that is not a
+  /// non-negative number is reported to the user instead of dropped.
+  void _commit(int weekday) {
+    final text = _controllers[weekday - 1].text.trim();
+    if (text.isEmpty) return;
+    final minutes = hoursTextToMinutes(text);
+    if (minutes == null || minutes < 0) {
+      widget.onInvalidInput();
+      return;
+    }
+    if (minutes == targetMinutesForWeekday(widget.settings, weekday)) return;
+    widget.onChanged(weekday, minutes);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -218,22 +230,28 @@ class _PerWeekdayInputState extends State<_PerWeekdayInput> {
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(
               children: [
-                Expanded(child: Text(weekdayName(context, weekday))),
+                // The day name is the field's label, so it is announced
+                // there (below) rather than a second time as loose text.
+                Expanded(
+                  child: ExcludeSemantics(child: Text(weekdayName(context, weekday))),
+                ),
                 SizedBox(
                   width: 120,
-                  child: TextField(
-                    key: ValueKey('workTimeTarget$weekday'),
-                    enabled: widget.enabled,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    controller: _controllers[weekday - 1],
-                    decoration: InputDecoration(
-                      isDense: true,
-                      suffixText: l10n.settingsWorkTimeHoursSuffix,
+                  child: Semantics(
+                    label: weekdayName(context, weekday),
+                    child: CommitOnFocusLoss(
+                      onCommit: () => _commit(weekday),
+                      child: TextField(
+                        key: ValueKey('workTimeTarget$weekday'),
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        controller: _controllers[weekday - 1],
+                        decoration: InputDecoration(
+                          isDense: true,
+                          suffixText: l10n.settingsWorkTimeHoursSuffix,
+                        ),
+                        onSubmitted: (_) => _commit(weekday),
+                      ),
                     ),
-                    onSubmitted: (text) {
-                      final minutes = hoursTextToMinutes(text);
-                      if (minutes != null && minutes >= 0) widget.onChanged(weekday, minutes);
-                    },
                   ),
                 ),
               ],
@@ -248,14 +266,16 @@ class _WeeklyInput extends StatefulWidget {
   const _WeeklyInput({
     required this.settings,
     required this.workDays,
-    required this.enabled,
+    required this.chipsEnabled,
     required this.onChanged,
+    required this.onInvalidInput,
   });
 
   final AppSettingsRow settings;
   final Set<int> workDays;
-  final bool enabled;
+  final bool chipsEnabled;
   final Future<void> Function(int weeklyMinutes, Set<int> workDays) onChanged;
+  final VoidCallback onInvalidInput;
 
   @override
   State<_WeeklyInput> createState() => _WeeklyInputState();
@@ -273,6 +293,19 @@ class _WeeklyInputState extends State<_WeeklyInput> {
   int _weeklyMinutesOf(AppSettingsRow settings) => [
         for (var weekday = 1; weekday <= 7; weekday++) targetMinutesForWeekday(settings, weekday),
       ].fold(0, (sum, minutes) => sum + minutes);
+
+  /// The weekly figure as the field currently reads it, falling back to the
+  /// stored sum when it holds nothing usable. A chip toggle redistributes
+  /// this, and it must be what the user can see: distributing the stored
+  /// sum instead would write a total the field contradicts, and because
+  /// [didUpdateWidget] only refreshes the field when the stored sum
+  /// changes, the screen would go on showing the figure that was never
+  /// saved.
+  int get _weeklyMinutesOnScreen {
+    final typed = hoursTextToMinutes(_weeklyController.text.trim());
+    if (typed == null || typed < 0) return _weeklyMinutesOf(widget.settings);
+    return typed;
+  }
 
   @override
   void didUpdateWidget(_WeeklyInput oldWidget) {
@@ -292,26 +325,39 @@ class _WeeklyInputState extends State<_WeeklyInput> {
     super.dispose();
   }
 
+  /// Same contract as `_PerWeekdayInputState._commit`: empty is left alone,
+  /// unusable text is reported, and an unchanged figure is not rewritten.
+  void _commit() {
+    final text = _weeklyController.text.trim();
+    if (text.isEmpty) return;
+    final minutes = hoursTextToMinutes(text);
+    if (minutes == null || minutes < 0) {
+      widget.onInvalidInput();
+      return;
+    }
+    if (minutes == _weeklyMinutesOf(widget.settings)) return;
+    widget.onChanged(minutes, _workDays);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
-          key: const ValueKey('workTimeWeekly'),
-          enabled: widget.enabled,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          controller: _weeklyController,
-          decoration: InputDecoration(
-            labelText: l10n.settingsWorkTimeWeeklyHours,
-            isDense: true,
-            suffixText: l10n.settingsWorkTimeHoursSuffix,
+        CommitOnFocusLoss(
+          onCommit: _commit,
+          child: TextField(
+            key: const ValueKey('workTimeWeekly'),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            controller: _weeklyController,
+            decoration: InputDecoration(
+              labelText: l10n.settingsWorkTimeWeeklyHours,
+              isDense: true,
+              suffixText: l10n.settingsWorkTimeHoursSuffix,
+            ),
+            onSubmitted: (_) => _commit(),
           ),
-          onSubmitted: (text) {
-            final minutes = hoursTextToMinutes(text);
-            if (minutes != null && minutes >= 0) widget.onChanged(minutes, _workDays);
-          },
         ),
         const SizedBox(height: 12),
         Text(l10n.settingsWorkTimeWorkDays, style: Theme.of(context).textTheme.bodySmall),
@@ -324,12 +370,12 @@ class _WeeklyInputState extends State<_WeeklyInput> {
               FilterChip(
                 label: Text(weekdayName(context, weekday)),
                 selected: _workDays.contains(weekday),
-                onSelected: widget.enabled
+                onSelected: widget.chipsEnabled
                     ? (selected) {
                         setState(() {
                           selected ? _workDays.add(weekday) : _workDays.remove(weekday);
                         });
-                        widget.onChanged(_weeklyMinutesOf(widget.settings), _workDays);
+                        widget.onChanged(_weeklyMinutesOnScreen, _workDays);
                       }
                     : null,
               ),
