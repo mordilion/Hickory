@@ -6,6 +6,8 @@
 // balance would need recomputation after every cross-device event-log
 // merge, and those merges happen at arbitrary times.
 
+import 'package:flutter/material.dart' show DateTimeRange;
+
 import '../../data/drift/database.dart';
 import '../../data/drift/tables/absences_table.dart';
 import 'report_calculations.dart' show totalsByDay;
@@ -248,6 +250,82 @@ List<DayBalance> dayBalances(
     );
   }
   return result;
+}
+
+/// What one report range adds up to: the figures the dashboard's tiles
+/// show beside the running balance.
+class RangeFigures {
+  const RangeFigures({
+    required this.worked,
+    required this.target,
+    required this.absenceCredit,
+    required this.workDays,
+    required this.creditedOnWorkDays,
+  });
+
+  final Duration worked;
+
+  /// The summed target after unpaid absences have been taken off it — the
+  /// same figure [DayBalance.target] carries per day.
+  final Duration target;
+  final Duration absenceCredit;
+
+  /// Days in the range whose target is above zero. The divisor for
+  /// [averagePerWorkDay]: a Saturday that was worked is a surplus, not a
+  /// day the average should be spread over.
+  final int workDays;
+
+  /// Worked plus credited time on those work days alone — [worked] counts
+  /// free days too, and folding a worked Saturday into a per-work-day
+  /// average would overstate the working day it never was.
+  final Duration creditedOnWorkDays;
+
+  Duration get balance => worked + absenceCredit - target;
+
+  /// How much a work day in this range carried on average, or zero when
+  /// the range holds none — an average over nothing is not a number worth
+  /// showing.
+  Duration get averagePerWorkDay =>
+      workDays == 0 ? Duration.zero : creditedOnWorkDays ~/ workDays;
+
+  /// Worked plus credited over target, as a fraction. Zero when the range
+  /// has no target at all, which is the honest answer for a stretch of
+  /// free days: there was nothing to complete.
+  double get completion => target == Duration.zero
+      ? 0
+      : (worked + absenceCredit).inMinutes / target.inMinutes;
+}
+
+/// Adds up the days of [balances] that fall inside [range].
+///
+/// [range.end] is exclusive, matching `rangeForPreset` in
+/// reports_providers.dart — a range ending on the 9th stops at the 8th.
+RangeFigures figuresForRange(List<DayBalance> balances, DateTimeRange range) {
+  var worked = Duration.zero;
+  var target = Duration.zero;
+  var credit = Duration.zero;
+  var creditedOnWorkDays = Duration.zero;
+  var workDays = 0;
+
+  for (final day in balances) {
+    if (day.day.isBefore(range.start)) continue;
+    if (!day.day.isBefore(range.end)) continue;
+    worked += day.worked;
+    target += day.target;
+    credit += day.absenceCredit;
+    if (day.target > Duration.zero) {
+      workDays++;
+      creditedOnWorkDays += day.worked + day.absenceCredit;
+    }
+  }
+
+  return RangeFigures(
+    worked: worked,
+    target: target,
+    absenceCredit: credit,
+    workDays: workDays,
+    creditedOnWorkDays: creditedOnWorkDays,
+  );
 }
 
 /// The cutoff date falling in [year], with the configured day clamped to

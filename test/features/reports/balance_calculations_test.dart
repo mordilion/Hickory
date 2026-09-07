@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show DateTimeRange;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/drift/tables/absences_table.dart';
@@ -670,5 +671,112 @@ void main() {
       Duration.zero,
       reason: 'being absent cannot earn overtime',
     );
+  });
+
+  group('figuresForRange', () {
+    test('sums only the days inside the range, whose end is exclusive', () {
+      final balances = [
+        DayBalance(
+          day: DateTime(2026, 9, 7),
+          worked: const Duration(hours: 9),
+          target: const Duration(hours: 8),
+        ),
+        DayBalance(
+          day: DateTime(2026, 9, 8),
+          worked: const Duration(hours: 7),
+          target: const Duration(hours: 8),
+        ),
+        DayBalance(
+          day: DateTime(2026, 9, 9),
+          worked: const Duration(hours: 8),
+          target: const Duration(hours: 8),
+        ),
+      ];
+
+      final figures = figuresForRange(
+        balances,
+        DateTimeRange(start: DateTime(2026, 9, 7), end: DateTime(2026, 9, 9)),
+      );
+
+      expect(figures.worked, const Duration(hours: 16));
+      expect(figures.target, const Duration(hours: 16));
+      expect(figures.balance, Duration.zero);
+      expect(figures.workDays, 2, reason: 'the 9th is the exclusive end, so it is out');
+    });
+
+    test('counts paid absence toward the range, as the day balance does', () {
+      final figures = figuresForRange(
+        [
+          DayBalance(
+            day: DateTime(2026, 9, 7),
+            worked: Duration.zero,
+            target: const Duration(hours: 8),
+            absenceCredit: const Duration(hours: 8),
+          ),
+        ],
+        DateTimeRange(start: DateTime(2026, 9, 7), end: DateTime(2026, 9, 8)),
+      );
+
+      expect(figures.absenceCredit, const Duration(hours: 8));
+      expect(figures.balance, Duration.zero, reason: 'a paid day off is neutral');
+      expect(figures.completion, 1.0);
+    });
+
+    test('averages over work days, not calendar days', () {
+      final balances = [
+        DayBalance(
+          day: DateTime(2026, 9, 7),
+          worked: const Duration(hours: 10),
+          target: const Duration(hours: 8),
+        ),
+        // A Saturday that was worked: no target, so it is not a work day,
+        // but every one of its minutes is a surplus.
+        DayBalance(
+          day: DateTime(2026, 9, 12),
+          worked: const Duration(hours: 2),
+          target: Duration.zero,
+        ),
+      ];
+
+      final figures = figuresForRange(
+        balances,
+        DateTimeRange(start: DateTime(2026, 9, 7), end: DateTime(2026, 9, 14)),
+      );
+
+      expect(figures.workDays, 1);
+      expect(figures.balance, const Duration(hours: 4));
+      expect(
+        figures.averagePerWorkDay,
+        const Duration(hours: 10),
+        reason: "the Saturday's two hours are a surplus, not part of a working day",
+      );
+    });
+
+    test('an empty range reports zeroes rather than dividing by nothing', () {
+      final figures = figuresForRange(
+        const [],
+        DateTimeRange(start: DateTime(2026, 9, 7), end: DateTime(2026, 9, 8)),
+      );
+
+      expect(figures.worked, Duration.zero);
+      expect(figures.averagePerWorkDay, Duration.zero);
+      expect(figures.completion, 0);
+    });
+
+    test('a range of free days reports no completion instead of dividing by zero', () {
+      final figures = figuresForRange(
+        [
+          DayBalance(
+            day: DateTime(2026, 9, 12),
+            worked: const Duration(hours: 3),
+            target: Duration.zero,
+          ),
+        ],
+        DateTimeRange(start: DateTime(2026, 9, 12), end: DateTime(2026, 9, 13)),
+      );
+
+      expect(figures.completion, 0);
+      expect(figures.balance, const Duration(hours: 3));
+    });
   });
 }
