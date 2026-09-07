@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +19,7 @@ import '../../data/drift/tables/jira_worklogs_table.dart';
 import '../../data/drift/tables/personio_attendances_table.dart';
 import '../../data/drift/time_entry_extensions.dart';
 import '../../l10n/app_localizations.dart';
+import '../absences/absence_edit_dialog.dart';
 import '../projects/projects_providers.dart';
 import '../timer/timer_providers.dart';
 import 'entries_location.dart';
@@ -321,6 +323,7 @@ class _DayEntriesBlock extends ConsumerWidget {
               absence: absence,
               type: absenceTypesById[absence.absenceTypeId],
               l10n: l10n,
+              onEdit: () => _editAbsence(context, ref, absence),
               onDismissed: () {
                 ref
                     .read(syncedWritesProvider.future)
@@ -434,6 +437,28 @@ class _EntryTile extends StatelessWidget {
   }
 }
 
+/// Opens the edit dialog for [absence] and writes what comes back.
+///
+/// The write lives here rather than in [_AbsenceTile] for the same reason
+/// the delete does: the row stays presentational and the Riverpod-aware
+/// caller owns the side effect.
+Future<void> _editAbsence(BuildContext context, WidgetRef ref, Absence absence) async {
+  final edit = await showDialog<AbsenceEdit>(
+    context: context,
+    builder: (_) => AbsenceEditDialog(absence: absence),
+  );
+  if (edit == null) return;
+  final writes = await ref.read(syncedWritesProvider.future);
+  await writes.updateAbsence(
+    absence.id,
+    absenceTypeId: edit.absenceTypeId,
+    portion: edit.portion,
+    startAt: Value(edit.startAt),
+    endAt: Value(edit.endAt),
+    note: Value(edit.note),
+  );
+}
+
 /// An absence inside a [_DayEntriesBlock]. Presentational only --
 /// [onDismissed] carries the Riverpod-dependent behaviour, the same split
 /// [_EntryTile] uses. An absence has no duration of its own to show: a
@@ -445,6 +470,7 @@ class _AbsenceTile extends StatelessWidget {
     required this.absence,
     required this.type,
     required this.l10n,
+    required this.onEdit,
     required this.onDismissed,
   });
 
@@ -454,6 +480,7 @@ class _AbsenceTile extends StatelessWidget {
   /// another device before this row's own event arrived.
   final AbsenceType? type;
   final AppLocalizations l10n;
+  final VoidCallback onEdit;
   final VoidCallback onDismissed;
 
   String _portionLabel() {
@@ -486,6 +513,14 @@ class _AbsenceTile extends StatelessWidget {
         leading: const Icon(Icons.event_busy_outlined),
         title: Text(type?.name ?? _portionLabel()),
         subtitle: Text(subtitle),
+        // Swiping deletes; a mistyped type, extent or note is corrected
+        // here instead of being deleted and recorded again.
+        trailing: IconButton(
+          key: ValueKey('editAbsence-${absence.id}'),
+          icon: const Icon(Icons.edit_outlined),
+          tooltip: l10n.commonEdit,
+          onPressed: onEdit,
+        ),
       ),
     );
   }

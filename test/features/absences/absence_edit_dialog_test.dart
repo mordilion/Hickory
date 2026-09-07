@@ -1,0 +1,166 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hickory/core/di/absence_providers.dart';
+import 'package:hickory/data/drift/database.dart';
+import 'package:hickory/data/drift/tables/absences_table.dart';
+import 'package:hickory/features/absences/absence_edit_dialog.dart';
+import 'package:hickory/l10n/app_localizations.dart';
+
+void main() {
+  AbsenceType type(String id, String name) => AbsenceType(
+        id: id,
+        name: name,
+        paid: true,
+        sortOrder: 0,
+        deviceId: 'd',
+        createdAt: DateTime.utc(2026, 1, 1),
+        updatedAt: DateTime.utc(2026, 1, 1),
+      );
+
+  Absence absence({
+    String portion = absencePortionFullDay,
+    DateTime? startAt,
+    DateTime? endAt,
+    String? note,
+  }) => Absence(
+        id: 'absence-1',
+        date: DateTime(2026, 9, 7),
+        absenceTypeId: 'type-1',
+        portion: portion,
+        startAt: startAt,
+        endAt: endAt,
+        note: note,
+        deviceId: 'd',
+        createdAt: DateTime.utc(2026, 1, 1),
+        updatedAt: DateTime.utc(2026, 1, 1),
+      );
+
+  /// Mounts the dialog and hands back whatever it pops with. Pushed from a
+  /// button rather than shown directly, so the pop has a route to return
+  /// to and the result is observable.
+  Future<AbsenceEdit?> showEditor(
+    WidgetTester tester,
+    Absence row, {
+    List<AbsenceType> types = const [],
+  }) async {
+    AbsenceEdit? result;
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          absenceTypesProvider.overrideWith((ref) => Stream.value(types)),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('de'),
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () async {
+                  result = await showDialog<AbsenceEdit>(
+                    context: context,
+                    builder: (_) => AbsenceEditDialog(absence: row),
+                  );
+                },
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    return Future.value().then((_) => result);
+  }
+
+  testWidgets('keeps the note and the extent it was opened with', (tester) async {
+    await showEditor(
+      tester,
+      absence(portion: absencePortionHalfDay, note: 'Arzt'),
+      types: [type('type-1', 'Urlaub')],
+    );
+
+    expect(find.text('Arzt'), findsOneWidget);
+    expect(find.text('Urlaub'), findsOneWidget);
+    final segments = tester.widget<SegmentedButton<String>>(
+      find.byType(SegmentedButton<String>),
+    );
+    expect(segments.selected, {absencePortionHalfDay});
+  });
+
+  testWidgets('refuses a range that ends when it starts and stays open', (tester) async {
+    await showEditor(
+      tester,
+      absence(
+        portion: absencePortionRange,
+        startAt: DateTime(2026, 9, 7, 9).toUtc(),
+        endAt: DateTime(2026, 9, 7, 9).toUtc(),
+      ),
+      types: [type('type-1', 'Urlaub')],
+    );
+
+    await tester.tap(find.text('Speichern'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Das Ende muss nach dem Beginn liegen.'), findsOneWidget);
+    expect(
+      find.byType(AbsenceEditDialog),
+      findsOneWidget,
+      reason: 'a refused save must not close the dialog and lose the edit',
+    );
+  });
+
+  testWidgets('clears the time range when a range becomes a whole day', (tester) async {
+    AbsenceEdit? result;
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          absenceTypesProvider.overrideWith(
+            (ref) => Stream.value([type('type-1', 'Urlaub')]),
+          ),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('de'),
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () async {
+                  result = await showDialog<AbsenceEdit>(
+                    context: context,
+                    builder: (_) => AbsenceEditDialog(
+                      absence: absence(
+                        portion: absencePortionRange,
+                        startAt: DateTime(2026, 9, 7, 9).toUtc(),
+                        endAt: DateTime(2026, 9, 7, 11).toUtc(),
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Ganztags'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Speichern'));
+    await tester.pumpAndSettle();
+
+    expect(result?.portion, absencePortionFullDay);
+    expect(
+      result?.startAt,
+      isNull,
+      reason: 'a whole day carries no time range, and the stored one must go',
+    );
+    expect(result?.endAt, isNull);
+  });
+}

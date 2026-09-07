@@ -779,6 +779,41 @@ void main() {
     expect(find.byIcon(Icons.event_busy_outlined), findsNothing);
   });
 
+
+  testWidgets('an absence is edited from its own row', (tester) async {
+    // Written through the DAO rather than as a fixture, so the edit has a
+    // real row to land on.
+    final created = await db.absencesDao.createAbsence(
+      deviceId: 'd',
+      date: DateTime(2026, 9, 7),
+      absenceTypeId: 'type-1',
+      portion: absencePortionFullDay,
+    );
+    await tester.pumpWidget(
+      makeApp(
+        const [],
+        absences: [created],
+        absenceTypes: [vacationType()],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(ValueKey('editAbsence-${created.id}')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const ValueKey('absenceEditNote')), 'Doctor');
+
+    late Absence row;
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Save'));
+      await tester.pump();
+      await waitFor(() async => (await db.select(db.absences).get()).single.note != null);
+      row = (await db.select(db.absences).get()).single;
+    });
+    await tester.pump();
+
+    expect(row.note, 'Doctor', reason: 'a mistyped absence has to be correctable');
+    expect(row.portion, absencePortionFullDay);
+  });
 }
 
 /// Pins the location so a test doesn't silently depend on today's date.
