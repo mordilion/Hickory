@@ -42,6 +42,13 @@
   (`absenceDaysBetween`) turns a full/half-day date range into the list of calendar days
   that actually get a row — days whose weekday target is zero are skipped, because an
   absence on a day with no target would credit nothing and only leave a row to look at.
+  `absenceSpanDays` does the same for a `range` absence, which carries a from/to date as
+  well as a from/to time: the span is one continuous absence, so the first day runs from
+  its clock time to midnight, the last from midnight to its clock time, and the days
+  between are whole days. A span inside one day keeps both times (the appointment case).
+  A skipped free day never moves the clipping onto another day — the clock times belong
+  to the calendar days the user picked, not to the first and last row that gets written —
+  and a span ending at midnight leaves that day out, since it covers none of it.
 - `lib/features/settings/absence_types_editor.dart` (`AbsenceTypesEditor`): the global
   switch plus the user's list of types, shown by `absences_settings_screen.dart`. The
   "add standard types" button stays visible for the life of the list and skips every
@@ -73,6 +80,13 @@
   would then sync into a pile of duplicates — there is no natural row for two devices to
   agree is "the same" default type. The standard set is therefore an explicit action the
   user takes once, on one device, and it syncs like any other write from there.
+- **A range absence spans days like a manual entry does.** The two clock times only have
+  to be in order within a single day; across days, away from Monday 14:00 until Wednesday
+  09:00 is ordinary, so `_pickTime`'s clamp and the invalid-range refusal both apply only
+  while `_from` and `_to` are the same calendar day. The alternative reading — the same
+  clock window repeated on every day of the span — was considered and rejected: the form
+  shows the same `date time – date time` line the manual entry does, and it has to mean
+  the same thing there.
 - **An absence is one row per calendar day, never a span.** A fortnight of vacation
   entered once in the form becomes fourteen (or fewer, once free days are skipped) rows.
   This keeps the balance calculation a per-day lookup — `dayBalances` never has to ask

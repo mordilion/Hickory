@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hickory/data/drift/tables/absences_table.dart';
 import 'package:hickory/features/absences/absence_days.dart';
 
 import '../../support/app_settings_fixture.dart';
@@ -62,5 +63,94 @@ void main() {
       workWeek,
     );
     expect(days, [DateTime(2026, 9, 30), DateTime(2026, 10, 1)]);
+  });
+
+  group('absenceSpanDays', () {
+    test('a span inside one day is that day, with the clock window it was given', () {
+      final days = absenceSpanDays(
+        DateTime(2026, 9, 7, 9),
+        DateTime(2026, 9, 7, 11),
+        workWeek,
+      );
+
+      expect(days, hasLength(1));
+      expect(days.single.date, monday);
+      expect(days.single.portion, absencePortionRange);
+      expect(days.single.startAt, DateTime(2026, 9, 7, 9));
+      expect(days.single.endAt, DateTime(2026, 9, 7, 11));
+    });
+
+    test('a span across days is clipped at its ends and whole in between', () {
+      // Read exactly as the same line in the manual form: away from
+      // Monday 09:00 until Wednesday 11:00, without interruption.
+      final days = absenceSpanDays(
+        DateTime(2026, 9, 7, 9),
+        DateTime(2026, 9, 9, 11),
+        workWeek,
+      );
+
+      expect(days.map((day) => day.date), [
+        DateTime(2026, 9, 7),
+        DateTime(2026, 9, 8),
+        DateTime(2026, 9, 9),
+      ]);
+      expect(days.first.startAt, DateTime(2026, 9, 7, 9));
+      expect(
+        days.first.endAt,
+        DateTime(2026, 9, 8),
+        reason: 'the first day runs to midnight, not to the end time',
+      );
+      expect(
+        days[1].portion,
+        absencePortionFullDay,
+        reason: 'a day in the middle is away from start to finish',
+      );
+      expect(days[1].startAt, isNull);
+      expect(days.last.startAt, DateTime(2026, 9, 9));
+      expect(days.last.endAt, DateTime(2026, 9, 9, 11));
+    });
+
+    test('free days inside a span are skipped and do not take the clipping with them', () {
+      final days = absenceSpanDays(
+        DateTime(2026, 9, 4, 14),
+        DateTime(2026, 9, 8, 10),
+        workWeek,
+      );
+
+      // Friday the 4th, then the weekend is skipped, then Monday and Tuesday.
+      expect(days.map((day) => day.date), [
+        DateTime(2026, 9, 4),
+        DateTime(2026, 9, 7),
+        DateTime(2026, 9, 8),
+      ]);
+      expect(days.first.startAt, DateTime(2026, 9, 4, 14));
+      expect(
+        days[1].portion,
+        absencePortionFullDay,
+        reason: 'Monday is neither end of the span, so it is a whole day',
+      );
+      expect(days.last.endAt, DateTime(2026, 9, 8, 10));
+    });
+
+    test('a last day the span ends at midnight of is left out', () {
+      final days = absenceSpanDays(
+        DateTime(2026, 9, 7, 9),
+        DateTime(2026, 9, 9),
+        workWeek,
+      );
+
+      expect(
+        days.map((day) => day.date),
+        [DateTime(2026, 9, 7), DateTime(2026, 9, 8)],
+        reason: 'an absence ending at midnight covers nothing of that day',
+      );
+    });
+
+    test('a span that ends before it starts yields nothing', () {
+      expect(
+        absenceSpanDays(DateTime(2026, 9, 7, 11), DateTime(2026, 9, 7, 9), workWeek),
+        isEmpty,
+      );
+    });
   });
 }

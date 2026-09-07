@@ -228,36 +228,33 @@ class _AbsenceBarState extends ConsumerState<AbsenceBar> {
           // dash sits between whichever pair is the span.
           Center(
             child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
                 TextButton(
                   key: const ValueKey('absenceStartDate'),
                   onPressed: _busy ? null : () => _pickDate(isStart: true),
                   child: Text(formatDate(_from, dateStyle, languageCode)),
                 ),
-                if (!isRange) ...[
-                  const Text('–'),
-                  TextButton(
-                    key: const ValueKey('absenceEndDate'),
-                    onPressed: _busy ? null : () => _pickDate(isStart: false),
-                    child: Text(formatDate(_to, dateStyle, languageCode)),
-                  ),
-                ],
-                if (isRange) ...[
+                if (isRange)
                   TextButton(
                     key: const ValueKey('absenceStartTime'),
                     onPressed: _busy ? null : () => _pickTime(isStart: true),
                     child: Text(formatTime(_at(_from, _startTime), timeStyle)),
                   ),
-                  const Text('–'),
+                const Text('–'),
+                TextButton(
+                  key: const ValueKey('absenceEndDate'),
+                  onPressed: _busy ? null : () => _pickDate(isStart: false),
+                  child: Text(formatDate(_to, dateStyle, languageCode)),
+                ),
+                if (isRange)
                   TextButton(
                     key: const ValueKey('absenceEndTime'),
                     onPressed: _busy ? null : () => _pickTime(isStart: false),
-                    child: Text(formatTime(_at(_from, _endTime), timeStyle)),
+                    child: Text(formatTime(_at(_to, _endTime), timeStyle)),
                   ),
-                ],
               ],
             ),
           ),

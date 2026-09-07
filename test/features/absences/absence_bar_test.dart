@@ -359,4 +359,39 @@ void main() {
 
     expect(find.byType(GradientPillButton), findsOneWidget);
   });
+
+  testWidgets('a time range offers a from and a to date, like the manual form', (tester) async {
+    await tester.pumpWidget(makeApp(types: [vacation()]));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Zeitraum'));
+    await tester.pumpAndSettle();
+
+    // date time - date time, the same four controls in the same order as
+    // QuickAddBar: an absence over a range reads as one continuous span.
+    expect(find.byKey(const ValueKey('absenceStartDate')), findsOneWidget);
+    expect(find.byKey(const ValueKey('absenceStartTime')), findsOneWidget);
+    expect(find.byKey(const ValueKey('absenceEndDate')), findsOneWidget);
+    expect(find.byKey(const ValueKey('absenceEndTime')), findsOneWidget);
+  });
+
+  testWidgets('a range inside one day is written with both its times', (tester) async {
+    await tester.pumpWidget(makeApp(types: [vacation()]));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Zeitraum'));
+    await tester.pumpAndSettle();
+
+    late List<Absence> rows;
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Eintragen'));
+      await tester.pump();
+      await waitFor(() async => (await db.select(db.absences).get()).isNotEmpty);
+      rows = await db.select(db.absences).get();
+    });
+    await tester.pump();
+
+    expect(rows, hasLength(1), reason: 'the form defaults to one day');
+    expect(rows.single.portion, absencePortionRange);
+    expect(rows.single.startAt?.toLocal().hour, 9);
+    expect(rows.single.endAt?.toLocal().hour, 11);
+  });
 }
