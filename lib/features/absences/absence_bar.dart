@@ -150,118 +150,133 @@ class _AbsenceBarState extends ConsumerState<AbsenceBar> {
     final l10n = AppLocalizations.of(context);
     final settings = ref.watch(appSettingsProvider).value;
     final types = ref.watch(absenceTypesProvider).value ?? const <AbsenceType>[];
-    if (settings == null) return const Center(child: CircularProgressIndicator());
-    if (types.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(16),
-        child: Text(l10n.absenceFormNoTypes),
-      );
+    // The same Card > Padding(16) the timer's start card and QuickAddBar
+    // use, so the three modes of this tab are one shape -- including while
+    // loading and with no type yet, or the box would come and go.
+    if (settings == null) {
+      return const _AbsenceCard(child: Center(child: CircularProgressIndicator()));
     }
+    if (types.isEmpty) return _AbsenceCard(child: Text(l10n.absenceFormNoTypes));
 
     final localeName = Localizations.localeOf(context).toLanguageTag();
     final dateFormat = DateFormat.yMd(localeName);
     final isRange = _portion == absencePortionRange;
     final selectedType = _typeId ?? types.first.id;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        DropdownButtonFormField<String>(
-          key: const ValueKey('absenceType'),
-          initialValue: selectedType,
-          isDense: true,
-          decoration: InputDecoration(labelText: l10n.absenceFormType),
-          items: [
-            for (final type in types)
-              DropdownMenuItem(value: type.id, child: Text(type.name)),
-          ],
-          onChanged: _busy ? null : (id) => setState(() => _typeId = id),
-        ),
-        const SizedBox(height: 12),
-        Text(l10n.absenceFormPortion, style: Theme.of(context).textTheme.labelMedium),
-        const SizedBox(height: 4),
-        Semantics(
-          label: l10n.absenceFormPortion,
-          child: SegmentedButton<String>(
-            segments: [
-              ButtonSegment(
-                value: absencePortionFullDay,
-                label: Text(l10n.absencePortionFullDay),
-              ),
-              ButtonSegment(
-                value: absencePortionHalfDay,
-                label: Text(l10n.absencePortionHalfDay),
-              ),
-              ButtonSegment(
-                value: absencePortionRange,
-                label: Text(l10n.absencePortionRange),
-              ),
+    return _AbsenceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DropdownButtonFormField<String>(
+            key: const ValueKey('absenceType'),
+            initialValue: selectedType,
+            isDense: true,
+            decoration: InputDecoration(labelText: l10n.absenceFormType),
+            items: [
+              for (final type in types)
+                DropdownMenuItem(value: type.id, child: Text(type.name)),
             ],
-            selected: {_portion},
-            onSelectionChanged:
-                _busy ? null : (selection) => setState(() => _portion = selection.first),
+            onChanged: _busy ? null : (id) => setState(() => _typeId = id),
           ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton(
-                key: const ValueKey('absenceStartDate'),
-                onPressed: _busy ? null : () => _pickDate(isStart: true),
-                child: Text('${l10n.absenceFormFrom}: ${dateFormat.format(_from)}'),
-              ),
-            ),
-            if (!isRange) ...[
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton(
-                  key: const ValueKey('absenceEndDate'),
-                  onPressed: _busy ? null : () => _pickDate(isStart: false),
-                  child: Text('${l10n.absenceFormTo}: ${dateFormat.format(_to)}'),
+          const SizedBox(height: 12),
+          Text(l10n.absenceFormPortion, style: Theme.of(context).textTheme.labelMedium),
+          const SizedBox(height: 4),
+          Semantics(
+            label: l10n.absenceFormPortion,
+            child: SegmentedButton<String>(
+              segments: [
+                ButtonSegment(
+                  value: absencePortionFullDay,
+                  label: Text(l10n.absencePortionFullDay),
                 ),
-              ),
-            ],
-          ],
-        ),
-        if (isRange) ...[
-          const SizedBox(height: 8),
+                ButtonSegment(
+                  value: absencePortionHalfDay,
+                  label: Text(l10n.absencePortionHalfDay),
+                ),
+                ButtonSegment(
+                  value: absencePortionRange,
+                  label: Text(l10n.absencePortionRange),
+                ),
+              ],
+              selected: {_portion},
+              onSelectionChanged:
+                  _busy ? null : (selection) => setState(() => _portion = selection.first),
+            ),
+          ),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
                 child: OutlinedButton(
-                  key: const ValueKey('absenceStartTime'),
-                  onPressed: _busy ? null : () => _pickTime(isStart: true),
-                  child: Text('${l10n.absenceFormFrom}: ${_startTime.format(context)}'),
+                  key: const ValueKey('absenceStartDate'),
+                  onPressed: _busy ? null : () => _pickDate(isStart: true),
+                  child: Text('${l10n.absenceFormFrom}: ${dateFormat.format(_from)}'),
                 ),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton(
-                  key: const ValueKey('absenceEndTime'),
-                  onPressed: _busy ? null : () => _pickTime(isStart: false),
-                  child: Text('${l10n.absenceFormTo}: ${_endTime.format(context)}'),
+              if (!isRange) ...[
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton(
+                    key: const ValueKey('absenceEndDate'),
+                    onPressed: _busy ? null : () => _pickDate(isStart: false),
+                    child: Text('${l10n.absenceFormTo}: ${dateFormat.format(_to)}'),
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
-        ],
-        const SizedBox(height: 8),
-        TextField(
-          key: const ValueKey('absenceNote'),
-          controller: _noteController,
-          enabled: !_busy,
-          decoration: InputDecoration(labelText: l10n.absenceFormNote, isDense: true),
-        ),
-        const SizedBox(height: 12),
-        Align(
-          alignment: Alignment.centerRight,
-          child: FilledButton(
-            onPressed: _busy ? null : () => _submit(settings, types),
-            child: Text(l10n.absenceFormSubmit),
+          if (isRange) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    key: const ValueKey('absenceStartTime'),
+                    onPressed: _busy ? null : () => _pickTime(isStart: true),
+                    child: Text('${l10n.absenceFormFrom}: ${_startTime.format(context)}'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton(
+                    key: const ValueKey('absenceEndTime'),
+                    onPressed: _busy ? null : () => _pickTime(isStart: false),
+                    child: Text('${l10n.absenceFormTo}: ${_endTime.format(context)}'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 8),
+          TextField(
+            key: const ValueKey('absenceNote'),
+            controller: _noteController,
+            enabled: !_busy,
+            decoration: InputDecoration(labelText: l10n.absenceFormNote, isDense: true),
           ),
-        ),
-      ],
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: FilledButton(
+              onPressed: _busy ? null : () => _submit(settings, types),
+              child: Text(l10n.absenceFormSubmit),
+            ),
+          ),
+        ],
+      ),
     );
   }
+}
+
+/// The box every mode of the timer tab shares: `Card > Padding(16)`, the
+/// same shape as the timer's start card and QuickAddBar.
+class _AbsenceCard extends StatelessWidget {
+  const _AbsenceCard({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Card(
+        child: Padding(padding: const EdgeInsets.all(16), child: child),
+      );
 }

@@ -245,4 +245,31 @@ void main() {
     expect(rows, isEmpty, reason: 'a range of no length must not become a row');
     expect(find.text('Das Ende muss nach dem Beginn liegen.'), findsOneWidget);
   });
+
+  testWidgets('sits in the same card the timer and manual forms use', (tester) async {
+    await tester.pumpWidget(makeApp(types: [vacation()]));
+    await tester.pumpAndSettle();
+
+    // QuickAddBar and the timer's start card are both Card > Padding(16);
+    // a bare column here made the third mode look like a different screen.
+    expect(find.byType(Card), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(Card),
+        matching: find.byWidgetPredicate(
+          (widget) => widget is Padding && widget.padding == const EdgeInsets.all(16),
+        ),
+      ),
+      findsOneWidget,
+      reason: 'the form has to sit on the same 16px inset as the other two',
+    );
+  });
+
+  testWidgets('keeps the card when no type has been created yet', (tester) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Card), findsOneWidget);
+    expect(find.text('Lege zuerst in den Einstellungen einen Abwesenheitstyp an.'), findsOneWidget);
+  });
 }

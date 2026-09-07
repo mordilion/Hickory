@@ -29,7 +29,9 @@
 ## Architecture
 
 - `lib/features/absences/absence_bar.dart` (`AbsenceBar`): the third way to record time on
-  the main screen, beside the timer and a manual entry. `lib/features/absences/absence_days.dart`
+  the main screen, beside the timer and a manual entry. It renders in the same
+  `Card > Padding(16)` box as `_StartCard` and `QuickAddBar` — including its loading and
+  "no type yet" states, so switching modes never changes the shape of the tab. `lib/features/absences/absence_days.dart`
   (`absenceDaysBetween`) turns a full/half-day date range into the list of calendar days
   that actually get a row — days whose weekday target is zero are skipped, because an
   absence on a day with no target would credit nothing and only leave a row to look at.
