@@ -1,7 +1,11 @@
+import 'dart:io';
+
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/core/di/absence_providers.dart';
+import 'package:hickory/core/format/iso_week.dart' show mondayOf;
 import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/core/di/break_rule_tiers_provider.dart';
 import 'package:hickory/core/di/jira_providers.dart';
@@ -11,6 +15,10 @@ import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/drift/tables/absences_table.dart';
 import 'package:hickory/data/drift/tables/jira_worklogs_table.dart';
 import 'package:hickory/data/drift/tables/personio_attendances_table.dart';
+import 'package:hickory/data/sync/sync_log_writer.dart';
+import 'package:hickory/data/sync/synced_writes.dart';
+import 'package:hickory/core/di/device_id_provider.dart';
+import 'package:hickory/core/di/sync_providers.dart';
 import 'package:hickory/features/entries/entries_list.dart';
 import 'package:hickory/features/entries/entries_location.dart';
 import 'package:hickory/features/projects/projects_providers.dart';
@@ -79,10 +87,49 @@ BreakRuleTier _tier({required int afterMinutes, required int requiredBreakMinute
   );
 }
 
+/// A day beside [today] that the list shows in the same view: same ISO week
+/// and same month, since a week crossing a month boundary becomes two
+/// nodes and only the one matching today is opened. Today ± 1 always has
+/// such a neighbour -- a week cannot begin and end on the same day.
+DateTime _sameViewNeighbourOf(DateTime today) {
+  bool sameView(DateTime day) =>
+      mondayOf(day) == mondayOf(today) && day.month == today.month;
+  final before = today.subtract(const Duration(days: 1));
+  return sameView(before) ? before : today.add(const Duration(days: 1));
+}
+
 void main() {
   // Month names go through intl's DateFormat.MMMM, which throws unless the
   // locale data is loaded (the all-numeric date styles never needed it).
   setUpAll(() => initializeDateFormatting('en'));
+
+  // Only the tests that write anything touch these; the rest render from
+  // frozen provider fixtures and never reach a database at all.
+  late AppDatabase db;
+  late Directory syncRoot;
+
+  setUp(() {
+    db = AppDatabase.forTesting(NativeDatabase.memory());
+    syncRoot = Directory.systemTemp.createTempSync('hickory_entries_list_test_');
+  });
+
+  tearDown(() async {
+    await db.close();
+    if (syncRoot.existsSync()) syncRoot.deleteSync(recursive: true);
+  });
+
+  /// Polls [condition] on the real event loop; only usable inside
+  /// tester.runAsync, like every other database read in this file's
+  /// writing tests.
+  Future<void> waitFor(Future<bool> Function() condition) async {
+    for (var attempt = 0; attempt < 50; attempt++) {
+      if (await condition()) {
+        await Future.delayed(const Duration(milliseconds: 50));
+        return;
+      }
+      await Future.delayed(const Duration(milliseconds: 10));
+    }
+  }
 
   Widget makeApp(
     List<TimeEntry> entries, {
@@ -111,6 +158,13 @@ void main() {
           ),
           absencesProvider.overrideWith((ref) => Stream.value(absences)),
           absenceTypesProvider.overrideWith((ref) => Stream.value(absenceTypes)),
+          deviceIdProvider.overrideWith((ref) async => 'device-1'),
+          syncedWritesProvider.overrideWith(
+            (ref) async => SyncedWrites(
+              db: db,
+              logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'device-1'),
+            ),
+          ),
         ],
         child: MaterialApp(
           // The list reads its muted and accent colors from HickoryColors,
@@ -132,14 +186,10 @@ void main() {
   testWidgets('groups entries under Today/Yesterday headers with totals', (tester) async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day, 9);
-    final yesterday = today.subtract(const Duration(days: 1));
     await tester.pumpWidget(
-      makeApp(
-        [
-          _entry(id: '1', startAt: today, endAt: today.add(const Duration(hours: 1))),
-          _entry(id: '2', startAt: yesterday, endAt: yesterday.add(const Duration(minutes: 30))),
-        ],
-      ),
+      makeApp([
+        _entry(id: '1', startAt: today, endAt: today.add(const Duration(hours: 1))),
+      ]),
     );
     await tester.pumpAndSettle();
 
@@ -148,6 +198,26 @@ void main() {
     // hides seconds in both the header total and the entry row's duration.
     expect(find.text('Today'), findsOneWidget);
     expect(find.descendant(of: row('Today'), matching: find.text('01:00')), findsOneWidget);
+  });
+
+  // Yesterday is asserted on its own rather than beside today: the list
+  // opens one week at a time, so on a Monday the two days sit in different
+  // views and a test demanding both would fail one day in seven.
+  testWidgets('heads the previous day with Yesterday and its total', (tester) async {
+    final now = DateTime.now();
+    final yesterday = DateTime(now.year, now.month, now.day, 9)
+        .subtract(const Duration(days: 1));
+    await tester.pumpWidget(
+      makeApp([
+        _entry(
+          id: '1',
+          startAt: yesterday,
+          endAt: yesterday.add(const Duration(minutes: 30)),
+        ),
+      ]),
+    );
+    await tester.pumpAndSettle();
+
     expect(find.text('Yesterday'), findsOneWidget);
     expect(
       find.descendant(of: row('Yesterday'), matching: find.text('00:30')),
@@ -188,7 +258,7 @@ void main() {
     (tester) async {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day, 9);
-      final yesterday = today.subtract(const Duration(days: 1));
+      final otherDay = _sameViewNeighbourOf(today);
       await tester.pumpWidget(
         makeApp([
           _entry(id: '1', startAt: today, endAt: today.add(const Duration(hours: 1))),
@@ -197,7 +267,7 @@ void main() {
             startAt: today.add(const Duration(hours: 2)),
             endAt: today.add(const Duration(hours: 3)),
           ),
-          _entry(id: '3', startAt: yesterday, endAt: yesterday.add(const Duration(minutes: 30))),
+          _entry(id: '3', startAt: otherDay, endAt: otherDay.add(const Duration(minutes: 30))),
         ]),
       );
       await tester.pumpAndSettle();
@@ -708,6 +778,7 @@ void main() {
 
     expect(find.byIcon(Icons.event_busy_outlined), findsNothing);
   });
+
 }
 
 /// Pins the location so a test doesn't silently depend on today's date.
@@ -718,4 +789,5 @@ class _FixedLocation extends EntriesLocationController {
 
   @override
   EntriesLocation? build() => _initial;
+
 }
