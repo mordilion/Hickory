@@ -30,6 +30,19 @@ class ProjectHasTimeEntriesException implements Exception {}
 /// with active projects, deletion is only for clients with none.
 class ClientHasProjectsException implements Exception {}
 
+/// Thrown by [SyncedWrites.deleteAbsenceType] when absence rows still
+/// reference the type. [count] is how many days do, so the caller can say
+/// what is in the way rather than a bare "cannot delete".
+///
+/// Enforced here rather than left to the screen: the synced tables carry
+/// no foreign keys by design, so this is the last place that can stop a
+/// delete from orphaning rows.
+class AbsenceTypeInUseException implements Exception {
+  AbsenceTypeInUseException(this.count);
+
+  final int count;
+}
+
 /// Thin write-through wrapper around the DAOs: every mutation is applied to
 /// the local drift cache immediately (via the DAO, for instant UI feedback)
 /// and also appended to the device's own event log, per the architecture
@@ -458,10 +471,17 @@ class SyncedWrites {
     return type;
   }
 
-  /// Deletes an absence type and logs the tombstone. Callers must refuse
-  /// this while absence rows still reference the type -- see
-  /// AbsencesDao.countByType; nothing at the database level enforces it.
+  /// Deletes an absence type and logs the tombstone, refusing while
+  /// absence rows still reference it — the same shape [deleteProject] and
+  /// [deleteClient] take, and for the same reason: nothing at the database
+  /// level enforces it.
+  ///
+  /// This cannot stop a peer that deleted the type before this device's
+  /// absence reached it; `absenceTypesByIdProvider`'s "an unresolvable
+  /// type contributes nothing" is the calculation's backstop for that.
   Future<void> deleteAbsenceType(String id) async {
+    final inUse = await db.absencesDao.countByType(id);
+    if (inUse > 0) throw AbsenceTypeInUseException(inUse);
     await db.absenceTypesDao.deleteType(id);
     await logWriter.appendEvent(
       entityType: EntityTypes.absenceType,

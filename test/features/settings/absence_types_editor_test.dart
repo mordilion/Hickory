@@ -169,7 +169,12 @@ void main() {
 
     await tester.runAsync(() async {
       await tester.tap(find.byKey(ValueKey('deleteAbsenceType-${type.id}')));
-      await Future.delayed(const Duration(milliseconds: 200));
+      // The refusal now comes from SyncedWrites, so the tap has to get
+      // through the write queue and a database count before the message
+      // is scheduled -- a pump inside runAsync is what lets that chain
+      // run at all.
+      await tester.pump();
+      await Future.delayed(const Duration(milliseconds: 300));
     });
     await tester.pumpAndSettle();
 

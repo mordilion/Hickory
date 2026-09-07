@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/absence_providers.dart';
 import '../../core/di/app_settings_provider.dart';
-import '../../core/di/database_provider.dart';
 import '../../core/di/device_id_provider.dart';
 import '../../core/di/sync_providers.dart';
 import '../../data/drift/database.dart';
+import '../../data/sync/synced_writes.dart';
 import '../../l10n/app_localizations.dart';
 import 'settings_editor_support.dart';
 
@@ -73,19 +73,19 @@ class _AbsenceTypesEditorState extends ConsumerState<AbsenceTypesEditor>
     });
   }
 
+  /// Deletes [type], or says how many days are in the way.
+  ///
+  /// The refusal itself lives in [SyncedWrites.deleteAbsenceType], where
+  /// no other caller can go around it; this only turns it into a message.
   Future<void> _delete(AbsenceType type) async {
     final l10n = AppLocalizations.of(context);
-    // The synced tables carry no foreign keys, so nothing below this line
-    // would stop a delete from orphaning absence rows. Checked here, and
-    // refused with the count rather than a bare "cannot delete".
-    final inUse = await ref.read(appDatabaseProvider).absencesDao.countByType(type.id);
-    if (inUse > 0) {
-      if (mounted) showMessage(l10n.settingsAbsenceTypeInUse(inUse));
-      return;
-    }
     await guardedWrite(() async {
       final writes = await ref.read(syncedWritesProvider.future);
-      await writes.deleteAbsenceType(type.id);
+      try {
+        await writes.deleteAbsenceType(type.id);
+      } on AbsenceTypeInUseException catch (error) {
+        if (mounted) showMessage(l10n.settingsAbsenceTypeInUse(error.count));
+      }
     });
   }
 
