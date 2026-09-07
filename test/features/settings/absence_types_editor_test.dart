@@ -115,14 +115,43 @@ void main() {
     );
   });
 
-  testWidgets('the standard-types button disappears once a type exists', (tester) async {
+  testWidgets('the standard-types button stays available once a type exists', (tester) async {
     final type = await db.absenceTypesDao.createType(
-      deviceId: 'd', name: 'Urlaub', paid: true, sortOrder: 0,
+      deviceId: 'd', name: 'Eigener Typ', paid: true, sortOrder: 0,
     );
     await tester.pumpWidget(makeApp(types: [type]));
     await tester.pumpAndSettle();
 
-    expect(find.text('Standardtypen anlegen'), findsNothing);
+    // Adding one type of their own must not shut the user out of the
+    // standard set for good.
+    expect(find.text('Standardtypen anlegen'), findsOneWidget);
+  });
+
+  testWidgets('the standard-types button skips a name that is already there', (tester) async {
+    final type = await db.absenceTypesDao.createType(
+      deviceId: 'd', name: 'urlaub', paid: false, sortOrder: 0,
+    );
+    await tester.pumpWidget(makeApp(types: [type]));
+    await tester.pumpAndSettle();
+
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Standardtypen anlegen'));
+      await tester.pump();
+      await waitFor(() async => (await db.absenceTypesDao.getAllTypes()).length == 4);
+    });
+    await tester.pump();
+
+    final types = await db.absenceTypesDao.getAllTypes();
+    expect(
+      types.where((t) => t.name.toLowerCase() == 'urlaub'),
+      hasLength(1),
+      reason: 'a standard type the user already has must not be added a second time',
+    );
+    expect(
+      types.firstWhere((t) => t.name.toLowerCase() == 'urlaub').paid,
+      isFalse,
+      reason: "the user's own type is left exactly as they set it up",
+    );
   });
 
   testWidgets('a type in use cannot be deleted and the count is shown', (tester) async {

@@ -36,6 +36,12 @@ class _AbsenceTypesEditorState extends ConsumerState<AbsenceTypesEditor>
     });
   }
 
+  /// Adds the standard set, leaving out every name the user already has.
+  ///
+  /// The button stays available for the life of the list, so it has to be
+  /// safe to press twice -- and a type the user has already renamed or
+  /// re-flagged must survive it untouched. Names are compared
+  /// case-insensitively, which is how a person reads the list.
   Future<void> _addStandardTypes() {
     final l10n = AppLocalizations.of(context);
     // Named in the user's language at creation time: the name is user data
@@ -46,15 +52,22 @@ class _AbsenceTypesEditorState extends ConsumerState<AbsenceTypesEditor>
       (l10n.settingsAbsenceTypeDefaultHoliday, true),
       (l10n.settingsAbsenceTypeDefaultUnpaid, false),
     ];
+    final existing = ref.read(absenceTypesProvider).value ?? const <AbsenceType>[];
+    final taken = existing.map((type) => type.name.trim().toLowerCase()).toSet();
+    var nextOrder = existing.isEmpty
+        ? 0
+        : existing.map((type) => type.sortOrder).reduce((a, b) => a > b ? a : b) + 1;
+
     return guardedWrite(() async {
       final deviceId = await ref.read(deviceIdProvider.future);
       final writes = await ref.read(syncedWritesProvider.future);
-      for (final (index, entry) in standard.indexed) {
+      for (final entry in standard) {
+        if (!taken.add(entry.$1.trim().toLowerCase())) continue;
         await writes.createAbsenceType(
           deviceId: deviceId,
           name: entry.$1,
           paid: entry.$2,
-          sortOrder: index,
+          sortOrder: nextOrder++,
         );
       }
     });
@@ -193,13 +206,11 @@ class _AbsenceTypesEditorState extends ConsumerState<AbsenceTypesEditor>
               icon: const Icon(Icons.add),
               label: Text(l10n.settingsAbsenceTypeAdd),
             ),
-            if (types.isEmpty) ...[
-              const SizedBox(width: 8),
-              TextButton(
-                onPressed: busy ? null : _addStandardTypes,
-                child: Text(l10n.settingsAbsenceTypeAddStandard),
-              ),
-            ],
+            const SizedBox(width: 8),
+            TextButton(
+              onPressed: busy ? null : _addStandardTypes,
+              child: Text(l10n.settingsAbsenceTypeAddStandard),
+            ),
           ],
         ),
       ],
