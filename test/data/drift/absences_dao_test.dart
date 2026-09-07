@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/data/drift/database.dart';
@@ -105,5 +106,57 @@ void main() {
 
     final remaining = await db.absencesDao.watchAllAbsences().first;
     expect(remaining.map((a) => a.id), [kept.id]);
+  });
+
+  test('updateAbsence changes the given fields and leaves the rest alone', () async {
+    final absence = await db.absencesDao.createAbsence(
+      deviceId: 'd', date: DateTime(2026, 9, 7),
+      absenceTypeId: typeId, portion: absencePortionFullDay, note: 'Holiday',
+    );
+    final other = await db.absenceTypesDao.createType(
+      deviceId: 'd', name: 'Sick leave', paid: true, sortOrder: 1,
+    );
+
+    final updated = await db.absencesDao.updateAbsence(
+      absence.id,
+      absenceTypeId: other.id,
+      portion: absencePortionRange,
+      startAt: Value(DateTime(2026, 9, 7, 9).toUtc()),
+      endAt: Value(DateTime(2026, 9, 7, 11).toUtc()),
+    );
+
+    expect(updated.absenceTypeId, other.id);
+    expect(updated.portion, absencePortionRange);
+    expect(updated.startAt?.toUtc(), DateTime(2026, 9, 7, 9).toUtc());
+    expect(updated.note, 'Holiday', reason: 'a field not passed in stays as it was');
+    expect(updated.date, absence.date, reason: 'the day an absence covers is not moved');
+    expect(
+      updated.updatedAt.isBefore(absence.updatedAt),
+      isFalse,
+      reason: 'the sync log orders events by updatedAt',
+    );
+  });
+
+  test('updateAbsence clears a time range that no longer applies', () async {
+    final absence = await db.absencesDao.createAbsence(
+      deviceId: 'd', date: DateTime(2026, 9, 7),
+      absenceTypeId: typeId, portion: absencePortionRange,
+      startAt: DateTime(2026, 9, 7, 9).toUtc(),
+      endAt: DateTime(2026, 9, 7, 11).toUtc(),
+      note: 'Doctor',
+    );
+
+    final updated = await db.absencesDao.updateAbsence(
+      absence.id,
+      portion: absencePortionFullDay,
+      startAt: const Value(null),
+      endAt: const Value(null),
+      note: const Value(null),
+    );
+
+    expect(updated.portion, absencePortionFullDay);
+    expect(updated.startAt, isNull);
+    expect(updated.endAt, isNull);
+    expect(updated.note, isNull);
   });
 }

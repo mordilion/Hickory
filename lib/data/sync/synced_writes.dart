@@ -502,6 +502,34 @@ class SyncedWrites {
     return absence;
   }
 
+  /// Updates one absence and logs it. The day the row covers is not
+  /// editable — see AbsencesDao.updateAbsence — so an absence moved to
+  /// another day is a delete and a create, not an update.
+  Future<Absence> updateAbsence(
+    String id, {
+    String? absenceTypeId,
+    String? portion,
+    Value<DateTime?> startAt = const Value.absent(),
+    Value<DateTime?> endAt = const Value.absent(),
+    Value<String?> note = const Value.absent(),
+  }) async {
+    final absence = await db.absencesDao.updateAbsence(
+      id,
+      absenceTypeId: absenceTypeId,
+      portion: portion,
+      startAt: startAt,
+      endAt: endAt,
+      note: note,
+    );
+    await logWriter.appendEvent(
+      entityType: EntityTypes.absence,
+      entityId: absence.id,
+      op: EventOp.update,
+      payload: absence.toJson(),
+    );
+    return absence;
+  }
+
   Future<void> deleteAbsence(String id) async {
     await db.absencesDao.deleteAbsence(id);
     await logWriter.appendEvent(

@@ -652,4 +652,46 @@ void main() {
 
     expect(await readerDb.absencesDao.watchAllAbsences().first, isEmpty);
   });
+
+  test('editing an absence reaches a second device', () async {
+    final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(writerDb.close);
+    final writes = SyncedWrites(
+      db: writerDb,
+      logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'writer'),
+    );
+    final type = await writes.createAbsenceType(
+      deviceId: 'writer', name: 'Vacation', paid: true, sortOrder: 0,
+    );
+    final created = await writes.createAbsence(
+      deviceId: 'writer',
+      date: DateTime(2026, 9, 7),
+      absenceTypeId: type.id,
+      portion: absencePortionRange,
+      startAt: DateTime(2026, 9, 7, 9).toUtc(),
+      endAt: DateTime(2026, 9, 7, 11).toUtc(),
+      note: 'Docter',
+    );
+
+    await writes.updateAbsence(
+      created.id,
+      portion: absencePortionFullDay,
+      startAt: const Value(null),
+      endAt: const Value(null),
+      note: const Value('Doctor'),
+    );
+
+    final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(readerDb.close);
+    await SyncIngestor(db: readerDb, syncRoot: syncRoot).syncNow();
+
+    final absence = (await readerDb.select(readerDb.absences).get()).single;
+    expect(absence.portion, absencePortionFullDay);
+    expect(absence.note, 'Doctor');
+    expect(
+      absence.startAt,
+      isNull,
+      reason: 'a cleared time range must reach the peer as cleared, not stay behind',
+    );
+  });
 }
