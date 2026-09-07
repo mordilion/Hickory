@@ -694,4 +694,31 @@ void main() {
       reason: 'a cleared time range must reach the peer as cleared, not stay behind',
     );
   });
+
+  test('which half of the day a half day covers reaches a second device', () async {
+    final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(writerDb.close);
+    final writes = SyncedWrites(
+      db: writerDb,
+      logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'writer'),
+    );
+    final type = await writes.createAbsenceType(
+      deviceId: 'writer', name: 'Vacation', paid: true, sortOrder: 0,
+    );
+    final created = await writes.createAbsence(
+      deviceId: 'writer',
+      date: DateTime(2026, 9, 7),
+      absenceTypeId: type.id,
+      portion: absencePortionHalfDay,
+      halfDayPart: absenceHalfDayMorning,
+    );
+    await writes.updateAbsence(created.id, halfDayPart: const Value(absenceHalfDayAfternoon));
+
+    final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(readerDb.close);
+    await SyncIngestor(db: readerDb, syncRoot: syncRoot).syncNow();
+
+    final absence = (await readerDb.select(readerDb.absences).get()).single;
+    expect(absence.halfDayPart, absenceHalfDayAfternoon);
+  });
 }

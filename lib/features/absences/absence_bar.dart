@@ -32,6 +32,7 @@ class _AbsenceBarState extends ConsumerState<AbsenceBar> {
   final _noteController = TextEditingController();
   String? _typeId;
   String _portion = absencePortionFullDay;
+  String _halfDayPart = absenceHalfDayMorning;
   DateTime _from = DateTime.now();
   DateTime _to = DateTime.now();
   TimeOfDay _startTime = const TimeOfDay(hour: 9, minute: 0);
@@ -130,6 +131,7 @@ class _AbsenceBarState extends ConsumerState<AbsenceBar> {
           endAt: _portion == absencePortionRange
               ? _at(day, _endTime).toUtc()
               : null,
+          halfDayPart: _portion == absencePortionHalfDay ? _halfDayPart : null,
           note: note.isEmpty ? null : note,
         );
       }
@@ -221,6 +223,30 @@ class _AbsenceBarState extends ConsumerState<AbsenceBar> {
               ),
             ),
           ),
+          if (_portion == absencePortionHalfDay) ...[
+            const SizedBox(height: 8),
+            // Which half is informational -- half a day is credited either
+            // way -- but "half a day off" without saying which half is not
+            // something anyone writes down on paper either.
+            Center(
+              child: SegmentedButton<String>(
+                segments: [
+                  ButtonSegment(
+                    value: absenceHalfDayMorning,
+                    label: Text(l10n.absenceHalfDayMorning),
+                  ),
+                  ButtonSegment(
+                    value: absenceHalfDayAfternoon,
+                    label: Text(l10n.absenceHalfDayAfternoon),
+                  ),
+                ],
+                selected: {_halfDayPart},
+                onSelectionChanged: _busy
+                    ? null
+                    : (selection) => setState(() => _halfDayPart = selection.first),
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           // Laid out like QuickAddBar's four pickers: bare text buttons in
           // a Wrap with an en dash between the two ends. A whole or half

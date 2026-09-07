@@ -6390,6 +6390,17 @@ class $AbsencesTable extends Absences with TableInfo<$AbsencesTable, Absence> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _halfDayPartMeta = const VerificationMeta(
+    'halfDayPart',
+  );
+  @override
+  late final GeneratedColumn<String> halfDayPart = GeneratedColumn<String>(
+    'half_day_part',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _startAtMeta = const VerificationMeta(
     'startAt',
   );
@@ -6458,6 +6469,7 @@ class $AbsencesTable extends Absences with TableInfo<$AbsencesTable, Absence> {
     date,
     absenceTypeId,
     portion,
+    halfDayPart,
     startAt,
     endAt,
     note,
@@ -6508,6 +6520,15 @@ class $AbsencesTable extends Absences with TableInfo<$AbsencesTable, Absence> {
       );
     } else if (isInserting) {
       context.missing(_portionMeta);
+    }
+    if (data.containsKey('half_day_part')) {
+      context.handle(
+        _halfDayPartMeta,
+        halfDayPart.isAcceptableOrUnknown(
+          data['half_day_part']!,
+          _halfDayPartMeta,
+        ),
+      );
     }
     if (data.containsKey('start_at')) {
       context.handle(
@@ -6576,6 +6597,10 @@ class $AbsencesTable extends Absences with TableInfo<$AbsencesTable, Absence> {
         DriftSqlType.string,
         data['${effectivePrefix}portion'],
       )!,
+      halfDayPart: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}half_day_part'],
+      ),
       startAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}start_at'],
@@ -6614,6 +6639,7 @@ class Absence extends DataClass implements Insertable<Absence> {
   final DateTime date;
   final String absenceTypeId;
   final String portion;
+  final String? halfDayPart;
   final DateTime? startAt;
   final DateTime? endAt;
   final String? note;
@@ -6625,6 +6651,7 @@ class Absence extends DataClass implements Insertable<Absence> {
     required this.date,
     required this.absenceTypeId,
     required this.portion,
+    this.halfDayPart,
     this.startAt,
     this.endAt,
     this.note,
@@ -6639,6 +6666,9 @@ class Absence extends DataClass implements Insertable<Absence> {
     map['date'] = Variable<DateTime>(date);
     map['absence_type_id'] = Variable<String>(absenceTypeId);
     map['portion'] = Variable<String>(portion);
+    if (!nullToAbsent || halfDayPart != null) {
+      map['half_day_part'] = Variable<String>(halfDayPart);
+    }
     if (!nullToAbsent || startAt != null) {
       map['start_at'] = Variable<DateTime>(startAt);
     }
@@ -6660,6 +6690,9 @@ class Absence extends DataClass implements Insertable<Absence> {
       date: Value(date),
       absenceTypeId: Value(absenceTypeId),
       portion: Value(portion),
+      halfDayPart: halfDayPart == null && nullToAbsent
+          ? const Value.absent()
+          : Value(halfDayPart),
       startAt: startAt == null && nullToAbsent
           ? const Value.absent()
           : Value(startAt),
@@ -6683,6 +6716,7 @@ class Absence extends DataClass implements Insertable<Absence> {
       date: serializer.fromJson<DateTime>(json['date']),
       absenceTypeId: serializer.fromJson<String>(json['absenceTypeId']),
       portion: serializer.fromJson<String>(json['portion']),
+      halfDayPart: serializer.fromJson<String?>(json['halfDayPart']),
       startAt: serializer.fromJson<DateTime?>(json['startAt']),
       endAt: serializer.fromJson<DateTime?>(json['endAt']),
       note: serializer.fromJson<String?>(json['note']),
@@ -6699,6 +6733,7 @@ class Absence extends DataClass implements Insertable<Absence> {
       'date': serializer.toJson<DateTime>(date),
       'absenceTypeId': serializer.toJson<String>(absenceTypeId),
       'portion': serializer.toJson<String>(portion),
+      'halfDayPart': serializer.toJson<String?>(halfDayPart),
       'startAt': serializer.toJson<DateTime?>(startAt),
       'endAt': serializer.toJson<DateTime?>(endAt),
       'note': serializer.toJson<String?>(note),
@@ -6713,6 +6748,7 @@ class Absence extends DataClass implements Insertable<Absence> {
     DateTime? date,
     String? absenceTypeId,
     String? portion,
+    Value<String?> halfDayPart = const Value.absent(),
     Value<DateTime?> startAt = const Value.absent(),
     Value<DateTime?> endAt = const Value.absent(),
     Value<String?> note = const Value.absent(),
@@ -6724,6 +6760,7 @@ class Absence extends DataClass implements Insertable<Absence> {
     date: date ?? this.date,
     absenceTypeId: absenceTypeId ?? this.absenceTypeId,
     portion: portion ?? this.portion,
+    halfDayPart: halfDayPart.present ? halfDayPart.value : this.halfDayPart,
     startAt: startAt.present ? startAt.value : this.startAt,
     endAt: endAt.present ? endAt.value : this.endAt,
     note: note.present ? note.value : this.note,
@@ -6739,6 +6776,9 @@ class Absence extends DataClass implements Insertable<Absence> {
           ? data.absenceTypeId.value
           : this.absenceTypeId,
       portion: data.portion.present ? data.portion.value : this.portion,
+      halfDayPart: data.halfDayPart.present
+          ? data.halfDayPart.value
+          : this.halfDayPart,
       startAt: data.startAt.present ? data.startAt.value : this.startAt,
       endAt: data.endAt.present ? data.endAt.value : this.endAt,
       note: data.note.present ? data.note.value : this.note,
@@ -6755,6 +6795,7 @@ class Absence extends DataClass implements Insertable<Absence> {
           ..write('date: $date, ')
           ..write('absenceTypeId: $absenceTypeId, ')
           ..write('portion: $portion, ')
+          ..write('halfDayPart: $halfDayPart, ')
           ..write('startAt: $startAt, ')
           ..write('endAt: $endAt, ')
           ..write('note: $note, ')
@@ -6771,6 +6812,7 @@ class Absence extends DataClass implements Insertable<Absence> {
     date,
     absenceTypeId,
     portion,
+    halfDayPart,
     startAt,
     endAt,
     note,
@@ -6786,6 +6828,7 @@ class Absence extends DataClass implements Insertable<Absence> {
           other.date == this.date &&
           other.absenceTypeId == this.absenceTypeId &&
           other.portion == this.portion &&
+          other.halfDayPart == this.halfDayPart &&
           other.startAt == this.startAt &&
           other.endAt == this.endAt &&
           other.note == this.note &&
@@ -6799,6 +6842,7 @@ class AbsencesCompanion extends UpdateCompanion<Absence> {
   final Value<DateTime> date;
   final Value<String> absenceTypeId;
   final Value<String> portion;
+  final Value<String?> halfDayPart;
   final Value<DateTime?> startAt;
   final Value<DateTime?> endAt;
   final Value<String?> note;
@@ -6811,6 +6855,7 @@ class AbsencesCompanion extends UpdateCompanion<Absence> {
     this.date = const Value.absent(),
     this.absenceTypeId = const Value.absent(),
     this.portion = const Value.absent(),
+    this.halfDayPart = const Value.absent(),
     this.startAt = const Value.absent(),
     this.endAt = const Value.absent(),
     this.note = const Value.absent(),
@@ -6824,6 +6869,7 @@ class AbsencesCompanion extends UpdateCompanion<Absence> {
     required DateTime date,
     required String absenceTypeId,
     required String portion,
+    this.halfDayPart = const Value.absent(),
     this.startAt = const Value.absent(),
     this.endAt = const Value.absent(),
     this.note = const Value.absent(),
@@ -6843,6 +6889,7 @@ class AbsencesCompanion extends UpdateCompanion<Absence> {
     Expression<DateTime>? date,
     Expression<String>? absenceTypeId,
     Expression<String>? portion,
+    Expression<String>? halfDayPart,
     Expression<DateTime>? startAt,
     Expression<DateTime>? endAt,
     Expression<String>? note,
@@ -6856,6 +6903,7 @@ class AbsencesCompanion extends UpdateCompanion<Absence> {
       if (date != null) 'date': date,
       if (absenceTypeId != null) 'absence_type_id': absenceTypeId,
       if (portion != null) 'portion': portion,
+      if (halfDayPart != null) 'half_day_part': halfDayPart,
       if (startAt != null) 'start_at': startAt,
       if (endAt != null) 'end_at': endAt,
       if (note != null) 'note': note,
@@ -6871,6 +6919,7 @@ class AbsencesCompanion extends UpdateCompanion<Absence> {
     Value<DateTime>? date,
     Value<String>? absenceTypeId,
     Value<String>? portion,
+    Value<String?>? halfDayPart,
     Value<DateTime?>? startAt,
     Value<DateTime?>? endAt,
     Value<String?>? note,
@@ -6884,6 +6933,7 @@ class AbsencesCompanion extends UpdateCompanion<Absence> {
       date: date ?? this.date,
       absenceTypeId: absenceTypeId ?? this.absenceTypeId,
       portion: portion ?? this.portion,
+      halfDayPart: halfDayPart ?? this.halfDayPart,
       startAt: startAt ?? this.startAt,
       endAt: endAt ?? this.endAt,
       note: note ?? this.note,
@@ -6908,6 +6958,9 @@ class AbsencesCompanion extends UpdateCompanion<Absence> {
     }
     if (portion.present) {
       map['portion'] = Variable<String>(portion.value);
+    }
+    if (halfDayPart.present) {
+      map['half_day_part'] = Variable<String>(halfDayPart.value);
     }
     if (startAt.present) {
       map['start_at'] = Variable<DateTime>(startAt.value);
@@ -6940,6 +6993,7 @@ class AbsencesCompanion extends UpdateCompanion<Absence> {
           ..write('date: $date, ')
           ..write('absenceTypeId: $absenceTypeId, ')
           ..write('portion: $portion, ')
+          ..write('halfDayPart: $halfDayPart, ')
           ..write('startAt: $startAt, ')
           ..write('endAt: $endAt, ')
           ..write('note: $note, ')
@@ -11080,6 +11134,7 @@ typedef $$AbsencesTableCreateCompanionBuilder =
       required DateTime date,
       required String absenceTypeId,
       required String portion,
+      Value<String?> halfDayPart,
       Value<DateTime?> startAt,
       Value<DateTime?> endAt,
       Value<String?> note,
@@ -11094,6 +11149,7 @@ typedef $$AbsencesTableUpdateCompanionBuilder =
       Value<DateTime> date,
       Value<String> absenceTypeId,
       Value<String> portion,
+      Value<String?> halfDayPart,
       Value<DateTime?> startAt,
       Value<DateTime?> endAt,
       Value<String?> note,
@@ -11129,6 +11185,11 @@ class $$AbsencesTableFilterComposer
 
   ColumnFilters<String> get portion => $composableBuilder(
     column: $table.portion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get halfDayPart => $composableBuilder(
+    column: $table.halfDayPart,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -11192,6 +11253,11 @@ class $$AbsencesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get halfDayPart => $composableBuilder(
+    column: $table.halfDayPart,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get startAt => $composableBuilder(
     column: $table.startAt,
     builder: (column) => ColumnOrderings(column),
@@ -11246,6 +11312,11 @@ class $$AbsencesTableAnnotationComposer
   GeneratedColumn<String> get portion =>
       $composableBuilder(column: $table.portion, builder: (column) => column);
 
+  GeneratedColumn<String> get halfDayPart => $composableBuilder(
+    column: $table.halfDayPart,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get startAt =>
       $composableBuilder(column: $table.startAt, builder: (column) => column);
 
@@ -11297,6 +11368,7 @@ class $$AbsencesTableTableManager
                 Value<DateTime> date = const Value.absent(),
                 Value<String> absenceTypeId = const Value.absent(),
                 Value<String> portion = const Value.absent(),
+                Value<String?> halfDayPart = const Value.absent(),
                 Value<DateTime?> startAt = const Value.absent(),
                 Value<DateTime?> endAt = const Value.absent(),
                 Value<String?> note = const Value.absent(),
@@ -11309,6 +11381,7 @@ class $$AbsencesTableTableManager
                 date: date,
                 absenceTypeId: absenceTypeId,
                 portion: portion,
+                halfDayPart: halfDayPart,
                 startAt: startAt,
                 endAt: endAt,
                 note: note,
@@ -11323,6 +11396,7 @@ class $$AbsencesTableTableManager
                 required DateTime date,
                 required String absenceTypeId,
                 required String portion,
+                Value<String?> halfDayPart = const Value.absent(),
                 Value<DateTime?> startAt = const Value.absent(),
                 Value<DateTime?> endAt = const Value.absent(),
                 Value<String?> note = const Value.absent(),
@@ -11335,6 +11409,7 @@ class $$AbsencesTableTableManager
                 date: date,
                 absenceTypeId: absenceTypeId,
                 portion: portion,
+                halfDayPart: halfDayPart,
                 startAt: startAt,
                 endAt: endAt,
                 note: note,

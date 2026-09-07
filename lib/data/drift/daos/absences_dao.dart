@@ -21,6 +21,7 @@ class AbsencesDao extends DatabaseAccessor<AppDatabase> with _$AbsencesDaoMixin 
     required DateTime date,
     required String absenceTypeId,
     required String portion,
+    String? halfDayPart,
     DateTime? startAt,
     DateTime? endAt,
     String? note,
@@ -33,6 +34,7 @@ class AbsencesDao extends DatabaseAccessor<AppDatabase> with _$AbsencesDaoMixin 
         date: date,
         absenceTypeId: absenceTypeId,
         portion: portion,
+        halfDayPart: Value(halfDayPart),
         startAt: Value(startAt),
         endAt: Value(endAt),
         note: Value(note),
@@ -55,6 +57,7 @@ class AbsencesDao extends DatabaseAccessor<AppDatabase> with _$AbsencesDaoMixin 
     String id, {
     String? absenceTypeId,
     String? portion,
+    Value<String?> halfDayPart = const Value.absent(),
     Value<DateTime?> startAt = const Value.absent(),
     Value<DateTime?> endAt = const Value.absent(),
     Value<String?> note = const Value.absent(),
@@ -63,6 +66,7 @@ class AbsencesDao extends DatabaseAccessor<AppDatabase> with _$AbsencesDaoMixin 
       AbsencesCompanion(
         absenceTypeId: absenceTypeId == null ? const Value.absent() : Value(absenceTypeId),
         portion: portion == null ? const Value.absent() : Value(portion),
+        halfDayPart: halfDayPart,
         startAt: startAt,
         endAt: endAt,
         note: note,

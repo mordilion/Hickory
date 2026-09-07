@@ -814,6 +814,24 @@ void main() {
     expect(row.note, 'Doctor', reason: 'a mistyped absence has to be correctable');
     expect(row.portion, absencePortionFullDay);
   });
+
+  testWidgets('a half-day absence says which half of the day it covers', (tester) async {
+    final created = await db.absencesDao.createAbsence(
+      deviceId: 'd',
+      date: DateTime(2026, 9, 7),
+      absenceTypeId: 'type-1',
+      portion: absencePortionHalfDay,
+      halfDayPart: absenceHalfDayAfternoon,
+    );
+    await tester.pumpWidget(
+      makeApp(const [], absences: [created], absenceTypes: [vacationType()]),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Half day'), findsOneWidget);
+    expect(find.textContaining('Afternoon'), findsOneWidget);
+  });
+
 }
 
 /// Pins the location so a test doesn't silently depend on today's date.

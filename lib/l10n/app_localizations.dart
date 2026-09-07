@@ -1203,6 +1203,18 @@ abstract class AppLocalizations {
   /// **'Halbtags'**
   String get absencePortionHalfDay;
 
+  /// No description provided for @absenceHalfDayMorning.
+  ///
+  /// In de, this message translates to:
+  /// **'Vormittag'**
+  String get absenceHalfDayMorning;
+
+  /// No description provided for @absenceHalfDayAfternoon.
+  ///
+  /// In de, this message translates to:
+  /// **'Nachmittag'**
+  String get absenceHalfDayAfternoon;
+
   /// No description provided for @absencePortionRange.
   ///
   /// In de, this message translates to:

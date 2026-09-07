@@ -208,6 +208,8 @@
   "absenceFormPortion": "Omvang",
   "absencePortionFullDay": "Hele dag",
   "absencePortionHalfDay": "Halve dag",
+  "absenceHalfDayMorning": "Ochtend",
+  "absenceHalfDayAfternoon": "Middag",
   "absencePortionRange": "Tijdvak",
   "absenceFormFrom": "Van",
   "absenceFormTo": "Tot",

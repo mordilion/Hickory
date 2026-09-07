@@ -394,4 +394,48 @@ void main() {
     expect(rows.single.startAt?.toLocal().hour, 9);
     expect(rows.single.endAt?.toLocal().hour, 11);
   });
+
+  testWidgets('a half day asks which half of it, and records the answer', (tester) async {
+    await tester.pumpWidget(makeApp(types: [vacation()]));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Nachmittag'),
+      findsNothing,
+      reason: 'the question only applies to a half day',
+    );
+
+    await tester.tap(find.text('Halbtags'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Nachmittag'));
+    await tester.pumpAndSettle();
+
+    late List<Absence> rows;
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Eintragen'));
+      await tester.pump();
+      await waitFor(() async => (await db.select(db.absences).get()).isNotEmpty);
+      rows = await db.select(db.absences).get();
+    });
+    await tester.pump();
+
+    expect(rows.single.portion, absencePortionHalfDay);
+    expect(rows.single.halfDayPart, absenceHalfDayAfternoon);
+  });
+
+  testWidgets('a whole day records no half of the day', (tester) async {
+    await tester.pumpWidget(makeApp(types: [vacation()]));
+    await tester.pumpAndSettle();
+
+    late List<Absence> rows;
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Eintragen'));
+      await tester.pump();
+      await waitFor(() async => (await db.select(db.absences).get()).isNotEmpty);
+      rows = await db.select(db.absences).get();
+    });
+    await tester.pump();
+
+    expect(rows.single.halfDayPart, isNull);
+  });
 }

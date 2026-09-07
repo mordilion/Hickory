@@ -208,6 +208,8 @@
   "absenceFormPortion": "Estensione",
   "absencePortionFullDay": "Giornata intera",
   "absencePortionHalfDay": "Mezza giornata",
+  "absenceHalfDayMorning": "Mattina",
+  "absenceHalfDayAfternoon": "Pomeriggio",
   "absencePortionRange": "Fascia oraria",
   "absenceFormFrom": "Dal",
   "absenceFormTo": "Al",

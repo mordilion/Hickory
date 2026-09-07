@@ -303,6 +303,8 @@
   "absenceFormPortion": "Umfang",
   "absencePortionFullDay": "Ganztags",
   "absencePortionHalfDay": "Halbtags",
+  "absenceHalfDayMorning": "Vormittag",
+  "absenceHalfDayAfternoon": "Nachmittag",
   "absencePortionRange": "Zeitraum",
   "absenceFormFrom": "Von",
   "absenceFormTo": "Bis",

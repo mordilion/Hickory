@@ -208,6 +208,8 @@
   "absenceFormPortion": "Extent",
   "absencePortionFullDay": "Full day",
   "absencePortionHalfDay": "Half day",
+  "absenceHalfDayMorning": "Morning",
+  "absenceHalfDayAfternoon": "Afternoon",
   "absencePortionRange": "Time range",
   "absenceFormFrom": "From",
   "absenceFormTo": "To",

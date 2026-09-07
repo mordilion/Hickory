@@ -208,6 +208,8 @@
   "absenceFormPortion": "Étendue",
   "absencePortionFullDay": "Journée entière",
   "absencePortionHalfDay": "Demi-journée",
+  "absenceHalfDayMorning": "Matin",
+  "absenceHalfDayAfternoon": "Après-midi",
   "absencePortionRange": "Plage horaire",
   "absenceFormFrom": "Du",
   "absenceFormTo": "Au",

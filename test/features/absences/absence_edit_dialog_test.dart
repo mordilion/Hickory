@@ -24,6 +24,7 @@ void main() {
 
   Absence absence({
     String portion = absencePortionFullDay,
+    String? halfDayPart,
     DateTime? startAt,
     DateTime? endAt,
     String? note,
@@ -32,6 +33,7 @@ void main() {
         date: DateTime(2026, 9, 7),
         absenceTypeId: 'type-1',
         portion: portion,
+        halfDayPart: halfDayPart,
         startAt: startAt,
         endAt: endAt,
         note: note,
@@ -40,10 +42,11 @@ void main() {
         updatedAt: DateTime.utc(2026, 1, 1),
       );
 
-  /// Mounts the dialog and hands back whatever it pops with. Pushed from a
-  /// button rather than shown directly, so the pop has a route to return
-  /// to and the result is observable.
-  Future<AbsenceEdit?> showEditor(
+  /// Mounts the dialog and hands back a getter for whatever it pops with.
+  /// Pushed from a button rather than shown directly, so the pop has a
+  /// route to return to and the result is observable; the getter is read
+  /// after the interaction the test is about.
+  Future<AbsenceEdit? Function()> showEditor(
     WidgetTester tester,
     Absence row, {
     List<AbsenceType> types = const [],
@@ -79,7 +82,7 @@ void main() {
     );
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
-    return Future.value().then((_) => result);
+    return () => result;
   }
 
   testWidgets('keeps the note and the extent it was opened with', (tester) async {
@@ -91,8 +94,10 @@ void main() {
 
     expect(find.text('Arzt'), findsOneWidget);
     expect(find.text('Urlaub'), findsOneWidget);
+    // The first of the two: the extent, above the half-of-the-day control
+    // that a half day brings with it.
     final segments = tester.widget<SegmentedButton<String>>(
-      find.byType(SegmentedButton<String>),
+      find.byType(SegmentedButton<String>).first,
     );
     expect(segments.selected, {absencePortionHalfDay});
   });
@@ -195,5 +200,20 @@ void main() {
     expect(find.text('9:00 AM'), findsOneWidget);
     expect(find.text('11:00 AM'), findsOneWidget);
     expect(find.byType(OutlinedButton), findsNothing);
+  });
+
+  testWidgets('offers the other half of the day to a half-day absence', (tester) async {
+    final result = await showEditor(
+      tester,
+      absence(portion: absencePortionHalfDay, halfDayPart: absenceHalfDayMorning),
+      types: [type('type-1', 'Urlaub')],
+    );
+
+    await tester.tap(find.text('Nachmittag'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Speichern'));
+    await tester.pumpAndSettle();
+
+    expect(result()?.halfDayPart, absenceHalfDayAfternoon);
   });
 }

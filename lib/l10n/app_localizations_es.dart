@@ -646,6 +646,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get absencePortionHalfDay => 'Medio día';
 
   @override
+  String get absenceHalfDayMorning => 'Mañana';
+
+  @override
+  String get absenceHalfDayAfternoon => 'Tarde';
+
+  @override
   String get absencePortionRange => 'Franja horaria';
 
   @override

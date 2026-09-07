@@ -7,6 +7,13 @@ const absencePortionFullDay = 'fullDay';
 const absencePortionHalfDay = 'halfDay';
 const absencePortionRange = 'range';
 
+/// Which half of the day a `halfDay` absence covers. Null on every other
+/// portion, and on half days recorded before this was asked for — the
+/// credited time is half the target either way, so an older row and an
+/// older peer both stay correct without it.
+const absenceHalfDayMorning = 'morning';
+const absenceHalfDayAfternoon = 'afternoon';
+
 /// One day of absence: a vacation day, a sick day, a two-hour doctor's
 /// appointment. Always **one row per calendar day** — a fortnight of
 /// vacation entered once in the form becomes ten rows, skipping days whose
@@ -36,6 +43,9 @@ class Absences extends Table {
   // Settings refuses to delete a type that is still referenced.
   TextColumn get absenceTypeId => text()();
   TextColumn get portion => text()();
+  // `morning` or `afternoon`, set only when portion == absencePortionHalfDay.
+  // Informational: it says which half was taken, not how much is credited.
+  TextColumn get halfDayPart => text().nullable()();
   // UTC, set only when portion == absencePortionRange.
   DateTimeColumn get startAt => dateTime().nullable()();
   DateTimeColumn get endAt => dateTime().nullable()();

@@ -453,6 +453,7 @@ Future<void> _editAbsence(BuildContext context, WidgetRef ref, Absence absence) 
     absence.id,
     absenceTypeId: edit.absenceTypeId,
     portion: edit.portion,
+    halfDayPart: Value(edit.halfDayPart),
     startAt: Value(edit.startAt),
     endAt: Value(edit.endAt),
     note: Value(edit.note),
@@ -496,9 +497,22 @@ class _AbsenceTile extends StatelessWidget {
     }
   }
 
+  /// "Morning" / "Afternoon" for a half day that says which half, null
+  /// otherwise -- including for half days recorded before the app asked.
+  String? _halfDayLabel() {
+    switch (absence.halfDayPart) {
+      case absenceHalfDayMorning:
+        return l10n.absenceHalfDayMorning;
+      case absenceHalfDayAfternoon:
+        return l10n.absenceHalfDayAfternoon;
+      default:
+        return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final subtitle = [_portionLabel(), ?absence.note].join(' · ');
+    final subtitle = [_portionLabel(), ?_halfDayLabel(), ?absence.note].join(' · ');
     return Dismissible(
       key: ValueKey(absence.id),
       direction: DismissDirection.endToStart,

@@ -159,4 +159,43 @@ void main() {
     expect(updated.endAt, isNull);
     expect(updated.note, isNull);
   });
+
+  test('createAbsence records which half of the day a half day covers', () async {
+    final absence = await db.absencesDao.createAbsence(
+      deviceId: 'd', date: DateTime(2026, 9, 7),
+      absenceTypeId: typeId, portion: absencePortionHalfDay,
+      halfDayPart: absenceHalfDayAfternoon,
+    );
+
+    expect(absence.halfDayPart, absenceHalfDayAfternoon);
+  });
+
+  test('createAbsence leaves the half of the day unset when none is given', () async {
+    final absence = await db.absencesDao.createAbsence(
+      deviceId: 'd', date: DateTime(2026, 9, 7),
+      absenceTypeId: typeId, portion: absencePortionFullDay,
+    );
+
+    expect(
+      absence.halfDayPart,
+      isNull,
+      reason: 'a whole day has no half, and rows written before this column stay null',
+    );
+  });
+
+  test('updateAbsence clears the half of the day a whole day no longer has', () async {
+    final absence = await db.absencesDao.createAbsence(
+      deviceId: 'd', date: DateTime(2026, 9, 7),
+      absenceTypeId: typeId, portion: absencePortionHalfDay,
+      halfDayPart: absenceHalfDayMorning,
+    );
+
+    final updated = await db.absencesDao.updateAbsence(
+      absence.id,
+      portion: absencePortionFullDay,
+      halfDayPart: const Value(null),
+    );
+
+    expect(updated.halfDayPart, isNull);
+  });
 }

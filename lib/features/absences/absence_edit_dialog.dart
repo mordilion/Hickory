@@ -15,6 +15,7 @@ import 'absence_time_range.dart';
 typedef AbsenceEdit = ({
   String absenceTypeId,
   String portion,
+  String? halfDayPart,
   DateTime? startAt,
   DateTime? endAt,
   String? note,
@@ -41,6 +42,7 @@ class _AbsenceEditDialogState extends ConsumerState<AbsenceEditDialog> {
       TextEditingController(text: widget.absence.note ?? '');
   late String _typeId = widget.absence.absenceTypeId;
   late String _portion = widget.absence.portion;
+  late String _halfDayPart = widget.absence.halfDayPart ?? absenceHalfDayMorning;
   late TimeOfDay _startTime = _timeOf(widget.absence.startAt, const TimeOfDay(hour: 9, minute: 0));
   late TimeOfDay _endTime = _timeOf(widget.absence.endAt, const TimeOfDay(hour: 11, minute: 0));
 
@@ -88,6 +90,7 @@ class _AbsenceEditDialogState extends ConsumerState<AbsenceEditDialog> {
     Navigator.of(context).pop((
       absenceTypeId: _typeId,
       portion: _portion,
+      halfDayPart: _portion == absencePortionHalfDay ? _halfDayPart : null,
       startAt: isRange ? _at(_startTime) : null,
       endAt: isRange ? _at(_endTime) : null,
       note: note.isEmpty ? null : note,
@@ -152,6 +155,26 @@ class _AbsenceEditDialogState extends ConsumerState<AbsenceEditDialog> {
               }),
             ),
           ),
+          if (_portion == absencePortionHalfDay) ...[
+            const SizedBox(height: 8),
+            Center(
+              child: SegmentedButton<String>(
+                segments: [
+                  ButtonSegment(
+                    value: absenceHalfDayMorning,
+                    label: Text(l10n.absenceHalfDayMorning),
+                  ),
+                  ButtonSegment(
+                    value: absenceHalfDayAfternoon,
+                    label: Text(l10n.absenceHalfDayAfternoon),
+                  ),
+                ],
+                selected: {_halfDayPart},
+                onSelectionChanged: (selection) =>
+                    setState(() => _halfDayPart = selection.first),
+              ),
+            ),
+          ],
           const SizedBox(height: 8),
           // Laid out like the recording form's pickers, with the day the
           // absence covers spelled out rather than offered as a button:

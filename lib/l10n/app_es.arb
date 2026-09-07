@@ -208,6 +208,8 @@
   "absenceFormPortion": "Alcance",
   "absencePortionFullDay": "Día completo",
   "absencePortionHalfDay": "Medio día",
+  "absenceHalfDayMorning": "Mañana",
+  "absenceHalfDayAfternoon": "Tarde",
   "absencePortionRange": "Franja horaria",
   "absenceFormFrom": "Desde",
   "absenceFormTo": "Hasta",

@@ -12,7 +12,8 @@
   (local midnight, the same key `totalsByDay` groups worked time by), `absenceTypeId`,
   `portion` (`fullDay` | `halfDay` | `range`, stored as text rather than a drift enum so an
   older peer ingesting an unknown value reads a harmless string instead of failing to
-  decode the row), `startAt`/`endAt` (UTC, set only for `range`), `note`, `deviceId`,
+  decode the row), `halfDayPart` (`morning` | `afternoon`, null on every other portion and
+  on half days recorded before schema 12), `startAt`/`endAt` (UTC, set only for `range`), `note`, `deviceId`,
   `createdAt`, `updatedAt`. Neither table carries a foreign key — like every synced table
   in this codebase, a row must survive a peer applying events out of order.
 - `AbsenceTypesDao` / `AbsencesDao` (`lib/data/drift/daos/`): CRUD plus
@@ -94,6 +95,11 @@
   vacation be removed on its own. The cost is that a bulk entry is several writes, which
   the write-through sync already handles like any other batch; it is not a new problem
   this feature introduces.
+- **Which half of a half day is its own nullable column, not two more portion values.**
+  A peer that predates it reads `portion: halfDay` and still credits half the target,
+  where a `halfDayMorning` portion would have hit `absenceMinutes`'s unknown-portion
+  branch and scored zero. It is informational — half a day is credited either way — which
+  is also why it stays null rather than defaulting on old rows.
 - **Full and half days store a portion, not a minute figure.** `absenceMinutes` derives
   the credited time from *that day's* target when the balance is computed, not from a
   number written down when the absence was recorded. An absence therefore stays correct
@@ -148,8 +154,8 @@ Against `docs/superpowers/specs/2026-09-02-worktime-balance-dashboard-design.md`
   the *type*, changed roughly once when the type is created, and an always-live switch on
   every row invites a mis-tap that silently re-scores every absence of that kind across
   the whole history. The dialog keeps it beside the name it belongs to.
-- **The schema landed across versions 10 and 11**, where §2 anticipated a single 10 for
-  "the tables added in phases 2 and 3". `absenceTypes` and `absences` shipped in separate
+- **The schema landed across versions 10, 11 and 12**, where §2 anticipated a single 10
+  for "the tables added in phases 2 and 3". `absenceTypes` and `absences` shipped in separate
   steps, each independently demonstrable, and a migration step is cheap; folding two
   `createTable` calls into one version afterwards would have meant rewriting a migration
   already applied on the developer's own database.
