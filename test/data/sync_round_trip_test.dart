@@ -721,4 +721,48 @@ void main() {
     final absence = (await readerDb.select(readerDb.absences).get()).single;
     expect(absence.halfDayPart, absenceHalfDayAfternoon);
   });
+
+  test('a balance correction reaches a second device', () async {
+    final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(writerDb.close);
+    final writes = SyncedWrites(
+      db: writerDb,
+      logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'writer'),
+    );
+
+    await writes.createAdjustment(
+      deviceId: 'writer',
+      date: DateTime(2026, 9, 7),
+      deltaMinutes: -480,
+      note: 'paid out',
+    );
+
+    final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(readerDb.close);
+    await SyncIngestor(db: readerDb, syncRoot: syncRoot).syncNow();
+
+    final row = (await readerDb.select(readerDb.balanceAdjustments).get()).single;
+    expect(row.deltaMinutes, -480);
+    expect(row.note, 'paid out');
+    expect(row.date, DateTime(2026, 9, 7));
+  });
+
+  test('deleting a balance correction reaches a second device', () async {
+    final writerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(writerDb.close);
+    final writes = SyncedWrites(
+      db: writerDb,
+      logWriter: SyncLogWriter(syncRoot: syncRoot, deviceId: 'writer'),
+    );
+    final created = await writes.createAdjustment(
+      deviceId: 'writer', date: DateTime(2026, 9, 7), deltaMinutes: 60,
+    );
+    await writes.deleteAdjustment(created.id);
+
+    final readerDb = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(readerDb.close);
+    await SyncIngestor(db: readerDb, syncRoot: syncRoot).syncNow();
+
+    expect(await readerDb.select(readerDb.balanceAdjustments).get(), isEmpty);
+  });
 }

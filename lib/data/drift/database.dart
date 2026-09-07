@@ -10,6 +10,7 @@ import 'daos/absence_types_dao.dart';
 import 'daos/absences_dao.dart';
 import 'daos/activity_samples_dao.dart';
 import 'daos/app_settings_dao.dart';
+import 'daos/balance_adjustments_dao.dart';
 import 'daos/break_rule_tiers_dao.dart';
 import 'daos/clients_dao.dart';
 import 'daos/events_dao.dart';
@@ -19,6 +20,7 @@ import 'daos/projects_dao.dart';
 import 'daos/time_entries_dao.dart';
 import 'tables/absence_types_table.dart';
 import 'tables/absences_table.dart';
+import 'tables/balance_adjustments_table.dart';
 import 'tables/activity_samples_table.dart';
 import 'tables/app_settings_table.dart';
 import 'tables/break_rule_tiers_table.dart';
@@ -50,6 +52,7 @@ part 'database.g.dart';
     PersonioAttendances,
     AbsenceTypes,
     Absences,
+    BalanceAdjustments,
   ],
   daos: [
     ClientsDao,
@@ -63,6 +66,7 @@ part 'database.g.dart';
     PersonioAttendancesDao,
     AbsenceTypesDao,
     AbsencesDao,
+    BalanceAdjustmentsDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -71,7 +75,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.connection);
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -124,6 +128,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 12) {
         await m.addColumn(absences, absences.halfDayPart);
+      }
+      if (from < 13) {
+        await m.createTable(balanceAdjustments);
       }
     },
   );

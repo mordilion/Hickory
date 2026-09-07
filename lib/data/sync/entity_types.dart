@@ -13,4 +13,5 @@ abstract final class EntityTypes {
   static const personioAttendance = 'personio_attendance';
   static const absenceType = 'absence_type';
   static const absence = 'absence';
+  static const balanceAdjustment = 'balance_adjustment';
 }

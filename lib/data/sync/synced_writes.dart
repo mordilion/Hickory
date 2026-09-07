@@ -544,6 +544,39 @@ class SyncedWrites {
     );
   }
 
+  /// Records a dated correction to the balance and logs it. There is no
+  /// update counterpart on purpose — see BalanceAdjustmentsDao.
+  Future<BalanceAdjustment> createAdjustment({
+    required String deviceId,
+    required DateTime date,
+    required int deltaMinutes,
+    String? note,
+  }) async {
+    final adjustment = await db.balanceAdjustmentsDao.createAdjustment(
+      deviceId: deviceId,
+      date: date,
+      deltaMinutes: deltaMinutes,
+      note: note,
+    );
+    await logWriter.appendEvent(
+      entityType: EntityTypes.balanceAdjustment,
+      entityId: adjustment.id,
+      op: EventOp.create,
+      payload: adjustment.toJson(),
+    );
+    return adjustment;
+  }
+
+  Future<void> deleteAdjustment(String id) async {
+    await db.balanceAdjustmentsDao.deleteAdjustment(id);
+    await logWriter.appendEvent(
+      entityType: EntityTypes.balanceAdjustment,
+      entityId: id,
+      op: EventOp.delete,
+      payload: null,
+    );
+  }
+
   /// Writes the given Jira sync-tracking row and logs it, so the state
   /// (e.g. "this entry now has a Jira worklog") propagates to the user's
   /// other devices the same way every other entity does.

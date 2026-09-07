@@ -55,6 +55,7 @@ class SyncIngestor {
       await db.delete(db.personioAttendances).go();
       await db.delete(db.absences).go();
       await db.delete(db.absenceTypes).go();
+      await db.delete(db.balanceAdjustments).go();
     });
     await syncNow();
   }
@@ -246,6 +247,21 @@ class SyncIngestor {
           await db
               .into(db.absences)
               .insertOnConflictUpdate(Absence.fromJson(entity.payload!).toCompanion(false));
+        }
+      case EntityTypes.balanceAdjustment:
+        if (entity.isDeleted) {
+          await (db.delete(db.balanceAdjustments)
+                ..where((a) => a.id.equals(entity.entityId)))
+              .go();
+        } else {
+          // toCompanion(false) for the same reason as Absences: the note
+          // is nullable and its null means "this correction carries no
+          // note", not "keep whatever the peer had".
+          await db
+              .into(db.balanceAdjustments)
+              .insertOnConflictUpdate(
+                BalanceAdjustment.fromJson(entity.payload!).toCompanion(false),
+              );
         }
       case EntityTypes.personioAttendance:
         if (entity.isDeleted) {

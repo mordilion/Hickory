@@ -7006,6 +7006,464 @@ class AbsencesCompanion extends UpdateCompanion<Absence> {
   }
 }
 
+class $BalanceAdjustmentsTable extends BalanceAdjustments
+    with TableInfo<$BalanceAdjustmentsTable, BalanceAdjustment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BalanceAdjustmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deltaMinutesMeta = const VerificationMeta(
+    'deltaMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> deltaMinutes = GeneratedColumn<int>(
+    'delta_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    date,
+    deltaMinutes,
+    note,
+    deviceId,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'balance_adjustments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BalanceAdjustment> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('delta_minutes')) {
+      context.handle(
+        _deltaMinutesMeta,
+        deltaMinutes.isAcceptableOrUnknown(
+          data['delta_minutes']!,
+          _deltaMinutesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_deltaMinutesMeta);
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BalanceAdjustment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BalanceAdjustment(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}date'],
+      )!,
+      deltaMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}delta_minutes'],
+      )!,
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BalanceAdjustmentsTable createAlias(String alias) {
+    return $BalanceAdjustmentsTable(attachedDatabase, alias);
+  }
+}
+
+class BalanceAdjustment extends DataClass
+    implements Insertable<BalanceAdjustment> {
+  final String id;
+  final DateTime date;
+  final int deltaMinutes;
+  final String? note;
+  final String deviceId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const BalanceAdjustment({
+    required this.id,
+    required this.date,
+    required this.deltaMinutes,
+    this.note,
+    required this.deviceId,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['date'] = Variable<DateTime>(date);
+    map['delta_minutes'] = Variable<int>(deltaMinutes);
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    map['device_id'] = Variable<String>(deviceId);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  BalanceAdjustmentsCompanion toCompanion(bool nullToAbsent) {
+    return BalanceAdjustmentsCompanion(
+      id: Value(id),
+      date: Value(date),
+      deltaMinutes: Value(deltaMinutes),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      deviceId: Value(deviceId),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory BalanceAdjustment.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BalanceAdjustment(
+      id: serializer.fromJson<String>(json['id']),
+      date: serializer.fromJson<DateTime>(json['date']),
+      deltaMinutes: serializer.fromJson<int>(json['deltaMinutes']),
+      note: serializer.fromJson<String?>(json['note']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'date': serializer.toJson<DateTime>(date),
+      'deltaMinutes': serializer.toJson<int>(deltaMinutes),
+      'note': serializer.toJson<String?>(note),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  BalanceAdjustment copyWith({
+    String? id,
+    DateTime? date,
+    int? deltaMinutes,
+    Value<String?> note = const Value.absent(),
+    String? deviceId,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => BalanceAdjustment(
+    id: id ?? this.id,
+    date: date ?? this.date,
+    deltaMinutes: deltaMinutes ?? this.deltaMinutes,
+    note: note.present ? note.value : this.note,
+    deviceId: deviceId ?? this.deviceId,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  BalanceAdjustment copyWithCompanion(BalanceAdjustmentsCompanion data) {
+    return BalanceAdjustment(
+      id: data.id.present ? data.id.value : this.id,
+      date: data.date.present ? data.date.value : this.date,
+      deltaMinutes: data.deltaMinutes.present
+          ? data.deltaMinutes.value
+          : this.deltaMinutes,
+      note: data.note.present ? data.note.value : this.note,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BalanceAdjustment(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('deltaMinutes: $deltaMinutes, ')
+          ..write('note: $note, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, date, deltaMinutes, note, deviceId, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BalanceAdjustment &&
+          other.id == this.id &&
+          other.date == this.date &&
+          other.deltaMinutes == this.deltaMinutes &&
+          other.note == this.note &&
+          other.deviceId == this.deviceId &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class BalanceAdjustmentsCompanion extends UpdateCompanion<BalanceAdjustment> {
+  final Value<String> id;
+  final Value<DateTime> date;
+  final Value<int> deltaMinutes;
+  final Value<String?> note;
+  final Value<String> deviceId;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const BalanceAdjustmentsCompanion({
+    this.id = const Value.absent(),
+    this.date = const Value.absent(),
+    this.deltaMinutes = const Value.absent(),
+    this.note = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BalanceAdjustmentsCompanion.insert({
+    required String id,
+    required DateTime date,
+    required int deltaMinutes,
+    this.note = const Value.absent(),
+    required String deviceId,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       date = Value(date),
+       deltaMinutes = Value(deltaMinutes),
+       deviceId = Value(deviceId),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<BalanceAdjustment> custom({
+    Expression<String>? id,
+    Expression<DateTime>? date,
+    Expression<int>? deltaMinutes,
+    Expression<String>? note,
+    Expression<String>? deviceId,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (date != null) 'date': date,
+      if (deltaMinutes != null) 'delta_minutes': deltaMinutes,
+      if (note != null) 'note': note,
+      if (deviceId != null) 'device_id': deviceId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BalanceAdjustmentsCompanion copyWith({
+    Value<String>? id,
+    Value<DateTime>? date,
+    Value<int>? deltaMinutes,
+    Value<String?>? note,
+    Value<String>? deviceId,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return BalanceAdjustmentsCompanion(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      deltaMinutes: deltaMinutes ?? this.deltaMinutes,
+      note: note ?? this.note,
+      deviceId: deviceId ?? this.deviceId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<DateTime>(date.value);
+    }
+    if (deltaMinutes.present) {
+      map['delta_minutes'] = Variable<int>(deltaMinutes.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BalanceAdjustmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('deltaMinutes: $deltaMinutes, ')
+          ..write('note: $note, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -7026,6 +7484,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $PersonioAttendancesTable(this);
   late final $AbsenceTypesTable absenceTypes = $AbsenceTypesTable(this);
   late final $AbsencesTable absences = $AbsencesTable(this);
+  late final $BalanceAdjustmentsTable balanceAdjustments =
+      $BalanceAdjustmentsTable(this);
   late final Index idxEventsEntityId = Index(
     'idx_events_entity_id',
     'CREATE INDEX idx_events_entity_id ON events (entity_id)',
@@ -7054,6 +7514,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this as AppDatabase,
   );
   late final AbsencesDao absencesDao = AbsencesDao(this as AppDatabase);
+  late final BalanceAdjustmentsDao balanceAdjustmentsDao =
+      BalanceAdjustmentsDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7073,6 +7535,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     personioAttendances,
     absenceTypes,
     absences,
+    balanceAdjustments,
     idxEventsEntityId,
   ];
 }
@@ -11440,6 +11903,259 @@ typedef $$AbsencesTableProcessedTableManager =
       Absence,
       PrefetchHooks Function()
     >;
+typedef $$BalanceAdjustmentsTableCreateCompanionBuilder =
+    BalanceAdjustmentsCompanion Function({
+      required String id,
+      required DateTime date,
+      required int deltaMinutes,
+      Value<String?> note,
+      required String deviceId,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$BalanceAdjustmentsTableUpdateCompanionBuilder =
+    BalanceAdjustmentsCompanion Function({
+      Value<String> id,
+      Value<DateTime> date,
+      Value<int> deltaMinutes,
+      Value<String?> note,
+      Value<String> deviceId,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$BalanceAdjustmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $BalanceAdjustmentsTable> {
+  $$BalanceAdjustmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get deltaMinutes => $composableBuilder(
+    column: $table.deltaMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BalanceAdjustmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BalanceAdjustmentsTable> {
+  $$BalanceAdjustmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get deltaMinutes => $composableBuilder(
+    column: $table.deltaMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BalanceAdjustmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BalanceAdjustmentsTable> {
+  $$BalanceAdjustmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<int> get deltaMinutes => $composableBuilder(
+    column: $table.deltaMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$BalanceAdjustmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BalanceAdjustmentsTable,
+          BalanceAdjustment,
+          $$BalanceAdjustmentsTableFilterComposer,
+          $$BalanceAdjustmentsTableOrderingComposer,
+          $$BalanceAdjustmentsTableAnnotationComposer,
+          $$BalanceAdjustmentsTableCreateCompanionBuilder,
+          $$BalanceAdjustmentsTableUpdateCompanionBuilder,
+          (
+            BalanceAdjustment,
+            BaseReferences<
+              _$AppDatabase,
+              $BalanceAdjustmentsTable,
+              BalanceAdjustment
+            >,
+          ),
+          BalanceAdjustment,
+          PrefetchHooks Function()
+        > {
+  $$BalanceAdjustmentsTableTableManager(
+    _$AppDatabase db,
+    $BalanceAdjustmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BalanceAdjustmentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BalanceAdjustmentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BalanceAdjustmentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<DateTime> date = const Value.absent(),
+                Value<int> deltaMinutes = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BalanceAdjustmentsCompanion(
+                id: id,
+                date: date,
+                deltaMinutes: deltaMinutes,
+                note: note,
+                deviceId: deviceId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required DateTime date,
+                required int deltaMinutes,
+                Value<String?> note = const Value.absent(),
+                required String deviceId,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => BalanceAdjustmentsCompanion.insert(
+                id: id,
+                date: date,
+                deltaMinutes: deltaMinutes,
+                note: note,
+                deviceId: deviceId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BalanceAdjustmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BalanceAdjustmentsTable,
+      BalanceAdjustment,
+      $$BalanceAdjustmentsTableFilterComposer,
+      $$BalanceAdjustmentsTableOrderingComposer,
+      $$BalanceAdjustmentsTableAnnotationComposer,
+      $$BalanceAdjustmentsTableCreateCompanionBuilder,
+      $$BalanceAdjustmentsTableUpdateCompanionBuilder,
+      (
+        BalanceAdjustment,
+        BaseReferences<
+          _$AppDatabase,
+          $BalanceAdjustmentsTable,
+          BalanceAdjustment
+        >,
+      ),
+      BalanceAdjustment,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -11471,4 +12187,6 @@ class $AppDatabaseManager {
       $$AbsenceTypesTableTableManager(_db, _db.absenceTypes);
   $$AbsencesTableTableManager get absences =>
       $$AbsencesTableTableManager(_db, _db.absences);
+  $$BalanceAdjustmentsTableTableManager get balanceAdjustments =>
+      $$BalanceAdjustmentsTableTableManager(_db, _db.balanceAdjustments);
 }
