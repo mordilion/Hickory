@@ -117,10 +117,12 @@
   it silently cancelled against the absence credit. Paid credit is still capped at the
   day's effective target, so absence can bring a day to neutral but never manufacture
   overtime on its own.
-- **Deleting a type in use is refused in the application layer, not the database.**
-  `AbsencesDao.countByType` is checked before `SyncedWrites.deleteAbsenceType`, and the
-  editor shows the count rather than a bare "cannot delete." A database-level foreign key
-  would do this for a single device, but the synced tables carry none by design — a row
+- **Deleting a type in use is refused inside `SyncedWrites`, not the database and not the
+  screen.** `deleteAbsenceType` counts the referencing rows itself and throws
+  `AbsenceTypeInUseException(count)`; the editor only turns that into its message. This
+  is the same shape `deleteProject` and `deleteClient` have always had — a guard living
+  in a screen is one any other caller walks around. A database-level foreign key would do
+  this for a single device, but the synced tables carry none by design — a row
   written by one peer must decode even if another peer's ordering of events would
   otherwise orphan it — so nothing below the UI would stop the delete from leaving
   absence rows pointing at a type that no longer exists. `absenceTypesByIdProvider`'s

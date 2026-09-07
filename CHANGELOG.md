@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Refuse deleting an absence type that days still use from anywhere in the app, not just from the settings screen it was checked in.
 - Refuse an absence whose time range ends when it starts. It was written as a row worth no time at all while the form reported it as recorded.
 - Keep the caret in place in the work-time settings fields. Refreshing a field — most visibly when a work-day toggle redistributes the weekly figure — sent the cursor to the end of it.
 
@@ -26,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Book to Jira on its own. The reconciliation now runs at app start and, coalesced into one run per few seconds, after every entry that is created, stopped, edited or deleted — until now it only ever ran when the user pressed the button on the Sync tab, so an edit to an already-booked entry never reached Jira. It stays silent: the outcome shows up in each entry's status icon, and nothing happens at all while Jira is unconfigured.
 - Name the reason a Jira booking failed. The entry's red cloud icon carries the stored error message instead of the generic "Jira booking failed", which stays the tooltip for a failure recorded before this version.
+- Show three more figures beside the flex-time balance in the Reports tab: the balance within the selected range, target against actual with a progress bar, and the average per work day. They follow the range chips but none of the filters — "overtime, but only for project X" is not a meaningful number.
+- Correct the balance by hand under Reports → Correction: a signed number of hours against a date, with a reason. Every correction stays listed and can be taken back, instead of history being rewritten.
 - Say which half a half-day absence covers, morning or afternoon. Half days recorded before this stay as they are and are still credited half the day's target.
 - Record an absence over a time range that crosses days: the range now carries a from and a to date beside its two times, read as one continuous absence — the first day from its start time, the days between whole, the last day up to its end time.
 - Give the absence form the same shape as the timer and manual modes: one card, the note first, the same date and time buttons, and the same full-width submit button. Its dates and times now follow the formats set under Settings — it used the system locale and a 24-hour clock of its own, so the same moment read differently depending on which mode wrote it.

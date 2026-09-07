@@ -45,6 +45,25 @@
 
 ## Decisions
 
+- **A correction is a dated fact, so `BalanceAdjustments` has no update path.** Fixing a
+  wrong one is a delete plus a new row, which keeps the event log a truthful account of
+  what the user actually did — and saves an update case in the ingestor that nothing
+  would emit.
+- **The cutoff takes effect at the start of the date it names, for work and corrections
+  alike.** Spec §3 says corrections land "before that date's cutoff is evaluated", which
+  taken literally would put a correction dated on the cutoff on the far side of the line
+  from that same day's work — a payout split from the hours it settles. `runningBalance`
+  merges days and corrections into one ordered ledger and applies a cutoff when crossing
+  it, so both belong to the period that begins there. Configure the cutoff as the first
+  day of the new period (1 January, not 31 December), which is how the settings screen
+  words it.
+- **The range tiles follow the report's range but none of its filters.** Same reason the
+  running balance ignores them: "overtime, but only for project X" is not a number. The
+  block says so whenever a filter is active.
+- **A figure with no meaning shows a dash, not a zero.** An average over a range without
+  a single work day, or figures that have not arrived yet — a zero there reads as a
+  measurement that was taken.
+
 - **The cutoff walk is a single forward pass, never recursive.** `runningBalance` seeds at
   the first worked day (not the epoch) and walks forward once, applying `_afterCutoff`
   whenever a cutoff falls between the previous day and the current one. A recursive
