@@ -55,8 +55,8 @@ class _WorkTimeTargetsEditorState extends ConsumerState<WorkTimeTargetsEditor>
     );
   }
 
-  Future<void> _setDayMinutes(int weekday, int minutes) async {
-    await guardedWrite(() async {
+  Future<bool> _setDayMinutes(int weekday, int minutes) {
+    return guardedWrite(() async {
       final writes = await ref.read(syncedWritesProvider.future);
       await writes.updateAppSettings(
         targetMinutesMonday: weekday == DateTime.monday ? minutes : null,
@@ -70,8 +70,8 @@ class _WorkTimeTargetsEditorState extends ConsumerState<WorkTimeTargetsEditor>
     });
   }
 
-  Future<void> _setWeekly(int weeklyMinutes, Set<int> workDays) async {
-    await guardedWrite(() async {
+  Future<bool> _setWeekly(int weeklyMinutes, Set<int> workDays) {
+    return guardedWrite(() async {
       final perDay = distributeWeeklyMinutes(weeklyMinutes, workDays);
       final writes = await ref.read(syncedWritesProvider.future);
       await writes.updateAppSettings(
@@ -164,7 +164,7 @@ class _PerWeekdayInput extends StatefulWidget {
   });
 
   final AppSettingsRow settings;
-  final Future<void> Function(int weekday, int minutes) onChanged;
+  final Future<bool> Function(int weekday, int minutes) onChanged;
   final VoidCallback onInvalidInput;
 
   @override
@@ -179,6 +179,16 @@ class _PerWeekdayInputState extends State<_PerWeekdayInput> {
       ),
   ];
 
+  /// What each field was last saved as, indexed by `weekday - 1`. Enter and
+  /// the focus loss that follows it are two commit paths over one value,
+  /// and the settings stream has not come back round between them -- so
+  /// [widget.settings] alone cannot tell the second commit that the first
+  /// already happened.
+  late final List<int> _committed = [
+    for (var weekday = 1; weekday <= 7; weekday++)
+      targetMinutesForWeekday(widget.settings, weekday),
+  ];
+
   @override
   void didUpdateWidget(_PerWeekdayInput oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -191,6 +201,7 @@ class _PerWeekdayInputState extends State<_PerWeekdayInput> {
       final newMinutes = targetMinutesForWeekday(widget.settings, weekday);
       if (oldMinutes != newMinutes) {
         _controllers[weekday - 1].text = minutesToHoursText(newMinutes);
+        _committed[weekday - 1] = newMinutes;
       }
     }
   }
@@ -216,8 +227,17 @@ class _PerWeekdayInputState extends State<_PerWeekdayInput> {
       widget.onInvalidInput();
       return;
     }
-    if (minutes == targetMinutesForWeekday(widget.settings, weekday)) return;
-    widget.onChanged(weekday, minutes);
+    final index = weekday - 1;
+    if (minutes == _committed[index]) return;
+    final previous = _committed[index];
+    _committed[index] = minutes;
+    // Put back when the write did not go through, or a value that failed
+    // to save could never be retried from this field again.
+    unawaited(
+      widget.onChanged(weekday, minutes).then((saved) {
+        if (!saved) _committed[index] = previous;
+      }),
+    );
   }
 
   @override
@@ -274,7 +294,7 @@ class _WeeklyInput extends StatefulWidget {
   final AppSettingsRow settings;
   final Set<int> workDays;
   final bool chipsEnabled;
-  final Future<void> Function(int weeklyMinutes, Set<int> workDays) onChanged;
+  final Future<bool> Function(int weeklyMinutes, Set<int> workDays) onChanged;
   final VoidCallback onInvalidInput;
 
   @override
@@ -289,6 +309,10 @@ class _WeeklyInputState extends State<_WeeklyInput> {
   late final TextEditingController _weeklyController = TextEditingController(
     text: minutesToHoursText(_weeklyMinutesOf(widget.settings)),
   );
+
+  /// The weekly total as last saved -- the same role [_committed] plays
+  /// for the seven day fields.
+  late int _committedWeekly = _weeklyMinutesOf(widget.settings);
 
   int _weeklyMinutesOf(AppSettingsRow settings) => [
         for (var weekday = 1; weekday <= 7; weekday++) targetMinutesForWeekday(settings, weekday),
@@ -316,6 +340,7 @@ class _WeeklyInputState extends State<_WeeklyInput> {
     final newMinutes = _weeklyMinutesOf(widget.settings);
     if (oldMinutes != newMinutes) {
       _weeklyController.text = minutesToHoursText(newMinutes);
+      _committedWeekly = newMinutes;
     }
   }
 
@@ -335,8 +360,21 @@ class _WeeklyInputState extends State<_WeeklyInput> {
       widget.onInvalidInput();
       return;
     }
-    if (minutes == _weeklyMinutesOf(widget.settings)) return;
-    widget.onChanged(minutes, _workDays);
+    if (minutes == _committedWeekly) return;
+    _save(minutes, _workDays);
+  }
+
+  /// Records [minutes] as saved before the write returns, for the reason
+  /// given on [_committedWeekly], and puts the old figure back if it did
+  /// not go through.
+  void _save(int minutes, Set<int> workDays) {
+    final previous = _committedWeekly;
+    _committedWeekly = minutes;
+    unawaited(
+      widget.onChanged(minutes, workDays).then((saved) {
+        if (!saved) _committedWeekly = previous;
+      }),
+    );
   }
 
   @override
@@ -375,7 +413,7 @@ class _WeeklyInputState extends State<_WeeklyInput> {
                         setState(() {
                           selected ? _workDays.add(weekday) : _workDays.remove(weekday);
                         });
-                        widget.onChanged(_weeklyMinutesOnScreen, _workDays);
+                        _save(_weeklyMinutesOnScreen, _workDays);
                       }
                     : null,
               ),

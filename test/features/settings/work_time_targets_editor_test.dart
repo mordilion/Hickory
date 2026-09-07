@@ -9,10 +9,13 @@ import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/core/di/device_id_provider.dart';
 import 'package:hickory/core/di/sync_providers.dart';
 import 'package:hickory/data/drift/database.dart';
+import 'package:hickory/data/drift/tables/app_settings_table.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
+import 'package:hickory/data/sync/sync_paths.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
 import 'package:hickory/features/settings/work_time_targets_editor.dart';
 import 'package:hickory/l10n/app_localizations.dart';
+import 'package:sync_engine/sync_engine.dart';
 
 import '../../support/app_settings_fixture.dart';
 
@@ -252,5 +255,42 @@ void main() {
     expect(row.targetMinutesSaturday, 400);
     expect(row.targetMinutesMonday, 400);
     expect(row.targetMinutesSunday, 0);
+  });
+
+  /// How many settings writes reached the sync log. The database keeps a
+  /// single settings row, so a duplicate write leaves no trace there -- the
+  /// event log is the only place a write that changed nothing is visible.
+  int settingsEventCount() {
+    final file = currentMonthLogFile(syncRoot, 'device-1');
+    if (!file.existsSync()) return 0;
+    return decodeJsonl(file.readAsStringSync())
+        .events
+        .where((event) => event.entityId == appSettingsRowId)
+        .length;
+  }
+
+  testWidgets('a value committed by Enter is not written again when focus leaves', (
+    tester,
+  ) async {
+    await tester.pumpWidget(makeApp());
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(const ValueKey('workTimeTarget1')), '8');
+    late int events;
+    await tester.runAsync(() async {
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await waitFor(
+        () async => (await db.appSettingsDao.watchSettings().first).targetMinutesMonday == 480,
+      );
+      // Tab is the second commit path. The settings stream here is a
+      // frozen fixture, which is exactly the state the real screen is in
+      // when the user tabs on before the write has come back round.
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      await Future.delayed(const Duration(milliseconds: 100));
+      events = settingsEventCount();
+    });
+
+    expect(events, 1, reason: 'Enter and the focus loss after it must not each log a write');
   });
 }

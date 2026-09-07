@@ -8,10 +8,13 @@ import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/core/di/device_id_provider.dart';
 import 'package:hickory/core/di/sync_providers.dart';
 import 'package:hickory/data/drift/database.dart';
+import 'package:hickory/data/drift/tables/app_settings_table.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
+import 'package:hickory/data/sync/sync_paths.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
 import 'package:hickory/features/settings/balance_rule_editor.dart';
 import 'package:hickory/l10n/app_localizations.dart';
+import 'package:sync_engine/sync_engine.dart';
 
 import '../../support/app_settings_fixture.dart';
 
@@ -353,5 +356,44 @@ void main() {
     expect(row.balanceResetMonth, null, reason: 'switching to none clears the stale cutoff month');
     expect(row.carryOverMaxMinutes, null, reason: 'switching to none clears the stale max bound');
     expect(row.carryOverMinMinutes, null, reason: 'switching to none clears the stale min bound');
+  });
+
+  testWidgets('a bound committed by Enter is not written again when focus leaves', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      makeApp(
+        settings: appSettingsFixture(
+          balanceResetMode: 'carryOver',
+          balanceResetDay: 31,
+          balanceResetMonth: 12,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    int settingsEvents() {
+      final file = currentMonthLogFile(syncRoot, 'device-1');
+      if (!file.existsSync()) return 0;
+      return decodeJsonl(file.readAsStringSync())
+          .events
+          .where((event) => event.entityId == appSettingsRowId)
+          .length;
+    }
+
+    await tester.enterText(find.byKey(const ValueKey('carryOverMax')), '5');
+    late int events;
+    await tester.runAsync(() async {
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await waitFor(
+        () async => (await db.appSettingsDao.watchSettings().first).carryOverMaxMinutes == 300,
+      );
+      await tester.tap(find.byKey(const ValueKey('carryOverMin')));
+      await tester.pumpAndSettle();
+      await Future.delayed(const Duration(milliseconds: 100));
+      events = settingsEvents();
+    });
+
+    expect(events, 1, reason: 'Enter and the focus loss after it must not each log a write');
   });
 }

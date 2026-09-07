@@ -3,9 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/app_localizations.dart';
 
-/// Shared write plumbing for the work-time settings editors. Both of them
-/// edit the same singleton settings row through a read-modify-write cycle,
-/// so two writes in flight at once could lose one of them.
+/// Shared write plumbing for the settings editors. Each of them edits the
+/// same singleton settings row through a read-modify-write cycle, so two
+/// writes in flight at once could lose one of them.
+///
+/// The queue lives on the State that mixes this in, so it serialises the
+/// writes of *one* editor, not of two editors at once. That is enough here
+/// because each editor is its own sub-page and only one of them can be on
+/// screen -- a genuinely concurrent pair of editors would need a queue
+/// above the widget layer.
 ///
 /// Writes are therefore queued, not dropped. Refusing the second write
 /// would lose it outright, and losing a value the user entered is the
@@ -31,26 +37,31 @@ mixin SettingsWriteGuard<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   /// editor so the user is told which setting failed, not just "settings".
   String saveErrorMessage(AppLocalizations l10n);
 
-  /// Queues [write] behind any write already running. Any failure is
-  /// reported through [saveErrorMessage] and swallowed, so callers can
-  /// fire this and forget it without an unhandled error escaping.
-  Future<void> guardedWrite(Future<void> Function() write) {
+  /// Queues [write] behind any write already running and reports whether
+  /// it went through. Any failure is reported through [saveErrorMessage]
+  /// and swallowed, so callers can fire this and forget it without an
+  /// unhandled error escaping; a caller that remembers what it just saved
+  /// awaits the `false` instead and puts its own state back.
+  Future<bool> guardedWrite(Future<void> Function() write) {
     // Counted before the queue is joined, so the controls disable on the
     // gesture rather than when this write's turn comes round.
     _inFlight++;
     if (mounted) setState(() {});
+    final result = _queue.then((_) => _runGuarded(write));
     // The tail must never carry an error: `then` would propagate it in
     // place of running the next write's body, jamming the queue for good.
-    _queue = _queue.then((_) => _runGuarded(write)).catchError((Object _) {});
-    return _queue;
+    _queue = result.then((_) {}).catchError((Object _) {});
+    return result;
   }
 
-  Future<void> _runGuarded(Future<void> Function() write) async {
+  Future<bool> _runGuarded(Future<void> Function() write) async {
     try {
       await write();
+      return true;
     } catch (error) {
       debugPrint('${widget.runtimeType} failed to save: $error');
       if (mounted) showMessage(saveErrorMessage(AppLocalizations.of(context)));
+      return false;
     } finally {
       _inFlight--;
       if (mounted) setState(() {});

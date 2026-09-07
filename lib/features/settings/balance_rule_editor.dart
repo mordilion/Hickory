@@ -313,6 +313,14 @@ class _CarryOverBoundsInputState extends State<_CarryOverBoundsInput> {
     text: minutesToHoursText((widget.minMinutes ?? 0).abs()),
   );
 
+  /// What each bound was last saved as. Enter and the focus loss that
+  /// follows it are two commit paths over one value, and neither the
+  /// settings stream nor the parent's pending state has necessarily come
+  /// back round between them -- so the incoming [widget] values alone
+  /// cannot tell the second commit that the first already happened.
+  late int? _committedMax = widget.maxMinutes;
+  late int? _committedMin = widget.minMinutes;
+
   @override
   void didUpdateWidget(_CarryOverBoundsInput oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -322,9 +330,11 @@ class _CarryOverBoundsInputState extends State<_CarryOverBoundsInput> {
     // user is currently typing.
     if (oldWidget.maxMinutes != widget.maxMinutes) {
       _maxController.text = minutesToHoursText(widget.maxMinutes ?? 0);
+      _committedMax = widget.maxMinutes;
     }
     if (oldWidget.minMinutes != widget.minMinutes) {
       _minController.text = minutesToHoursText((widget.minMinutes ?? 0).abs());
+      _committedMin = widget.minMinutes;
     }
   }
 
@@ -354,13 +364,15 @@ class _CarryOverBoundsInputState extends State<_CarryOverBoundsInput> {
 
   void _commitMax() {
     final minutes = _magnitudeOf(_maxController);
-    if (minutes == null || minutes == widget.maxMinutes) return;
+    if (minutes == null || minutes == _committedMax) return;
+    _committedMax = minutes;
     widget.onMaxChanged(minutes);
   }
 
   void _commitMin() {
     final minutes = _magnitudeOf(_minController);
-    if (minutes == null || -minutes == widget.minMinutes) return;
+    if (minutes == null || -minutes == _committedMin) return;
+    _committedMin = -minutes;
     widget.onMinChanged(-minutes);
   }
 
