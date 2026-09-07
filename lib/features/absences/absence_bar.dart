@@ -179,28 +179,32 @@ class _AbsenceBarState extends ConsumerState<AbsenceBar> {
             onChanged: _busy ? null : (id) => setState(() => _typeId = id),
           ),
           const SizedBox(height: 12),
-          Text(l10n.absenceFormPortion, style: Theme.of(context).textTheme.labelMedium),
-          const SizedBox(height: 4),
-          Semantics(
-            label: l10n.absenceFormPortion,
-            child: SegmentedButton<String>(
-              segments: [
-                ButtonSegment(
-                  value: absencePortionFullDay,
-                  label: Text(l10n.absencePortionFullDay),
-                ),
-                ButtonSegment(
-                  value: absencePortionHalfDay,
-                  label: Text(l10n.absencePortionHalfDay),
-                ),
-                ButtonSegment(
-                  value: absencePortionRange,
-                  label: Text(l10n.absencePortionRange),
-                ),
-              ],
-              selected: {_portion},
-              onSelectionChanged:
-                  _busy ? null : (selection) => setState(() => _portion = selection.first),
+          // No heading: the three segments name themselves. The label lives
+          // on as the control's accessible name, which has no visible
+          // equivalent to fall back on.
+          Center(
+            child: Semantics(
+              label: l10n.absenceFormPortion,
+              child: SegmentedButton<String>(
+                segments: [
+                  ButtonSegment(
+                    value: absencePortionFullDay,
+                    label: Text(l10n.absencePortionFullDay),
+                  ),
+                  ButtonSegment(
+                    value: absencePortionHalfDay,
+                    label: Text(l10n.absencePortionHalfDay),
+                  ),
+                  ButtonSegment(
+                    value: absencePortionRange,
+                    label: Text(l10n.absencePortionRange),
+                  ),
+                ],
+                selected: {_portion},
+                onSelectionChanged: _busy
+                    ? null
+                    : (selection) => setState(() => _portion = selection.first),
+              ),
             ),
           ),
           const SizedBox(height: 12),
