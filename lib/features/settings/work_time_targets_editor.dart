@@ -200,7 +200,7 @@ class _PerWeekdayInputState extends State<_PerWeekdayInput> {
       final oldMinutes = targetMinutesForWeekday(oldWidget.settings, weekday);
       final newMinutes = targetMinutesForWeekday(widget.settings, weekday);
       if (oldMinutes != newMinutes) {
-        _controllers[weekday - 1].text = minutesToHoursText(newMinutes);
+        setTextPreservingCaret(_controllers[weekday - 1], minutesToHoursText(newMinutes));
         _committed[weekday - 1] = newMinutes;
       }
     }
@@ -339,7 +339,7 @@ class _WeeklyInputState extends State<_WeeklyInput> {
     final oldMinutes = _weeklyMinutesOf(oldWidget.settings);
     final newMinutes = _weeklyMinutesOf(widget.settings);
     if (oldMinutes != newMinutes) {
-      _weeklyController.text = minutesToHoursText(newMinutes);
+      setTextPreservingCaret(_weeklyController, minutesToHoursText(newMinutes));
       _committedWeekly = newMinutes;
     }
   }

@@ -75,6 +75,22 @@ mixin SettingsWriteGuard<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   }
 }
 
+/// Replaces [controller]'s text without throwing away the caret.
+///
+/// Assigning `TextEditingController.text` resets the selection -- even when
+/// the text is unchanged -- so a field refreshed while the user has it open
+/// loses their place. The caret is kept where it was, clamped to the new
+/// text, and parked at the end when the field carried none.
+void setTextPreservingCaret(TextEditingController controller, String text) {
+  final offset = controller.selection.baseOffset;
+  controller.value = TextEditingValue(
+    text: text,
+    selection: TextSelection.collapsed(
+      offset: offset < 0 || offset > text.length ? text.length : offset,
+    ),
+  );
+}
+
 /// Calls [onCommit] whenever [child] loses focus.
 ///
 /// The work-time fields have no Save button, so a value typed into one is

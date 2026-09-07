@@ -329,11 +329,14 @@ class _CarryOverBoundsInputState extends State<_CarryOverBoundsInput> {
     // write settling) would reset the cursor and overwrite whatever the
     // user is currently typing.
     if (oldWidget.maxMinutes != widget.maxMinutes) {
-      _maxController.text = minutesToHoursText(widget.maxMinutes ?? 0);
+      setTextPreservingCaret(_maxController, minutesToHoursText(widget.maxMinutes ?? 0));
       _committedMax = widget.maxMinutes;
     }
     if (oldWidget.minMinutes != widget.minMinutes) {
-      _minController.text = minutesToHoursText((widget.minMinutes ?? 0).abs());
+      setTextPreservingCaret(
+        _minController,
+        minutesToHoursText((widget.minMinutes ?? 0).abs()),
+      );
       _committedMin = widget.minMinutes;
     }
   }

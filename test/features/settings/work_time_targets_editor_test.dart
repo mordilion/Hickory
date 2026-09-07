@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/native.dart';
@@ -82,10 +83,10 @@ void main() {
     await removeSyncRoot(syncRoot);
   });
 
-  Widget makeApp({AppSettingsRow? settings}) => ProviderScope(
+  Widget makeApp({AppSettingsRow? settings, Stream<AppSettingsRow>? settingsStream}) => ProviderScope(
         overrides: [
           appSettingsProvider.overrideWith(
-            (ref) => Stream.value(settings ?? appSettingsFixture()),
+            (ref) => settingsStream ?? Stream.value(settings ?? appSettingsFixture()),
           ),
           deviceIdProvider.overrideWith((ref) async => 'device-1'),
           syncedWritesProvider.overrideWith(
@@ -292,5 +293,45 @@ void main() {
     });
 
     expect(events, 1, reason: 'Enter and the focus loss after it must not each log a write');
+  });
+
+  testWidgets('a stored change leaves the caret where the user put it', (tester) async {
+    final settings = StreamController<AppSettingsRow>();
+    addTearDown(settings.close);
+    await tester.pumpWidget(makeApp(settingsStream: settings.stream));
+    settings.add(appSettingsFixture(targetInputMode: 'perWeek'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(const ValueKey('workTimeWeekly')), '40');
+    final field = tester.widget<EditableText>(
+      find.descendant(
+        of: find.byKey(const ValueKey('workTimeWeekly')),
+        matching: find.byType(EditableText),
+      ),
+    );
+    field.controller.selection = const TextSelection.collapsed(offset: 1);
+    await tester.pump();
+
+    // What a work-day chip toggle writes back: the same 40 hours, now
+    // spread over five days. The figure on screen does not change, but the
+    // stored sum does, which is what pushes a value into the field.
+    settings.add(
+      appSettingsFixture(
+        targetInputMode: 'perWeek',
+        targetMinutesMonday: 480,
+        targetMinutesTuesday: 480,
+        targetMinutesWednesday: 480,
+        targetMinutesThursday: 480,
+        targetMinutesFriday: 480,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(field.controller.text, '40');
+    expect(
+      field.controller.selection.baseOffset,
+      1,
+      reason: 'refreshing the field must not throw away the caret position',
+    );
   });
 }
