@@ -91,6 +91,18 @@ Absence absenceOn(
   );
 }
 
+
+BalanceAdjustment adjustmentOn(DateTime date, int deltaMinutes, {String id = 'adj-1'}) =>
+    BalanceAdjustment(
+      id: id,
+      date: date,
+      deltaMinutes: deltaMinutes,
+      note: null,
+      deviceId: 'device-1',
+      createdAt: DateTime.utc(2026, 1, 1),
+      updatedAt: DateTime.utc(2026, 1, 1),
+    );
+
 void main() {
   // 2026-09-07 is a Monday.
   final monday = DateTime(2026, 9, 7);
@@ -777,6 +789,119 @@ void main() {
 
       expect(figures.completion, 0);
       expect(figures.balance, const Duration(hours: 3));
+    });
+  });
+
+  group('balance corrections', () {
+    test('a correction is added on its effective date', () {
+      final settings = settingsWith(monday: 480);
+      final balances = dayBalances([entryOn(monday, 480)], settings);
+
+      expect(
+        runningBalance(
+          balances,
+          settings,
+          asOf: DateTime(2026, 9, 30),
+          adjustments: [adjustmentOn(monday, -120)],
+        ),
+        const Duration(minutes: -120),
+      );
+    });
+
+    test('a correction on a day with no work of its own still counts', () {
+      final settings = settingsWith(monday: 480);
+
+      expect(
+        runningBalance(
+          const [],
+          settings,
+          asOf: DateTime(2026, 9, 30),
+          adjustments: [adjustmentOn(DateTime(2026, 9, 12), 90)],
+        ),
+        const Duration(minutes: 90),
+        reason: 'a correction is a fact about a day, not an annotation on a worked one',
+      );
+    });
+
+    test('a correction after the reporting date is not counted yet', () {
+      final settings = settingsWith(monday: 480);
+
+      expect(
+        runningBalance(
+          const [],
+          settings,
+          asOf: DateTime(2026, 9, 10),
+          adjustments: [adjustmentOn(DateTime(2026, 9, 20), 90)],
+        ),
+        Duration.zero,
+      );
+    });
+
+    test('a correction before the cutoff is wiped with everything else', () {
+      final settings = settingsWith(
+        monday: 480,
+        balanceResetMode: 'resetToZero',
+        balanceResetDay: 1,
+        balanceResetMonth: 9,
+      );
+
+      expect(
+        runningBalance(
+          const [],
+          settings,
+          asOf: DateTime(2026, 9, 30),
+          adjustments: [adjustmentOn(DateTime(2026, 8, 31), 300)],
+        ),
+        Duration.zero,
+      );
+    });
+
+    test('a correction on the cutoff date belongs to the new period', () {
+      // The cutoff takes effect at the start of the date it names -- the
+      // same rule a worked day follows -- so a correction dated on it is
+      // the first entry of the period that begins there, not the last of
+      // the one that ends. Work and corrections must agree on this, or a
+      // payout booked the same day as the shift it settles would land on
+      // the other side of the line from the hours it cancels.
+      final settings = settingsWith(
+        monday: 480,
+        balanceResetMode: 'resetToZero',
+        balanceResetDay: 1,
+        balanceResetMonth: 9,
+      );
+
+      expect(
+        runningBalance(
+          const [],
+          settings,
+          asOf: DateTime(2026, 9, 30),
+          adjustments: [adjustmentOn(DateTime(2026, 9, 1), -60)],
+        ),
+        const Duration(minutes: -60),
+      );
+    });
+
+    test('corrections inside the range count toward the range balance', () {
+      final figures = figuresForRange(
+        [
+          DayBalance(
+            day: DateTime(2026, 9, 7),
+            worked: const Duration(hours: 8),
+            target: const Duration(hours: 8),
+          ),
+        ],
+        DateTimeRange(start: DateTime(2026, 9, 7), end: DateTime(2026, 9, 14)),
+        adjustments: [
+          adjustmentOn(DateTime(2026, 9, 8), -60),
+          adjustmentOn(DateTime(2026, 9, 20), 600, id: 'adj-2'),
+        ],
+      );
+
+      expect(
+        figures.balance,
+        const Duration(minutes: -60),
+        reason: 'the correction outside the range is not this range\'s business',
+      );
     });
   });
 }

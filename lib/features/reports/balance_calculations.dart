@@ -46,6 +46,10 @@ bool hasAnyTarget(AppSettingsRow settings) => [
       settings.targetMinutesSunday,
     ].any((minutes) => minutes > 0);
 
+/// Local midnight of [dt] — the key both [DayBalance] and a correction
+/// are grouped by.
+DateTime _dayOf(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
+
 /// One calendar day's contribution to the balance.
 class DayBalance {
   const DayBalance({
@@ -261,6 +265,7 @@ class RangeFigures {
     required this.absenceCredit,
     required this.workDays,
     required this.creditedOnWorkDays,
+    this.correction = Duration.zero,
   });
 
   final Duration worked;
@@ -280,7 +285,12 @@ class RangeFigures {
   /// average would overstate the working day it never was.
   final Duration creditedOnWorkDays;
 
-  Duration get balance => worked + absenceCredit - target;
+  /// Manual corrections dated inside the range, summed. Kept apart from
+  /// [worked] so a tile can show what was tracked and what was corrected
+  /// without one hiding the other.
+  final Duration correction;
+
+  Duration get balance => worked + absenceCredit + correction - target;
 
   /// How much a work day in this range carried on average, or zero when
   /// the range holds none — an average over nothing is not a number worth
@@ -300,11 +310,16 @@ class RangeFigures {
 ///
 /// [range.end] is exclusive, matching `rangeForPreset` in
 /// reports_providers.dart — a range ending on the 9th stops at the 8th.
-RangeFigures figuresForRange(List<DayBalance> balances, DateTimeRange range) {
+RangeFigures figuresForRange(
+  List<DayBalance> balances,
+  DateTimeRange range, {
+  List<BalanceAdjustment> adjustments = const [],
+}) {
   var worked = Duration.zero;
   var target = Duration.zero;
   var credit = Duration.zero;
   var creditedOnWorkDays = Duration.zero;
+  var correction = Duration.zero;
   var workDays = 0;
 
   for (final day in balances) {
@@ -319,12 +334,19 @@ RangeFigures figuresForRange(List<DayBalance> balances, DateTimeRange range) {
     }
   }
 
+  for (final adjustment in adjustments) {
+    final day = _dayOf(adjustment.date);
+    if (day.isBefore(range.start) || !day.isBefore(range.end)) continue;
+    correction += Duration(minutes: adjustment.deltaMinutes);
+  }
+
   return RangeFigures(
     worked: worked,
     target: target,
     absenceCredit: credit,
     workDays: workDays,
     creditedOnWorkDays: creditedOnWorkDays,
+    correction: correction,
   );
 }
 
@@ -373,12 +395,30 @@ Duration runningBalance(
   List<DayBalance> balances,
   AppSettingsRow settings, {
   required DateTime asOf,
+  List<BalanceAdjustment> adjustments = const [],
 }) {
+  // Days and corrections merged into one ordered ledger: a correction on a
+  // day with no work of its own is a day of the walk like any other, and a
+  // cutoff between two of them has to be applied whichever kind they are.
+  final byDay = <DateTime, Duration>{};
+  for (final day in balances) {
+    byDay.update(day.day, (sum) => sum + day.balance, ifAbsent: () => day.balance);
+  }
+  for (final adjustment in adjustments) {
+    final delta = Duration(minutes: adjustment.deltaMinutes);
+    byDay.update(
+      _dayOf(adjustment.date),
+      (sum) => sum + delta,
+      ifAbsent: () => delta,
+    );
+  }
+  final days = byDay.keys.toList()..sort();
+
   var total = Duration.zero;
-  // Seeded with the first worked day (or asOf, if there is none) rather
-  // than the epoch — starting at 1970 would walk every no-op cutoff year
-  // between then and the first real day for no reason.
-  var previous = balances.isNotEmpty ? balances.first.day : asOf;
+  // Seeded with the first day of the ledger (or asOf, if it is empty)
+  // rather than the epoch — starting at 1970 would walk every no-op cutoff
+  // year between then and the first real day for no reason.
+  var previous = days.isNotEmpty ? days.first : asOf;
 
   void applyCutoffsBetween(DateTime from, DateTime to) {
     if (settings.balanceResetMode == 'none') return;
@@ -391,11 +431,11 @@ Duration runningBalance(
     }
   }
 
-  for (final day in balances) {
-    if (day.day.isAfter(asOf)) break;
-    applyCutoffsBetween(previous, day.day);
-    total += day.balance;
-    previous = day.day;
+  for (final day in days) {
+    if (day.isAfter(asOf)) break;
+    applyCutoffsBetween(previous, day);
+    total += byDay[day]!;
+    previous = day;
   }
   applyCutoffsBetween(previous, asOf);
   return total;
