@@ -34,7 +34,16 @@
   that actually get a row — days whose weekday target is zero are skipped, because an
   absence on a day with no target would credit nothing and only leave a row to look at.
 - `lib/features/settings/absence_types_editor.dart` (`AbsenceTypesEditor`): the global
-  switch plus the user's list of types, shown by `absences_settings_screen.dart`.
+  switch plus the user's list of types, shown by `absences_settings_screen.dart`. The
+  "add standard types" button stays visible for the life of the list and skips every
+  name (case-insensitively) already there, so it is safe to press twice and adding one
+  type of your own does not shut you out of the standard set.
+- `lib/features/absences/absence_edit_dialog.dart` (`AbsenceEditDialog`): pops with an
+  `AbsenceEdit` record and writes nothing itself; `_editAbsence` in `entries_list.dart`
+  owns the `SyncedWrites.updateAbsence` call, the same split the delete path uses.
+  `lib/features/absences/absence_time_range.dart` (`isAbsenceRangeInOrder`) is shared by
+  both forms: a range whose end is not after its start is refused rather than written as
+  a row worth zero minutes.
 - `lib/features/reports/balance_calculations.dart`: `absenceMinutes` scores one absence on
   its day; `dayBalances` folds absences into the per-day totals; both are pure, no Riverpod.
 - `lib/features/reports/reports_providers.dart` (`workTimeBalanceProvider`): wires
@@ -106,12 +115,11 @@
 
 Against `docs/superpowers/specs/2026-09-02-worktime-balance-dashboard-design.md`:
 
-- **An absence can be deleted but not edited**, where §5 says absences are "edited and
-  deleted" in the entries list. An absence carries no free-form content worth amending —
-  a wrong day, type or portion is a different absence — so deleting the row and
-  recording the right one is both fewer moving parts and the same number of gestures.
-  An edit path would also need `SyncedWrites.updateAbsence` and an update event the
-  ingestor's `toCompanion(false)` branch was written for but nothing yet emits.
+- **An absence's day cannot be edited**, only its type, extent, time range and note
+  (`lib/features/absences/absence_edit_dialog.dart`, reached from the row's edit button).
+  `date` is the key both `dayBalances` and the entries tree group by, so moving a row
+  between days is recording a different absence; the correction path exists for the
+  fields a person actually mistypes.
 - **The paid flag lives in the type's edit dialog, not on each list row**, where §4
   describes "add, rename, reorder, delete and a paid toggle each". Paid is a property of
   the *type*, changed roughly once when the type is created, and an always-live switch on

@@ -34,9 +34,12 @@
   defaulted; a cutoff the user never picked would reset or clamp the balance on a date of
   the app's choosing.
 - `lib/features/settings/settings_editor_support.dart`: shared by both editors above.
-  `SettingsWriteGuard` queues writes to the singleton settings row (never drops them) and
-  turns a failure into a SnackBar; `CommitOnFocusLoss` is what makes the text fields
-  commit without an Enter key.
+  `SettingsWriteGuard` queues writes to the singleton settings row (never drops them),
+  turns a failure into a SnackBar and reports success as a `bool`; `CommitOnFocusLoss` is
+  what makes the text fields commit without an Enter key, and `setTextPreservingCaret` is
+  how a stored value is pushed into an open field. The queue is per State, so it
+  serialises one editor's writes, not two editors at once — enough only because each
+  editor is its own sub-page.
 - `lib/features/reports/reports_providers.dart`'s `workTimeBalanceProvider` and
   `lib/features/reports/balance_card.dart`'s `BalanceCard`: the Reports-tab display.
 
@@ -80,6 +83,17 @@
   clearing `carryOverMaxMinutes` would never reach the peer and the two devices would
   compute different balances. This is the first row on which `null` is semantically
   meaningful; do not "harmonize" it back to `true`.
+- **Every settings field remembers what it last committed**, in a `_committed` field
+  beside its controller, and compares against that rather than against the incoming
+  `settings`/`widget` values. Enter and the focus loss that follows it are two commit
+  paths over one value and neither the settings stream nor the parent's pending state has
+  come back round in between, so without this both wrote — idempotent, but one sync-log
+  event each for every peer to ingest. A write reported as failed puts the old figure
+  back, or a value that failed to save could never be retried from that field.
+- **Pushing text into a field goes through `setTextPreservingCaret`, never
+  `controller.text =`.** The setter drops the selection even when the text is unchanged,
+  so a field refreshed while the user is in it loses their place — most visibly when a
+  work-day chip redistributes the weekly figure being typed.
 - **The text fields in both settings editors are never disabled while a write is in
   flight** (only the chips, dropdowns and the mode toggle are). Disabling a focused field
   takes its focus away, and focus loss is exactly what commits it — tabbing from one day

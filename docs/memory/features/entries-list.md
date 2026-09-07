@@ -64,6 +64,12 @@ the existing delete/edit paths. This feature is UI plus pure grouping logic.
   `EntriesWeekLocation`. Otherwise the list opens on the current week and the entry under
   test is simply not on screen; the failure reads as "finder found 0 widgets" for the entry
   text, which looks like a rendering bug rather than a navigation one.
+- **A test using today's date must not assert two days at once.** The list shows one week
+  at a time, so "today and yesterday" is only ever on screen together when today is not a
+  Monday — a test asserting both passed six days in seven. Assert each day in its own
+  test, or pick the second day with `_sameViewNeighbourOf` (in
+  `test/features/entries/entries_list_test.dart`), which stays inside today's week *and*
+  month, since a week crossing a month boundary is two nodes and only today's is opened.
 - **The week of a fixed date is rarely the date's own Monday.** 2026-07-01 is a Wednesday,
   so its `EntriesWeekLocation` monday is 2026-06-29 while year/month stay July — the June
   days are a separate node.

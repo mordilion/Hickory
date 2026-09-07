@@ -15,11 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set a target work time under Settings → Work time & balance, either as seven daily figures or as one weekly figure spread over the days you pick. Until now the app had nothing to measure tracked time against, so it could not say whether a week was over or under. The same screen holds the yearly cutoff rule: the balance can carry on untouched, be reset to zero on a date you choose, or be carried over capped at an upper and a lower bound.
 - Show the flex-time balance at the top of the Reports tab, counted from the last cutoff and always signed, so a surplus and a deficit cannot be confused. It covers every entry regardless of the tab's filters — "overtime, but only for project X" is not a meaningful number — and says so while a filter is active. With no target set yet it points at the settings screen instead of reading every tracked minute as overtime.
 - Absences can be recorded from the main screen against freely defined types, each marked paid or unpaid, and count toward the work-time balance accordingly. Recording is off by default; with it on, a work day with neither a booking nor an absence shows up as a deficit.
+- Correct a recorded absence from its row in the entries list: type, extent, time range and note. Until now a mistyped absence could only be deleted and entered again, once per day of a vacation.
+
+### Fixed
+
+- Refuse an absence whose time range ends when it starts. It was written as a row worth no time at all while the form reported it as recorded.
+- Keep the caret in place in the work-time settings fields. Refreshing a field — most visibly when a work-day toggle redistributes the weekly figure — sent the cursor to the end of it.
 
 ### Changed
 
 - Book to Jira on its own. The reconciliation now runs at app start and, coalesced into one run per few seconds, after every entry that is created, stopped, edited or deleted — until now it only ever ran when the user pressed the button on the Sync tab, so an edit to an already-booked entry never reached Jira. It stays silent: the outcome shows up in each entry's status icon, and nothing happens at all while Jira is unconfigured.
 - Name the reason a Jira booking failed. The entry's red cloud icon carries the stored error message instead of the generic "Jira booking failed", which stays the tooltip for a failure recorded before this version.
+- Keep the standard absence types reachable. The button that creates them stayed hidden once any type existed; it now stays put and skips every name already in the list.
 
 ## [1.3.2] - 2026-08-19
 
