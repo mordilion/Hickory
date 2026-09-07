@@ -222,6 +222,7 @@
     }
   },
   "absenceFormSaveError": "De afwezigheid kon niet worden opgeslagen.",
+  "absenceFormInvalidRange": "Het einde moet na het begin liggen.",
   "settingsProjectsTitle": "Projecten",
   "settingsProjectsDescription": "Projecten aanmaken, bewerken en archiveren.",
   "settingsProjectsAddLabel": "Project toevoegen",

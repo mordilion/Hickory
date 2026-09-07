@@ -685,6 +685,9 @@ class AppLocalizationsNl extends AppLocalizations {
       'De afwezigheid kon niet worden opgeslagen.';
 
   @override
+  String get absenceFormInvalidRange => 'Het einde moet na het begin liggen.';
+
+  @override
   String get settingsProjectsTitle => 'Projecten';
 
   @override

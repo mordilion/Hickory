@@ -218,4 +218,31 @@ void main() {
     expect(rows.single.portion, absencePortionHalfDay);
     expect(rows.single.startAt, isNull, reason: 'a half day derives its length from the target');
   });
+
+  testWidgets('a time range that ends when it starts is refused, not reported as saved', (
+    tester,
+  ) async {
+    await tester.pumpWidget(makeApp(types: [vacation()]));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Zeitraum'));
+    await tester.pumpAndSettle();
+
+    // Pulls the start up to the end. The clamp keeps the two in order but
+    // cannot make them a span: 11:00 to 11:00 is no absence at all.
+    await pickTime(tester, fieldKey: 'absenceStartTime', hour: '11', minute: '00');
+    expect(find.text('Von: 11:00'), findsOneWidget);
+    expect(find.text('Bis: 11:00'), findsOneWidget);
+
+    late List<Absence> rows;
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Eintragen'));
+      await tester.pump();
+      await Future.delayed(const Duration(milliseconds: 100));
+      rows = await db.select(db.absences).get();
+    });
+    await tester.pump();
+
+    expect(rows, isEmpty, reason: 'a range of no length must not become a row');
+    expect(find.text('Das Ende muss nach dem Beginn liegen.'), findsOneWidget);
+  });
 }

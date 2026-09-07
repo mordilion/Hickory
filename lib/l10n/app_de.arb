@@ -317,6 +317,7 @@
     }
   },
   "absenceFormSaveError": "Die Abwesenheit konnte nicht gespeichert werden.",
+  "absenceFormInvalidRange": "Das Ende muss nach dem Beginn liegen.",
   "settingsProjectsTitle": "Projekte",
   "settingsProjectsDescription": "Projekte anlegen, bearbeiten und archivieren.",
   "settingsProjectsAddLabel": "Projekt hinzufügen",

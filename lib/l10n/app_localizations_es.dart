@@ -683,6 +683,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get absenceFormSaveError => 'No se pudo guardar la ausencia.';
 
   @override
+  String get absenceFormInvalidRange =>
+      'El final debe ser posterior al inicio.';
+
+  @override
   String get settingsProjectsTitle => 'Proyectos';
 
   @override

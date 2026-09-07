@@ -222,6 +222,7 @@
     }
   },
   "absenceFormSaveError": "L'absence n'a pas pu être enregistrée.",
+  "absenceFormInvalidRange": "La fin doit être postérieure au début.",
   "settingsProjectsTitle": "Projets",
   "settingsProjectsDescription": "Créer, modifier et archiver des projets.",
   "settingsProjectsAddLabel": "Ajouter un projet",

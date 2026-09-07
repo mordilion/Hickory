@@ -222,6 +222,7 @@
     }
   },
   "absenceFormSaveError": "The absence could not be saved.",
+  "absenceFormInvalidRange": "The end must be later than the start.",
   "settingsProjectsTitle": "Projects",
   "settingsProjectsDescription": "Create, edit, and archive projects.",
   "settingsProjectsAddLabel": "Add project",

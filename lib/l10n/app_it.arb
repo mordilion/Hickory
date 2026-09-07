@@ -222,6 +222,7 @@
     }
   },
   "absenceFormSaveError": "Impossibile salvare l'assenza.",
+  "absenceFormInvalidRange": "La fine deve essere successiva all’inizio.",
   "settingsProjectsTitle": "Progetti",
   "settingsProjectsDescription": "Crea, modifica e archivia progetti.",
   "settingsProjectsAddLabel": "Aggiungi progetto",

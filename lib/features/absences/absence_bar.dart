@@ -96,6 +96,14 @@ class _AbsenceBarState extends ConsumerState<AbsenceBar> {
     final l10n = AppLocalizations.of(context);
     final typeId = _typeId ?? types.first.id;
 
+    // The pickers keep the two times in order but cannot keep them apart,
+    // and a range that ends when it starts is scored as zero minutes -- so
+    // saving it would report an absence that credits nothing.
+    if (_portion == absencePortionRange && !_isEarlier(_startTime, _endTime)) {
+      _showMessage(l10n.absenceFormInvalidRange);
+      return;
+    }
+
     // A time range is one day by definition; the span pickers only apply
     // to whole and half days.
     final days = _portion == absencePortionRange

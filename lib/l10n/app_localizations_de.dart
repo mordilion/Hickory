@@ -685,6 +685,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Abwesenheit konnte nicht gespeichert werden.';
 
   @override
+  String get absenceFormInvalidRange => 'Das Ende muss nach dem Beginn liegen.';
+
+  @override
   String get settingsProjectsTitle => 'Projekte';
 
   @override

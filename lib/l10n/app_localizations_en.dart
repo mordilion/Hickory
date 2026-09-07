@@ -677,6 +677,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get absenceFormSaveError => 'The absence could not be saved.';
 
   @override
+  String get absenceFormInvalidRange => 'The end must be later than the start.';
+
+  @override
   String get settingsProjectsTitle => 'Projects';
 
   @override

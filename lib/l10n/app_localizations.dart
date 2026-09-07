@@ -1257,6 +1257,12 @@ abstract class AppLocalizations {
   /// **'Die Abwesenheit konnte nicht gespeichert werden.'**
   String get absenceFormSaveError;
 
+  /// No description provided for @absenceFormInvalidRange.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Ende muss nach dem Beginn liegen.'**
+  String get absenceFormInvalidRange;
+
   /// No description provided for @settingsProjectsTitle.
   ///
   /// In de, this message translates to:
