@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/absence_providers.dart';
+import '../../core/di/app_settings_provider.dart';
+import '../../core/format/date_format.dart';
 import '../../data/drift/database.dart';
 import '../../data/drift/tables/absences_table.dart';
 import '../../l10n/app_localizations.dart';
@@ -96,6 +98,11 @@ class _AbsenceEditDialogState extends ConsumerState<AbsenceEditDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final types = ref.watch(absenceTypesProvider).value ?? const <AbsenceType>[];
+    // The same two settings every other date and time in the app reads.
+    final settings = ref.watch(appSettingsProvider).value;
+    final dateStyle = settings.dateStyle;
+    final timeStyle = settings.timeStyle;
+    final languageCode = Localizations.localeOf(context).languageCode;
     final isRange = _portion == absencePortionRange;
     // A type deleted on another device would otherwise leave the dropdown
     // with a value none of its items carry, which Flutter asserts on.
@@ -145,34 +152,37 @@ class _AbsenceEditDialogState extends ConsumerState<AbsenceEditDialog> {
               }),
             ),
           ),
-          if (isRange) ...[
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    key: const ValueKey('absenceEditStartTime'),
-                    onPressed: () => _pickTime(isStart: true),
-                    child: Text('${l10n.absenceFormFrom}: ${_startTime.format(context)}'),
-                  ),
+          const SizedBox(height: 8),
+          // Laid out like the recording form's pickers, with the day the
+          // absence covers spelled out rather than offered as a button:
+          // this dialog cannot move a row to another day.
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text(formatDate(widget.absence.date, dateStyle, languageCode)),
+              if (isRange) ...[
+                TextButton(
+                  key: const ValueKey('absenceEditStartTime'),
+                  onPressed: () => _pickTime(isStart: true),
+                  child: Text(formatTime(_at(_startTime).toLocal(), timeStyle)),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton(
-                    key: const ValueKey('absenceEditEndTime'),
-                    onPressed: () => _pickTime(isStart: false),
-                    child: Text('${l10n.absenceFormTo}: ${_endTime.format(context)}'),
-                  ),
+                const Text('–'),
+                TextButton(
+                  key: const ValueKey('absenceEditEndTime'),
+                  onPressed: () => _pickTime(isStart: false),
+                  child: Text(formatTime(_at(_endTime).toLocal(), timeStyle)),
                 ),
               ],
-            ),
-            if (_rangeInvalid) ...[
-              const SizedBox(height: 8),
-              Text(
-                l10n.absenceFormInvalidRange,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
             ],
+          ),
+          if (isRange && _rangeInvalid) ...[
+            const SizedBox(height: 8),
+            Text(
+              l10n.absenceFormInvalidRange,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ],
           const SizedBox(height: 8),
           TextField(

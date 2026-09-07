@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import '../../core/di/absence_providers.dart';
 import '../../core/di/app_settings_provider.dart';
 import '../../core/di/device_id_provider.dart';
 import '../../core/di/sync_providers.dart';
+import '../../core/format/date_format.dart';
+import '../../core/theme/hickory_colors.dart';
+import '../../core/widgets/gradient_buttons.dart';
 import '../../data/drift/database.dart';
 import '../../data/drift/tables/absences_table.dart';
 import '../../l10n/app_localizations.dart';
@@ -158,8 +160,12 @@ class _AbsenceBarState extends ConsumerState<AbsenceBar> {
     }
     if (types.isEmpty) return _AbsenceCard(child: Text(l10n.absenceFormNoTypes));
 
-    final localeName = Localizations.localeOf(context).toLanguageTag();
-    final dateFormat = DateFormat.yMd(localeName);
+    // The same two settings QuickAddBar and the manual dialog read, so a
+    // date or a time reads identically whichever mode of this tab wrote it.
+    final dateStyle = settings.dateStyle;
+    final timeStyle = settings.timeStyle;
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final tokens = HickoryColors.of(context);
     final isRange = _portion == absencePortionRange;
     final selectedType = _typeId ?? types.first.id;
 
@@ -167,10 +173,18 @@ class _AbsenceBarState extends ConsumerState<AbsenceBar> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Free text first, then what it is about: the same order the
+          // timer card and QuickAddBar put their description in.
+          TextField(
+            key: const ValueKey('absenceNote'),
+            controller: _noteController,
+            enabled: !_busy,
+            decoration: InputDecoration(labelText: l10n.absenceFormNote),
+          ),
+          const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             key: const ValueKey('absenceType'),
             initialValue: selectedType,
-            isDense: true,
             decoration: InputDecoration(labelText: l10n.absenceFormType),
             items: [
               for (final type in types)
@@ -208,63 +222,55 @@ class _AbsenceBarState extends ConsumerState<AbsenceBar> {
             ),
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
+          // Laid out like QuickAddBar's four pickers: bare text buttons in
+          // a Wrap with an en dash between the two ends. A whole or half
+          // day spans dates, a time range spans one day's clock, so the
+          // dash sits between whichever pair is the span.
+          Center(
+            child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                TextButton(
                   key: const ValueKey('absenceStartDate'),
                   onPressed: _busy ? null : () => _pickDate(isStart: true),
-                  child: Text('${l10n.absenceFormFrom}: ${dateFormat.format(_from)}'),
+                  child: Text(formatDate(_from, dateStyle, languageCode)),
                 ),
-              ),
-              if (!isRange) ...[
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton(
+                if (!isRange) ...[
+                  const Text('–'),
+                  TextButton(
                     key: const ValueKey('absenceEndDate'),
                     onPressed: _busy ? null : () => _pickDate(isStart: false),
-                    child: Text('${l10n.absenceFormTo}: ${dateFormat.format(_to)}'),
+                    child: Text(formatDate(_to, dateStyle, languageCode)),
                   ),
-                ),
-              ],
-            ],
-          ),
-          if (isRange) ...[
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
+                ],
+                if (isRange) ...[
+                  TextButton(
                     key: const ValueKey('absenceStartTime'),
                     onPressed: _busy ? null : () => _pickTime(isStart: true),
-                    child: Text('${l10n.absenceFormFrom}: ${_startTime.format(context)}'),
+                    child: Text(formatTime(_at(_from, _startTime), timeStyle)),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton(
+                  const Text('–'),
+                  TextButton(
                     key: const ValueKey('absenceEndTime'),
                     onPressed: _busy ? null : () => _pickTime(isStart: false),
-                    child: Text('${l10n.absenceFormTo}: ${_endTime.format(context)}'),
+                    child: Text(formatTime(_at(_from, _endTime), timeStyle)),
                   ),
-                ),
+                ],
               ],
             ),
-          ],
-          const SizedBox(height: 8),
-          TextField(
-            key: const ValueKey('absenceNote'),
-            controller: _noteController,
-            enabled: !_busy,
-            decoration: InputDecoration(labelText: l10n.absenceFormNote, isDense: true),
           ),
           const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerRight,
-            child: FilledButton(
-              onPressed: _busy ? null : () => _submit(settings, types),
-              child: Text(l10n.absenceFormSubmit),
-            ),
+          // The same commitment QuickAddBar's add and the timer's start
+          // are, so it gets the same full-width pill rather than a small
+          // button of its own.
+          GradientPillButton(
+            label: l10n.absenceFormSubmit,
+            icon: Icons.event_busy_outlined,
+            gradient: tokens.primaryGradient,
+            foregroundColor: tokens.onPrimaryGradient,
+            onPressed: _busy ? null : () => _submit(settings, types),
           ),
         ],
       ),

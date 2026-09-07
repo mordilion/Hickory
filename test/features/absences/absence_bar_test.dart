@@ -13,6 +13,9 @@ import 'package:hickory/data/drift/tables/absences_table.dart';
 import 'package:hickory/data/sync/sync_log_writer.dart';
 import 'package:hickory/data/sync/synced_writes.dart';
 import 'package:hickory/features/absences/absence_bar.dart';
+import 'package:hickory/core/format/date_format.dart';
+import 'package:hickory/core/theme/app_theme.dart';
+import 'package:hickory/core/widgets/gradient_buttons.dart';
 import 'package:hickory/l10n/app_localizations.dart';
 
 import '../../support/app_settings_fixture.dart';
@@ -65,9 +68,9 @@ void main() {
     targetMinutesSunday: 480,
   );
 
-  Widget makeApp({List<AbsenceType> types = const []}) => ProviderScope(
+  Widget makeApp({List<AbsenceType> types = const [], AppSettingsRow? settings}) => ProviderScope(
         overrides: [
-          appSettingsProvider.overrideWith((ref) => Stream.value(everyDayTarget)),
+          appSettingsProvider.overrideWith((ref) => Stream.value(settings ?? everyDayTarget)),
           absenceTypesProvider.overrideWith((ref) => Stream.value(types)),
           deviceIdProvider.overrideWith((ref) async => 'device-1'),
           syncedWritesProvider.overrideWith(
@@ -78,6 +81,9 @@ void main() {
           ),
         ],
         child: MaterialApp(
+          // The submit pill reads its gradient from HickoryColors, which
+          // only exists as a ThemeExtension on the app's own theme.
+          theme: AppTheme.light,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           locale: const Locale('de'),
@@ -171,15 +177,15 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Zeitraum'));
     await tester.pumpAndSettle();
-    expect(find.text('Von: 09:00'), findsOneWidget);
+    expect(find.text('09:00'), findsOneWidget);
 
     await pickTime(tester, fieldKey: 'absenceEndTime', hour: '08', minute: '00');
 
     // Without the clamp the row would be written with endAt before
     // startAt, which absenceMinutes scores as zero while the snackbar
-    // still reports the absence as recorded.
-    expect(find.text('Bis: 08:00'), findsOneWidget);
-    expect(find.text('Von: 08:00'), findsOneWidget);
+    // still reports the absence as recorded. Both ends now read 08:00,
+    // so the two buttons carry the same text.
+    expect(find.text('08:00'), findsNWidgets(2));
   });
 
   testWidgets('a start time after the end pushes the end along with it', (tester) async {
@@ -187,12 +193,11 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Zeitraum'));
     await tester.pumpAndSettle();
-    expect(find.text('Bis: 11:00'), findsOneWidget);
+    expect(find.text('11:00'), findsOneWidget);
 
     await pickTime(tester, fieldKey: 'absenceStartTime', hour: '11', minute: '30');
 
-    expect(find.text('Von: 11:30'), findsOneWidget);
-    expect(find.text('Bis: 11:30'), findsOneWidget);
+    expect(find.text('11:30'), findsNWidgets(2));
   });
 
   testWidgets('a half-day absence stores the portion, not a minute figure', (tester) async {
@@ -225,8 +230,7 @@ void main() {
     // Pulls the start up to the end. The clamp keeps the two in order but
     // cannot make them a span: 11:00 to 11:00 is no absence at all.
     await pickTime(tester, fieldKey: 'absenceStartTime', hour: '11', minute: '00');
-    expect(find.text('Von: 11:00'), findsOneWidget);
-    expect(find.text('Bis: 11:00'), findsOneWidget);
+    expect(find.text('11:00'), findsNWidgets(2));
 
     late List<Absence> rows;
     await tester.runAsync(() async {
@@ -294,5 +298,65 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('renders dates and times in the configured format', (tester) async {
+    // The other two modes of this tab read the same two settings; this one
+    // used intl's locale defaults and a 24-hour clock of its own, so the
+    // same moment read differently depending on which mode you were in.
+    await tester.pumpWidget(
+      makeApp(
+        types: [vacation()],
+        settings: appSettingsFixture(
+          absenceTrackingEnabled: true,
+          targetMinutesMonday: 480,
+          targetMinutesTuesday: 480,
+          targetMinutesWednesday: 480,
+          targetMinutesThursday: 480,
+          targetMinutesFriday: 480,
+          targetMinutesSaturday: 480,
+          targetMinutesSunday: 480,
+          dateFormat: 'de',
+          timeFormat: '12h',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final today = DateTime.now();
+    expect(find.text(formatDate(today, DateFormatStyle.de, 'de')), findsWidgets);
+
+    await tester.tap(find.text('Zeitraum'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('9:00 AM'), findsOneWidget);
+    expect(find.text('11:00 AM'), findsOneWidget);
+  });
+
+  testWidgets('uses the same date and time controls as the manual form', (tester) async {
+    await tester.pumpWidget(makeApp(types: [vacation()]));
+    await tester.pumpAndSettle();
+
+    // QuickAddBar renders its four pickers as bare TextButtons in a Wrap,
+    // separated by an en dash. Outlined buttons carrying "Von:"/"Bis:"
+    // made the same control look like a different one per mode.
+    expect(find.byType(OutlinedButton), findsNothing);
+    expect(
+      find.descendant(of: find.byType(Wrap), matching: find.byType(TextButton)),
+      findsNWidgets(2),
+    );
+    expect(find.text('–'), findsOneWidget);
+    expect(
+      find.ancestor(of: find.byType(Wrap), matching: find.byType(Center)),
+      findsOneWidget,
+      reason: "the pickers sit centred, as they do in the manual form's centred column",
+    );
+  });
+
+  testWidgets('commits with the same pill button the other two modes use', (tester) async {
+    await tester.pumpWidget(makeApp(types: [vacation()]));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(GradientPillButton), findsOneWidget);
   });
 }

@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Book to Jira on its own. The reconciliation now runs at app start and, coalesced into one run per few seconds, after every entry that is created, stopped, edited or deleted — until now it only ever ran when the user pressed the button on the Sync tab, so an edit to an already-booked entry never reached Jira. It stays silent: the outcome shows up in each entry's status icon, and nothing happens at all while Jira is unconfigured.
 - Name the reason a Jira booking failed. The entry's red cloud icon carries the stored error message instead of the generic "Jira booking failed", which stays the tooltip for a failure recorded before this version.
+- Give the absence form the same shape as the timer and manual modes: one card, the note first, the same date and time buttons, and the same full-width submit button. Its dates and times now follow the formats set under Settings — it used the system locale and a 24-hour clock of its own, so the same moment read differently depending on which mode wrote it.
 - Keep the standard absence types reachable. The button that creates them stayed hidden once any type existed; it now stays put and skips every name already in the list.
 
 ## [1.3.2] - 2026-08-19

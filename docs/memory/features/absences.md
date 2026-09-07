@@ -31,7 +31,14 @@
 - `lib/features/absences/absence_bar.dart` (`AbsenceBar`): the third way to record time on
   the main screen, beside the timer and a manual entry. It renders in the same
   `Card > Padding(16)` box as `_StartCard` and `QuickAddBar` — including its loading and
-  "no type yet" states, so switching modes never changes the shape of the tab. `lib/features/absences/absence_days.dart`
+  "no type yet" states, so switching modes never changes the shape of the tab. The three
+  modes are deliberately one shape down to the details: free text first, then the pickers
+  as bare `TextButton`s in a centred `Wrap` with an en dash between the two ends, then a
+  full-width `GradientPillButton`. Dates and times go through `formatDate`/`formatTime`
+  with the stored `dateStyle`/`timeStyle`, never `DateFormat.yMd` or
+  `TimeOfDay.format(context)` — those ignore the user's setting, so the same moment used
+  to read differently depending on which mode wrote it. `AbsenceEditDialog` follows the
+  same layout and shows the day as plain text, since it cannot move a row between days. `lib/features/absences/absence_days.dart`
   (`absenceDaysBetween`) turns a full/half-day date range into the list of calendar days
   that actually get a row — days whose weekday target is zero are skipped, because an
   absence on a day with no target would credit nothing and only leave a row to look at.

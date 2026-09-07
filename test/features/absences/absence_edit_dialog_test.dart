@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/core/di/absence_providers.dart';
+import 'package:hickory/core/di/app_settings_provider.dart';
+import 'package:hickory/core/format/date_format.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/drift/tables/absences_table.dart';
 import 'package:hickory/features/absences/absence_edit_dialog.dart';
 import 'package:hickory/l10n/app_localizations.dart';
+
+import '../../support/app_settings_fixture.dart';
 
 void main() {
   AbsenceType type(String id, String name) => AbsenceType(
@@ -49,6 +53,9 @@ void main() {
       ProviderScope(
         overrides: [
           absenceTypesProvider.overrideWith((ref) => Stream.value(types)),
+          appSettingsProvider.overrideWith(
+            (ref) => Stream.value(appSettingsFixture(dateFormat: 'de', timeFormat: '12h')),
+          ),
         ],
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -120,6 +127,9 @@ void main() {
           absenceTypesProvider.overrideWith(
             (ref) => Stream.value([type('type-1', 'Urlaub')]),
           ),
+          appSettingsProvider.overrideWith(
+            (ref) => Stream.value(appSettingsFixture(dateFormat: 'de', timeFormat: '12h')),
+          ),
         ],
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -162,5 +172,28 @@ void main() {
       reason: 'a whole day carries no time range, and the stored one must go',
     );
     expect(result?.endAt, isNull);
+  });
+
+  testWidgets('renders the day and the range in the configured format', (tester) async {
+    await showEditor(
+      tester,
+      absence(
+        portion: absencePortionRange,
+        startAt: DateTime(2026, 9, 7, 9).toUtc(),
+        endAt: DateTime(2026, 9, 7, 11).toUtc(),
+      ),
+      types: [type('type-1', 'Urlaub')],
+    );
+
+    // The same settings the form that recorded it reads, and the day it
+    // belongs to spelled out -- the dialog cannot move it, so it says
+    // which day is being corrected instead of leaving that to memory.
+    expect(
+      find.text(formatDate(DateTime(2026, 9, 7), DateFormatStyle.de, 'de')),
+      findsOneWidget,
+    );
+    expect(find.text('9:00 AM'), findsOneWidget);
+    expect(find.text('11:00 AM'), findsOneWidget);
+    expect(find.byType(OutlinedButton), findsNothing);
   });
 }
