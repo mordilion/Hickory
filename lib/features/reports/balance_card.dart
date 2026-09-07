@@ -6,6 +6,7 @@ import '../../core/di/app_settings_provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/format/date_format.dart';
 import '../../core/format/duration_format.dart';
+import 'balance_adjustment_dialog.dart';
 import 'balance_calculations.dart';
 import 'report_view_controller.dart';
 import 'reports_providers.dart';
@@ -108,6 +109,15 @@ class BalanceCard extends ConsumerWidget {
                               l10n: l10n,
                             ),
                           ],
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton.icon(
+                            key: const ValueKey('openBalanceAdjustments'),
+                            onPressed: () => showBalanceAdjustmentsDialog(context, ref),
+                            icon: const Icon(Icons.tune, size: 18),
+                            label: Text(l10n.reportsAdjustmentsOpen),
+                          ),
                         ),
                         if (filterActive) ...[
                           const SizedBox(height: 12),

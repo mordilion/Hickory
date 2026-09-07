@@ -1689,6 +1689,54 @@ abstract class AppLocalizations {
   /// **'–'**
   String get reportsBalanceNoFigure;
 
+  /// No description provided for @reportsAdjustmentsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Korrekturen'**
+  String get reportsAdjustmentsTitle;
+
+  /// No description provided for @reportsAdjustmentsOpen.
+  ///
+  /// In de, this message translates to:
+  /// **'Korrektur'**
+  String get reportsAdjustmentsOpen;
+
+  /// No description provided for @reportsAdjustmentsEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Korrekturen erfasst.'**
+  String get reportsAdjustmentsEmpty;
+
+  /// No description provided for @reportsAdjustmentHours.
+  ///
+  /// In de, this message translates to:
+  /// **'Stunden (+/-)'**
+  String get reportsAdjustmentHours;
+
+  /// No description provided for @reportsAdjustmentNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Grund'**
+  String get reportsAdjustmentNote;
+
+  /// No description provided for @reportsAdjustmentAdd.
+  ///
+  /// In de, this message translates to:
+  /// **'Hinzufügen'**
+  String get reportsAdjustmentAdd;
+
+  /// No description provided for @reportsAdjustmentInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte eine Stundenzahl ungleich null eingeben.'**
+  String get reportsAdjustmentInvalid;
+
+  /// No description provided for @reportsAdjustmentSaveError.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Korrektur konnte nicht gespeichert werden.'**
+  String get reportsAdjustmentSaveError;
+
   /// No description provided for @reportsBalanceNoTargets.
   ///
   /// In de, this message translates to:

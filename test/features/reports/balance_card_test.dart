@@ -291,4 +291,13 @@ void main() {
     expect(find.text('Ø pro Arbeitstag'), findsOneWidget);
     expect(tileValue('Ø pro Arbeitstag', '–'), findsOneWidget);
   });
+
+  testWidgets('opens the corrections dialog from the block', (tester) async {
+    await pumpCard(tester, settings: appSettingsFixture(targetMinutesMonday: 480));
+
+    await tester.tap(find.byKey(const ValueKey('openBalanceAdjustments')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Korrekturen'), findsOneWidget);
+  });
 }

@@ -922,6 +922,32 @@ class AppLocalizationsDe extends AppLocalizations {
   String get reportsBalanceNoFigure => '–';
 
   @override
+  String get reportsAdjustmentsTitle => 'Korrekturen';
+
+  @override
+  String get reportsAdjustmentsOpen => 'Korrektur';
+
+  @override
+  String get reportsAdjustmentsEmpty => 'Noch keine Korrekturen erfasst.';
+
+  @override
+  String get reportsAdjustmentHours => 'Stunden (+/-)';
+
+  @override
+  String get reportsAdjustmentNote => 'Grund';
+
+  @override
+  String get reportsAdjustmentAdd => 'Hinzufügen';
+
+  @override
+  String get reportsAdjustmentInvalid =>
+      'Bitte eine Stundenzahl ungleich null eingeben.';
+
+  @override
+  String get reportsAdjustmentSaveError =>
+      'Die Korrektur konnte nicht gespeichert werden.';
+
+  @override
   String get reportsBalanceNoTargets =>
       'Noch keine Soll-Arbeitszeit hinterlegt.';
 

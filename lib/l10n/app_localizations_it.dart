@@ -917,6 +917,31 @@ class AppLocalizationsIt extends AppLocalizations {
   String get reportsBalanceNoFigure => '–';
 
   @override
+  String get reportsAdjustmentsTitle => 'Correzioni';
+
+  @override
+  String get reportsAdjustmentsOpen => 'Correzione';
+
+  @override
+  String get reportsAdjustmentsEmpty => 'Nessuna correzione registrata finora.';
+
+  @override
+  String get reportsAdjustmentHours => 'Ore (+/-)';
+
+  @override
+  String get reportsAdjustmentNote => 'Motivo';
+
+  @override
+  String get reportsAdjustmentAdd => 'Aggiungi';
+
+  @override
+  String get reportsAdjustmentInvalid =>
+      'Inserisci un numero di ore diverso da zero.';
+
+  @override
+  String get reportsAdjustmentSaveError => 'Impossibile salvare la correzione.';
+
+  @override
   String get reportsBalanceNoTargets => 'Nessun orario previsto impostato.';
 
   @override

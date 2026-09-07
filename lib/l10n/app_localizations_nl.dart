@@ -921,6 +921,32 @@ class AppLocalizationsNl extends AppLocalizations {
   String get reportsBalanceNoFigure => '–';
 
   @override
+  String get reportsAdjustmentsTitle => 'Correcties';
+
+  @override
+  String get reportsAdjustmentsOpen => 'Correctie';
+
+  @override
+  String get reportsAdjustmentsEmpty => 'Nog geen correcties vastgelegd.';
+
+  @override
+  String get reportsAdjustmentHours => 'Uren (+/-)';
+
+  @override
+  String get reportsAdjustmentNote => 'Reden';
+
+  @override
+  String get reportsAdjustmentAdd => 'Toevoegen';
+
+  @override
+  String get reportsAdjustmentInvalid =>
+      'Voer een aantal uren in dat niet nul is.';
+
+  @override
+  String get reportsAdjustmentSaveError =>
+      'De correctie kon niet worden opgeslagen.';
+
+  @override
   String get reportsBalanceNoTargets => 'Nog geen streefwerktijd ingesteld.';
 
   @override
