@@ -300,6 +300,10 @@
     }
   },
   "reportsBalanceAllTime": "Saldo complessivo",
+  "reportsBalanceInRange": "Nel periodo",
+  "reportsBalanceTargetVsActual": "Previsto / effettivo",
+  "reportsBalanceAveragePerDay": "Media per giorno lavorativo",
+  "reportsBalanceNoFigure": "–",
   "reportsBalanceNoTargets": "Nessun orario previsto impostato.",
   "reportsBalanceConfigure": "Impostalo in Impostazioni → Orario di lavoro e saldo.",
   "reportsBalanceIgnoresFilter": "Il saldo considera tutte le voci, indipendentemente dal filtro.",

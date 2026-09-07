@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/core/di/absence_providers.dart';
 import 'package:hickory/core/di/app_settings_provider.dart';
+import 'package:hickory/core/di/balance_adjustment_providers.dart';
 import 'package:hickory/core/theme/app_theme.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/features/reports/report_view_controller.dart';
@@ -98,6 +99,7 @@ void main() {
       allEntriesProvider.overrideWith((ref) => Stream.value(entries)),
       absencesProvider.overrideWith((ref) => Stream.value(const [])),
       absenceTypesProvider.overrideWith((ref) => Stream.value(const [])),
+          balanceAdjustmentsProvider.overrideWith((ref) => Stream.value(const [])),
     ],
     child: MaterialApp(
       theme: AppTheme.light,

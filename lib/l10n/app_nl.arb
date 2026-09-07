@@ -300,6 +300,10 @@
     }
   },
   "reportsBalanceAllTime": "Saldo totaal",
+  "reportsBalanceInRange": "In de periode",
+  "reportsBalanceTargetVsActual": "Norm / werkelijk",
+  "reportsBalanceAveragePerDay": "Gem. per werkdag",
+  "reportsBalanceNoFigure": "–",
   "reportsBalanceNoTargets": "Nog geen streefwerktijd ingesteld.",
   "reportsBalanceConfigure": "Stel die in bij Instellingen → Werktijd en saldo.",
   "reportsBalanceIgnoresFilter": "Het saldo omvat alle registraties, ongeacht het filter.",

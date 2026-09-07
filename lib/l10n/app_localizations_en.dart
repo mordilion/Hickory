@@ -897,6 +897,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportsBalanceAllTime => 'Balance overall';
 
   @override
+  String get reportsBalanceInRange => 'In the range';
+
+  @override
+  String get reportsBalanceTargetVsActual => 'Target / actual';
+
+  @override
+  String get reportsBalanceAveragePerDay => 'Avg. per work day';
+
+  @override
+  String get reportsBalanceNoFigure => '–';
+
+  @override
   String get reportsBalanceNoTargets => 'No target work time set yet.';
 
   @override

@@ -1665,6 +1665,30 @@ abstract class AppLocalizations {
   /// **'Saldo gesamt'**
   String get reportsBalanceAllTime;
 
+  /// No description provided for @reportsBalanceInRange.
+  ///
+  /// In de, this message translates to:
+  /// **'Im Zeitraum'**
+  String get reportsBalanceInRange;
+
+  /// No description provided for @reportsBalanceTargetVsActual.
+  ///
+  /// In de, this message translates to:
+  /// **'Soll / Ist'**
+  String get reportsBalanceTargetVsActual;
+
+  /// No description provided for @reportsBalanceAveragePerDay.
+  ///
+  /// In de, this message translates to:
+  /// **'Ø pro Arbeitstag'**
+  String get reportsBalanceAveragePerDay;
+
+  /// No description provided for @reportsBalanceNoFigure.
+  ///
+  /// In de, this message translates to:
+  /// **'–'**
+  String get reportsBalanceNoFigure;
+
   /// No description provided for @reportsBalanceNoTargets.
   ///
   /// In de, this message translates to:

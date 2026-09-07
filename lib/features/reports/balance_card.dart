@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 
 import '../../core/di/app_settings_provider.dart';
 import '../../l10n/app_localizations.dart';
+import '../../core/format/date_format.dart';
+import '../../core/format/duration_format.dart';
 import 'balance_calculations.dart';
 import 'report_view_controller.dart';
 import 'reports_providers.dart';
@@ -79,34 +81,36 @@ class BalanceCard extends ConsumerWidget {
             ? l10n.reportsBalanceAllTime
             : l10n.reportsBalanceSince(DateFormat.yMd(localeName).format(cutoff));
 
+        final timeStyle = settings.timeStyle;
         return Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: ref.watch(workTimeBalanceProvider).when(
                   data: (balance) {
-                    // Icon and colour together, never colour alone.
-                    final isDeficit = balance.isNegative;
-                    final color = isDeficit ? theme.colorScheme.error : theme.colorScheme.primary;
+                    final figures = ref.watch(balanceFiguresProvider).value;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Row(
+                        Wrap(
+                          spacing: 24,
+                          runSpacing: 16,
                           children: [
-                            Icon(
-                              isDeficit ? Icons.trending_down : Icons.trending_up,
-                              color: color,
+                            _BalanceTile(label: label, value: balance),
+                            _BalanceTile(
+                              label: l10n.reportsBalanceInRange,
+                              value: figures?.balance,
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(child: Text(label, style: theme.textTheme.titleMedium)),
-                            Text(
-                              formatSignedDuration(balance),
-                              style: theme.textTheme.headlineSmall?.copyWith(color: color),
+                            _TargetTile(figures: figures, timeStyle: timeStyle, l10n: l10n),
+                            _AverageTile(
+                              figures: figures,
+                              timeStyle: timeStyle,
+                              l10n: l10n,
                             ),
                           ],
                         ),
                         if (filterActive) ...[
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 12),
                           Text(
                             l10n.reportsBalanceIgnoresFilter,
                             style: theme.textTheme.bodySmall,
@@ -121,6 +125,147 @@ class BalanceCard extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+
+/// One figure of the balance block: a caption above a single number.
+///
+/// A signed duration carries its sign as an icon *and* a colour, never a
+/// colour alone. A null [value] means the figures have not arrived yet and
+/// renders as a dash rather than a zero, which would read as a real
+/// measurement.
+class _BalanceTile extends StatelessWidget {
+  const _BalanceTile({required this.label, required this.value});
+
+  final String label;
+  final Duration? value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final balance = value;
+    final isDeficit = balance != null && balance.isNegative;
+    final color = balance == null
+        ? theme.colorScheme.onSurfaceVariant
+        : (isDeficit ? theme.colorScheme.error : theme.colorScheme.primary);
+    return _TileFrame(
+      label: label,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (balance != null) ...[
+            Icon(
+              isDeficit ? Icons.trending_down : Icons.trending_up,
+              color: color,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+          ],
+          Text(
+            balance == null
+                ? AppLocalizations.of(context).reportsBalanceNoFigure
+                : formatSignedDuration(balance),
+            style: theme.textTheme.headlineSmall?.copyWith(color: color),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Target against what was actually credited, with a progress bar. The bar
+/// is clamped at one so a surplus fills it rather than overflowing, while
+/// the figures beside it still say by how much.
+class _TargetTile extends StatelessWidget {
+  const _TargetTile({
+    required this.figures,
+    required this.timeStyle,
+    required this.l10n,
+  });
+
+  final RangeFigures? figures;
+  final TimeFormatStyle timeStyle;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final range = figures;
+    return _TileFrame(
+      label: l10n.reportsBalanceTargetVsActual,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            range == null
+                ? l10n.reportsBalanceNoFigure
+                : '${formatDuration(range.target, timeStyle)} / '
+                      '${formatDuration(range.worked + range.absenceCredit, timeStyle)}',
+            style: theme.textTheme.titleLarge,
+          ),
+          const SizedBox(height: 6),
+          SizedBox(
+            width: 160,
+            child: LinearProgressIndicator(
+              value: range == null ? 0 : range.completion.clamp(0, 1).toDouble(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// What a work day in the range carried on average, or a dash when the
+/// range holds no work day at all — an average over nothing is not a
+/// number.
+class _AverageTile extends StatelessWidget {
+  const _AverageTile({
+    required this.figures,
+    required this.timeStyle,
+    required this.l10n,
+  });
+
+  final RangeFigures? figures;
+  final TimeFormatStyle timeStyle;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final range = figures;
+    final hasWorkDays = range != null && range.workDays > 0;
+    return _TileFrame(
+      label: l10n.reportsBalanceAveragePerDay,
+      child: Text(
+        hasWorkDays
+            ? formatDuration(range.averagePerWorkDay, timeStyle)
+            : l10n.reportsBalanceNoFigure,
+        style: Theme.of(context).textTheme.headlineSmall,
+      ),
+    );
+  }
+}
+
+/// Caption above value, the shape every tile in the block shares.
+class _TileFrame extends StatelessWidget {
+  const _TileFrame({required this.label, required this.child});
+
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(label, style: Theme.of(context).textTheme.labelMedium),
+        const SizedBox(height: 4),
+        child,
+      ],
     );
   }
 }

@@ -2,11 +2,14 @@ import 'package:flutter/material.dart' show DateTimeRange;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/absence_providers.dart';
+import '../../core/di/balance_adjustment_providers.dart';
 import '../../core/di/app_settings_provider.dart';
 import '../../core/di/database_provider.dart';
 import '../../data/drift/database.dart';
 import '../timer/timer_providers.dart' show allEntriesProvider;
 import 'balance_calculations.dart';
+import 'report_view_controller.dart';
+import 'report_view_state.dart';
 
 enum ReportRangePreset {
   today,
@@ -62,10 +65,15 @@ final reportProjectsProvider = StreamProvider<List<Project>>((ref) {
   return ref.watch(appDatabaseProvider).projectsDao.watchAllProjects();
 });
 
-/// The flex-time balance as of today, over the whole history — deliberately
-/// not scoped to the report's selected range or its project/billable
-/// filters: "overtime, but only for project X" is not a meaningful number.
-final workTimeBalanceProvider = Provider<AsyncValue<Duration>>((ref) {
+/// Everything the two balance providers below need, resolved once: the
+/// per-day balances, the settings they were computed against, and the
+/// manual corrections that still have to be folded in.
+///
+/// Deliberately not scoped to the report's selected filters: "overtime,
+/// but only for project X" is not a meaningful number, so both providers
+/// read every entry there is.
+AsyncValue<({List<DayBalance> balances, AppSettingsRow settings, List<BalanceAdjustment> adjustments})>
+    _balanceInputs(Ref ref) {
   final entries = ref.watch(allEntriesProvider);
   final settings = ref.watch(appSettingsProvider);
   final absences = ref.watch(absencesProvider);
@@ -98,20 +106,54 @@ final workTimeBalanceProvider = Provider<AsyncValue<Duration>>((ref) {
     absenceList = loaded;
   }
 
+  // Corrections are cheap and always relevant, so unlike absences they are
+  // waited for unconditionally -- there is no switch that turns them off.
+  final adjustments = ref.watch(balanceAdjustmentsProvider);
+  if (adjustments is AsyncError<List<BalanceAdjustment>>) {
+    return AsyncValue.error(adjustments.error, adjustments.stackTrace);
+  }
+  final adjustmentList = adjustments.value;
+  if (adjustmentList == null) return const AsyncValue.loading();
+
   final now = DateTime.now();
-  return AsyncValue.data(
-    runningBalance(
-      dayBalances(
-        entryList,
-        settingsRow,
-        absences: absenceList,
-        absenceTypesById: ref.watch(absenceTypesByIdProvider),
-        // Enumerate up to today, so a work day that was neither booked
-        // nor excused shows up as the deficit it is.
-        through: DateTime(now.year, now.month, now.day),
-      ),
+  return AsyncValue.data((
+    balances: dayBalances(
+      entryList,
       settingsRow,
-      asOf: now,
+      absences: absenceList,
+      absenceTypesById: ref.watch(absenceTypesByIdProvider),
+      // Enumerate up to today, so a work day that was neither booked nor
+      // excused shows up as the deficit it is.
+      through: DateTime(now.year, now.month, now.day),
     ),
+    settings: settingsRow,
+    adjustments: adjustmentList,
+  ));
+}
+
+/// The flex-time balance as of today, over the whole history and since the
+/// last cutoff.
+final workTimeBalanceProvider = Provider<AsyncValue<Duration>>((ref) {
+  return _balanceInputs(ref).whenData(
+    (inputs) => runningBalance(
+      inputs.balances,
+      inputs.settings,
+      asOf: DateTime.now(),
+      adjustments: inputs.adjustments,
+    ),
+  );
+});
+
+/// Worked, target, average and corrections over the report's selected
+/// range. The range is the screen's own; its project and billable filters
+/// are deliberately ignored (see [_balanceInputs]).
+final balanceFiguresProvider = Provider<AsyncValue<RangeFigures>>((ref) {
+  // The stored view state arrives asynchronously and can fail to load at
+  // all; falling back to the default keeps the tiles showing the range the
+  // screen itself defaults to rather than an empty state.
+  final range =
+      (ref.watch(reportViewControllerProvider).value ?? const ReportViewState()).range;
+  return _balanceInputs(ref).whenData(
+    (inputs) => figuresForRange(inputs.balances, range, adjustments: inputs.adjustments),
   );
 });

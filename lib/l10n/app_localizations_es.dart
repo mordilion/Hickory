@@ -904,6 +904,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reportsBalanceAllTime => 'Saldo total';
 
   @override
+  String get reportsBalanceInRange => 'En el periodo';
+
+  @override
+  String get reportsBalanceTargetVsActual => 'Previsto / real';
+
+  @override
+  String get reportsBalanceAveragePerDay => 'Media por día laborable';
+
+  @override
+  String get reportsBalanceNoFigure => '–';
+
+  @override
   String get reportsBalanceNoTargets => 'Aún no hay jornada objetivo definida.';
 
   @override

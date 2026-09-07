@@ -300,6 +300,10 @@
     }
   },
   "reportsBalanceAllTime": "Solde total",
+  "reportsBalanceInRange": "Sur la période",
+  "reportsBalanceTargetVsActual": "Prévu / réel",
+  "reportsBalanceAveragePerDay": "Moy. par jour ouvré",
+  "reportsBalanceNoFigure": "–",
   "reportsBalanceNoTargets": "Aucun temps de travail cible défini.",
   "reportsBalanceConfigure": "À définir dans Réglages → Temps de travail et compteur.",
   "reportsBalanceIgnoresFilter": "Le compteur prend en compte toutes les entrées, indépendamment du filtre.",

@@ -300,6 +300,10 @@
     }
   },
   "reportsBalanceAllTime": "Balance overall",
+  "reportsBalanceInRange": "In the range",
+  "reportsBalanceTargetVsActual": "Target / actual",
+  "reportsBalanceAveragePerDay": "Avg. per work day",
+  "reportsBalanceNoFigure": "–",
   "reportsBalanceNoTargets": "No target work time set yet.",
   "reportsBalanceConfigure": "Set it under Settings → Work time & balance.",
   "reportsBalanceIgnoresFilter": "The balance covers all entries, regardless of the filter.",

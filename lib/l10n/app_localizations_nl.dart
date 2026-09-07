@@ -909,6 +909,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get reportsBalanceAllTime => 'Saldo totaal';
 
   @override
+  String get reportsBalanceInRange => 'In de periode';
+
+  @override
+  String get reportsBalanceTargetVsActual => 'Norm / werkelijk';
+
+  @override
+  String get reportsBalanceAveragePerDay => 'Gem. per werkdag';
+
+  @override
+  String get reportsBalanceNoFigure => '–';
+
+  @override
   String get reportsBalanceNoTargets => 'Nog geen streefwerktijd ingesteld.';
 
   @override

@@ -910,6 +910,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get reportsBalanceAllTime => 'Saldo gesamt';
 
   @override
+  String get reportsBalanceInRange => 'Im Zeitraum';
+
+  @override
+  String get reportsBalanceTargetVsActual => 'Soll / Ist';
+
+  @override
+  String get reportsBalanceAveragePerDay => 'Ø pro Arbeitstag';
+
+  @override
+  String get reportsBalanceNoFigure => '–';
+
+  @override
   String get reportsBalanceNoTargets =>
       'Noch keine Soll-Arbeitszeit hinterlegt.';
 

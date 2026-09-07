@@ -410,6 +410,10 @@
     }
   },
   "reportsBalanceAllTime": "Saldo gesamt",
+  "reportsBalanceInRange": "Im Zeitraum",
+  "reportsBalanceTargetVsActual": "Soll / Ist",
+  "reportsBalanceAveragePerDay": "Ø pro Arbeitstag",
+  "reportsBalanceNoFigure": "–",
   "reportsBalanceNoTargets": "Noch keine Soll-Arbeitszeit hinterlegt.",
   "reportsBalanceConfigure": "Unter Einstellungen → Arbeitszeit & Zeitkonto festlegen.",
   "reportsBalanceIgnoresFilter": "Das Zeitkonto berücksichtigt alle Einträge, unabhängig vom Filter.",

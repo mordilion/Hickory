@@ -300,6 +300,10 @@
     }
   },
   "reportsBalanceAllTime": "Saldo total",
+  "reportsBalanceInRange": "En el periodo",
+  "reportsBalanceTargetVsActual": "Previsto / real",
+  "reportsBalanceAveragePerDay": "Media por día laborable",
+  "reportsBalanceNoFigure": "–",
   "reportsBalanceNoTargets": "Aún no hay jornada objetivo definida.",
   "reportsBalanceConfigure": "Defínela en Ajustes → Jornada y saldo horario.",
   "reportsBalanceIgnoresFilter": "El saldo incluye todas las entradas, independientemente del filtro.",

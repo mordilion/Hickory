@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/core/di/absence_providers.dart';
 import 'package:hickory/core/di/app_settings_provider.dart';
+import 'package:hickory/core/di/balance_adjustment_providers.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/data/drift/tables/absences_table.dart';
 import 'package:hickory/features/reports/balance_card.dart';
@@ -35,6 +36,16 @@ TimeEntry _entryOn(DateTime day, int minutes, {String id = 'e'}) {
   );
 }
 
+/// The first Monday of [reference]'s month, so a test can date entries
+/// inside the default "this month" range whatever day it runs on.
+DateTime _mondayIn(DateTime reference) {
+  var day = DateTime(reference.year, reference.month, 1);
+  while (day.weekday != DateTime.monday) {
+    day = day.add(const Duration(days: 1));
+  }
+  return day;
+}
+
 void main() {
   // 2026-08-31 is a Monday, and in the past relative to any run of this
   // suite -- workTimeBalanceProvider's runningBalance stops at
@@ -48,6 +59,7 @@ void main() {
     List<TimeEntry> entries = const [],
     List<Absence> absences = const [],
     List<AbsenceType> absenceTypes = const [],
+    List<BalanceAdjustment> adjustments = const [],
     // Suppliers, not bare Streams: a StreamProvider override can be
     // invoked more than once, and re-returning the same single-subscription
     // Stream instance the second time throws "Stream has already been
@@ -69,6 +81,7 @@ void main() {
             (ref) => absencesStream?.call() ?? Stream.value(absences),
           ),
           absenceTypesProvider.overrideWith((ref) => Stream.value(absenceTypes)),
+          balanceAdjustmentsProvider.overrideWith((ref) => Stream.value(adjustments)),
         ],
         child: MaterialApp(
           locale: const Locale('de'),
@@ -80,6 +93,13 @@ void main() {
     );
     await tester.pumpAndSettle();
   }
+
+  /// The value shown under one tile's caption. Several tiles can carry the
+  /// same figure, so an assertion about one of them names its label.
+  Finder tileValue(String label, String value) => find.descendant(
+        of: find.ancestor(of: find.text(label), matching: find.byType(Column)).first,
+        matching: find.text(value),
+      );
 
   test('formatSignedDuration always carries an explicit sign', () {
     expect(formatSignedDuration(const Duration(minutes: 90)), '+1:30');
@@ -95,7 +115,7 @@ void main() {
   testWidgets('with a target it shows the overall balance', (tester) async {
     await pumpCard(tester, settings: appSettingsFixture(targetMinutesMonday: 480));
     expect(find.text('Saldo gesamt'), findsOneWidget);
-    expect(find.text('+0:00'), findsOneWidget);
+    expect(tileValue('Saldo gesamt', '+0:00'), findsOneWidget);
   });
 
   testWidgets('a worked day is weighed against that weekday\'s target, not just echoed as zero', (
@@ -109,7 +129,7 @@ void main() {
       settings: appSettingsFixture(targetMinutesMonday: 480),
       entries: [_entryOn(monday, 9 * 60)],
     );
-    expect(find.text('+1:00'), findsOneWidget);
+    expect(tileValue('Saldo gesamt', '+1:00'), findsOneWidget);
   });
 
   testWidgets('a failing entries stream surfaces an error instead of spinning forever', (
@@ -226,6 +246,49 @@ void main() {
       ],
     );
 
-    expect(find.text('+0:00'), findsOneWidget);
+    expect(tileValue('Saldo gesamt', '+0:00'), findsOneWidget);
+  });
+
+  testWidgets('shows the range balance, target against actual, and the daily average', (
+    tester,
+  ) async {
+    // The default range is this month, so the two days are dated inside
+    // it -- the same month the screen opens on when nothing is stored.
+    final now = DateTime.now();
+    final firstMonday = _mondayIn(now);
+    await pumpCard(
+      tester,
+      settings: appSettingsFixture(
+        targetMinutesMonday: 480,
+        targetMinutesTuesday: 480,
+      ),
+      entries: [
+        _entryOn(firstMonday, 540, id: 'a'),
+        _entryOn(firstMonday.add(const Duration(days: 1)), 420, id: 'b'),
+      ],
+    );
+
+    expect(find.text('Im Zeitraum'), findsOneWidget);
+    expect(find.text('Soll / Ist'), findsOneWidget);
+    expect(find.text('Ø pro Arbeitstag'), findsOneWidget);
+    expect(
+      find.byType(LinearProgressIndicator),
+      findsOneWidget,
+      reason: 'target against actual carries a progress bar',
+    );
+    // Nine hours and seven against two eight-hour days.
+    expect(tileValue('Soll / Ist', '16:00 / 16:00'), findsOneWidget);
+    expect(tileValue('Ø pro Arbeitstag', '08:00'), findsOneWidget);
+  });
+
+  testWidgets('a range without a single work day shows no average', (tester) async {
+    await pumpCard(
+      tester,
+      settings: appSettingsFixture(targetMinutesMonday: 480),
+      entries: const [],
+    );
+
+    expect(find.text('Ø pro Arbeitstag'), findsOneWidget);
+    expect(tileValue('Ø pro Arbeitstag', '–'), findsOneWidget);
   });
 }
