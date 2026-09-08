@@ -994,6 +994,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportsQualityClean => 'Nothing to flag.';
 
   @override
+  String get reportsTrendTitle => 'Trend';
+
+  @override
+  String get reportsTrendEmpty => 'Nothing tracked in this range.';
+
+  @override
+  String reportsTrendBarLabel(String label, String worked, String target) {
+    return '$label: $worked of $target';
+  }
+
+  @override
   String get reportsBalanceNoTargets => 'No target work time set yet.';
 
   @override

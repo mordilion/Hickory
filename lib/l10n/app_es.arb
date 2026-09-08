@@ -339,6 +339,16 @@
   },
   "reportsQualityAbsences": "Días de ausencia",
   "reportsQualityClean": "Nada que señalar.",
+  "reportsTrendTitle": "Evolución",
+  "reportsTrendEmpty": "Nada registrado en el periodo.",
+  "reportsTrendBarLabel": "{label}: {worked} de {target}",
+  "@reportsTrendBarLabel": {
+    "placeholders": {
+      "label": { "type": "String" },
+      "worked": { "type": "String" },
+      "target": { "type": "String" }
+    }
+  },
   "reportsBalanceNoTargets": "Aún no hay jornada objetivo definida.",
   "reportsBalanceConfigure": "Defínela en Ajustes → Jornada y saldo horario.",
   "reportsBalanceIgnoresFilter": "El saldo incluye todas las entradas, independientemente del filtro.",

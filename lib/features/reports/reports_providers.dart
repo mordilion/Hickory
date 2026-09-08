@@ -13,6 +13,7 @@ import '../timer/timer_providers.dart' show allEntriesProvider;
 import '../sync/failed_pushes.dart';
 import 'balance_calculations.dart';
 import 'quality_calculations.dart';
+import 'trend_calculations.dart';
 import 'report_view_controller.dart';
 import 'report_view_state.dart';
 
@@ -145,6 +146,26 @@ final workTimeBalanceProvider = Provider<AsyncValue<Duration>>((ref) {
       inputs.settings,
       asOf: DateTime.now(),
       adjustments: inputs.adjustments,
+    ),
+  );
+});
+
+/// The chart's bars for the report's selected range, per day or per week
+/// depending on how long the range is.
+///
+/// Reads every entry, like the balance it charts against: a target line
+/// drawn over a filtered subset would compare one project's hours with a
+/// whole week's target.
+final trendBarsProvider = Provider<AsyncValue<List<TrendBar>>>((ref) {
+  final range =
+      (ref.watch(reportViewControllerProvider).value ?? const ReportViewState()).range;
+  final now = DateTime.now();
+  return _balanceInputs(ref).whenData(
+    (inputs) => trendBars(
+      inputs.balances,
+      range,
+      granularityFor(range),
+      through: DateTime(now.year, now.month, now.day),
     ),
   );
 });

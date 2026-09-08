@@ -339,6 +339,16 @@
   },
   "reportsQualityAbsences": "Jours d’absence",
   "reportsQualityClean": "Rien à signaler.",
+  "reportsTrendTitle": "Évolution",
+  "reportsTrendEmpty": "Rien de saisi sur la période.",
+  "reportsTrendBarLabel": "{label} : {worked} sur {target}",
+  "@reportsTrendBarLabel": {
+    "placeholders": {
+      "label": { "type": "String" },
+      "worked": { "type": "String" },
+      "target": { "type": "String" }
+    }
+  },
   "reportsBalanceNoTargets": "Aucun temps de travail cible défini.",
   "reportsBalanceConfigure": "À définir dans Réglages → Temps de travail et compteur.",
   "reportsBalanceIgnoresFilter": "Le compteur prend en compte toutes les entrées, indépendamment du filtre.",

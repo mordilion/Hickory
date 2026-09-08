@@ -1809,6 +1809,24 @@ abstract class AppLocalizations {
   /// **'Nichts zu beanstanden.'**
   String get reportsQualityClean;
 
+  /// No description provided for @reportsTrendTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Verlauf'**
+  String get reportsTrendTitle;
+
+  /// No description provided for @reportsTrendEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Nichts erfasst im Zeitraum.'**
+  String get reportsTrendEmpty;
+
+  /// No description provided for @reportsTrendBarLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'{label}: {worked} von {target}'**
+  String reportsTrendBarLabel(String label, String worked, String target);
+
   /// No description provided for @reportsBalanceNoTargets.
   ///
   /// In de, this message translates to:

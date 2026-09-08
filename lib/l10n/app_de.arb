@@ -449,6 +449,16 @@
   },
   "reportsQualityAbsences": "Abwesenheitstage",
   "reportsQualityClean": "Nichts zu beanstanden.",
+  "reportsTrendTitle": "Verlauf",
+  "reportsTrendEmpty": "Nichts erfasst im Zeitraum.",
+  "reportsTrendBarLabel": "{label}: {worked} von {target}",
+  "@reportsTrendBarLabel": {
+    "placeholders": {
+      "label": { "type": "String" },
+      "worked": { "type": "String" },
+      "target": { "type": "String" }
+    }
+  },
   "reportsBalanceNoTargets": "Noch keine Soll-Arbeitszeit hinterlegt.",
   "reportsBalanceConfigure": "Unter Einstellungen → Arbeitszeit & Zeitkonto festlegen.",
   "reportsBalanceIgnoresFilter": "Das Zeitkonto berücksichtigt alle Einträge, unabhängig vom Filter.",

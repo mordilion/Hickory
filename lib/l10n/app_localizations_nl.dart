@@ -1007,6 +1007,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get reportsQualityClean => 'Niets op te merken.';
 
   @override
+  String get reportsTrendTitle => 'Verloop';
+
+  @override
+  String get reportsTrendEmpty => 'Niets geregistreerd in deze periode.';
+
+  @override
+  String reportsTrendBarLabel(String label, String worked, String target) {
+    return '$label: $worked van $target';
+  }
+
+  @override
   String get reportsBalanceNoTargets => 'Nog geen streefwerktijd ingesteld.';
 
   @override

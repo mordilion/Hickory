@@ -339,6 +339,16 @@
   },
   "reportsQualityAbsences": "Absence days",
   "reportsQualityClean": "Nothing to flag.",
+  "reportsTrendTitle": "Trend",
+  "reportsTrendEmpty": "Nothing tracked in this range.",
+  "reportsTrendBarLabel": "{label}: {worked} of {target}",
+  "@reportsTrendBarLabel": {
+    "placeholders": {
+      "label": { "type": "String" },
+      "worked": { "type": "String" },
+      "target": { "type": "String" }
+    }
+  },
   "reportsBalanceNoTargets": "No target work time set yet.",
   "reportsBalanceConfigure": "Set it under Settings → Work time & balance.",
   "reportsBalanceIgnoresFilter": "The balance covers all entries, regardless of the filter.",

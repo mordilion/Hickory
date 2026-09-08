@@ -1008,6 +1008,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get reportsQualityClean => 'Nichts zu beanstanden.';
 
   @override
+  String get reportsTrendTitle => 'Verlauf';
+
+  @override
+  String get reportsTrendEmpty => 'Nichts erfasst im Zeitraum.';
+
+  @override
+  String reportsTrendBarLabel(String label, String worked, String target) {
+    return '$label: $worked von $target';
+  }
+
+  @override
   String get reportsBalanceNoTargets =>
       'Noch keine Soll-Arbeitszeit hinterlegt.';
 

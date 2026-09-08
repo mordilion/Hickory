@@ -1001,6 +1001,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reportsQualityClean => 'Nada que señalar.';
 
   @override
+  String get reportsTrendTitle => 'Evolución';
+
+  @override
+  String get reportsTrendEmpty => 'Nada registrado en el periodo.';
+
+  @override
+  String reportsTrendBarLabel(String label, String worked, String target) {
+    return '$label: $worked de $target';
+  }
+
+  @override
   String get reportsBalanceNoTargets => 'Aún no hay jornada objetivo definida.';
 
   @override

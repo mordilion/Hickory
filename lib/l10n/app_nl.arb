@@ -339,6 +339,16 @@
   },
   "reportsQualityAbsences": "Afwezigheidsdagen",
   "reportsQualityClean": "Niets op te merken.",
+  "reportsTrendTitle": "Verloop",
+  "reportsTrendEmpty": "Niets geregistreerd in deze periode.",
+  "reportsTrendBarLabel": "{label}: {worked} van {target}",
+  "@reportsTrendBarLabel": {
+    "placeholders": {
+      "label": { "type": "String" },
+      "worked": { "type": "String" },
+      "target": { "type": "String" }
+    }
+  },
   "reportsBalanceNoTargets": "Nog geen streefwerktijd ingesteld.",
   "reportsBalanceConfigure": "Stel die in bij Instellingen → Werktijd en saldo.",
   "reportsBalanceIgnoresFilter": "Het saldo omvat alle registraties, ongeacht het filter.",
