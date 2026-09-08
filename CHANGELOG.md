@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-09-08
+
 ### Added
 
 - Show a progress bar while an update installs: a real percentage with megabytes during the download, then a labelled bar for verifying the checksum and unpacking, which cannot report progress.
@@ -103,7 +105,8 @@ which were never distributed to users.
 - Fix the Settings screen not being scrollable when its content overflows the window.
 - Fix the in-app updater silently relaunching the unchanged app on macOS/Windows when it can't write to the install directory; it now fails with a clear, actionable message before quitting instead.
 
-[Unreleased]: https://github.com/mordilion/Hickory/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/mordilion/Hickory/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/mordilion/Hickory/compare/v1.3.2...v1.4.0
 [1.2.0]: https://github.com/mordilion/Hickory/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/mordilion/Hickory/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/mordilion/Hickory/releases/tag/v1.0.2
