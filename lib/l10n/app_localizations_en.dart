@@ -934,6 +934,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportsAdjustmentSaveError => 'The correction could not be saved.';
 
   @override
+  String get reportsMoneyTitle => 'Money & billability';
+
+  @override
+  String get reportsMoneyBillableShare => 'Billable share';
+
+  @override
+  String get reportsMoneyRevenue => 'Revenue';
+
+  @override
+  String get reportsMoneyTopClients => 'Top clients';
+
+  @override
+  String get reportsMoneyNoRevenue => 'No revenue in this range.';
+
+  @override
+  String get reportsMoneyNoClient => 'No client';
+
+  @override
   String get reportsBalanceNoTargets => 'No target work time set yet.';
 
   @override

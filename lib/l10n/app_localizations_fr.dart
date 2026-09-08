@@ -954,6 +954,25 @@ class AppLocalizationsFr extends AppLocalizations {
       'La correction n’a pas pu être enregistrée.';
 
   @override
+  String get reportsMoneyTitle => 'Argent et facturation';
+
+  @override
+  String get reportsMoneyBillableShare => 'Part facturable';
+
+  @override
+  String get reportsMoneyRevenue => 'Chiffre d\'affaires';
+
+  @override
+  String get reportsMoneyTopClients => 'Principaux clients';
+
+  @override
+  String get reportsMoneyNoRevenue =>
+      'Aucun chiffre d’affaires sur la période.';
+
+  @override
+  String get reportsMoneyNoClient => 'Sans client';
+
+  @override
   String get reportsBalanceNoTargets => 'Aucun temps de travail cible défini.';
 
   @override

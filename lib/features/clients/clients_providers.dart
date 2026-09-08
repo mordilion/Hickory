@@ -14,3 +14,10 @@ final activeClientsProvider = StreamProvider<List<Client>>((ref) {
 final archivedClientsProvider = StreamProvider<List<Client>>((ref) {
   return ref.watch(appDatabaseProvider).clientsDao.watchArchivedClients();
 });
+
+/// Every client, archived included — reporting attributes revenue to the
+/// client a project carried at the time, which may since have been
+/// archived.
+final allClientsProvider = StreamProvider<List<Client>>((ref) {
+  return ref.watch(appDatabaseProvider).clientsDao.watchAllClients();
+});

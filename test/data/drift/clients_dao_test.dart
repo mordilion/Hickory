@@ -81,4 +81,13 @@ void main() {
     final remaining = await (db.select(db.clients)..where((c) => c.id.equals(client.id))).get();
     expect(remaining, isEmpty);
   });
+
+  test('watchAllClients returns archived clients too', () async {
+    final active = await db.clientsDao.createClient(name: 'Acme');
+    final archived = await db.clientsDao.createClient(name: 'Old Corp');
+    await db.clientsDao.archiveClient(archived.id);
+
+    final names = (await db.clientsDao.watchAllClients().first).map((c) => c.name);
+    expect(names, containsAll([active.name, archived.name]));
+  });
 }

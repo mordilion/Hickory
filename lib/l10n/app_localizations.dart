@@ -1737,6 +1737,42 @@ abstract class AppLocalizations {
   /// **'Die Korrektur konnte nicht gespeichert werden.'**
   String get reportsAdjustmentSaveError;
 
+  /// No description provided for @reportsMoneyTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Geld & Abrechenbarkeit'**
+  String get reportsMoneyTitle;
+
+  /// No description provided for @reportsMoneyBillableShare.
+  ///
+  /// In de, this message translates to:
+  /// **'Abrechenbarer Anteil'**
+  String get reportsMoneyBillableShare;
+
+  /// No description provided for @reportsMoneyRevenue.
+  ///
+  /// In de, this message translates to:
+  /// **'Umsatz'**
+  String get reportsMoneyRevenue;
+
+  /// No description provided for @reportsMoneyTopClients.
+  ///
+  /// In de, this message translates to:
+  /// **'Top-Kunden'**
+  String get reportsMoneyTopClients;
+
+  /// No description provided for @reportsMoneyNoRevenue.
+  ///
+  /// In de, this message translates to:
+  /// **'Kein Umsatz im Zeitraum.'**
+  String get reportsMoneyNoRevenue;
+
+  /// No description provided for @reportsMoneyNoClient.
+  ///
+  /// In de, this message translates to:
+  /// **'Ohne Kunde'**
+  String get reportsMoneyNoClient;
+
   /// No description provided for @reportsBalanceNoTargets.
   ///
   /// In de, this message translates to:

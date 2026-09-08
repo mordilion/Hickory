@@ -26,6 +26,13 @@ class ClientsDao extends DatabaseAccessor<AppDatabase> with _$ClientsDaoMixin {
         .watch();
   }
 
+  /// Every client, archived or not, by name. Reporting needs the archived
+  /// ones too: a range in the past can carry revenue for a client that was
+  /// archived since.
+  Stream<List<Client>> watchAllClients() {
+    return (select(clients)..orderBy([(c) => OrderingTerm.asc(c.name)])).watch();
+  }
+
   Future<Client> createClient({required String name}) async {
     final now = DateTime.now().toUtc();
     final entry = ClientsCompanion.insert(

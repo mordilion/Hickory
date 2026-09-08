@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/core/di/absence_providers.dart';
 import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/core/di/balance_adjustment_providers.dart';
+import 'package:hickory/features/clients/clients_providers.dart';
 import 'package:hickory/core/theme/app_theme.dart';
 import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/features/reports/report_view_controller.dart';
@@ -100,6 +101,7 @@ void main() {
       absencesProvider.overrideWith((ref) => Stream.value(const [])),
       absenceTypesProvider.overrideWith((ref) => Stream.value(const [])),
           balanceAdjustmentsProvider.overrideWith((ref) => Stream.value(const [])),
+          allClientsProvider.overrideWith((ref) => Stream.value(const [])),
     ],
     child: MaterialApp(
       theme: AppTheme.light,

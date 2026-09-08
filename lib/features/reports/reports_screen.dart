@@ -13,6 +13,7 @@ import '../../data/drift/database.dart';
 import '../../l10n/app_localizations.dart';
 import 'balance_card.dart';
 import 'csv_export.dart';
+import 'money_card.dart';
 import 'report_calculations.dart';
 import 'report_filter_dialog.dart';
 import 'report_view_controller.dart';
@@ -309,34 +310,47 @@ class _ReportBody extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
+        // One scrollable column, as spec section 6 asks for: the blocks and
+        // the project list scroll together. Each block is a fixed height,
+        // so a list that scrolled on its own inside a fixed frame would
+        // squeeze the blocks off the screen on a short window.
         Expanded(
-          child: totals.isEmpty
-              ? Center(
-                  child: Text(
-                    hasActiveFilters
-                        ? l10n.reportsEmptyFiltered
-                        : l10n.reportsEmptyRange,
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: totals.length,
-                  itemBuilder: (context, index) {
-                    final total = totals[index];
-                    final amount = total.amountCents == null
-                        ? null
-                        : '${(total.amountCents! / 100).toStringAsFixed(2)} ${total.currency ?? ''}';
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      shape: const StadiumBorder(),
-                      child: ListTile(
-                        shape: const StadiumBorder(),
-                        title: Text(total.projectName),
-                        subtitle: amount == null ? null : Text(amount),
-                        trailing: Text(formatDuration(total.duration)),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                MoneyCard(entries: entries, projects: projects),
+                const SizedBox(height: 12),
+                if (totals.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: Text(
+                        hasActiveFilters
+                            ? l10n.reportsEmptyFiltered
+                            : l10n.reportsEmptyRange,
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                for (final total in totals)
+                  Card(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    shape: const StadiumBorder(),
+                    child: ListTile(
+                      shape: const StadiumBorder(),
+                      title: Text(total.projectName),
+                      subtitle: total.amountCents == null
+                          ? null
+                          : Text(
+                              '${(total.amountCents! / 100).toStringAsFixed(2)} '
+                              '${total.currency ?? ''}',
+                            ),
+                      trailing: Text(formatDuration(total.duration)),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
       ],
     );

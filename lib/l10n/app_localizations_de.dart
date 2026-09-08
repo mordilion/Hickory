@@ -948,6 +948,24 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Korrektur konnte nicht gespeichert werden.';
 
   @override
+  String get reportsMoneyTitle => 'Geld & Abrechenbarkeit';
+
+  @override
+  String get reportsMoneyBillableShare => 'Abrechenbarer Anteil';
+
+  @override
+  String get reportsMoneyRevenue => 'Umsatz';
+
+  @override
+  String get reportsMoneyTopClients => 'Top-Kunden';
+
+  @override
+  String get reportsMoneyNoRevenue => 'Kein Umsatz im Zeitraum.';
+
+  @override
+  String get reportsMoneyNoClient => 'Ohne Kunde';
+
+  @override
   String get reportsBalanceNoTargets =>
       'Noch keine Soll-Arbeitszeit hinterlegt.';
 

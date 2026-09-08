@@ -947,6 +947,24 @@ class AppLocalizationsNl extends AppLocalizations {
       'De correctie kon niet worden opgeslagen.';
 
   @override
+  String get reportsMoneyTitle => 'Geld en facturabiliteit';
+
+  @override
+  String get reportsMoneyBillableShare => 'Factureerbaar deel';
+
+  @override
+  String get reportsMoneyRevenue => 'Omzet';
+
+  @override
+  String get reportsMoneyTopClients => 'Topklanten';
+
+  @override
+  String get reportsMoneyNoRevenue => 'Geen omzet in deze periode.';
+
+  @override
+  String get reportsMoneyNoClient => 'Zonder klant';
+
+  @override
   String get reportsBalanceNoTargets => 'Nog geen streefwerktijd ingesteld.';
 
   @override
