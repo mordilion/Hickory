@@ -10,6 +10,19 @@ import '../../l10n/app_localizations.dart';
 import 'reports_providers.dart';
 import 'trend_calculations.dart';
 
+/// The colour a bar in [TrendBarStatus] is drawn in.
+///
+/// The same three the balance tiles use, so one glance covers the whole
+/// dashboard: primary for a settled or beaten target, error for falling
+/// short, a neutral outline for a day that was never owed. Colour is never
+/// the only carrier — the target line shows the same relation, and every
+/// bar carries its figures as an accessible label.
+Color trendBarColor(TrendBarStatus status, ColorScheme scheme) => switch (status) {
+  TrendBarStatus.surplus => scheme.primary,
+  TrendBarStatus.deficit => scheme.error,
+  TrendBarStatus.noTarget => scheme.outline,
+};
+
 /// Worked time per day (or per week over a long range) against the target,
 /// drawn by hand: the project carries no charting dependency and one bar
 /// chart does not warrant adding one.
@@ -62,7 +75,10 @@ class TrendChart extends ConsumerWidget {
                               painter: _BarPainter(
                                 bar: bar,
                                 maxValue: _maxValue(bars),
-                                barColor: theme.colorScheme.primary,
+                                barColor: trendBarColor(
+                                  statusOf(bar),
+                                  theme.colorScheme,
+                                ),
                                 targetColor: theme.colorScheme.outline,
                               ),
                             ),
@@ -83,7 +99,8 @@ class TrendChart extends ConsumerWidget {
   static Duration _maxValue(List<TrendBar> bars) {
     var max = Duration.zero;
     for (final bar in bars) {
-      if (bar.worked > max) max = bar.worked;
+      final covered = bar.worked + bar.credit;
+      if (covered > max) max = covered;
       if (bar.target > max) max = bar.target;
     }
     return max;
@@ -111,7 +128,10 @@ class TrendChart extends ConsumerWidget {
     TimeFormatStyle timeStyle,
   ) => l10n.reportsTrendBarLabel(
     _periodLabel(bar, l10n, granularity, localeName),
-    formatDuration(bar.worked, timeStyle),
+    // Worked plus paid absence: the figure the bar's height and colour are
+    // built from. Reporting tracked time alone would have a screen reader
+    // announce "0:00 of 8:00" beside a bar painted as settled.
+    formatDuration(bar.worked + bar.credit, timeStyle),
     formatDuration(bar.target, timeStyle),
   );
 }
@@ -142,6 +162,22 @@ class _BarPainter extends CustomPainter {
       Rect.fromLTWH(gap, size.height - workedHeight, barWidth, workedHeight),
       Paint()..color = barColor,
     );
+
+    // Paid absence sits on top of the worked part, in the same colour at a
+    // lower opacity: the column reaches the target line, and it is still
+    // visible that the time was not worked.
+    final creditHeight = size.height * bar.credit.inMinutes / max;
+    if (creditHeight > 0) {
+      canvas.drawRect(
+        Rect.fromLTWH(
+          gap,
+          size.height - workedHeight - creditHeight,
+          barWidth,
+          creditHeight,
+        ),
+        Paint()..color = barColor.withValues(alpha: 0.4),
+      );
+    }
 
     if (bar.target == Duration.zero) return;
     final targetY = size.height - size.height * bar.target.inMinutes / max;

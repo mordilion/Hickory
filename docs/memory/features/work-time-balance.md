@@ -76,6 +76,14 @@
   spans 2000–2100, so enumerating the range itself would be thirty thousand empty bars;
   stopping at today keeps the rest of a running month from being drawn as zeroes that have
   not happened yet, while a forgotten week inside the span still reads as a gap.
+- **A trend bar is coloured by how it stands against its target** (`statusOf` /
+  `trendBarColor`): the balance tiles' primary for a target met or beaten, their error
+  colour for falling short, a neutral outline for a day that was never owed. Paid absence
+  counts toward the target, or a vacation day would be painted as a failure to work it;
+  it is drawn stacked on the worked part at 40% opacity, so the column reaches the target
+  line and it stays visible that the time was not worked. The bar's accessible label
+  reports worked **plus credit** for the same reason — the figure the height and the
+  colour are built from.
 - **Every trend bar is a `Semantics` node carrying its date and figures.** The hover
   tooltip §6.2 asks for has no keyboard or screen-reader equivalent, so the labels are the
   accessible path, not decoration — and the only thing a widget test can assert on, since

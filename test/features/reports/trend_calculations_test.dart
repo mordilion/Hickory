@@ -3,10 +3,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/features/reports/balance_calculations.dart';
 import 'package:hickory/features/reports/trend_calculations.dart';
 
-DayBalance _day(DateTime day, {int workedMinutes = 0, int targetMinutes = 480}) => DayBalance(
+DayBalance _day(
+  DateTime day, {
+  int workedMinutes = 0,
+  int targetMinutes = 480,
+  int creditMinutes = 0,
+}) => DayBalance(
       day: day,
       worked: Duration(minutes: workedMinutes),
       target: Duration(minutes: targetMinutes),
+      absenceCredit: Duration(minutes: creditMinutes),
     );
 
 void main() {
@@ -196,6 +202,76 @@ void main() {
 
       expect(bars, hasLength(3));
       expect(bars[1].worked, Duration.zero);
+    });
+  });
+
+  group('bar status', () {
+    final monday = DateTime(2026, 9, 7);
+
+    test('more worked than owed is a surplus', () {
+      final bar = trendBars(
+        [_day(monday, workedMinutes: 540)],
+        DateTimeRange(start: monday, end: monday.add(const Duration(days: 1))),
+        TrendGranularity.day,
+      ).single;
+
+      expect(statusOf(bar), TrendBarStatus.surplus);
+    });
+
+    test('less worked than owed is a deficit', () {
+      final bar = trendBars(
+        [_day(monday, workedMinutes: 420)],
+        DateTimeRange(start: monday, end: monday.add(const Duration(days: 1))),
+        TrendGranularity.day,
+      ).single;
+
+      expect(statusOf(bar), TrendBarStatus.deficit);
+    });
+
+    test('exactly the target is a surplus, not a deficit', () {
+      final bar = trendBars(
+        [_day(monday, workedMinutes: 480)],
+        DateTimeRange(start: monday, end: monday.add(const Duration(days: 1))),
+        TrendGranularity.day,
+      ).single;
+
+      expect(statusOf(bar), TrendBarStatus.surplus, reason: 'the day is settled');
+    });
+
+    test('a day covered by a paid absence is settled, not a deficit', () {
+      // Nothing worked, nothing owed any more -- painting it red would
+      // report a vacation day as a failure.
+      final bar = trendBars(
+        [_day(monday, creditMinutes: 480)],
+        DateTimeRange(start: monday, end: monday.add(const Duration(days: 1))),
+        TrendGranularity.day,
+      ).single;
+
+      expect(bar.credit, const Duration(minutes: 480));
+      expect(statusOf(bar), TrendBarStatus.surplus);
+    });
+
+    test('a day with no target is neither, whatever was worked on it', () {
+      final bar = trendBars(
+        [_day(monday, workedMinutes: 120, targetMinutes: 0)],
+        DateTimeRange(start: monday, end: monday.add(const Duration(days: 1))),
+        TrendGranularity.day,
+      ).single;
+
+      expect(statusOf(bar), TrendBarStatus.noTarget);
+    });
+
+    test('credit is summed into the bucket like worked time', () {
+      final bars = trendBars(
+        [
+          _day(monday, workedMinutes: 240, creditMinutes: 240),
+          _day(monday.add(const Duration(days: 1)), creditMinutes: 480),
+        ],
+        DateTimeRange(start: monday, end: monday.add(const Duration(days: 7))),
+        TrendGranularity.week,
+      );
+
+      expect(bars.single.credit, const Duration(minutes: 720));
     });
   });
 }

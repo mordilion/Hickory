@@ -9,8 +9,37 @@ import 'balance_calculations.dart' show DayBalance;
 
 enum TrendGranularity { day, week, month }
 
-/// One column of the chart: what was worked against what was owed.
-typedef TrendBar = ({DateTime start, Duration worked, Duration target});
+/// One column of the chart: what was worked and credited against what
+/// was owed.
+typedef TrendBar = ({
+  DateTime start,
+  Duration worked,
+  Duration credit,
+  Duration target,
+});
+
+/// How a bar stands against its target — what the chart colours by.
+enum TrendBarStatus {
+  /// Worked (plus paid absence) meets or beats the target. Meeting it
+  /// exactly counts here: the period is settled, which is the good case.
+  surplus,
+
+  /// Short of the target.
+  deficit,
+
+  /// No target at all, so neither: time on a free day is a plus for the
+  /// balance but says nothing about a day that was never owed.
+  noTarget,
+}
+
+/// Which of the three [bar] is. Paid absence counts toward the target, so
+/// a day off does not read as a failure to work it.
+TrendBarStatus statusOf(TrendBar bar) {
+  if (bar.target == Duration.zero) return TrendBarStatus.noTarget;
+  return bar.worked + bar.credit >= bar.target
+      ? TrendBarStatus.surplus
+      : TrendBarStatus.deficit;
+}
 
 DateTime _dayOf(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
 
@@ -76,6 +105,7 @@ List<TrendBar> trendBars(
   }
 
   final worked = <DateTime, Duration>{};
+  final credit = <DateTime, Duration>{};
   final target = <DateTime, Duration>{};
   DateTime bucketOf(DateTime day) => switch (granularity) {
     TrendGranularity.day => day,
@@ -86,6 +116,11 @@ List<TrendBar> trendBars(
   for (final balance in inRange) {
     final bucket = bucketOf(balance.day);
     worked.update(bucket, (sum) => sum + balance.worked, ifAbsent: () => balance.worked);
+    credit.update(
+      bucket,
+      (sum) => sum + balance.absenceCredit,
+      ifAbsent: () => balance.absenceCredit,
+    );
     target.update(bucket, (sum) => sum + balance.target, ifAbsent: () => balance.target);
   }
 
@@ -106,6 +141,7 @@ List<TrendBar> trendBars(
     bars.add((
       start: bucket,
       worked: worked[bucket] ?? Duration.zero,
+      credit: credit[bucket] ?? Duration.zero,
       target: target[bucket] ?? Duration.zero,
     ));
   }

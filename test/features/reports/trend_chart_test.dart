@@ -40,10 +40,16 @@ void main() {
 
   testWidgets('gives every bar an accessible label with its figures', (tester) async {
     await pumpChart(tester, [
-      (start: monday, worked: const Duration(hours: 9), target: const Duration(hours: 8)),
+      (
+        start: monday,
+        worked: const Duration(hours: 9),
+        credit: Duration.zero,
+        target: const Duration(hours: 8),
+      ),
       (
         start: monday.add(const Duration(days: 1)),
         worked: const Duration(hours: 7),
+        credit: Duration.zero,
         target: const Duration(hours: 8),
       ),
     ]);
@@ -66,7 +72,12 @@ void main() {
 
   testWidgets('draws the bars it was given', (tester) async {
     await pumpChart(tester, [
-      (start: monday, worked: const Duration(hours: 8), target: const Duration(hours: 8)),
+      (
+        start: monday,
+        worked: const Duration(hours: 8),
+        credit: Duration.zero,
+        target: const Duration(hours: 8),
+      ),
     ]);
 
     expect(find.byKey(const ValueKey('trendBars')), findsOneWidget);
@@ -77,7 +88,14 @@ void main() {
     // stands for a whole week reads as if only that day were in it.
     await pumpChart(
       tester,
-      [(start: monday, worked: const Duration(hours: 40), target: const Duration(hours: 40))],
+      [
+        (
+          start: monday,
+          worked: const Duration(hours: 40),
+          credit: Duration.zero,
+          target: const Duration(hours: 40),
+        ),
+      ],
       granularity: TrendGranularity.week,
     );
 
@@ -87,10 +105,55 @@ void main() {
   testWidgets('labels monthly bars with the month', (tester) async {
     await pumpChart(
       tester,
-      [(start: DateTime(2026, 9), worked: const Duration(hours: 160), target: const Duration(hours: 160))],
+      [
+        (
+          start: DateTime(2026, 9),
+          worked: const Duration(hours: 160),
+          credit: Duration.zero,
+          target: const Duration(hours: 160),
+        ),
+      ],
       granularity: TrendGranularity.month,
     );
 
     expect(find.bySemanticsLabel(RegExp('Sep')), findsOneWidget);
+  });
+
+  group('bar colours', () {
+    const scheme = ColorScheme.light();
+
+    test('a surplus and a deficit are told apart by colour', () {
+      expect(
+        trendBarColor(TrendBarStatus.surplus, scheme),
+        isNot(trendBarColor(TrendBarStatus.deficit, scheme)),
+      );
+    });
+
+    test('a surplus uses the same colour the balance tiles call positive', () {
+      expect(trendBarColor(TrendBarStatus.surplus, scheme), scheme.primary);
+    });
+
+    test('a deficit uses the error colour, as the balance tiles do', () {
+      expect(trendBarColor(TrendBarStatus.deficit, scheme), scheme.error);
+    });
+
+    test('a day that was never owed is neutral, neither good nor bad', () {
+      expect(trendBarColor(TrendBarStatus.noTarget, scheme), scheme.outline);
+    });
+  });
+
+  testWidgets('a day covered by a paid absence reads as settled, not missed', (tester) async {
+    await pumpChart(tester, [
+      (
+        start: monday,
+        worked: Duration.zero,
+        credit: const Duration(hours: 8),
+        target: const Duration(hours: 8),
+      ),
+    ]);
+
+    // The label carries the figure the colour is based on, or a screen
+    // reader would hear "0:00 of 8:00" beside a bar painted as settled.
+    expect(find.bySemanticsLabel(RegExp('08:00 von 08:00')), findsOneWidget);
   });
 }
