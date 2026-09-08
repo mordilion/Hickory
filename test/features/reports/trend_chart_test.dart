@@ -13,11 +13,17 @@ import 'package:hickory/core/di/app_settings_provider.dart';
 void main() {
   final monday = DateTime(2026, 9, 7);
 
-  Future<void> pumpChart(WidgetTester tester, List<TrendBar> bars) async {
+  Future<void> pumpChart(
+    WidgetTester tester,
+    List<TrendBar> bars, {
+    TrendGranularity granularity = TrendGranularity.day,
+  }) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          trendBarsProvider.overrideWithValue(AsyncValue.data(bars)),
+          trendBarsProvider.overrideWithValue(
+            AsyncValue.data((bars: bars, granularity: granularity)),
+          ),
           appSettingsProvider.overrideWith((ref) => Stream.value(appSettingsFixture())),
         ],
         child: MaterialApp(
@@ -64,5 +70,27 @@ void main() {
     ]);
 
     expect(find.byKey(const ValueKey('trendBars')), findsOneWidget);
+  });
+
+  testWidgets('labels weekly bars with the calendar week, not a date', (tester) async {
+    // 2026-09-07 is the Monday of ISO week 37. A day date on a bar that
+    // stands for a whole week reads as if only that day were in it.
+    await pumpChart(
+      tester,
+      [(start: monday, worked: const Duration(hours: 40), target: const Duration(hours: 40))],
+      granularity: TrendGranularity.week,
+    );
+
+    expect(find.bySemanticsLabel(RegExp('KW 37')), findsOneWidget);
+  });
+
+  testWidgets('labels monthly bars with the month', (tester) async {
+    await pumpChart(
+      tester,
+      [(start: DateTime(2026, 9), worked: const Duration(hours: 160), target: const Duration(hours: 160))],
+      granularity: TrendGranularity.month,
+    );
+
+    expect(find.bySemanticsLabel(RegExp('Sep')), findsOneWidget);
   });
 }

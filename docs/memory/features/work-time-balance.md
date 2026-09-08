@@ -67,7 +67,11 @@
 - **Currencies are never summed.** `moneyFigures` returns cents per currency, and a client
   billed in two appears once per currency: adding them would mean picking an exchange
   rate, which the app has no basis for choosing and no place to store.
-- **The trend switches to weekly bars past ~62 days** (`granularityFor`), and draws only
+- **The trend has three granularities** (`granularityFor`): days up to ~62, ISO weeks up
+  to ~730, months beyond that — so the "all" range draws one bar per month of real
+  history rather than one per week of it. Each bar is labelled the way its granularity
+  reads: a date, `KW 37`, or the month's name; a day date on a bar covering a whole week
+  reads as if only that day were in it. Bars are drawn only
   from the first day the data covers to today, clamped into the range. The "all" preset
   spans 2000–2100, so enumerating the range itself would be thirty thousand empty bars;
   stopping at today keeps the rest of a running month from being drawn as zeroes that have

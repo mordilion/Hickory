@@ -144,4 +144,58 @@ void main() {
       expect(bars, hasLength(2));
     });
   });
+
+  group('long ranges', () {
+    final monday = DateTime(2026, 9, 7);
+
+    test('a range of years is drawn per month', () {
+      expect(
+        granularityFor(
+          DateTimeRange(start: DateTime(2020, 1, 1), end: DateTime(2027, 1, 1)),
+        ),
+        TrendGranularity.month,
+        reason: 'weekly bars over seven years are 365 pickets nobody can read',
+      );
+    });
+
+    test('a single year stays weekly', () {
+      expect(
+        granularityFor(
+          DateTimeRange(start: DateTime(2026, 1, 1), end: DateTime(2027, 1, 1)),
+        ),
+        TrendGranularity.week,
+      );
+    });
+
+    test('monthly bars sum their month and start on the first', () {
+      final bars = trendBars(
+        [
+          _day(monday, workedMinutes: 480),
+          _day(monday.add(const Duration(days: 1)), workedMinutes: 300),
+          _day(DateTime(2026, 10, 5), workedMinutes: 120),
+        ],
+        DateTimeRange(start: DateTime(2026, 9, 1), end: DateTime(2026, 11, 1)),
+        TrendGranularity.month,
+      );
+
+      expect(bars, hasLength(2));
+      expect(bars.first.start, DateTime(2026, 9, 1));
+      expect(bars.first.worked, const Duration(minutes: 780));
+      expect(bars.last.worked, const Duration(minutes: 120));
+    });
+
+    test('a month with nothing tracked between two that have is still a bar', () {
+      final bars = trendBars(
+        [
+          _day(DateTime(2026, 9, 7), workedMinutes: 480),
+          _day(DateTime(2026, 11, 9), workedMinutes: 480),
+        ],
+        DateTimeRange(start: DateTime(2026, 9, 1), end: DateTime(2026, 12, 1)),
+        TrendGranularity.month,
+      );
+
+      expect(bars, hasLength(3));
+      expect(bars[1].worked, Duration.zero);
+    });
+  });
 }

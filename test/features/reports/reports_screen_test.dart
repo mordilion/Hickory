@@ -16,6 +16,10 @@ import 'package:hickory/data/drift/database.dart';
 import 'package:hickory/features/reports/report_view_controller.dart';
 import 'package:hickory/features/reports/report_view_state_store.dart';
 import 'package:hickory/features/reports/reports_providers.dart';
+import 'package:hickory/features/reports/balance_card.dart';
+import 'package:hickory/features/reports/money_card.dart';
+import 'package:hickory/features/reports/quality_card.dart';
+import 'package:hickory/features/reports/trend_chart.dart';
 import 'package:hickory/features/reports/reports_screen.dart';
 import 'package:hickory/features/timer/timer_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
@@ -303,5 +307,18 @@ void main() {
     // now says why.
     expect(find.text('Project B'), findsNothing);
     expect(find.text(note), findsOneWidget);
+  });
+
+  testWidgets('every dashboard block is the same width', (tester) async {
+    await tester.pumpWidget(buildAppIsolatingFontErrors());
+    await pumpUntilReady(tester);
+
+    // The blocks sat in a column that let each Card size to its own
+    // content, so a card with a short line ended up visibly narrower than
+    // the one above it.
+    final balance = tester.getSize(find.byType(BalanceCard)).width;
+    expect(tester.getSize(find.byType(MoneyCard)).width, balance);
+    expect(tester.getSize(find.byType(TrendChart)).width, balance);
+    expect(tester.getSize(find.byType(QualityCard)).width, balance);
   });
 }

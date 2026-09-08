@@ -318,8 +318,11 @@ class _ReportBody extends StatelessWidget {
         // squeeze the blocks off the screen on a short window.
         Expanded(
           child: SingleChildScrollView(
+            // stretch, not start: every block is a Card that would
+            // otherwise size to its own content, so a block with one short
+            // line ended up visibly narrower than the one above it.
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 MoneyCard(entries: entries, projects: projects),
                 const SizedBox(height: 12),

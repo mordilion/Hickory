@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../core/di/app_settings_provider.dart';
 import '../../core/format/date_format.dart';
 import '../../core/format/duration_format.dart';
+import '../../core/format/iso_week.dart';
 import '../../l10n/app_localizations.dart';
 import 'reports_providers.dart';
 import 'trend_calculations.dart';
@@ -26,11 +27,12 @@ class TrendChart extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final bars = ref.watch(trendBarsProvider).value ?? const <TrendBar>[];
+    final trend = ref.watch(trendBarsProvider).value;
+    final bars = trend?.bars ?? const <TrendBar>[];
+    final granularity = trend?.granularity ?? TrendGranularity.day;
     final settings = ref.watch(appSettingsProvider).value;
     final timeStyle = settings.timeStyle;
     final localeName = Localizations.localeOf(context).languageCode;
-    final dateFormat = DateFormat.Md(localeName);
 
     return Card(
       child: Padding(
@@ -53,9 +55,9 @@ class TrendChart extends ConsumerWidget {
                     for (final bar in bars)
                       Expanded(
                         child: Tooltip(
-                          message: _label(bar, l10n, dateFormat, timeStyle),
+                          message: _label(bar, l10n, granularity, localeName, timeStyle),
                           child: Semantics(
-                            label: _label(bar, l10n, dateFormat, timeStyle),
+                            label: _label(bar, l10n, granularity, localeName, timeStyle),
                             child: CustomPaint(
                               painter: _BarPainter(
                                 bar: bar,
@@ -87,13 +89,28 @@ class TrendChart extends ConsumerWidget {
     return max;
   }
 
+  /// What a bar stands for, spelled the way its granularity reads: a day
+  /// date, "KW 37" for a week, the month's name for a month. A day date on
+  /// a bar covering a whole week would read as if only that day were in it.
+  static String _periodLabel(
+    TrendBar bar,
+    AppLocalizations l10n,
+    TrendGranularity granularity,
+    String localeName,
+  ) => switch (granularity) {
+    TrendGranularity.day => DateFormat.Md(localeName).format(bar.start),
+    TrendGranularity.week => l10n.entriesWeekLabel(isoWeekNumber(bar.start)),
+    TrendGranularity.month => DateFormat.yMMM(localeName).format(bar.start),
+  };
+
   static String _label(
     TrendBar bar,
     AppLocalizations l10n,
-    DateFormat dateFormat,
+    TrendGranularity granularity,
+    String localeName,
     TimeFormatStyle timeStyle,
   ) => l10n.reportsTrendBarLabel(
-    dateFormat.format(bar.start),
+    _periodLabel(bar, l10n, granularity, localeName),
     formatDuration(bar.worked, timeStyle),
     formatDuration(bar.target, timeStyle),
   );

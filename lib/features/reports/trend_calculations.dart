@@ -7,7 +7,7 @@ import 'package:flutter/material.dart' show DateTimeRange;
 import '../../core/format/iso_week.dart' show mondayOf;
 import 'balance_calculations.dart' show DayBalance;
 
-enum TrendGranularity { day, week }
+enum TrendGranularity { day, week, month }
 
 /// One column of the chart: what was worked against what was owed.
 typedef TrendBar = ({DateTime start, Duration worked, Duration target});
@@ -18,11 +18,25 @@ DateTime _dayOf(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
 /// months, past which a per-day chart is a picket fence nobody can read.
 const _defaultDayLimit = 62;
 
-/// Whether [range] is drawn per day or per week.
-TrendGranularity granularityFor(DateTimeRange range, {int dayLimit = _defaultDayLimit}) {
+/// And beyond which it switches again, to months: about two years, where
+/// weekly bars would be a hundred pickets instead. The "all" range spans a
+/// century on paper, so without this step it would draw one bar per week
+/// of the user's whole history.
+const _defaultWeekLimit = 730;
+
+/// Whether [range] is drawn per day, per ISO week or per month.
+TrendGranularity granularityFor(
+  DateTimeRange range, {
+  int dayLimit = _defaultDayLimit,
+  int weekLimit = _defaultWeekLimit,
+}) {
   final days = _dayOf(range.end).difference(_dayOf(range.start)).inDays;
-  return days > dayLimit ? TrendGranularity.week : TrendGranularity.day;
+  if (days <= dayLimit) return TrendGranularity.day;
+  return days > weekLimit ? TrendGranularity.month : TrendGranularity.week;
 }
+
+/// First of [day]'s month, local midnight.
+DateTime _monthOf(DateTime day) => DateTime(day.year, day.month);
 
 /// Folds [balances] into one bar per day or per ISO week.
 ///
@@ -63,8 +77,11 @@ List<TrendBar> trendBars(
 
   final worked = <DateTime, Duration>{};
   final target = <DateTime, Duration>{};
-  DateTime bucketOf(DateTime day) =>
-      granularity == TrendGranularity.week ? mondayOf(day) : day;
+  DateTime bucketOf(DateTime day) => switch (granularity) {
+    TrendGranularity.day => day,
+    TrendGranularity.week => mondayOf(day),
+    TrendGranularity.month => _monthOf(day),
+  };
 
   for (final balance in inRange) {
     final bucket = bucketOf(balance.day);
@@ -72,14 +89,19 @@ List<TrendBar> trendBars(
     target.update(bucket, (sum) => sum + balance.target, ifAbsent: () => balance.target);
   }
 
+  // Months are stepped through the DateTime constructor rather than by
+  // adding days: their length varies, and a fixed step would drift.
+  DateTime nextBucket(DateTime bucket) => switch (granularity) {
+    TrendGranularity.day => _dayOf(bucket.add(const Duration(days: 1))),
+    TrendGranularity.week => _dayOf(bucket.add(const Duration(days: 7))),
+    TrendGranularity.month => DateTime(bucket.year, bucket.month + 1),
+  };
+
   final bars = <TrendBar>[];
-  final step = granularity == TrendGranularity.week
-      ? const Duration(days: 7)
-      : const Duration(days: 1);
   for (
     var bucket = bucketOf(first);
     !bucket.isAfter(bucketOf(last));
-    bucket = _dayOf(bucket.add(step))
+    bucket = nextBucket(bucket)
   ) {
     bars.add((
       start: bucket,

@@ -156,16 +156,21 @@ final workTimeBalanceProvider = Provider<AsyncValue<Duration>>((ref) {
 /// Reads every entry, like the balance it charts against: a target line
 /// drawn over a filtered subset would compare one project's hours with a
 /// whole week's target.
-final trendBarsProvider = Provider<AsyncValue<List<TrendBar>>>((ref) {
+final trendBarsProvider =
+    Provider<AsyncValue<({List<TrendBar> bars, TrendGranularity granularity})>>((ref) {
   final range =
       (ref.watch(reportViewControllerProvider).value ?? const ReportViewState()).range;
   final now = DateTime.now();
+  final granularity = granularityFor(range);
   return _balanceInputs(ref).whenData(
-    (inputs) => trendBars(
-      inputs.balances,
-      range,
-      granularityFor(range),
-      through: DateTime(now.year, now.month, now.day),
+    (inputs) => (
+      bars: trendBars(
+        inputs.balances,
+        range,
+        granularity,
+        through: DateTime(now.year, now.month, now.day),
+      ),
+      granularity: granularity,
     ),
   );
 });
