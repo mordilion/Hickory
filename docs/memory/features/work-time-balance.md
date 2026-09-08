@@ -60,6 +60,22 @@
 - **The range tiles follow the report's range but none of its filters.** Same reason the
   running balance ignores them: "overtime, but only for project X" is not a number. The
   block says so whenever a filter is active.
+- **Money follows the report's filters; the balance, trend and quality blocks do not.**
+  Revenue for one project or one client is a real figure, where "overtime, but only for
+  project X" is not and a target line drawn over a filtered subset would compare one
+  project's hours against a whole week's target. Spec §6 draws the line in the same place.
+- **Currencies are never summed.** `moneyFigures` returns cents per currency, and a client
+  billed in two appears once per currency: adding them would mean picking an exchange
+  rate, which the app has no basis for choosing and no place to store.
+- **The trend switches to weekly bars past ~62 days** (`granularityFor`), and draws only
+  from the first day the data covers to today, clamped into the range. The "all" preset
+  spans 2000–2100, so enumerating the range itself would be thirty thousand empty bars;
+  stopping at today keeps the rest of a running month from being drawn as zeroes that have
+  not happened yet, while a forgotten week inside the span still reads as a gap.
+- **Every trend bar is a `Semantics` node carrying its date and figures.** The hover
+  tooltip §6.2 asks for has no keyboard or screen-reader equivalent, so the labels are the
+  accessible path, not decoration — and the only thing a widget test can assert on, since
+  a `CustomPainter`'s output is unreadable from a test.
 - **A figure with no meaning shows a dash, not a zero.** An average over a range without
   a single work day, or figures that have not arrived yet — a zero there reads as a
   measurement that was taken.
@@ -117,6 +133,13 @@
   flight** (only the chips, dropdowns and the mode toggle are). Disabling a focused field
   takes its focus away, and focus loss is exactly what commits it — tabbing from one day
   field to the next would break. `SettingsWriteGuard` queues concurrent writes instead.
+- **A widget test that mounts `ReportsScreen` must override every provider the dashboard
+  blocks read**, now `balanceAdjustmentsProvider`, `allClientsProvider`,
+  `breakRuleTiersProvider`, `jiraWorklogsByEntryIdProvider` and
+  `personioAttendancesByEntryIdProvider` on top of the older four. Each one left live
+  watches a real drift stream from inside a widget, and the failure is not a missing
+  value but "A Timer is still pending even after the widget tree was disposed" at
+  teardown — which reads like a flake in an unrelated test.
 - **Do not overlay `appDatabaseProvider` in a widget test that mounts anything watching
   both `appSettingsProvider` and `allEntriesProvider`.** That combination deadlocks
   `flutter_test`: drift's debounced stream-close leaves a pending timer, and `tearDown`'s
