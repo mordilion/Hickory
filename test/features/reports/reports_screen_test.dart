@@ -7,6 +7,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hickory/core/di/absence_providers.dart';
 import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/core/di/balance_adjustment_providers.dart';
+import 'package:hickory/core/di/break_rule_tiers_provider.dart';
+import 'package:hickory/core/di/jira_providers.dart';
+import 'package:hickory/core/di/personio_providers.dart';
 import 'package:hickory/features/clients/clients_providers.dart';
 import 'package:hickory/core/theme/app_theme.dart';
 import 'package:hickory/data/drift/database.dart';
@@ -102,6 +105,12 @@ void main() {
       absenceTypesProvider.overrideWith((ref) => Stream.value(const [])),
           balanceAdjustmentsProvider.overrideWith((ref) => Stream.value(const [])),
           allClientsProvider.overrideWith((ref) => Stream.value(const [])),
+      // The quality block reads these three; left live they watch real
+      // drift streams from inside a widget and leave a pending timer
+      // behind at teardown.
+      breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),
+      jiraWorklogsByEntryIdProvider.overrideWith((ref) => Stream.value(const {})),
+      personioAttendancesByEntryIdProvider.overrideWith((ref) => Stream.value(const {})),
     ],
     child: MaterialApp(
       theme: AppTheme.light,

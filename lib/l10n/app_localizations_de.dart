@@ -966,6 +966,48 @@ class AppLocalizationsDe extends AppLocalizations {
   String get reportsMoneyNoClient => 'Ohne Kunde';
 
   @override
+  String get reportsQualityTitle => 'Qualität der Erfassung';
+
+  @override
+  String reportsQualityUnbooked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Arbeitstage ohne Buchung',
+      one: '1 Arbeitstag ohne Buchung',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reportsQualityShortBreak(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tage mit zu kurzer Pause',
+      one: '1 Tag mit zu kurzer Pause',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reportsQualityFailedPushes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Einträge konnten nicht übertragen werden',
+      one: '1 Eintrag konnte nicht übertragen werden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportsQualityAbsences => 'Abwesenheitstage';
+
+  @override
+  String get reportsQualityClean => 'Nichts zu beanstanden.';
+
+  @override
   String get reportsBalanceNoTargets =>
       'Noch keine Soll-Arbeitszeit hinterlegt.';
 

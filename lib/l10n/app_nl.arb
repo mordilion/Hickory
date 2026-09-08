@@ -318,6 +318,27 @@
   "reportsMoneyTopClients": "Topklanten",
   "reportsMoneyNoRevenue": "Geen omzet in deze periode.",
   "reportsMoneyNoClient": "Zonder klant",
+  "reportsQualityTitle": "Kwaliteit van de registratie",
+  "reportsQualityUnbooked": "{count, plural, =1{1 werkdag zonder boeking} other{{count} werkdagen zonder boeking}}",
+  "@reportsQualityUnbooked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityShortBreak": "{count, plural, =1{1 dag met een te korte pauze} other{{count} dagen met een te korte pauze}}",
+  "@reportsQualityShortBreak": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityFailedPushes": "{count, plural, =1{1 invoer kon niet worden verzonden} other{{count} invoeren konden niet worden verzonden}}",
+  "@reportsQualityFailedPushes": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityAbsences": "Afwezigheidsdagen",
+  "reportsQualityClean": "Niets op te merken.",
   "reportsBalanceNoTargets": "Nog geen streefwerktijd ingesteld.",
   "reportsBalanceConfigure": "Stel die in bij Instellingen → Werktijd en saldo.",
   "reportsBalanceIgnoresFilter": "Het saldo omvat alle registraties, ongeacht het filter.",

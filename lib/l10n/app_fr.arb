@@ -318,6 +318,27 @@
   "reportsMoneyTopClients": "Principaux clients",
   "reportsMoneyNoRevenue": "Aucun chiffre d’affaires sur la période.",
   "reportsMoneyNoClient": "Sans client",
+  "reportsQualityTitle": "Qualité du suivi",
+  "reportsQualityUnbooked": "{count, plural, =1{1 jour ouvré sans saisie} other{{count} jours ouvrés sans saisie}}",
+  "@reportsQualityUnbooked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityShortBreak": "{count, plural, =1{1 jour avec une pause trop courte} other{{count} jours avec une pause trop courte}}",
+  "@reportsQualityShortBreak": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityFailedPushes": "{count, plural, =1{1 entrée n’a pas pu être transmise} other{{count} entrées n’ont pas pu être transmises}}",
+  "@reportsQualityFailedPushes": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityAbsences": "Jours d’absence",
+  "reportsQualityClean": "Rien à signaler.",
   "reportsBalanceNoTargets": "Aucun temps de travail cible défini.",
   "reportsBalanceConfigure": "À définir dans Réglages → Temps de travail et compteur.",
   "reportsBalanceIgnoresFilter": "Le compteur prend en compte toutes les entrées, indépendamment du filtre.",

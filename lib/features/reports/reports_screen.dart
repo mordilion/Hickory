@@ -14,6 +14,7 @@ import '../../l10n/app_localizations.dart';
 import 'balance_card.dart';
 import 'csv_export.dart';
 import 'money_card.dart';
+import 'quality_card.dart';
 import 'report_calculations.dart';
 import 'report_filter_dialog.dart';
 import 'report_view_controller.dart';
@@ -320,6 +321,8 @@ class _ReportBody extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 MoneyCard(entries: entries, projects: projects),
+                const SizedBox(height: 12),
+                const QualityCard(),
                 const SizedBox(height: 12),
                 if (totals.isEmpty)
                   Padding(

@@ -318,6 +318,27 @@
   "reportsMoneyTopClients": "Clientes principales",
   "reportsMoneyNoRevenue": "Sin ingresos en este periodo.",
   "reportsMoneyNoClient": "Sin cliente",
+  "reportsQualityTitle": "Calidad del registro",
+  "reportsQualityUnbooked": "{count, plural, =1{1 día laborable sin registro} other{{count} días laborables sin registro}}",
+  "@reportsQualityUnbooked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityShortBreak": "{count, plural, =1{1 día con una pausa demasiado corta} other{{count} días con una pausa demasiado corta}}",
+  "@reportsQualityShortBreak": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityFailedPushes": "{count, plural, =1{1 entrada no se pudo enviar} other{{count} entradas no se pudieron enviar}}",
+  "@reportsQualityFailedPushes": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityAbsences": "Días de ausencia",
+  "reportsQualityClean": "Nada que señalar.",
   "reportsBalanceNoTargets": "Aún no hay jornada objetivo definida.",
   "reportsBalanceConfigure": "Defínela en Ajustes → Jornada y saldo horario.",
   "reportsBalanceIgnoresFilter": "El saldo incluye todas las entradas, independientemente del filtro.",

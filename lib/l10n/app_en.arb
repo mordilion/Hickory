@@ -318,6 +318,27 @@
   "reportsMoneyTopClients": "Top clients",
   "reportsMoneyNoRevenue": "No revenue in this range.",
   "reportsMoneyNoClient": "No client",
+  "reportsQualityTitle": "Tracking quality",
+  "reportsQualityUnbooked": "{count, plural, =1{1 work day with no booking} other{{count} work days with no booking}}",
+  "@reportsQualityUnbooked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityShortBreak": "{count, plural, =1{1 day with too short a break} other{{count} days with too short a break}}",
+  "@reportsQualityShortBreak": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityFailedPushes": "{count, plural, =1{1 entry could not be pushed} other{{count} entries could not be pushed}}",
+  "@reportsQualityFailedPushes": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityAbsences": "Absence days",
+  "reportsQualityClean": "Nothing to flag.",
   "reportsBalanceNoTargets": "No target work time set yet.",
   "reportsBalanceConfigure": "Set it under Settings → Work time & balance.",
   "reportsBalanceIgnoresFilter": "The balance covers all entries, regardless of the filter.",

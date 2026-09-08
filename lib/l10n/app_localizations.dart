@@ -1773,6 +1773,42 @@ abstract class AppLocalizations {
   /// **'Ohne Kunde'**
   String get reportsMoneyNoClient;
 
+  /// No description provided for @reportsQualityTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Qualität der Erfassung'**
+  String get reportsQualityTitle;
+
+  /// No description provided for @reportsQualityUnbooked.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Arbeitstag ohne Buchung} other{{count} Arbeitstage ohne Buchung}}'**
+  String reportsQualityUnbooked(int count);
+
+  /// No description provided for @reportsQualityShortBreak.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Tag mit zu kurzer Pause} other{{count} Tage mit zu kurzer Pause}}'**
+  String reportsQualityShortBreak(int count);
+
+  /// No description provided for @reportsQualityFailedPushes.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Eintrag konnte nicht übertragen werden} other{{count} Einträge konnten nicht übertragen werden}}'**
+  String reportsQualityFailedPushes(int count);
+
+  /// No description provided for @reportsQualityAbsences.
+  ///
+  /// In de, this message translates to:
+  /// **'Abwesenheitstage'**
+  String get reportsQualityAbsences;
+
+  /// No description provided for @reportsQualityClean.
+  ///
+  /// In de, this message translates to:
+  /// **'Nichts zu beanstanden.'**
+  String get reportsQualityClean;
+
   /// No description provided for @reportsBalanceNoTargets.
   ///
   /// In de, this message translates to:

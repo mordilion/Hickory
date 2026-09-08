@@ -428,6 +428,27 @@
   "reportsMoneyTopClients": "Top-Kunden",
   "reportsMoneyNoRevenue": "Kein Umsatz im Zeitraum.",
   "reportsMoneyNoClient": "Ohne Kunde",
+  "reportsQualityTitle": "Qualität der Erfassung",
+  "reportsQualityUnbooked": "{count, plural, =1{1 Arbeitstag ohne Buchung} other{{count} Arbeitstage ohne Buchung}}",
+  "@reportsQualityUnbooked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityShortBreak": "{count, plural, =1{1 Tag mit zu kurzer Pause} other{{count} Tage mit zu kurzer Pause}}",
+  "@reportsQualityShortBreak": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityFailedPushes": "{count, plural, =1{1 Eintrag konnte nicht übertragen werden} other{{count} Einträge konnten nicht übertragen werden}}",
+  "@reportsQualityFailedPushes": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityAbsences": "Abwesenheitstage",
+  "reportsQualityClean": "Nichts zu beanstanden.",
   "reportsBalanceNoTargets": "Noch keine Soll-Arbeitszeit hinterlegt.",
   "reportsBalanceConfigure": "Unter Einstellungen → Arbeitszeit & Zeitkonto festlegen.",
   "reportsBalanceIgnoresFilter": "Das Zeitkonto berücksichtigt alle Einträge, unabhängig vom Filter.",

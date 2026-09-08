@@ -318,6 +318,27 @@
   "reportsMoneyTopClients": "Clienti principali",
   "reportsMoneyNoRevenue": "Nessun ricavo nel periodo.",
   "reportsMoneyNoClient": "Senza cliente",
+  "reportsQualityTitle": "Qualità della registrazione",
+  "reportsQualityUnbooked": "{count, plural, =1{1 giorno lavorativo senza registrazione} other{{count} giorni lavorativi senza registrazione}}",
+  "@reportsQualityUnbooked": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityShortBreak": "{count, plural, =1{1 giorno con una pausa troppo breve} other{{count} giorni con una pausa troppo breve}}",
+  "@reportsQualityShortBreak": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityFailedPushes": "{count, plural, =1{1 voce non è stata trasferita} other{{count} voci non sono state trasferite}}",
+  "@reportsQualityFailedPushes": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportsQualityAbsences": "Giorni di assenza",
+  "reportsQualityClean": "Nulla da segnalare.",
   "reportsBalanceNoTargets": "Nessun orario previsto impostato.",
   "reportsBalanceConfigure": "Impostalo in Impostazioni → Orario di lavoro e saldo.",
   "reportsBalanceIgnoresFilter": "Il saldo considera tutte le voci, indipendentemente dal filtro.",

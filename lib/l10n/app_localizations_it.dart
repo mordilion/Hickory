@@ -960,6 +960,48 @@ class AppLocalizationsIt extends AppLocalizations {
   String get reportsMoneyNoClient => 'Senza cliente';
 
   @override
+  String get reportsQualityTitle => 'Qualità della registrazione';
+
+  @override
+  String reportsQualityUnbooked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count giorni lavorativi senza registrazione',
+      one: '1 giorno lavorativo senza registrazione',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reportsQualityShortBreak(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count giorni con una pausa troppo breve',
+      one: '1 giorno con una pausa troppo breve',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reportsQualityFailedPushes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count voci non sono state trasferite',
+      one: '1 voce non è stata trasferita',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportsQualityAbsences => 'Giorni di assenza';
+
+  @override
+  String get reportsQualityClean => 'Nulla da segnalare.';
+
+  @override
   String get reportsBalanceNoTargets => 'Nessun orario previsto impostato.';
 
   @override

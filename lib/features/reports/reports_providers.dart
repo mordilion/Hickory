@@ -3,11 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/absence_providers.dart';
 import '../../core/di/balance_adjustment_providers.dart';
+import '../../core/di/break_rule_tiers_provider.dart';
+import '../../core/di/jira_providers.dart';
+import '../../core/di/personio_providers.dart';
 import '../../core/di/app_settings_provider.dart';
 import '../../core/di/database_provider.dart';
 import '../../data/drift/database.dart';
 import '../timer/timer_providers.dart' show allEntriesProvider;
+import '../sync/failed_pushes.dart';
 import 'balance_calculations.dart';
+import 'quality_calculations.dart';
 import 'report_view_controller.dart';
 import 'report_view_state.dart';
 
@@ -142,6 +147,47 @@ final workTimeBalanceProvider = Provider<AsyncValue<Duration>>((ref) {
       adjustments: inputs.adjustments,
     ),
   );
+});
+
+/// What the tracking is missing over the report's selected range.
+///
+/// Reads every entry in the range, not the filtered ones: a forgotten day
+/// is forgotten whichever project the filter is set to (spec §6).
+final qualityFiguresProvider = Provider<AsyncValue<QualityFigures>>((ref) {
+  final range =
+      (ref.watch(reportViewControllerProvider).value ?? const ReportViewState()).range;
+  final tiers = ref.watch(breakRuleTiersProvider).value ?? const <BreakRuleTier>[];
+  final absences = ref.watch(absencesProvider).value ?? const <Absence>[];
+  final jira = ref.watch(jiraWorklogsByEntryIdProvider).value ?? const {};
+  final personio = ref.watch(personioAttendancesByEntryIdProvider).value ?? const {};
+
+  return _balanceInputs(ref).whenData((inputs) {
+    final entriesInRange = [
+      for (final entry in ref.watch(allEntriesProvider).value ?? const <TimeEntry>[])
+        if (entry.endAt != null &&
+            !entry.startAt.toLocal().isBefore(range.start) &&
+            entry.startAt.toLocal().isBefore(range.end))
+          entry,
+    ];
+    // One entry can fail on both services; it is one entry either way, so
+    // the two failure sets are unioned rather than added.
+    final failed = <String>{
+      ...jiraFailures(jira).keys,
+      ...personioFailures(personio).keys,
+    };
+    final failedInRange = entriesInRange.where((entry) => failed.contains(entry.id)).length;
+
+    return qualityFigures(
+      balances: inputs.balances,
+      entries: entriesInRange,
+      absences: absences,
+      absenceTypesById: ref.watch(absenceTypesByIdProvider),
+      tiers: tiers,
+      includePausedTimeInBreak: inputs.settings.countPausedTimeAsBreak,
+      failedPushCount: failedInRange,
+      range: range,
+    );
+  });
 });
 
 /// Worked, target, average and corrections over the report's selected
