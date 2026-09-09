@@ -9,6 +9,9 @@
 - Never log or store secrets; redact sensitive values in logs.
 - Use code library patterns instead of inventing new ones.
 - Do not introduce fixed versions; read from project config files.
+- Database migrations are ALWAYS transactional and idempotent, and the upgrade path is
+  tested from every released schema version — see
+  `.claude/rules/processes/dart-database-migrations.md`.
 - Prefer smallest change that satisfies requirements.
 - Keep outputs concise and unambiguous across AI tools.
 

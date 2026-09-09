@@ -107,10 +107,61 @@ final database = await $FloorAppDatabase
 ## Phase 3: Migration Workflow
 
 > **ALWAYS**:
+> - **Wrap the whole upgrade in ONE transaction — all steps or none**
+> - **Make every step idempotent** (`CREATE TABLE IF NOT EXISTS`, add a column only when it is missing)
+> - **Test the upgrade from every released schema version, not just from the previous one**
 > - One migration per logical change
 > - Test migrations in development first
 > - Increment schema version for each change
 > - Handle data transformations carefully
+
+### Transactional migrations (NON-NEGOTIABLE)
+
+> **ALWAYS**: Run all upgrade steps inside a single transaction. SQLite has
+> transactional DDL, so a step that throws leaves the file exactly as it was.
+>
+> **NEVER**: Let steps run unwrapped. Without a transaction a failure halfway
+> leaves tables and columns behind **while `user_version` still names the old
+> schema** — the next start walks the same steps again over work already done
+> and fails a second time. The database is then wedged and the app hangs on
+> whatever waits for it, with no error the user can act on.
+
+```dart
+onUpgrade: (m, from, to) async {
+  await m.database.customStatement('BEGIN');
+  try {
+    await _upgrade(m, from);
+    await m.database.customStatement('COMMIT');
+  } catch (_) {
+    await m.database.customStatement('ROLLBACK');
+    rethrow;
+  }
+},
+```
+
+> **Use `customStatement` for BEGIN/COMMIT, not `transaction()`** — that is the
+> path the migrator itself uses while it holds the database. A regular
+> `transaction()` (and a plain `customSelect`) queues behind the migration
+> asking for it and never returns.
+
+### A created table already has every column added later
+
+> **NEVER**: Add a column to a table that an earlier step in the same run may
+> have created. `createTable` builds the table from its **current** definition,
+> so a database arriving from before that step already carries the column, and
+> `ALTER TABLE ... ADD COLUMN` fails with `duplicate column name`.
+
+This is the defect that bricked Hickory 1.4.0 for every 1.3.x user: step 11
+created `absences` (already carrying `half_day_part`) and step 12 then added
+`half_day_part` to it. A developer never sees it — their database is already
+past the create step when the column step is written.
+
+### Test the upgrade path itself
+
+> **ALWAYS**: Seed a database at each **released** schema version, open it, and
+> assert it reaches the current version. A single test that only covers
+> "previous version → current" misses exactly the multi-step jump every real
+> user makes. See `test/data/drift/migration_test.dart`.
 
 **Create Migration (Drift)**:
 ```dart

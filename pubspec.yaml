@@ -64,6 +64,9 @@ dependencies:
   crypto: ^3.0.7
 
 dev_dependencies:
+  # Used by the migration test to build a database as an older
+  # release left it; drift pulls the same package in at runtime.
+  sqlite3: any
   flutter_test:
     sdk: flutter
 
