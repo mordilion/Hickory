@@ -38,7 +38,7 @@ void main() {
     List<DateTime> unbooked = const [],
     List<DateTime> shortBreaks = const [],
     int failedPushCount = 0,
-    Map<String, int> absences = const {},
+    Map<String, double> absences = const {},
   }) => QualityFigures(
         unbookedWorkDays: unbooked,
         shortBreakDays: shortBreaks,
@@ -138,6 +138,22 @@ void main() {
         matching: find.byType(InkWell),
       );
       expect(line, findsNothing);
+    });
+  });
+
+  group('absence days', () {
+    testWidgets('shows a half day as a half, in the reader\'s number format', (tester) async {
+      await pumpCard(tester, figures(absences: {'Urlaub': 10.5}));
+
+      // German writes the decimal with a comma; "10.5" would read as a
+      // thousands separator here.
+      expect(find.text('Urlaub: 10,5'), findsOneWidget);
+    });
+
+    testWidgets('shows a whole number without a decimal', (tester) async {
+      await pumpCard(tester, figures(absences: {'Urlaub': 11}));
+
+      expect(find.text('Urlaub: 11'), findsOneWidget);
     });
   });
 }

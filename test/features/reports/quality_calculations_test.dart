@@ -22,11 +22,20 @@ TimeEntry _entry(DateTime day, {required int startHour, required int minutes, St
   );
 }
 
-Absence _absence(DateTime day, {String typeId = 'type-1', String id = 'a'}) => Absence(
+Absence _absence(
+  DateTime day, {
+  String typeId = 'type-1',
+  String id = 'a',
+  String portion = absencePortionFullDay,
+  DateTime? startAt,
+  DateTime? endAt,
+}) => Absence(
       id: id,
       date: day,
       absenceTypeId: typeId,
-      portion: absencePortionFullDay,
+      portion: portion,
+      startAt: startAt,
+      endAt: endAt,
       deviceId: 'd',
       createdAt: DateTime.utc(2026, 1, 1),
       updatedAt: DateTime.utc(2026, 1, 1),
@@ -172,7 +181,7 @@ void main() {
       types: {'type-1': _type('type-1', 'Urlaub'), 'type-2': _type('type-2', 'Krank')},
     );
 
-    expect(result.absenceDaysByTypeName, {'Urlaub': 2, 'Krank': 1});
+    expect(result.absenceDaysByTypeName, {'Urlaub': 2.0, 'Krank': 1.0});
   });
 
   test('an absence whose type is gone is not counted under a guessed name', () {
@@ -183,5 +192,93 @@ void main() {
 
   test('the failed-push count is passed through', () {
     expect(figures(failedPushCount: 3).failedPushCount, 3);
+  });
+
+  group('how much of a day an absence is worth', () {
+    final workDay = DayBalance(
+      day: monday,
+      worked: Duration.zero,
+      target: const Duration(hours: 8),
+    );
+
+    test('a half day counts as half a day, not a whole one', () {
+      final result = figures(
+        balances: [workDay],
+        absences: [_absence(monday, portion: absencePortionHalfDay)],
+        types: {'type-1': _type('type-1', 'Urlaub')},
+      );
+
+      expect(result.absenceDaysByTypeName, {'Urlaub': 0.5});
+    });
+
+    test('ten whole days and one half make ten and a half', () {
+      // The figure this was reported with: eleven rows, one of them half.
+      final days = [for (var offset = 0; offset < 11; offset++) monday.add(Duration(days: offset))];
+      final result = figures(
+        balances: [
+          for (final day in days)
+            DayBalance(day: day, worked: Duration.zero, target: const Duration(hours: 8)),
+        ],
+        absences: [
+          for (final (index, day) in days.indexed)
+            _absence(
+              day,
+              id: 'a$index',
+              portion: index == 0 ? absencePortionHalfDay : absencePortionFullDay,
+            ),
+        ],
+        types: {'type-1': _type('type-1', 'Urlaub')},
+        range: DateTimeRange(start: monday, end: monday.add(const Duration(days: 20))),
+      );
+
+      expect(result.absenceDaysByTypeName, {'Urlaub': 10.5});
+    });
+
+    test('a time range counts its share of that day', () {
+      final result = figures(
+        balances: [workDay],
+        absences: [
+          _absence(
+            monday,
+            portion: absencePortionRange,
+            startAt: DateTime(2026, 9, 7, 9).toUtc(),
+            endAt: DateTime(2026, 9, 7, 11).toUtc(),
+          ),
+        ],
+        types: {'type-1': _type('type-1', 'Urlaub')},
+      );
+
+      // Two hours against an eight-hour day: a quarter of it, not a day
+      // off and not nothing.
+      expect(result.absenceDaysByTypeName, {'Urlaub': 0.25});
+    });
+
+    test('a range longer than the day it falls on still counts one day', () {
+      final result = figures(
+        balances: [workDay],
+        absences: [
+          _absence(
+            monday,
+            portion: absencePortionRange,
+            startAt: DateTime(2026, 9, 7, 6).toUtc(),
+            endAt: DateTime(2026, 9, 7, 20).toUtc(),
+          ),
+        ],
+        types: {'type-1': _type('type-1', 'Urlaub')},
+      );
+
+      expect(result.absenceDaysByTypeName, {'Urlaub': 1.0});
+    });
+
+    test('a day the balance never enumerated is still a whole day off', () {
+      // No DayBalance means no target to measure against; a full day is
+      // one day, which is the only reading that does not invent a figure.
+      final result = figures(
+        absences: [_absence(monday)],
+        types: {'type-1': _type('type-1', 'Urlaub')},
+      );
+
+      expect(result.absenceDaysByTypeName, {'Urlaub': 1.0});
+    });
   });
 }

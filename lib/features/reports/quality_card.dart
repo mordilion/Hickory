@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../core/di/app_settings_provider.dart';
 import '../../core/format/date_format.dart';
@@ -90,7 +91,14 @@ class _QualityCardState extends ConsumerState<QualityCard> {
               Text(l10n.reportsQualityAbsences, style: theme.textTheme.labelMedium),
               const SizedBox(height: 4),
               for (final entry in absences.entries)
-                Text('${entry.key}: ${entry.value}', style: theme.textTheme.bodyMedium),
+                Text(
+                  // Days, not rows: a half day is 0.5 and has to read that
+                  // way in the reader's own notation — a bare toString
+                  // writes "10.5", which German reads as a thousands
+                  // separator, and "11.0" for a whole number.
+                  '${entry.key}: ${NumberFormat.decimalPattern(languageCode).format(entry.value)}',
+                  style: theme.textTheme.bodyMedium,
+                ),
             ],
           ],
         ),

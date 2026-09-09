@@ -88,6 +88,13 @@
   tooltip §6.2 asks for has no keyboard or screen-reader equivalent, so the labels are the
   accessible path, not decoration — and the only thing a widget test can assert on, since
   a `CustomPainter`'s output is unreadable from a test.
+- **Absence days are counted in days, not in rows.** `_absenceDayShare` gives a whole day
+  1, a half day 0.5 and a time range its share of that day's target, capped at 1 — eleven
+  rows with one half day among them read as 10.5. Counting rows was the first version and
+  it was simply wrong. A range on a day with no known target counts as a whole day: there
+  is no scale to measure it against, and the recording form skips such days anyway. The
+  figure is rendered through `NumberFormat.decimalPattern`, or German would read "10.5"
+  as a thousands separator.
 - **The quality block's day counts open into the days themselves.** `unbookedWorkDays` and
   `shortBreakDays` were already in `QualityFigures`; only their length was shown, which
   says something is wrong without saying where to look. Both lines toggle independently

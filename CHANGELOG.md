@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Count absence days in days rather than in records: a half day counted as a whole one, so eleven entries with one half day among them read as 11 instead of 10.5. A recorded time range now counts its share of that day.
+
 ### Added
 
 - Name the days behind the tracking-quality counts: tapping "work days with no booking" or "days with too short a break" in the Reports tab unfolds the dates, so the figure says where to go and not only that something is wrong.
