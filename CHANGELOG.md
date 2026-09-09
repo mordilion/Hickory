@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-09-09
+
+### Fixed
+
+- Fix updating from 1.3.x to 1.4.0 leaving the app on an endless spinner. The database upgrade added a column to a table the same run had just created, which failed and left the database unopened. Upgrades now run as one transaction and repair a database that 1.4.0 already left half-migrated, so no data is lost and no reinstall is needed.
+
 ## [1.4.0] - 2026-09-08
 
 ### Added
@@ -105,7 +111,8 @@ which were never distributed to users.
 - Fix the Settings screen not being scrollable when its content overflows the window.
 - Fix the in-app updater silently relaunching the unchanged app on macOS/Windows when it can't write to the install directory; it now fails with a clear, actionable message before quitting instead.
 
-[Unreleased]: https://github.com/mordilion/Hickory/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/mordilion/Hickory/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/mordilion/Hickory/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/mordilion/Hickory/compare/v1.3.2...v1.4.0
 [1.2.0]: https://github.com/mordilion/Hickory/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/mordilion/Hickory/compare/v1.0.2...v1.1.0
