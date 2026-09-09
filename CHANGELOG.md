@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Name the days behind the tracking-quality counts: tapping "work days with no booking" or "days with too short a break" in the Reports tab unfolds the dates, so the figure says where to go and not only that something is wrong.
+
 ## [1.4.1] - 2026-09-09
 
 ### Fixed

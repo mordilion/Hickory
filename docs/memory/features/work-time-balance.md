@@ -88,6 +88,11 @@
   tooltip §6.2 asks for has no keyboard or screen-reader equivalent, so the labels are the
   accessible path, not decoration — and the only thing a widget test can assert on, since
   a `CustomPainter`'s output is unreadable from a test.
+- **The quality block's day counts open into the days themselves.** `unbookedWorkDays` and
+  `shortBreakDays` were already in `QualityFigures`; only their length was shown, which
+  says something is wrong without saying where to look. Both lines toggle independently
+  (`QualityCard._open`), and the failed-push line stays plain text on purpose — it has no
+  days of its own, and the Sync tab already lists those entries and can retry them.
 - **A figure with no meaning shows a dash, not a zero.** An average over a range without
   a single work day, or figures that have not arrived yet — a zero there reads as a
   measurement that was taken.
