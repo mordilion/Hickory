@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'app.dart';
 import 'core/di/autostart_service.dart';
@@ -17,7 +18,11 @@ import 'core/storage/app_directories.dart';
 import 'core/storage/support_directory_migration.dart';
 import 'data/drift/database.dart';
 import 'core/theme/app_text_theme.dart';
+import 'core/window/native_window.dart';
 import 'core/window/quit_behavior.dart';
+import 'core/window/window_bounds_store.dart';
+import 'core/window/window_mode_controller.dart';
+import 'core/window/window_mode_provider.dart';
 import 'core/window/window_tray_controller.dart';
 import 'l10n/app_localizations.dart';
 
@@ -61,7 +66,26 @@ Future<void> main() async {
     return;
   }
 
-  final container = ProviderContainer();
+  // Resolved here (rather than only inside WindowTrayController) because the
+  // mode controller needs the same directory as the tray controller's own
+  // window_bounds.json -- see WindowBoundsStore's doc comment on why it takes
+  // the directory as a parameter instead of resolving it itself. Calling
+  // getApplicationSupportDirectory() a second time is harmless; it just reads
+  // a path, it doesn't touch disk.
+  final supportDir = await getApplicationSupportDirectory();
+  final windowModeController = WindowModeController(
+    window: const WindowManagerNativeWindow(),
+    fullBounds: WindowBoundsStore(supportDirectory: supportDir),
+    pillBounds: WindowBoundsStore(
+      supportDirectory: supportDir,
+      fileName: 'pill_bounds.json',
+    ),
+  );
+  final container = ProviderContainer(
+    overrides: [
+      windowModeControllerProvider.overrideWithValue(windowModeController),
+    ],
+  );
 
   await container.read(autostartServiceProvider).setup();
 
@@ -72,6 +96,8 @@ Future<void> main() async {
     await stopPausedEntryOnQuit(db, writes);
   };
   await windowTrayController.initialize();
+  windowTrayController.persistBoundsForCurrentMode =
+      windowModeController.persistCurrentBounds;
 
   AppLocalizations trayL10n() {
     final explicit = container.read(localeControllerProvider).value;

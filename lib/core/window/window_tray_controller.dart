@@ -42,6 +42,12 @@ class WindowTrayController with WindowListener, TrayListener {
   /// deliberately has no access to. Falls back to German when unset.
   String Function()? backgroundNoticeMessage;
 
+  /// Persists the current bounds into whichever store owns the current window
+  /// mode. Set by `main()` for the same reason as [onBeforeQuit]: this
+  /// controller deliberately has no provider access. Null until then, in which
+  /// case move/resize events fall back to the main-window store below.
+  Future<void> Function()? persistBoundsForCurrentMode;
+
   Future<void> initialize() async {
     windowManager.addListener(this);
     trayManager.addListener(this);
@@ -178,6 +184,11 @@ class WindowTrayController with WindowListener, TrayListener {
   /// best-effort handling elsewhere (e.g. [_quit]'s swallowed
   /// [onBeforeQuit] failure).
   Future<void> _persistBounds() async {
+    final persist = persistBoundsForCurrentMode;
+    if (persist != null) {
+      await persist();
+      return;
+    }
     final store = _boundsStore;
     if (store == null) return;
     try {
