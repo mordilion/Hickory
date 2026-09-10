@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/device_id_provider.dart';
 import '../../core/di/sync_providers.dart';
+import '../../core/window/window_mode.dart';
+import '../../core/window/window_mode_provider.dart';
 import '../shell/background_services.dart';
 import 'idle_prompt_dialog.dart';
 import 'timer_providers.dart';
@@ -43,6 +45,16 @@ class TimerBackgroundHandlersState
     if (running == null || running.pausedAt != null) return;
 
     _idlePromptShowing = true;
+
+    // A dialog cannot open over the 320x56 pill -- and "you were away, should
+    // I trim that?" is a question answered at full size anyway (spec 4.2).
+    // The window stays expanded afterwards; collapsing again is the user's
+    // call, via the collapse button.
+    if (ref.read(windowModeProvider) == WindowMode.pill) {
+      await ref.read(windowModeProvider.notifier).expand();
+    }
+    if (!mounted) return;
+
     final idleDuration = Duration(seconds: idleSeconds);
     final shouldTrim = await showIdlePromptDialog(context, idleDuration);
     if (!mounted) return;
