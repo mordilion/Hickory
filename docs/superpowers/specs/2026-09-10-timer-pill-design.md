@@ -170,15 +170,50 @@ Fixed 320×56, not resizable.
 - starting an entry sets the mode to `pill`; stopping from the pill sets it back
 - `BackgroundServices` keeps its subscriptions alive across a mode switch
 
-## 8. Risks — resolve by spike before planning
+## 8. Risks — spike results (2026-09-10)
 
-1. **`setTitleBarStyle` in both directions at runtime.** Going frameless is the easy half;
-   reliably restoring a normal title bar, on macOS *and* Windows, is the weakest point of
-   the whole design. If the return path does not hold, the fallback is to keep the title
-   bar hidden permanently and draw our own in the main window — a substantially larger
-   change that must come back to this design.
-2. **Shrinking without flicker**, and whether a frameless always-on-top window stays in the
-   Windows taskbar.
+A throwaway spike (`lib/spike_main.dart` on branch `spike/timer-pill-window-mode`, both
+deleted afterwards) drove a bare window through full → pill → full twice on macOS, printing
+the observed native state at each step:
 
-The spike is a throwaway branch with a dummy widget in place of the real pill: shrink,
-drag, expand, inspect the restored state. Its output is an answer, not code that is kept.
+| Step | Size | Position | resizable | titleBarHeight | alwaysOnTop |
+|---|---|---|---|---|---|
+| 01 initial full | 480×960 | 624,49 | true | 32 | false |
+| 02 pill | 320×56 | 624,81 | false | 0 | true |
+| 03 pill moved | 320×56 | 40,40 | false | 0 | true |
+| 04 restored full | 480×960 | 40,33 | true | 32 | false |
+| 05 pill again | 320×56 | 40,65 | false | 0 | true |
+| 06 restored again | 480×960 | 40,33 | true | 32 | false |
+
+**Risk 1 (title bar round trip) is resolved on macOS.** `setTitleBarStyle` goes
+hidden → normal and back reliably, twice, and size, resizable and always-on-top all
+restore. The fallback design (permanently hidden title bar plus a self-drawn one) is not
+needed.
+
+**Risk 2 (flicker, frameless appearance) is resolved on macOS.** A screen capture during
+the pill phase shows the window frameless — no title bar, no traffic lights — floating
+above another application's window, with rounded corners applied by macOS for free. No
+flicker was observable across the transitions.
+
+### 8.1 New finding: the frame origin shifts by the title-bar height
+
+Collapsing moves the reported window top down by exactly the title-bar height (49 → 81,
+33 → 65; both +32) and expanding moves it back. `getBounds` and `setPosition` work on the
+window *frame*, and the frame changes when the title bar disappears.
+
+Consequence for the implementation: **every mode switch must set the target position
+explicitly** from the store for that mode, rather than assuming the window stays where it
+was. Never derive one mode's position from a `getBounds` taken in the other mode without
+correcting for `getTitleBarHeight()`.
+
+On expand, macOS additionally clamps the top edge so the window cannot cover the menu bar
+(step 03 → 04: y 40 would become 8, observed 33). Restoring the main window's saved
+position handles this; no extra code is needed.
+
+### 8.2 Still unverified: Windows
+
+The spike ran on macOS only — no Windows machine was available in this session. Both risks
+remain open there, specifically whether `setTitleBarStyle` restores a normal frame and
+whether a frameless always-on-top window keeps its taskbar entry. **Re-run the same spike
+on Windows before the pill ships**, and treat a Windows-only fallback (keeping the title
+bar in pill mode, or hiding to the tray instead) as a possible outcome.
