@@ -1,7 +1,8 @@
 // lib/core/window/window_tray_controller.dart
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, visibleForTesting;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tray_manager/tray_manager.dart';
@@ -21,6 +22,14 @@ class WindowTrayController with WindowListener, TrayListener {
   /// reused by the resize/move listeners so they don't re-resolve it on
   /// every event. Null only in the brief window before [initialize] runs.
   WindowBoundsStore? _boundsStore;
+
+  /// Test-only seam for [_boundsStore]. Production always gets it from
+  /// [initialize], which a test can't call (it hits the windowManager/
+  /// trayManager platform channels) -- without this setter, the fallback
+  /// branch of [_persistBounds] (the pre-Task-4 behaviour this task must not
+  /// regress) would be permanently unreachable from a test.
+  @visibleForTesting
+  set boundsStoreForTesting(WindowBoundsStore? store) => _boundsStore = store;
 
   /// Shown via a SnackBar the first time the window is hidden to the tray,
   /// so the app doesn't seem to have silently vanished. A [GlobalKey] is
