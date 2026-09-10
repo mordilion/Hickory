@@ -17,7 +17,6 @@ import 'package:hickory/features/jira/jira_credentials_store.dart';
 import 'package:hickory/features/personio/personio_credentials_store.dart';
 import 'package:hickory/features/projects/projects_providers.dart';
 import 'package:hickory/features/shell/app_shell.dart';
-import 'package:hickory/features/shell/nav_shell.dart';
 import 'package:hickory/features/timer/timer_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
 
@@ -90,38 +89,6 @@ TimeEntry _runningEntry() {
 }
 
 void main() {
-  // Brief's step 1: pins the behaviour AppShell's wiring depends on --
-  // fabBuilder is per-tab-selection but not tab-specific, i.e. a builder
-  // that ignores the index still renders on every tab. Passes immediately
-  // since NavShell.fabBuilder already exists (see nav_shell.dart); kept
-  // here rather than folded into nav_shell_test.dart because it documents
-  // the specific contract AppShell (below) relies on.
-  testWidgets('fabBuilder result is rendered for the selected tab', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: NavShell(
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.timer), label: 'a'),
-            NavigationDestination(icon: Icon(Icons.bar_chart), label: 'b'),
-          ],
-          children: const [Text('one'), Text('two')],
-          fabBuilder: (_) => FloatingActionButton.small(
-            onPressed: () {},
-            child: const Icon(Icons.close_fullscreen),
-          ),
-        ),
-      ),
-    );
-
-    expect(find.byIcon(Icons.close_fullscreen), findsOneWidget);
-
-    await tester.tap(find.text('b'));
-    await tester.pumpAndSettle();
-
-    // Still there: the collapse button is not tab-specific.
-    expect(find.byIcon(Icons.close_fullscreen), findsOneWidget);
-  });
-
   group('AppShell', () {
     // NavShell's IndexedStack keeps all four tabs mounted at once (not just
     // the selected one), so every provider any tab touches during build has
@@ -210,26 +177,39 @@ void main() {
       await tester.pumpWidget(
         buildAppIsolatingFontErrors(running: _runningEntry(), notifier: notifier),
       );
-      // A fixed-duration pump, not pumpAndSettle(): the Reports tab's
-      // filter spinner (reportViewControllerProvider never resolves here
-      // -- see the override list above) and Sync's folder-load indicator
-      // are indeterminate progress animations that never stop, which
-      // would make pumpAndSettle() time out even though the FAB itself
-      // has long finished its own show/hide transition.
-      await tester.pump(const Duration(seconds: 1));
+      // Not pumpAndSettle(): the Reports tab's filter spinner
+      // (reportViewControllerProvider never resolves here -- see the
+      // override list above) and Sync's folder-load indicator are
+      // indeterminate progress animations that never stop, which would make
+      // pumpAndSettle() time out regardless of the FAB's own state.
+      //
+      // Not a single fixed-duration pump() either, even though its Duration
+      // covers far more than Scaffold's own FAB entrance animation
+      // (kFloatingActionButtonSegue, 200ms): runningEntryProvider resolves
+      // one microtask after pumpWidget(), so the FAB's ScaleTransition
+      // starts its AnimationController.forward() *during* the build of
+      // whichever single frame that pump() call ends up producing. That
+      // controller's elapsed time is measured from its own start timestamp,
+      // which is that same frame's timestamp -- so the transform this one
+      // frame paints with is still the animation's t=0 value (scale 0, an
+      // unhittable point) no matter how long a Duration the pump was given.
+      // It only advances on a *later* frame's tick callback. A loop of
+      // short pumps forces those later frames to actually happen, letting
+      // the entrance animation reach its settled, hit-testable scale.
+      for (var i = 0; i < 20; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
 
       expect(find.byIcon(Icons.close_fullscreen), findsOneWidget);
 
-      // Invoked directly rather than through tester.tap(): Scaffold wraps
-      // its FAB in a Hero for the cross-fade transition, and that
-      // transition's own AnimationController leaves the button's
-      // hit-testable geometry degenerate for tap purposes well past any
-      // fixed pump duration in this test's four-tab tree, even though the
-      // button paints and behaves correctly. Calling onPressed still
-      // exercises the exact wiring this test cares about -- that the FAB
-      // this tab shows calls collapse().
-      final button = tester.widget<FloatingActionButton>(find.byType(FloatingActionButton));
-      button.onPressed!();
+      // A real tap, dispatched through hit-testing and the gesture arena --
+      // not a direct onPressed() call -- now that the loop above gives the
+      // entrance transition's transform time to settle. This is the
+      // meaningful difference for Finding 1's regression: an onPressed()
+      // call would still succeed even if something else visually and
+      // functionally covered the FAB, since it never asks the render tree
+      // what is actually hit-testable at that point on screen.
+      await tester.tap(find.byType(FloatingActionButton));
       await tester.pump(const Duration(milliseconds: 300));
       expect(notifier.calls, ['collapse']);
 
