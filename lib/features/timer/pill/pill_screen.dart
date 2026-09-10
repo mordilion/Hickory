@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:window_manager/window_manager.dart';
 
+import '../../../core/di/sync_providers.dart';
 import '../../../core/format/duration_format.dart';
 import '../../../core/theme/hickory_colors.dart';
+import '../../../core/window/window_mode_provider.dart';
 import '../../../data/drift/database.dart';
 import '../../../data/drift/time_entry_extensions.dart';
+import '../../../data/sync/synced_writes.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../clients/clients_providers.dart';
 import '../../projects/projects_providers.dart';
@@ -221,6 +225,39 @@ class _PillButton extends StatelessWidget {
       visualDensity: VisualDensity.compact,
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+    );
+  }
+}
+
+/// Supplies [PillScreen] with the running entry's controls, using the same
+/// writes `TimerScreen` uses, and turns [PillScreen.onDragStart] into the
+/// one `window_manager` call it makes. Separate from PillScreen so that
+/// widget stays a pure rendering of five callbacks a test can reach without
+/// a platform channel (see PillScreen's doc comment).
+class PillHost extends ConsumerWidget {
+  const PillHost({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final running = ref.watch(runningEntryProvider).value;
+
+    Future<void> withWrites(Future<void> Function(SyncedWrites writes) action) async {
+      final writes = await ref.read(syncedWritesProvider.future);
+      await action(writes);
+    }
+
+    void ifRunning(Future<void> Function(SyncedWrites writes, TimeEntry entry) action) {
+      final entry = running;
+      if (entry == null) return;
+      withWrites((writes) => action(writes, entry));
+    }
+
+    return PillScreen(
+      onPause: () => ifRunning((writes, entry) => writes.pauseEntry(entry.id)),
+      onResume: () => ifRunning((writes, entry) => writes.resumeEntry(entry.id)),
+      onStop: () => ifRunning((writes, entry) => writes.stopEntry(entry.id)),
+      onExpand: () => ref.read(windowModeProvider.notifier).expand(),
+      onDragStart: () => windowManager.startDragging(),
     );
   }
 }

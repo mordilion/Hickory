@@ -4,7 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/di/locale_provider.dart';
 import 'core/locale/locale_resolution.dart';
 import 'core/theme/app_theme.dart';
+import 'core/window/window_mode.dart';
+import 'core/window/window_mode_provider.dart';
 import 'features/shell/app_shell.dart';
+import 'features/timer/pill/pill_screen.dart';
+import 'features/timer/pill/timer_pill_coordinator.dart';
+import 'features/timer/timer_background_handlers.dart';
 import 'l10n/app_localizations.dart';
 
 class HickoryApp extends ConsumerWidget {
@@ -26,7 +31,14 @@ class HickoryApp extends ConsumerWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       localeResolutionCallback: (deviceLocale, _) => resolveLocale(deviceLocale),
       scaffoldMessengerKey: scaffoldMessengerKey,
-      home: const AppShell(),
+      home: TimerBackgroundHandlers(
+        child: TimerPillCoordinator(
+          child: switch (ref.watch(windowModeProvider)) {
+            WindowMode.full => const AppShell(),
+            WindowMode.pill => const PillHost(),
+          },
+        ),
+      ),
     );
   }
 }
