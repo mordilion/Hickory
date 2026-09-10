@@ -1,11 +1,8 @@
-import 'package:activity_tracker/activity_tracker.dart';
-import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/app_settings_provider.dart';
 import '../../core/di/device_id_provider.dart';
-import '../../core/di/jira_providers.dart';
 import '../../core/di/sync_providers.dart';
 import '../../core/format/duration_format.dart';
 import '../../core/theme/hickory_colors.dart';
@@ -19,13 +16,7 @@ import '../entries/quick_add_bar.dart';
 import '../jira/widgets/jira_ticket_field.dart';
 import '../projects/project_form_dialog.dart';
 import '../projects/projects_providers.dart';
-import 'idle_prompt_dialog.dart';
-import 'idle_tracking.dart';
 import 'timer_providers.dart';
-
-/// Idle time is prompted about once it reaches this threshold, on desktop
-/// only (see [isDesktopTrackingSupported]).
-const _idleThresholdSeconds = 5 * 60;
 
 enum _TimerTabMode { timer, manual, absence }
 
@@ -43,47 +34,12 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
   final _descriptionController = TextEditingController();
   String? _selectedProjectId;
   String? _selectedJiraTicketKey;
-  bool _idlePromptShowing = false;
   _TimerTabMode _mode = _TimerTabMode.timer;
 
   @override
   void dispose() {
     _descriptionController.dispose();
     super.dispose();
-  }
-
-  Future<void> _handleIdleSecondsChanged(int idleSeconds) async {
-    if (idleSeconds < _idleThresholdSeconds) {
-      _idlePromptShowing = false;
-      return;
-    }
-    if (_idlePromptShowing) return;
-    final running = ref.read(runningEntryProvider).value;
-    if (running == null || running.pausedAt != null) return;
-
-    _idlePromptShowing = true;
-    final idleDuration = Duration(seconds: idleSeconds);
-    final shouldTrim = await showIdlePromptDialog(context, idleDuration);
-    if (!mounted) return;
-    if (shouldTrim) {
-      final writes = await ref.read(syncedWritesProvider.future);
-      final idleStart = DateTime.now().subtract(idleDuration);
-      await writes.updateEntry(running.id, endAt: Value(idleStart.toUtc()));
-    }
-    _idlePromptShowing = false;
-  }
-
-  Future<void> _recordActivitySample(ActivitySample sample) async {
-    final running = ref.read(runningEntryProvider).value;
-    if (running == null || running.pausedAt != null) return;
-    final deviceId = await ref.read(deviceIdProvider.future);
-    final writes = await ref.read(syncedWritesProvider.future);
-    await writes.recordActivitySample(
-      deviceId: deviceId,
-      appName: sample.appName,
-      windowTitle: sample.windowTitle,
-      observedAt: sample.observedAt,
-    );
   }
 
   Future<void> _start() async {
@@ -121,20 +77,6 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
     final l10n = AppLocalizations.of(context);
     final runningAsync = ref.watch(runningEntryProvider);
     ref.watch(timerTickProvider);
-    ref.watch(syncWatcherProvider);
-    // Both background triggers are activated here, from the tab that is
-    // always mounted (AppShell uses an IndexedStack), so they live as long
-    // as the app does.
-    ref.watch(jiraAutoSyncProvider);
-
-    ref.listen<AsyncValue<int>>(idleSecondsProvider, (previous, next) {
-      final idleSeconds = next.value;
-      if (idleSeconds != null) _handleIdleSecondsChanged(idleSeconds);
-    });
-    ref.listen<AsyncValue<ActivitySample>>(activeWindowChangesProvider, (previous, next) {
-      final sample = next.value;
-      if (sample != null) _recordActivitySample(sample);
-    });
 
     final isRunning = runningAsync.value != null;
     if (isRunning) _mode = _TimerTabMode.timer;
