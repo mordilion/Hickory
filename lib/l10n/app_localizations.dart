@@ -2000,6 +2000,36 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Zurücksetzen fehlgeschlagen.'**
   String get settingsResetError;
+
+  /// No description provided for @pillPause.
+  ///
+  /// In de, this message translates to:
+  /// **'Pausieren'**
+  String get pillPause;
+
+  /// No description provided for @pillResume.
+  ///
+  /// In de, this message translates to:
+  /// **'Fortsetzen'**
+  String get pillResume;
+
+  /// No description provided for @pillStop.
+  ///
+  /// In de, this message translates to:
+  /// **'Stoppen'**
+  String get pillStop;
+
+  /// No description provided for @pillExpand.
+  ///
+  /// In de, this message translates to:
+  /// **'Hauptfenster öffnen'**
+  String get pillExpand;
+
+  /// No description provided for @timerCollapseToPill.
+  ///
+  /// In de, this message translates to:
+  /// **'Auf Pille verkleinern'**
+  String get timerCollapseToPill;
 }
 
 class _AppLocalizationsDelegate

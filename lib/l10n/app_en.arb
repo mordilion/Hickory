@@ -377,5 +377,10 @@
   "settingsResetConfirmMessage": "Projects, clients, time entries, settings, and Jira/Personio links on this device will be permanently deleted. This device's own history will also be permanently removed from the sync folder, and the connection to it will be removed. This cannot be undone.",
   "settingsResetConfirmButton": "Yes, reset everything",
   "settingsResetSuccess": "The app has been reset.",
-  "settingsResetError": "Reset failed."
+  "settingsResetError": "Reset failed.",
+  "pillPause": "Pause",
+  "pillResume": "Resume",
+  "pillStop": "Stop",
+  "pillExpand": "Open the main window",
+  "timerCollapseToPill": "Shrink to pill"
 }

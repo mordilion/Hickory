@@ -377,5 +377,10 @@
   "settingsResetConfirmMessage": "Projecten, klanten, tijdregistraties, instellingen en Jira-/Personio-koppelingen op dit apparaat worden permanent verwijderd. Ook de eigen geschiedenis van dit apparaat wordt definitief uit de synchronisatiemap verwijderd, en de verbinding ermee wordt verbroken. Dit kan niet ongedaan worden gemaakt.",
   "settingsResetConfirmButton": "Ja, alles resetten",
   "settingsResetSuccess": "De app is gereset.",
-  "settingsResetError": "Resetten is mislukt."
+  "settingsResetError": "Resetten is mislukt.",
+  "pillPause": "Pauzeren",
+  "pillResume": "Hervatten",
+  "pillStop": "Stoppen",
+  "pillExpand": "Hoofdvenster openen",
+  "timerCollapseToPill": "Verklein tot pil"
 }

@@ -1104,4 +1104,19 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settingsResetError => 'Ripristino non riuscito.';
+
+  @override
+  String get pillPause => 'Metti in pausa';
+
+  @override
+  String get pillResume => 'Riprendi';
+
+  @override
+  String get pillStop => 'Ferma';
+
+  @override
+  String get pillExpand => 'Apri la finestra principale';
+
+  @override
+  String get timerCollapseToPill => 'Riduci a pillola';
 }

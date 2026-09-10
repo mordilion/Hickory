@@ -377,5 +377,10 @@
   "settingsResetConfirmMessage": "Progetti, clienti, voci di tempo, impostazioni e collegamenti Jira/Personio su questo dispositivo verranno eliminati definitivamente. Anche la cronologia di questo dispositivo verrà rimossa definitivamente dalla cartella di sincronizzazione, e la connessione ad essa verrà rimossa. Questa azione non può essere annullata.",
   "settingsResetConfirmButton": "Sì, ripristina tutto",
   "settingsResetSuccess": "L'app è stata ripristinata.",
-  "settingsResetError": "Ripristino non riuscito."
+  "settingsResetError": "Ripristino non riuscito.",
+  "pillPause": "Metti in pausa",
+  "pillResume": "Riprendi",
+  "pillStop": "Ferma",
+  "pillExpand": "Apri la finestra principale",
+  "timerCollapseToPill": "Riduci a pillola"
 }

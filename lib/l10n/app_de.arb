@@ -487,5 +487,10 @@
   "settingsResetConfirmMessage": "Projekte, Kunden, Zeiteinträge, Einstellungen und Jira-/Personio-Verknüpfungen auf diesem Gerät werden unwiderruflich gelöscht. Der eigene Verlauf dieses Geräts wird auch endgültig aus dem Sync-Ordner entfernt, und die Verbindung dazu wird getrennt. Diese Aktion kann nicht rückgängig gemacht werden.",
   "settingsResetConfirmButton": "Ja, alles zurücksetzen",
   "settingsResetSuccess": "App wurde zurückgesetzt.",
-  "settingsResetError": "Zurücksetzen fehlgeschlagen."
+  "settingsResetError": "Zurücksetzen fehlgeschlagen.",
+  "pillPause": "Pausieren",
+  "pillResume": "Fortsetzen",
+  "pillStop": "Stoppen",
+  "pillExpand": "Hauptfenster öffnen",
+  "timerCollapseToPill": "Auf Pille verkleinern"
 }

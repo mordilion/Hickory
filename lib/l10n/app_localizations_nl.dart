@@ -1108,4 +1108,19 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settingsResetError => 'Resetten is mislukt.';
+
+  @override
+  String get pillPause => 'Pauzeren';
+
+  @override
+  String get pillResume => 'Hervatten';
+
+  @override
+  String get pillStop => 'Stoppen';
+
+  @override
+  String get pillExpand => 'Hoofdvenster openen';
+
+  @override
+  String get timerCollapseToPill => 'Verklein tot pil';
 }

@@ -377,5 +377,10 @@
   "settingsResetConfirmMessage": "Los proyectos, clientes, entradas de tiempo, ajustes y vínculos de Jira/Personio de este dispositivo se eliminarán permanentemente. El historial propio de este dispositivo también se eliminará de forma permanente de la carpeta de sincronización, y se eliminará la conexión con ella. Esta acción no se puede deshacer.",
   "settingsResetConfirmButton": "Sí, restablecer todo",
   "settingsResetSuccess": "La aplicación se ha restablecido.",
-  "settingsResetError": "No se pudo restablecer."
+  "settingsResetError": "No se pudo restablecer.",
+  "pillPause": "Pausar",
+  "pillResume": "Reanudar",
+  "pillStop": "Detener",
+  "pillExpand": "Abrir la ventana principal",
+  "timerCollapseToPill": "Reducir a píldora"
 }

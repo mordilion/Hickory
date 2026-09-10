@@ -1117,4 +1117,19 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsResetError => 'La réinitialisation a échoué.';
+
+  @override
+  String get pillPause => 'Mettre en pause';
+
+  @override
+  String get pillResume => 'Reprendre';
+
+  @override
+  String get pillStop => 'Arrêter';
+
+  @override
+  String get pillExpand => 'Ouvrir la fenêtre principale';
+
+  @override
+  String get timerCollapseToPill => 'Réduire en pastille';
 }

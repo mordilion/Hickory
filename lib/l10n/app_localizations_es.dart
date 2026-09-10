@@ -1101,4 +1101,19 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsResetError => 'No se pudo restablecer.';
+
+  @override
+  String get pillPause => 'Pausar';
+
+  @override
+  String get pillResume => 'Reanudar';
+
+  @override
+  String get pillStop => 'Detener';
+
+  @override
+  String get pillExpand => 'Abrir la ventana principal';
+
+  @override
+  String get timerCollapseToPill => 'Reducir a píldora';
 }

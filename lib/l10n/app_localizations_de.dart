@@ -1109,4 +1109,19 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsResetError => 'Zurücksetzen fehlgeschlagen.';
+
+  @override
+  String get pillPause => 'Pausieren';
+
+  @override
+  String get pillResume => 'Fortsetzen';
+
+  @override
+  String get pillStop => 'Stoppen';
+
+  @override
+  String get pillExpand => 'Hauptfenster öffnen';
+
+  @override
+  String get timerCollapseToPill => 'Auf Pille verkleinern';
 }
