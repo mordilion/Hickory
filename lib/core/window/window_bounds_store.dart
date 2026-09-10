@@ -12,11 +12,19 @@ import 'package:path/path.dart' as p;
 /// internally via path_provider) so it's trivially testable against a temp
 /// directory -- the real caller passes `await getApplicationSupportDirectory()`.
 class WindowBoundsStore {
-  WindowBoundsStore({required this.supportDirectory});
+  WindowBoundsStore({
+    required this.supportDirectory,
+    this.fileName = 'window_bounds.json',
+  });
 
   final Directory supportDirectory;
 
-  File get _boundsFile => File(p.join(supportDirectory.path, 'window_bounds.json'));
+  /// Which file inside [supportDirectory] this instance owns. Defaults to the
+  /// main window's bounds; the pill passes 'pill_bounds.json' so dragging the
+  /// pill can't overwrite the main window's remembered size.
+  final String fileName;
+
+  File get _boundsFile => File(p.join(supportDirectory.path, fileName));
 
   /// Returns null if no bounds have been saved yet, the file can't be
   /// read/parsed (e.g. a partial write), or the saved width/height aren't

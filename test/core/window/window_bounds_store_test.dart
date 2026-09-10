@@ -48,4 +48,27 @@ void main() {
     final store = WindowBoundsStore(supportDirectory: tempDir);
     expect(await store.read(), isNull);
   });
+
+  test('two stores with different file names keep separate bounds', () async {
+    final windowStore = WindowBoundsStore(supportDirectory: tempDir);
+    final pillStore = WindowBoundsStore(
+      supportDirectory: tempDir,
+      fileName: 'pill_bounds.json',
+    );
+    const windowBounds = Rect.fromLTWH(100, 100, 480, 960);
+    const pillBounds = Rect.fromLTWH(1500, 40, 320, 56);
+
+    await windowStore.write(windowBounds);
+    await pillStore.write(pillBounds);
+
+    expect(await windowStore.read(), windowBounds);
+    expect(await pillStore.read(), pillBounds);
+    expect(File('${tempDir.path}/pill_bounds.json').existsSync(), isTrue);
+  });
+
+  test('default file name is unchanged, so existing installs keep their bounds', () async {
+    final store = WindowBoundsStore(supportDirectory: tempDir);
+    await store.write(const Rect.fromLTWH(10, 20, 480, 960));
+    expect(File('${tempDir.path}/window_bounds.json').existsSync(), isTrue);
+  });
 }
