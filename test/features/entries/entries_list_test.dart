@@ -832,6 +832,39 @@ void main() {
     expect(find.textContaining('Afternoon'), findsOneWidget);
   });
 
+  testWidgets(
+    'reserves bottom padding so the shell FAB never covers the last row',
+    (tester) async {
+      // The absence row's edit IconButton sits in the same bottom-right
+      // corner AppShell's collapse-to-pill FAB floats over while a timer
+      // runs. This regressed once already when the previous FAB was
+      // removed along with its padding in fc82d62 (see
+      // docs/superpowers/specs/2026-07-07-electric-violet-redesign-design.md:72)
+      // -- pinning it here so a future FAB change can't silently drop it
+      // again.
+      final monday = DateTime(2024, 5, 6);
+      await tester.pumpWidget(
+        makeApp(
+          const [],
+          absences: [vacationOn(monday)],
+          absenceTypes: [vacationType()],
+          location: EntriesWeekLocation(monday: monday, year: 2024, month: 5),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final listView = tester.widget<ListView>(find.byType(ListView));
+      final padding = listView.padding as EdgeInsets?;
+
+      // Lower bound, not an exact match: FloatingActionButton.small's
+      // rendered footprint on desktop (40px -- MaterialTapTargetSize
+      // .shrinkWrap adds no tap-target padding here, unlike mobile's 48px)
+      // plus twice the standard FAB margin, mirroring the clearance the
+      // original _bottomPaddingForFab constant gave the larger FAB it
+      // replaced.
+      expect(padding?.bottom, greaterThanOrEqualTo(40.0 + 2 * kFloatingActionButtonMargin));
+    },
+  );
 }
 
 /// Pins the location so a test doesn't silently depend on today's date.

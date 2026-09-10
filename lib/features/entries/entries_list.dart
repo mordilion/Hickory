@@ -26,6 +26,21 @@ import 'entries_location.dart';
 import 'entry_tree.dart';
 import 'manual_entry_dialog.dart';
 
+/// Reserves space so the shell's collapse-to-pill FAB (AppShell, shown
+/// whenever a timer runs) never overlaps the last row's controls -- the
+/// deepest drill-down level (`EntriesWeekView`) renders absence rows with a
+/// real, tappable edit `IconButton` in the same bottom-right corner the FAB
+/// occupies. This already caused a bug once (see
+/// docs/superpowers/specs/2026-07-07-electric-violet-redesign-design.md:72)
+/// and was removed with the old manual-entry FAB in fc82d62 -- restored here
+/// now that a shell-level FAB exists again. Value: `FloatingActionButton
+/// .small`'s rendered height (40px; Hickory is desktop-only, where the
+/// default `MaterialTapTargetSize.shrinkWrap` means no extra tap-target
+/// padding is added, unlike the padded 48px on mobile) plus twice
+/// [kFloatingActionButtonMargin], matching the clearance the original
+/// constant gave the larger, since-replaced regular FAB (56px + 2 * 16px).
+const _bottomPaddingForFab = 40.0 + 2 * kFloatingActionButtonMargin;
+
 class EntriesList extends ConsumerWidget {
   const EntriesList({super.key});
 
@@ -97,6 +112,7 @@ class EntriesList extends ConsumerWidget {
             Expanded(
               child: switch (view) {
                 EntriesYearsView(:final years) => ListView.builder(
+                  padding: const EdgeInsets.only(bottom: _bottomPaddingForFab),
                   itemCount: years.length,
                   itemBuilder: (context, index) {
                     final year = years[index];
@@ -115,6 +131,7 @@ class EntriesList extends ConsumerWidget {
                   },
                 ),
                 EntriesMonthsView(year: final yearGroup) => ListView.builder(
+                  padding: const EdgeInsets.only(bottom: _bottomPaddingForFab),
                   itemCount: yearGroup.months.length,
                   itemBuilder: (context, index) {
                     final month = yearGroup.months[index];
@@ -134,6 +151,7 @@ class EntriesList extends ConsumerWidget {
                   },
                 ),
                 EntriesWeeksView(month: final monthGroup) => ListView.builder(
+                  padding: const EdgeInsets.only(bottom: _bottomPaddingForFab),
                   itemCount: monthGroup.weeks.length,
                   itemBuilder: (context, index) {
                     final week = monthGroup.weeks[index];
@@ -166,6 +184,7 @@ class EntriesList extends ConsumerWidget {
                 // The deepest view: no more drilling, the days show their own
                 // entries so a whole week reads in one screen.
                 EntriesWeekView(:final week) => ListView.builder(
+                  padding: const EdgeInsets.only(bottom: _bottomPaddingForFab),
                   itemCount: week.days.length,
                   itemBuilder: (context, index) {
                     final day = week.days[index];
