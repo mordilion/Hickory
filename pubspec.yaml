@@ -48,6 +48,9 @@ dependencies:
   share_plus: ^12.0.2
   tray_manager: ^0.5.3
   window_manager: ^0.5.2
+  # Was already resolved transitively via window_manager; promoted to a
+  # direct dependency because native_window.dart imports it directly.
+  screen_retriever: ^0.2.2
   sync_engine:
     path: packages/sync_engine
   storage_access:
