@@ -7,3 +7,4 @@
 | Sync screen | Sync tab: folder, Jira/Personio credentials, failed-entry lists | [sync-screen.md](features/sync-screen.md) |
 | Work-time balance | Target hours, cutoff rule, flex-time balance tile | [work-time-balance.md](features/work-time-balance.md) |
 | Absences | Absence types, recording, effect on the work-time balance | [absences.md](features/absences.md) |
+| Timer pill | Frameless always-on-top mini window while a timer runs | [timer-pill.md](features/timer-pill.md) |

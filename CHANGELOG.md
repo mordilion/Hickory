@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Name the days behind the tracking-quality counts: tapping "work days with no booking" or "days with too short a break" in the Reports tab unfolds the dates, so the figure says where to go and not only that something is wrong.
+- Add a floating timer pill: while a timer runs, the window collapses to a small always-on-top pill with the elapsed time, client and project, and pause/stop/expand controls
 
 ## [1.4.1] - 2026-09-09
 
