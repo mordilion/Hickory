@@ -130,7 +130,14 @@ void main() {
     ]);
   });
 
-  test('expand falls back to the minimum size when nothing was saved', () async {
+  test('expand falls back to the minimum size when nothing usable was saved', () async {
+    // expand() now guards on "already full" (FIX 2), so it's only reachable
+    // after a real collapse(). getBounds() is made to return a degenerate
+    // rect so collapse()'s own persist of the full-window bounds is rejected
+    // by WindowBoundsStore.read()'s usability check -- genuinely reproducing
+    // "nothing was saved" rather than assuming expand() could be called
+    // directly from full mode.
+    when(() => window.getBounds()).thenAnswer((_) async => Rect.zero);
     controller = WindowModeController(
       window: window,
       fullBounds: WindowBoundsStore(
@@ -140,6 +147,7 @@ void main() {
       pillBounds: pillBounds,
     );
 
+    await controller.collapse();
     await controller.expand();
 
     verify(() => window.setSize(WindowModeController.fullMinimumSize)).called(1);
@@ -191,5 +199,131 @@ void main() {
       () => window.setTitleBarHidden(false),
       () => window.setPosition(any()),
     ]);
+  });
+
+  group('bounds routing during a mode switch (FIX 1)', () {
+    test(
+      'persistCurrentBounds re-entered from collapse\'s own native calls '
+      'is suppressed, leaving the deliberately-saved full bounds intact',
+      () async {
+        // Reproduces window_manager's real behaviour: on macOS,
+        // setSize()/setPosition() call through to NSWindow.setFrame, and
+        // AppKit posts NSWindowDidMove synchronously for that -- which
+        // WindowTrayController.onWindowMoved routes straight into
+        // persistCurrentBounds(). Tracking the "current" bounds here and
+        // updating them inside the setSize/setPosition stubs (rather than
+        // returning a fixed getBounds() forever) is what makes this
+        // re-entrant call see the window's new, already-shrunk shape --
+        // exactly as the real platform channel would.
+        var currentBounds = const Rect.fromLTWH(200, 100, 480, 960);
+        when(() => window.getBounds()).thenAnswer((_) async => currentBounds);
+        when(() => window.setSize(any())).thenAnswer((invocation) async {
+          final size = invocation.positionalArguments[0] as Size;
+          currentBounds = Rect.fromLTWH(
+            currentBounds.left,
+            currentBounds.top,
+            size.width,
+            size.height,
+          );
+          await controller.persistCurrentBounds();
+        });
+        when(() => window.setPosition(any())).thenAnswer((invocation) async {
+          final position = invocation.positionalArguments[0] as Offset;
+          currentBounds = Rect.fromLTWH(
+            position.dx,
+            position.dy,
+            currentBounds.width,
+            currentBounds.height,
+          );
+          await controller.persistCurrentBounds();
+        });
+
+        await controller.collapse();
+
+        // The full store must still hold exactly what collapse() saved
+        // deliberately at its own start -- not the pill's 320x56 shape a
+        // stale-_mode reentrant persistCurrentBounds() would have written.
+        expect(await fullBounds.read(), const Rect.fromLTWH(200, 100, 480, 960));
+        // The pill store must not have been touched at all during the
+        // switch -- persistCurrentBounds() is suppressed throughout, not
+        // just routed correctly.
+        expect(await pillBounds.read(), isNull);
+      },
+    );
+
+    test(
+      'persistCurrentBounds re-entered from expand\'s own native calls '
+      'is suppressed, leaving the deliberately-saved pill bounds intact',
+      () async {
+        var currentBounds = const Rect.fromLTWH(200, 100, 480, 960);
+        when(() => window.getBounds()).thenAnswer((_) async => currentBounds);
+        when(() => window.setSize(any())).thenAnswer((invocation) async {
+          final size = invocation.positionalArguments[0] as Size;
+          currentBounds = Rect.fromLTWH(
+            currentBounds.left,
+            currentBounds.top,
+            size.width,
+            size.height,
+          );
+          await controller.persistCurrentBounds();
+        });
+        when(() => window.setPosition(any())).thenAnswer((invocation) async {
+          final position = invocation.positionalArguments[0] as Offset;
+          currentBounds = Rect.fromLTWH(
+            position.dx,
+            position.dy,
+            currentBounds.width,
+            currentBounds.height,
+          );
+          await controller.persistCurrentBounds();
+        });
+
+        // Reach pill mode first. The reentrant stubs above are active during
+        // this collapse() too (the previous test already pins that they're
+        // suppressed), and by the time it returns, currentBounds correctly
+        // tracks the pill's actual final shape and position -- the value
+        // expand() must deliberately save before it starts restoring the
+        // full window.
+        await controller.collapse();
+
+        await controller.expand();
+
+        expect(await pillBounds.read(), const Rect.fromLTWH(1584, 16, 320, 56));
+        expect(await fullBounds.read(), const Rect.fromLTWH(200, 100, 480, 960));
+      },
+    );
+  });
+
+  group('overlapping mode switches are serialised (FIX 2)', () {
+    test('two un-awaited collapse calls run the native sequence once', () async {
+      final first = controller.collapse();
+      final second = controller.collapse();
+
+      await Future.wait([first, second]);
+
+      verify(() => window.setSize(WindowModeController.pillSize)).called(1);
+      verify(() => window.setResizable(false)).called(1);
+      expect(controller.mode, WindowMode.pill);
+    });
+
+    test('two un-awaited expand calls run the native sequence once', () async {
+      await controller.collapse();
+
+      final first = controller.expand();
+      final second = controller.expand();
+
+      await Future.wait([first, second]);
+
+      verify(() => window.setResizable(true)).called(1);
+      expect(controller.mode, WindowMode.full);
+    });
+
+    test('expand while already full does not touch the native window', () async {
+      await controller.expand();
+
+      verifyNever(() => window.setAlwaysOnTop(false));
+      verifyNever(() => window.setSize(any()));
+      expect(controller.mode, WindowMode.full);
+    });
   });
 }
