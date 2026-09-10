@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:window_manager/window_manager.dart';
 
 import '../../../core/format/duration_format.dart';
 import '../../../core/theme/hickory_colors.dart';
@@ -16,13 +15,18 @@ import '../timer_providers.dart';
 /// `lib/core/window/window_mode.dart`); the window itself is reshaped by
 /// that controller, this widget only paints into it.
 ///
-/// A pure rendering of four callbacks -- it reads the running entry to
-/// display it but never writes: a later task's `PillHost` wraps this widget
-/// and supplies the callbacks from the same writes the timer tab uses.
+/// A pure rendering of five callbacks -- it reads the running entry to
+/// display it but never writes, and never touches a platform API itself:
+/// a later task's `PillHost` wraps this widget, supplies the callbacks from
+/// the same writes the timer tab uses, and turns [onDragStart] into
+/// `windowManager.startDragging()`. That indirection is deliberate --
+/// `lib/core/window/native_window.dart` exists precisely so `window_manager`,
+/// a plugin singleton backed by a platform channel, is never called from a
+/// widget a test cannot reach.
 ///
-/// The whole surface outside the three buttons drags the window
-/// (`onPanStart` -> `windowManager.startDragging()`), verified on macOS only
-/// -- Windows support for frameless dragging is unconfirmed (see
+/// The whole surface outside the three buttons invokes [onDragStart] on
+/// pan-start, verified on macOS only -- Windows support for frameless
+/// dragging is unconfirmed (see
 /// docs/superpowers/specs/2026-09-10-timer-pill-design.md section 8.2).
 class PillScreen extends ConsumerWidget {
   const PillScreen({
@@ -31,12 +35,14 @@ class PillScreen extends ConsumerWidget {
     required this.onResume,
     required this.onStop,
     required this.onExpand,
+    required this.onDragStart,
   });
 
   final VoidCallback onPause;
   final VoidCallback onResume;
   final VoidCallback onStop;
   final VoidCallback onExpand;
+  final VoidCallback onDragStart;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,60 +59,104 @@ class PillScreen extends ConsumerWidget {
     // project forbids, and a transparent body on a frameless window can
     // paint black. Omitting it lets the Scaffold take the theme surface;
     // macOS clips the window's corners itself (spike-verified), so the
-    // gradient Container below still reads as a pill.
+    // gradient surface below still reads as a pill.
     return Scaffold(
       body: SizedBox.expand(
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onPanStart: (_) => windowManager.startDragging(),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: tokens.surfaceGradient,
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        formatDuration(running?.workedDuration ?? Duration.zero),
-                        style: TextStyle(
-                          fontFamily: Theme.of(context).textTheme.displayLarge?.fontFamily,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 20,
-                          height: 1.1,
-                          color: isPaused ? tokens.textMuted : tokens.timerNumeral,
-                        ),
+          onPanStart: (_) => onDragStart(),
+          child: Stack(
+            children: [
+              // Painted as its own layer, separate from the content below,
+              // so dimming it for the paused state never also washes out
+              // the buttons or text (see _PillSurface).
+              Positioned.fill(child: _PillSurface(tokens: tokens, isPaused: isPaused)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            formatDuration(running?.workedDuration ?? Duration.zero),
+                            style: TextStyle(
+                              fontFamily: Theme.of(context).textTheme.displayLarge?.fontFamily,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 20,
+                              height: 1.1,
+                              color: isPaused ? tokens.textMuted : tokens.timerNumeral,
+                            ),
+                          ),
+                          _ProjectLine(entry: running, muted: tokens.textMuted),
+                        ],
                       ),
-                      _ProjectLine(entry: running, muted: tokens.textMuted),
-                    ],
-                  ),
+                    ),
+                    _PillButton(
+                      icon: isPaused ? Icons.play_arrow : Icons.pause,
+                      tooltip: isPaused ? l10n.pillResume : l10n.pillPause,
+                      onPressed: isPaused ? onResume : onPause,
+                    ),
+                    _PillButton(icon: Icons.stop, tooltip: l10n.pillStop, onPressed: onStop),
+                    _PillButton(
+                      icon: Icons.open_in_full,
+                      tooltip: l10n.pillExpand,
+                      onPressed: onExpand,
+                    ),
+                  ],
                 ),
-                _PillButton(
-                  icon: isPaused ? Icons.play_arrow : Icons.pause,
-                  tooltip: isPaused ? l10n.pillResume : l10n.pillPause,
-                  onPressed: isPaused ? onResume : onPause,
-                ),
-                _PillButton(icon: Icons.stop, tooltip: l10n.pillStop, onPressed: onStop),
-                _PillButton(
-                  icon: Icons.open_in_full,
-                  tooltip: l10n.pillExpand,
-                  onPressed: onExpand,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// The pill's gradient background. Isolated from the row of text and buttons
+/// painted on top of it (see [PillScreen]) so dimming it for the paused
+/// state cannot also mute a button's tap affordance or double-dim the
+/// numeral, which already gets its own muted colour.
+class _PillSurface extends StatelessWidget {
+  const _PillSurface({required this.tokens, required this.isPaused});
+
+  final HickoryColors tokens;
+  final bool isPaused;
+
+  @override
+  Widget build(BuildContext context) {
+    final gradient = DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: tokens.surfaceGradient,
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+    );
+    if (!isPaused) return gradient;
+
+    // Scales the rendered RGB down (alpha untouched) instead of blending
+    // toward another token colour. A Color.lerp target doesn't work here:
+    // the dark palette's muted/text tokens are near-white -- they double as
+    // legible foreground colours on a dark surface -- so lerping toward one
+    // of them would brighten the paused pill in dark mode instead of
+    // dimming it. Multiplying channels is the one approach that reads as
+    // dimmer in both palettes without a new colour literal (design spec
+    // section 6: "frozen time, dimmed surface, ▶ instead of ⏸").
+    return ColorFiltered(
+      colorFilter: const ColorFilter.matrix(<double>[
+        0.55, 0, 0, 0, 0, //
+        0, 0.55, 0, 0, 0, //
+        0, 0, 0.55, 0, 0, //
+        0, 0, 0, 1, 0,
+      ]),
+      child: gradient,
     );
   }
 }

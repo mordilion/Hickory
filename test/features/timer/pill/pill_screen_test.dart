@@ -8,6 +8,7 @@ import 'package:hickory/features/projects/projects_providers.dart';
 import 'package:hickory/features/timer/pill/pill_screen.dart';
 import 'package:hickory/features/timer/timer_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
+import 'package:hickory/l10n/app_localizations_en.dart';
 
 TimeEntry _entry({DateTime? pausedAt, String? projectId}) => TimeEntry(
   id: 'e1',
@@ -70,6 +71,7 @@ Widget _host({
   VoidCallback? onResume,
   VoidCallback? onStop,
   VoidCallback? onExpand,
+  VoidCallback? onDragStart,
 }) => ProviderScope(
   overrides: [
     runningEntryProvider.overrideWith((ref) => Stream.value(entry)),
@@ -79,6 +81,7 @@ Widget _host({
   ],
   child: MaterialApp(
     theme: AppTheme.light,
+    locale: const Locale('en'),
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     home: PillScreen(
@@ -86,6 +89,7 @@ Widget _host({
       onResume: onResume ?? () {},
       onStop: onStop ?? () {},
       onExpand: onExpand ?? () {},
+      onDragStart: onDragStart ?? () {},
     ),
   ),
 );
@@ -118,6 +122,29 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Website-Relaunch'), findsOneWidget);
+  });
+
+  testWidgets('shows no project line when the entry has no project', (tester) async {
+    await tester.pumpWidget(_host(entry: _entry()));
+    await tester.pumpAndSettle();
+
+    // The elapsed-time text is the only Text in the tree; _ProjectLine must
+    // have taken its `projectId == null` early return, not merely rendered
+    // an empty string.
+    expect(find.byType(Text), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('shows no project line when the project id is unknown', (tester) async {
+    await tester.pumpWidget(
+      _host(entry: _entry(projectId: 'missing'), projects: [_project()]),
+    );
+    await tester.pumpAndSettle();
+
+    // A projectId with no match in activeProjectsProvider must render
+    // nothing rather than throw when the lookup loop finds no candidate.
+    expect(find.byType(Text), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   // Split into two tests rather than pumping a second, differently-overridden
@@ -160,11 +187,68 @@ void main() {
     expect(expanded, 1);
   });
 
-  testWidgets('every icon button carries a tooltip', (tester) async {
+  testWidgets('every icon button carries its localized tooltip', (tester) async {
     await tester.pumpWidget(_host(entry: _entry()));
     await tester.pumpAndSettle();
 
-    expect(find.byType(Tooltip), findsNWidgets(3));
+    // Resolved through AppLocalizationsEn rather than hardcoded English, so
+    // a swapped or blanked ARB value fails this test instead of only a
+    // vacuous count check.
+    final l10n = AppLocalizationsEn();
+    final messages = tester
+        .widgetList<Tooltip>(find.byType(Tooltip))
+        .map((tooltip) => tooltip.message)
+        .toSet();
+
+    expect(messages, {l10n.pillPause, l10n.pillStop, l10n.pillExpand});
+  });
+
+  testWidgets('does not dim the surface while running', (tester) async {
+    await tester.pumpWidget(_host(entry: _entry()));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ColorFiltered), findsNothing);
+  });
+
+  testWidgets('dims the surface while paused', (tester) async {
+    await tester.pumpWidget(
+      _host(entry: _entry(pausedAt: DateTime.utc(2026, 9, 10, 9))),
+    );
+    await tester.pumpAndSettle();
+
+    // The paused surface must differ in its own decoration -- not merely in
+    // the pause/resume icon, which every other test already exercises.
+    expect(find.byType(ColorFiltered), findsOneWidget);
+  });
+
+  testWidgets('panning the surface starts the window drag', (tester) async {
+    var dragged = 0;
+    await tester.pumpWidget(_host(entry: _entry(), onDragStart: () => dragged++));
+    await tester.pumpAndSettle();
+
+    // The pill's centre sits over the client/project column, not over any
+    // button -- it is draggable there only because the surface
+    // GestureDetector uses HitTestBehavior.opaque, not because a button
+    // happens to be under the pointer.
+    await tester.dragFrom(tester.getCenter(find.byType(PillScreen)), const Offset(40, 0));
+
+    expect(dragged, 1);
+  });
+
+  testWidgets('panning directly above a button still starts the window drag', (tester) async {
+    var dragged = 0;
+    await tester.pumpWidget(_host(entry: _entry(), onDragStart: () => dragged++));
+    await tester.pumpAndSettle();
+
+    // Each icon button is a tightly-constrained 32x32 hit area with no
+    // horizontal gap between neighbours, so the only pixels provably off
+    // every button sit above/below the row, in the same column as a button --
+    // this drags from there to confirm the surface (not just the text
+    // column) is draggable, per HitTestBehavior.opaque on the GestureDetector.
+    final stopButtonCenter = tester.getCenter(find.byIcon(Icons.stop));
+    await tester.dragFrom(stopButtonCenter - const Offset(0, 20), const Offset(0, 40));
+
+    expect(dragged, 1);
   });
 
   testWidgets('does not overflow at the pill\'s fixed 320x56 size', (tester) async {
