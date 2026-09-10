@@ -75,8 +75,9 @@ final jiraAutoSyncDebounceProvider = Provider<Duration>(
 /// state. Does nothing while Jira is unconfigured: no credentials must
 /// mean "skip", never an error written to every row.
 ///
-/// Activated by watching it for the app's lifetime (see TimerScreen, which
-/// does the same for [syncWatcherProvider]).
+/// Activated by watching it for the app's lifetime (see [BackgroundServices],
+/// which also watches [syncWatcherProvider] to keep both subscriptions alive
+/// across widget-tree swaps, including the timer pill).
 final jiraAutoSyncProvider = Provider<AutoSyncTrigger>((ref) {
   final trigger = AutoSyncTrigger(
     () async {

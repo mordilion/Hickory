@@ -12,7 +12,6 @@ import 'package:hickory/core/di/database_provider.dart';
 import 'package:hickory/core/di/device_id_provider.dart';
 import 'package:hickory/core/di/jira_providers.dart';
 import 'package:hickory/core/di/personio_providers.dart';
-import 'package:hickory/data/sync/auto_sync_trigger.dart';
 import 'package:hickory/core/di/sync_providers.dart';
 import 'package:hickory/core/theme/app_theme.dart';
 import 'package:hickory/core/widgets/gradient_buttons.dart';
@@ -65,11 +64,6 @@ void main() {
           personioAttendancesByEntryIdProvider.overrideWith(
             (ref) => Stream.value(const {}),
           ),
-          // TimerScreen activates the background Jira reconciliation for the
-          // app's lifetime. A no-op trigger keeps it out of the test: the
-          // real one would reach the live database and leave its debounce
-          // timer pending past the end of the test.
-          jiraAutoSyncProvider.overrideWithValue(AutoSyncTrigger(() async {})),
           breakRuleTiersProvider.overrideWith((ref) => Stream.value(const [])),
           absencesProvider.overrideWith((ref) => Stream.value(const [])),
           absenceTypesProvider.overrideWith((ref) => Stream.value(const [])),
