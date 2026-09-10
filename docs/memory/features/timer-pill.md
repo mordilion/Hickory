@@ -15,10 +15,11 @@ timer tab already uses.
 - `lib/core/window/window_mode_provider.dart` (`windowModeProvider`,
   `WindowModeNotifier`) — Riverpod state mirroring the controller's mode.
 - `lib/core/window/native_window.dart` — narrow interface (`setSize`, `setPosition`,
-  `setResizable`, `setMinimumSize`, `setTitleBarHidden`, `setAlwaysOnTop`,
-  `getTitleBarHeight`, `getBounds`) so `window_manager` (a plugin singleton, unreachable in
-  tests) is never called from untestable code. Production delegates to `windowManager`;
-  tests use a `mocktail` fake.
+  `setResizable`, `setMinimumSize`, `setTitleBarHidden`, `setAlwaysOnTop`, `getBounds`,
+  `getDisplaySize`) so `window_manager` (a plugin singleton, unreachable in tests) is never
+  called from untestable code. Production delegates to `windowManager`/`screen_retriever`;
+  tests use a `mocktail` fake. There is no `getTitleBarHeight` — see the frame-origin
+  gotcha below for how the title-bar height is actually accounted for.
 - `lib/core/window/window_bounds_store.dart` (`WindowBoundsStore`) — gained a `fileName`
   constructor parameter (default `window_bounds.json`); the controller holds two
   instances, the second pointed at `pill_bounds.json`, so dragging the pill can never
@@ -63,12 +64,30 @@ whenever the title bar appears or disappears even though nothing asked the windo
 
 Consequence, enforced in `WindowModeController.collapse()`/`expand()`: **every mode switch
 sets its target position explicitly, from that mode's own `WindowBoundsStore`** — never by
-reusing a `getBounds()` taken in the other mode. If a future change ever wants to derive a
-position from `getBounds()`, it must correct for `window.getTitleBarHeight()` first, or it
-will silently target the pre-shift frame and land the window in the wrong place. This
-would be trivial to reintroduce (it looks correct until you actually watch the window jump).
-`collapse()` also hides the title bar *before* setting position, and lowers the minimum
-size *before* setting the pill size — both orderings were spike findings, not assumptions.
+reusing a `getBounds()` taken in the other mode. `NativeWindow` has no `getTitleBarHeight`
+(and none should be added for this): the correct fix for a shifted frame origin is not to
+measure the shift and compensate, it's to never read the position from the wrong mode in
+the first place. `collapse()` reads from `pillBounds`/writes to `fullBounds`, `expand()`
+the reverse — always that mode's own store, never a `getBounds()` taken while the other
+mode's shape is still on screen. This would be trivial to reintroduce by reasoning instead
+of testing (it looks correct until you actually watch the window jump). `collapse()` also
+hides the title bar *before* setting position, and lowers the minimum size *before* setting
+the pill size — both orderings were spike findings, not assumptions.
+
+## Bounds persistence must be suppressed for the whole duration of a switch
+
+Found by the final whole-branch review, not the spike: `collapse()`/`expand()`'s own
+`setSize`/`setPosition` calls make the native window emit a move event *during* the switch
+(macOS: `NSWindow.setFrame` posts `NSWindowDidMove`, exactly as a user drag would), which
+`WindowTrayController.onWindowMoved` routes into `persistCurrentBounds()`. Because `_mode`
+in `WindowModeController` was only assigned after every native call, that re-entrant write
+landed on the *old* mode's store while the window already had its *new* shape — corrupting
+the user's saved window geometry on the very first collapse. `WindowModeController` now
+tracks a `_switching` flag for the duration of `collapse()`/`expand()`; `persistCurrentBounds()`
+no-ops while it is set, and the same flag also serialises overlapping switches (e.g. a
+double-clicked collapse button). See `lib/core/window/window_mode_controller.dart` and
+`test/core/window/window_mode_controller_test.dart` for the re-entrant-fake technique used
+to reproduce this without a real platform channel.
 
 ## Why `BackgroundServices` exists
 
