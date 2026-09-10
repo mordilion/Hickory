@@ -59,6 +59,34 @@ class _FullModeNotifier extends WindowModeNotifier {
   }
 }
 
+/// Starts in pill mode; its first [expand] throws (simulating expand()'s own
+/// platform-channel failure) and every later call succeeds. Used to prove
+/// FIX 4: `_idlePromptShowing` must not stick after a thrown error, or the
+/// idle prompt would silently stop firing for good.
+class _FlakyPillModeNotifier extends WindowModeNotifier {
+  final calls = <String>[];
+  var _throwNext = true;
+
+  @override
+  WindowMode build() => WindowMode.pill;
+
+  @override
+  Future<void> expand() async {
+    calls.add('expand');
+    if (_throwNext) {
+      _throwNext = false;
+      throw StateError('platform channel unavailable');
+    }
+    state = WindowMode.full;
+  }
+
+  @override
+  Future<void> collapse() async {
+    calls.add('collapse');
+    state = WindowMode.pill;
+  }
+}
+
 TimeEntry _running() => TimeEntry(
   id: 'e1',
   deviceId: 'd1',
@@ -204,4 +232,34 @@ void main() {
     expect(notifier.calls, isNot(contains('collapse')));
     expect(container.read(windowModeProvider), WindowMode.full);
   });
+
+  testWidgets(
+    'a thrown expand still clears the idle-prompt guard for the next check',
+    (tester) async {
+      final notifier = _FlakyPillModeNotifier();
+      final key = GlobalKey<TimerBackgroundHandlersState>();
+
+      await tester.pumpWidget(_harness(notifier: () => notifier, key: key));
+      await tester.pumpAndSettle();
+
+      // First call: expand() throws. Without FIX 4's try/finally,
+      // _idlePromptShowing would stay stuck true and the second call below
+      // would silently no-op forever, per the early-return guard at the top
+      // of handleIdleSecondsChanged.
+      await expectLater(
+        key.currentState!.handleIdleSecondsChanged(600),
+        throwsStateError,
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsNothing);
+
+      // The second call must actually run the body again, not bail out on a
+      // guard that never reset.
+      unawaited(key.currentState!.handleIdleSecondsChanged(600));
+      await tester.pumpAndSettle();
+
+      expect(notifier.calls, ['expand', 'expand']);
+      expect(find.byType(AlertDialog), findsOneWidget);
+    },
+  );
 }

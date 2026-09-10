@@ -45,25 +45,33 @@ class TimerBackgroundHandlersState
     if (running == null || running.pausedAt != null) return;
 
     _idlePromptShowing = true;
+    // Everything from here on can throw (expand()'s platform channel,
+    // showIdlePromptDialog's Navigator, updateEntry's write) and idleSeconds
+    // keeps polling every 5s regardless -- without this `finally`, a thrown
+    // error would leave _idlePromptShowing stuck true and silently disable
+    // every later idle prompt until the next sub-threshold reading resets it
+    // (see the early return above), which could be a long time.
+    try {
+      // A dialog cannot open over the 320x56 pill -- and "you were away, should
+      // I trim that?" is a question answered at full size anyway (spec 4.2).
+      // The window stays expanded afterwards; collapsing again is the user's
+      // call, via the collapse button.
+      if (ref.read(windowModeProvider) == WindowMode.pill) {
+        await ref.read(windowModeProvider.notifier).expand();
+      }
+      if (!mounted) return;
 
-    // A dialog cannot open over the 320x56 pill -- and "you were away, should
-    // I trim that?" is a question answered at full size anyway (spec 4.2).
-    // The window stays expanded afterwards; collapsing again is the user's
-    // call, via the collapse button.
-    if (ref.read(windowModeProvider) == WindowMode.pill) {
-      await ref.read(windowModeProvider.notifier).expand();
+      final idleDuration = Duration(seconds: idleSeconds);
+      final shouldTrim = await showIdlePromptDialog(context, idleDuration);
+      if (!mounted) return;
+      if (shouldTrim) {
+        final writes = await ref.read(syncedWritesProvider.future);
+        final idleStart = DateTime.now().subtract(idleDuration);
+        await writes.updateEntry(running.id, endAt: Value(idleStart.toUtc()));
+      }
+    } finally {
+      _idlePromptShowing = false;
     }
-    if (!mounted) return;
-
-    final idleDuration = Duration(seconds: idleSeconds);
-    final shouldTrim = await showIdlePromptDialog(context, idleDuration);
-    if (!mounted) return;
-    if (shouldTrim) {
-      final writes = await ref.read(syncedWritesProvider.future);
-      final idleStart = DateTime.now().subtract(idleDuration);
-      await writes.updateEntry(running.id, endAt: Value(idleStart.toUtc()));
-    }
-    _idlePromptShowing = false;
   }
 
   Future<void> recordActivitySample(ActivitySample sample) async {
