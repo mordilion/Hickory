@@ -492,5 +492,6 @@
   "pillResume": "Fortsetzen",
   "pillStop": "Stoppen",
   "pillExpand": "Hauptfenster öffnen",
+  "pillExpandError": "Hauptfenster konnte nicht geöffnet werden.",
   "timerCollapseToPill": "Auf Pille verkleinern"
 }

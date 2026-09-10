@@ -1108,5 +1108,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pillExpand => 'Open the main window';
 
   @override
+  String get pillExpandError => 'The main window could not be opened.';
+
+  @override
   String get timerCollapseToPill => 'Shrink to pill';
 }

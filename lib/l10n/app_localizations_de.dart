@@ -1123,5 +1123,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get pillExpand => 'Hauptfenster öffnen';
 
   @override
+  String get pillExpandError => 'Hauptfenster konnte nicht geöffnet werden.';
+
+  @override
   String get timerCollapseToPill => 'Auf Pille verkleinern';
 }

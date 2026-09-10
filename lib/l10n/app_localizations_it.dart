@@ -1118,5 +1118,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get pillExpand => 'Apri la finestra principale';
 
   @override
+  String get pillExpandError => 'Impossibile aprire la finestra principale.';
+
+  @override
   String get timerCollapseToPill => 'Riduci a pillola';
 }

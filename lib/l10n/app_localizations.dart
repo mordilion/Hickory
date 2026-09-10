@@ -2025,6 +2025,12 @@ abstract class AppLocalizations {
   /// **'Hauptfenster öffnen'**
   String get pillExpand;
 
+  /// No description provided for @pillExpandError.
+  ///
+  /// In de, this message translates to:
+  /// **'Hauptfenster konnte nicht geöffnet werden.'**
+  String get pillExpandError;
+
   /// No description provided for @timerCollapseToPill.
   ///
   /// In de, this message translates to:

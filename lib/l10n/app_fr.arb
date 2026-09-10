@@ -382,5 +382,6 @@
   "pillResume": "Reprendre",
   "pillStop": "Arrêter",
   "pillExpand": "Ouvrir la fenêtre principale",
+  "pillExpandError": "Impossible d'ouvrir la fenêtre principale.",
   "timerCollapseToPill": "Réduire en pastille"
 }

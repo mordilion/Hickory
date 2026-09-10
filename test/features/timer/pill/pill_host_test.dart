@@ -12,6 +12,7 @@ import 'package:hickory/features/projects/projects_providers.dart';
 import 'package:hickory/features/timer/pill/pill_screen.dart';
 import 'package:hickory/features/timer/timer_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
+import 'package:hickory/l10n/app_localizations_en.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockSyncedWrites extends Mock implements SyncedWrites {}
@@ -38,6 +39,30 @@ class _FakeWindowModeNotifier extends WindowModeNotifier {
   }
 }
 
+/// Simulates a platform-level expand() failure (spec 8.2's live Windows
+/// risk: `setTitleBarStyle` may not restore there) without needing a real
+/// `WindowModeController`. `succeedsAfter` lets a test also cover recovery:
+/// the Nth call onward resolves normally instead of throwing.
+class _FlakyWindowModeNotifier extends WindowModeNotifier {
+  _FlakyWindowModeNotifier({this.succeedsAfter});
+
+  final int? succeedsAfter;
+  var _attempts = 0;
+
+  @override
+  WindowMode build() => WindowMode.pill;
+
+  @override
+  Future<void> expand() async {
+    _attempts++;
+    if (succeedsAfter != null && _attempts > succeedsAfter!) {
+      state = WindowMode.full;
+      return;
+    }
+    throw StateError('platform channel unavailable');
+  }
+}
+
 TimeEntry _entry({DateTime? pausedAt}) => TimeEntry(
   id: 'e1',
   deviceId: 'd1',
@@ -57,7 +82,7 @@ TimeEntry _entry({DateTime? pausedAt}) => TimeEntry(
 Widget _host({
   required TimeEntry? entry,
   required _MockSyncedWrites writes,
-  _FakeWindowModeNotifier? windowMode,
+  WindowModeNotifier? windowMode,
 }) => ProviderScope(
   overrides: [
     runningEntryProvider.overrideWith((ref) => Stream.value(entry)),
@@ -159,5 +184,45 @@ void main() {
     verifyNever(() => writes.pauseEntry(any()));
     verifyNever(() => writes.resumeEntry(any()));
     verifyNever(() => writes.stopEntry(any()));
+  });
+
+  testWidgets('a failed expand surfaces as a warning icon, not silently', (tester) async {
+    final windowMode = _FlakyWindowModeNotifier();
+    await tester.pumpWidget(_host(entry: _entry(), writes: writes, windowMode: windowMode));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.open_in_full));
+    await tester.pumpAndSettle();
+
+    // No unhandled exception reaches the test binding -- PillHost's own
+    // catch is what stands between a thrown expand() and a crashed pill.
+    expect(tester.takeException(), isNull);
+    expect(find.byIcon(Icons.open_in_full), findsNothing);
+    expect(find.byIcon(Icons.error_outline), findsOneWidget);
+
+    final l10n = AppLocalizationsEn();
+    final tooltip = tester.widget<Tooltip>(
+      find.ancestor(of: find.byIcon(Icons.error_outline), matching: find.byType(Tooltip)),
+    );
+    expect(tooltip.message, l10n.pillExpandError);
+  });
+
+  testWidgets('a later successful expand clears the warning icon', (tester) async {
+    final windowMode = _FlakyWindowModeNotifier(succeedsAfter: 1);
+    await tester.pumpWidget(_host(entry: _entry(), writes: writes, windowMode: windowMode));
+    await tester.pumpAndSettle();
+
+    // First tap fails and shows the warning ...
+    await tester.tap(find.byIcon(Icons.open_in_full));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.error_outline), findsOneWidget);
+
+    // ... the second tap is the retry the icon swap exists to invite, and it
+    // succeeds, so the warning must not linger once the window is open.
+    await tester.tap(find.byIcon(Icons.error_outline));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byIcon(Icons.error_outline), findsNothing);
   });
 }

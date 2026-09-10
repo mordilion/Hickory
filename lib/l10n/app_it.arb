@@ -382,5 +382,6 @@
   "pillResume": "Riprendi",
   "pillStop": "Ferma",
   "pillExpand": "Apri la finestra principale",
+  "pillExpandError": "Impossibile aprire la finestra principale.",
   "timerCollapseToPill": "Riduci a pillola"
 }

@@ -382,5 +382,6 @@
   "pillResume": "Hervatten",
   "pillStop": "Stoppen",
   "pillExpand": "Hoofdvenster openen",
+  "pillExpandError": "Het hoofdvenster kon niet worden geopend.",
   "timerCollapseToPill": "Verklein tot pil"
 }

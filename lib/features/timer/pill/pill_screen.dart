@@ -1,3 +1,5 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
@@ -19,14 +21,14 @@ import '../timer_providers.dart';
 /// `lib/core/window/window_mode.dart`); the window itself is reshaped by
 /// that controller, this widget only paints into it.
 ///
-/// A pure rendering of five callbacks -- it reads the running entry to
-/// display it but never writes, and never touches a platform API itself:
-/// a later task's `PillHost` wraps this widget, supplies the callbacks from
-/// the same writes the timer tab uses, and turns [onDragStart] into
-/// `windowManager.startDragging()`. That indirection is deliberate --
-/// `lib/core/window/native_window.dart` exists precisely so `window_manager`,
-/// a plugin singleton backed by a platform channel, is never called from a
-/// widget a test cannot reach.
+/// A pure rendering of five callbacks plus whether the last [onExpand]
+/// attempt failed -- it reads the running entry to display it but never
+/// writes, and never touches a platform API itself: `PillHost` wraps this
+/// widget, supplies the callbacks from the same writes the timer tab uses,
+/// and turns [onDragStart] into `windowManager.startDragging()`. That
+/// indirection is deliberate -- `lib/core/window/native_window.dart` exists
+/// precisely so `window_manager`, a plugin singleton backed by a platform
+/// channel, is never called from a widget a test cannot reach.
 ///
 /// The whole surface outside the three buttons invokes [onDragStart] on
 /// pan-start, verified on macOS only -- Windows support for frameless
@@ -40,6 +42,7 @@ class PillScreen extends ConsumerWidget {
     required this.onStop,
     required this.onExpand,
     required this.onDragStart,
+    this.expandFailed = false,
   });
 
   final VoidCallback onPause;
@@ -47,6 +50,17 @@ class PillScreen extends ConsumerWidget {
   final VoidCallback onStop;
   final VoidCallback onExpand;
   final VoidCallback onDragStart;
+
+  /// Set by `PillHost` when the previous [onExpand] threw (spec 8.2's live
+  /// Windows risk: `setTitleBarStyle` may not restore there). A SnackBar --
+  /// this codebase's house pattern for a failed write elsewhere (see
+  /// `lib/features/clients/clients_editor.dart`) -- does not fit here: its
+  /// minimum height alone is close to this window's entire 56px, so it would
+  /// either get clipped by the fixed, non-resizable frame or blot out the
+  /// controls the user would need to retry. Swapping the expand icon for a
+  /// warning glyph with an explanatory tooltip stays inside the pill's
+  /// existing footprint and keeps the button tappable for a retry.
+  final bool expandFailed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -106,8 +120,8 @@ class PillScreen extends ConsumerWidget {
                     ),
                     _PillButton(icon: Icons.stop, tooltip: l10n.pillStop, onPressed: onStop),
                     _PillButton(
-                      icon: Icons.open_in_full,
-                      tooltip: l10n.pillExpand,
+                      icon: expandFailed ? Icons.error_outline : Icons.open_in_full,
+                      tooltip: expandFailed ? l10n.pillExpandError : l10n.pillExpand,
                       onPressed: onExpand,
                     ),
                   ],
@@ -234,11 +248,38 @@ class _PillButton extends StatelessWidget {
 /// one `window_manager` call it makes. Separate from PillScreen so that
 /// widget stays a pure rendering of five callbacks a test can reach without
 /// a platform channel (see PillScreen's doc comment).
-class PillHost extends ConsumerWidget {
+///
+/// Stateful only for [_expandFailed]: expand() is the one control here whose
+/// failure would otherwise vanish silently (this project's
+/// `.claude/rules/core/general/architecture.md` forbids that) with the pill
+/// stuck up and no way for the user to tell a second tap would only fail the
+/// same way -- see [PillScreen.expandFailed] for why that surfaces as an
+/// icon swap rather than a SnackBar.
+class PillHost extends ConsumerStatefulWidget {
   const PillHost({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PillHost> createState() => _PillHostState();
+}
+
+class _PillHostState extends ConsumerState<PillHost> {
+  bool _expandFailed = false;
+
+  Future<void> _expand() async {
+    try {
+      await ref.read(windowModeProvider.notifier).expand();
+      if (mounted) setState(() => _expandFailed = false);
+    } catch (error) {
+      // Best-effort logging, matching this project's other guarded-write
+      // call sites (e.g. ClientsEditor._guardedWrite): the real signal for
+      // the user is the icon swap below, not this log line.
+      debugPrint('Pill failed to expand the window: $error');
+      if (mounted) setState(() => _expandFailed = true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final running = ref.watch(runningEntryProvider).value;
 
     Future<void> withWrites(Future<void> Function(SyncedWrites writes) action) async {
@@ -256,8 +297,9 @@ class PillHost extends ConsumerWidget {
       onPause: () => ifRunning((writes, entry) => writes.pauseEntry(entry.id)),
       onResume: () => ifRunning((writes, entry) => writes.resumeEntry(entry.id)),
       onStop: () => ifRunning((writes, entry) => writes.stopEntry(entry.id)),
-      onExpand: () => ref.read(windowModeProvider.notifier).expand(),
+      onExpand: () => unawaited(_expand()),
       onDragStart: () => windowManager.startDragging(),
+      expandFailed: _expandFailed,
     );
   }
 }

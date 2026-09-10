@@ -382,5 +382,6 @@
   "pillResume": "Reanudar",
   "pillStop": "Detener",
   "pillExpand": "Abrir la ventana principal",
+  "pillExpandError": "No se pudo abrir la ventana principal.",
   "timerCollapseToPill": "Reducir a píldora"
 }

@@ -382,5 +382,6 @@
   "pillResume": "Resume",
   "pillStop": "Stop",
   "pillExpand": "Open the main window",
+  "pillExpandError": "The main window could not be opened.",
   "timerCollapseToPill": "Shrink to pill"
 }

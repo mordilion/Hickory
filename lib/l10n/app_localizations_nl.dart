@@ -1122,5 +1122,8 @@ class AppLocalizationsNl extends AppLocalizations {
   String get pillExpand => 'Hoofdvenster openen';
 
   @override
+  String get pillExpandError => 'Het hoofdvenster kon niet worden geopend.';
+
+  @override
   String get timerCollapseToPill => 'Verklein tot pil';
 }
