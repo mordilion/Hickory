@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/window/window_mode_provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../reports/reports_screen.dart';
 import '../settings/settings_screen.dart';
 import '../sync/sync_screen.dart';
+import '../timer/timer_providers.dart';
 import '../timer/timer_screen.dart';
 import 'nav_shell.dart';
 
@@ -12,7 +15,7 @@ import 'nav_shell.dart';
 /// lib/app.dart). Manual-entry creation lives in QuickAddBar (pinned to
 /// the Timer tab), not a shell-level FAB — see
 /// docs/superpowers/specs/2026-08-03-quick-entry-redesign-design.md.
-class AppShell extends StatelessWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({super.key});
 
   static List<NavigationDestination> _destinations(AppLocalizations l10n) => [
@@ -39,11 +42,24 @@ class AppShell extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     return NavShell(
       destinations: _destinations(l10n),
       children: const [TimerScreen(), ReportsScreen(), SyncScreen(), SettingsScreen()],
+      // Reachable from every tab, not just Timer -- the spec's scenario is
+      // expanding to check Reports mid-call and then collapsing again from
+      // there (see task-8-brief.md), so this ignores selectedIndex on
+      // purpose rather than gating on it.
+      fabBuilder: (_) {
+        final isRunning = ref.watch(runningEntryProvider).value != null;
+        if (!isRunning) return null;
+        return FloatingActionButton.small(
+          tooltip: l10n.timerCollapseToPill,
+          onPressed: () => ref.read(windowModeProvider.notifier).collapse(),
+          child: const Icon(Icons.close_fullscreen),
+        );
+      },
     );
   }
 }
