@@ -14,6 +14,7 @@ import 'package:hickory/features/timer/idle_tracking.dart';
 import 'package:hickory/features/timer/timer_background_handlers.dart';
 import 'package:hickory/features/timer/timer_providers.dart';
 import 'package:hickory/l10n/app_localizations.dart';
+import 'package:hickory/l10n/app_localizations_en.dart';
 
 /// Starts in pill mode and records every collapse/expand call, so the tests
 /// below can assert the handler expanded before showing its dialog.
@@ -81,6 +82,10 @@ TimeEntry _running() => TimeEntry(
 Widget _harness({
   required WindowModeNotifier Function() notifier,
   required GlobalKey<TimerBackgroundHandlersState> key,
+  // Unset (as before) for the existing tests, which never read dialog button
+  // text; pinned to English by the dialog-dismissal test below so the
+  // "Keep time" lookup doesn't depend on the test binding's platform locale.
+  Locale? locale,
 }) {
   return ProviderScope(
     overrides: [
@@ -97,6 +102,7 @@ Widget _harness({
       jiraAutoSyncProvider.overrideWithValue(AutoSyncTrigger(() async {})),
     ],
     child: MaterialApp(
+      locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: TimerBackgroundHandlers(
@@ -155,5 +161,47 @@ void main() {
 
     expect(notifier.calls, isEmpty);
     expect(find.byType(AlertDialog), findsNothing);
+  });
+
+  testWidgets('does not collapse after the idle dialog is dismissed', (
+    tester,
+  ) async {
+    final notifier = _PillModeNotifier();
+    final key = GlobalKey<TimerBackgroundHandlersState>();
+    final l10n = AppLocalizationsEn();
+
+    await tester.pumpWidget(
+      _harness(
+        notifier: () => notifier,
+        key: key,
+        locale: const Locale('en'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Capture the Future (unlike the other tests' `unawaited`) so this test
+    // can observe the handler resume and finish once the dialog resolves,
+    // rather than only that it suspended on it.
+    final handled = key.currentState!.handleIdleSecondsChanged(600);
+    await tester.pumpAndSettle();
+
+    // "Keep time" pops `false`, so the handler skips the trim write and
+    // needs no `syncedWritesProvider` override; "Deduct idle time" would
+    // reach the real database.
+    await tester.tap(find.widgetWithText(TextButton, l10n.timerIdleKeepTime));
+    await tester.pumpAndSettle();
+    await handled;
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(TimerBackgroundHandlers)),
+      listen: false,
+    );
+
+    // The spec (4.2) guarantees the window stays expanded after the dialog;
+    // collapsing again is the user's call via the collapse button, never an
+    // automatic side effect of the dialog resolving.
+    expect(notifier.calls, contains('expand'));
+    expect(notifier.calls, isNot(contains('collapse')));
+    expect(container.read(windowModeProvider), WindowMode.full);
   });
 }
