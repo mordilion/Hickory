@@ -107,7 +107,7 @@ currently on (`screen_retriever` is already in the tree via `window_manager`).
 |---|---|
 | `lib/core/window/window_mode.dart` | `enum WindowMode { full, pill }` |
 | `lib/core/window/window_mode_controller.dart` | The only place that drives the native window across modes: size, position, resizable, minimum size, title-bar style, always-on-top. Also the seam for the later window-level setting |
-| `lib/core/window/pill_bounds_store.dart` | Pill position, stored separately from the main window's bounds |
+| `lib/core/window/window_bounds_store.dart` | Gains a `fileName` constructor parameter (default `window_bounds.json`) so a second instance can hold the pill's position in `pill_bounds.json`. Revised during planning: a separate `PillBoundsStore` class would have been a near-identical copy |
 | `lib/features/timer/pill/pill_screen.dart` | The pill UI |
 | `lib/app.dart` | `home:` switches on `windowModeProvider` |
 | `lib/features/shell/app_shell.dart` | Passes a collapse FAB via the existing, so far unused `NavShell.fabBuilder`; becomes a `ConsumerWidget` |
