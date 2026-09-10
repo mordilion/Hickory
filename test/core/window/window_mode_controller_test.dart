@@ -178,4 +178,18 @@ void main() {
 
     expect(controller.mode, WindowMode.pill);
   });
+
+  test('expand sets the position after showing the title bar', () async {
+    // The frame origin shifts again by the title-bar height when it reappears
+    // (spec 8.1), so the position must be applied once the frame is final.
+    await fullBounds.write(const Rect.fromLTWH(200, 100, 480, 960));
+    await controller.collapse();
+
+    await controller.expand();
+
+    verifyInOrder([
+      () => window.setTitleBarHidden(false),
+      () => window.setPosition(any()),
+    ]);
+  });
 }
