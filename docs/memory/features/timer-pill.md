@@ -138,6 +138,25 @@ commit `fc82d62` when the old manual-entry FAB went away, then restored in this 
 padding must go with it; if a FAB is ever re-added, the padding must come back.** Neither
 side of that pairing is enforced by a test that would fail if only one half changed.
 
+## The numeral must never wrap, and the overflow test is wall-clock-dependent
+
+`formatDuration` pads the hours to two digits but never caps them, so a timer left running
+over a weekend or a holiday renders four-digit hours (`1127:14:19`). At the pill's font size
+that string is wider than the text column, and before the fix it simply wrapped to a second
+line: 22 + 22 + 16 = 60px inside a window whose height is fixed at 56, i.e. a `RenderFlex
+overflowed by 4.0 pixels`. The numeral now sits in a `FittedBox(fit: BoxFit.scaleDown)` —
+scaling keeps every digit readable where ellipsizing a clock would not, and `scaleDown`
+never enlarges, so ordinary durations render exactly as before.
+
+What makes this worth writing down is how it surfaced. `pill_screen_test.dart`'s
+"does not overflow at the pill's fixed 320x56 size" builds its entry with a **fixed**
+`startAt` (2026-09-10) and renders the duration against `DateTime.now()`, so the string it
+feeds the layout grows by one character every time the clock passes a power of ten in hours.
+The test passed for weeks, then started failing on its own with no commit behind it — which
+reads exactly like a toolchain regression and is not one. Measure the render boxes before
+blaming the Flutter version. The long duration was left in place deliberately: it is now the
+regression input that keeps the numeral from wrapping again.
+
 ## Windows is unverified
 
 The spike (design spec §8) ran on macOS only — no Windows machine was available. Both
