@@ -66,6 +66,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Controllo aggiornamenti non riuscito. Riprova più tardi.';
 
   @override
+  String get updatePromptTitle => 'Aggiornamento disponibile';
+
+  @override
   String settingsUpdateAvailable(Object version) {
     return 'La versione $version è disponibile.';
   }
@@ -303,6 +306,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get timerIdleTrimTime => 'Sottrai il tempo inattivo';
+
+  @override
+  String get commonOk => 'OK';
 
   @override
   String get commonCancel => 'Annulla';

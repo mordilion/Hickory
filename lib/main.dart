@@ -128,14 +128,17 @@ Future<void> main() async {
     ),
   );
 
-  // Silent by design: only ever sets availableUpdateProvider when a real
-  // update is found (Settings surfaces it) -- never shown as an error or
-  // any other visible feedback if the check itself fails.
+  // Silent about failure by design: a check that itself fails is never
+  // shown as an error or any other visible feedback. A check that finds
+  // something fills availableUpdateProvider (which the update page renders)
+  // and startupUpdatePromptProvider (which AppShell turns into a prompt
+  // offering to open that page).
   if (Platform.isMacOS || Platform.isWindows) {
     unawaited(
       container.read(updateCheckerProvider).checkForUpdate().then((update) {
         if (update != null) {
           container.read(availableUpdateProvider.notifier).state = update;
+          container.read(startupUpdatePromptProvider.notifier).state = update;
         }
       }),
     );

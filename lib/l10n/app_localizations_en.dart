@@ -65,6 +65,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Update check failed. Please try again later.';
 
   @override
+  String get updatePromptTitle => 'Update available';
+
+  @override
   String settingsUpdateAvailable(Object version) {
     return 'Version $version is available.';
   }
@@ -303,6 +306,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get timerIdleTrimTime => 'Deduct idle time';
+
+  @override
+  String get commonOk => 'OK';
 
   @override
   String get commonCancel => 'Cancel';

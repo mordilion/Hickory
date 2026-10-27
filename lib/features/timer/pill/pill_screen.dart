@@ -99,14 +99,27 @@ class PillScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            formatDuration(running?.workedDuration ?? Duration.zero),
-                            style: TextStyle(
-                              fontFamily: Theme.of(context).textTheme.displayLarge?.fontFamily,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 20,
-                              height: 1.1,
-                              color: isPaused ? tokens.textMuted : tokens.timerNumeral,
+                          // The numeral must never wrap. This window's height
+                          // is fixed at 56px, and a second line of it does
+                          // not fit -- `formatDuration` leaves the hours
+                          // uncapped, so a timer left running over a holiday
+                          // reaches four digits and, at this font size, is
+                          // wider than the column. Scaling it down keeps
+                          // every digit readable where ellipsizing a clock
+                          // would not, and changes nothing at ordinary
+                          // lengths, since BoxFit.scaleDown never enlarges.
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              formatDuration(running?.workedDuration ?? Duration.zero),
+                              style: TextStyle(
+                                fontFamily: Theme.of(context).textTheme.displayLarge?.fontFamily,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 20,
+                                height: 1.1,
+                                color: isPaused ? tokens.textMuted : tokens.timerNumeral,
+                              ),
                             ),
                           ),
                           _ProjectLine(entry: running, muted: tokens.textMuted),

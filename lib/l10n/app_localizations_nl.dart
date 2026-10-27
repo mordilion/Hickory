@@ -66,6 +66,9 @@ class AppLocalizationsNl extends AppLocalizations {
       'Update-controle mislukt. Probeer het later opnieuw.';
 
   @override
+  String get updatePromptTitle => 'Update beschikbaar';
+
+  @override
   String settingsUpdateAvailable(Object version) {
     return 'Versie $version is beschikbaar.';
   }
@@ -305,6 +308,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get timerIdleTrimTime => 'Inactieve tijd aftrekken';
+
+  @override
+  String get commonOk => 'OK';
 
   @override
   String get commonCancel => 'Annuleren';

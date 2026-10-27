@@ -7,7 +7,15 @@
 FlutterWindow::FlutterWindow(const flutter::DartProject& project)
     : project_(project) {}
 
-FlutterWindow::~FlutterWindow() {}
+FlutterWindow::~FlutterWindow() {
+  // Clear the member rather than leaving it to the unique_ptr's own
+  // destructor: destroying the controller destroys Flutter's child window, and
+  // Windows delivers the resulting WM_PARENTNOTIFY to this still-alive
+  // top-level window synchronously, re-entering MessageHandler. `reset` nulls
+  // the pointer before deleting, so that re-entry sees no controller instead
+  // of reaching into a half-destroyed one and dereferencing null.
+  flutter_controller_ = nullptr;
+}
 
 bool FlutterWindow::OnCreate() {
   if (!Win32Window::OnCreate()) {
@@ -63,7 +71,11 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
 
   switch (message) {
     case WM_FONTCHANGE:
-      flutter_controller_->engine()->ReloadSystemFonts();
+      // Reachable after the controller is gone: the window outlives it, and
+      // the block above only returns while it still exists.
+      if (flutter_controller_) {
+        flutter_controller_->engine()->ReloadSystemFonts();
+      }
       break;
   }
 

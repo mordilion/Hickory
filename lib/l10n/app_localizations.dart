@@ -208,6 +208,12 @@ abstract class AppLocalizations {
   /// **'Update-Prüfung fehlgeschlagen. Bitte versuche es später erneut.'**
   String get settingsUpdateCheckError;
 
+  /// No description provided for @updatePromptTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Update verfügbar'**
+  String get updatePromptTitle;
+
   /// No description provided for @settingsUpdateAvailable.
   ///
   /// In de, this message translates to:
@@ -620,6 +626,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Inaktive Zeit abziehen'**
   String get timerIdleTrimTime;
+
+  /// No description provided for @commonOk.
+  ///
+  /// In de, this message translates to:
+  /// **'OK'**
+  String get commonOk;
 
   /// No description provided for @commonCancel.
   ///

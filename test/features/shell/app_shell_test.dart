@@ -9,7 +9,9 @@ import 'package:hickory/core/di/app_settings_provider.dart';
 import 'package:hickory/core/di/break_rule_tiers_provider.dart';
 import 'package:hickory/core/di/jira_providers.dart';
 import 'package:hickory/core/di/personio_providers.dart';
+import 'package:hickory/core/di/update_providers.dart';
 import 'package:hickory/core/theme/app_theme.dart';
+import 'package:hickory/core/update/update_checker.dart';
 import 'package:hickory/core/window/window_mode.dart';
 import 'package:hickory/core/window/window_mode_provider.dart';
 import 'package:hickory/data/drift/database.dart';
@@ -88,6 +90,14 @@ TimeEntry _runningEntry() {
   );
 }
 
+UpdateInfo _update() => const UpdateInfo(
+  version: '1.2.0',
+  notes: 'notes',
+  downloadUrl: 'https://example.invalid/hickory.zip',
+  checksumUrl: 'https://example.invalid/hickory.zip.sha256',
+  size: 1024,
+);
+
 void main() {
   group('AppShell', () {
     // NavShell's IndexedStack keeps all four tabs mounted at once (not just
@@ -112,15 +122,30 @@ void main() {
     // which always fails under flutter_test (no network) and otherwise
     // escapes as an unhandled Zone error -- same wrapper, same reason, as
     // reports_screen_test.dart's buildAppIsolatingFontErrors.
+    /// [startupUpdate] stands in for what the silent startup check found;
+    /// [availableUpdate] for what the update page itself knows about and
+    /// defaults to the same value, because main() sets both together. The
+    /// two are separable so a test can reproduce the manual "Check for
+    /// updates" case, which fills only the latter.
     Widget buildAppIsolatingFontErrors({
       required TimeEntry? running,
       required WindowModeNotifier notifier,
+      UpdateInfo? startupUpdate,
+      UpdateInfo? availableUpdate,
     }) {
       late Widget app;
       runZonedGuarded(
         () => app = ProviderScope(
           overrides: [
             windowModeProvider.overrideWith(() => notifier),
+            startupUpdatePromptProvider.overrideWith((ref) => startupUpdate),
+            availableUpdateProvider.overrideWith(
+              (ref) => availableUpdate ?? startupUpdate,
+            ),
+            // PackageInfo.fromPlatform() behind the real provider needs a
+            // platform channel no widget test provides; the update page
+            // watches it during build.
+            currentAppVersionProvider.overrideWith((ref) async => '1.1.0'),
             runningEntryProvider.overrideWith((ref) => Stream.value(running)),
             // Every stream below is watched during build by whichever tab
             // uses it, regardless of which tab is selected (see the
@@ -219,6 +244,76 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.byIcon(Icons.close_fullscreen), findsOneWidget);
+    });
+
+    /// Not pumpAndSettle(): Reports' filter spinner and Sync's folder-load
+    /// indicator never stop (see the collapse test above), so settling times
+    /// out regardless of the dialog. A short loop of pumps covers the
+    /// post-frame prompt and the dialog route's own entrance.
+    Future<void> pumpPastDialogTransition(WidgetTester tester) async {
+      for (var i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+    }
+
+    testWidgets('offers a startup update and opens the update page on OK', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildAppIsolatingFontErrors(
+          running: null,
+          notifier: _FakeWindowModeNotifier(),
+          startupUpdate: _update(),
+        ),
+      );
+      await pumpPastDialogTransition(tester);
+
+      expect(find.text('Update available'), findsOneWidget);
+      expect(find.text('Version 1.2.0 is available.'), findsOneWidget);
+
+      await tester.tap(find.text('OK'));
+      await pumpPastDialogTransition(tester);
+
+      expect(find.text('Update available'), findsNothing);
+      // Only findable with the Settings tab selected *and* its update page
+      // pushed onto that tab's own Navigator: NavShell's IndexedStack hides
+      // the unselected tabs from the default finder.
+      expect(find.text('Install now'), findsOneWidget);
+    });
+
+    testWidgets('dismissing the startup prompt navigates nowhere', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildAppIsolatingFontErrors(
+          running: null,
+          notifier: _FakeWindowModeNotifier(),
+          startupUpdate: _update(),
+        ),
+      );
+      await pumpPastDialogTransition(tester);
+      expect(find.text('Update available'), findsOneWidget);
+
+      await tester.tap(find.text('Cancel'));
+      await pumpPastDialogTransition(tester);
+
+      expect(find.text('Update available'), findsNothing);
+      expect(find.text('Install now'), findsNothing);
+    });
+
+    testWidgets('an update known only to the update page raises no prompt', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildAppIsolatingFontErrors(
+          running: null,
+          notifier: _FakeWindowModeNotifier(),
+          availableUpdate: _update(),
+        ),
+      );
+      await pumpPastDialogTransition(tester);
+
+      expect(find.text('Update available'), findsNothing);
     });
   });
 }

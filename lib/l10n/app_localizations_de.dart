@@ -65,6 +65,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Update-Prüfung fehlgeschlagen. Bitte versuche es später erneut.';
 
   @override
+  String get updatePromptTitle => 'Update verfügbar';
+
+  @override
   String settingsUpdateAvailable(Object version) {
     return 'Version $version ist verfügbar.';
   }
@@ -304,6 +307,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get timerIdleTrimTime => 'Inaktive Zeit abziehen';
+
+  @override
+  String get commonOk => 'OK';
 
   @override
   String get commonCancel => 'Abbrechen';
