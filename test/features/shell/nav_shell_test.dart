@@ -33,4 +33,35 @@ void main() {
     expect(find.text('Reports content'), findsOneWidget);
     expect(find.byType(FloatingActionButton), findsNothing);
   });
+
+  testWidgets('controlled mode renders the given index and reports taps '
+      'instead of switching itself', (tester) async {
+    var reported = -1;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: NavShell(
+          selectedIndex: 1,
+          onDestinationSelected: (index) => reported = index,
+          destinations: const [
+            NavigationDestination(icon: Icon(Icons.timer_outlined), label: 'Timer'),
+            NavigationDestination(icon: Icon(Icons.bar_chart_outlined), label: 'Reports'),
+          ],
+          children: const [
+            Center(child: Text('Timer content')),
+            Center(child: Text('Reports content')),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.text('Reports content'), findsOneWidget);
+
+    await tester.tap(find.text('Timer'));
+    await tester.pumpAndSettle();
+
+    expect(reported, 0);
+    // Still on the index the caller passed: a controlled NavShell never
+    // moves on its own, or the owner's state and the bar would drift apart.
+    expect(find.text('Reports content'), findsOneWidget);
+  });
 }

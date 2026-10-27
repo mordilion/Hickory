@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Say it when a new version is there: if the check at startup finds one, Hickory now asks right away instead of waiting to be looked up in Settings. OK opens the update page, Cancel closes the message and nothing else. An update that was waved away comes up again at the next start, for as long as it is still waiting.
+
 ### Fixed
 
 - Fix Windows crashing every time the app is quit from the tray menu, and at the end of an in-app update. The window was torn down in an order that let Flutter's shutdown reach back into itself, so Windows killed the process instead of letting it exit. Quitting and updating now end cleanly.

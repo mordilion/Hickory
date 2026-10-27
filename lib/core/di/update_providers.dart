@@ -42,3 +42,13 @@ final currentAppVersionProvider = FutureProvider<String>((ref) async {
 /// mutable state (not code-generated) so it can be set imperatively from
 /// both call sites via `.notifier.state = ...`.
 final availableUpdateProvider = StateProvider<UpdateInfo?>((ref) => null);
+
+/// An update the startup check found and that hasn't been offered to the
+/// user yet; AppShell turns it into a prompt and clears it again.
+///
+/// Separate from [availableUpdateProvider] on purpose: only the silent
+/// startup check writes here, so pressing "Check for updates" in Settings
+/// never raises a prompt in front of the page it was pressed on. Nothing is
+/// persisted, so an update the user dismissed is offered again on the next
+/// start -- which is the intended behaviour.
+final startupUpdatePromptProvider = StateProvider<UpdateInfo?>((ref) => null);

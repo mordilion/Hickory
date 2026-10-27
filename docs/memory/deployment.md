@@ -26,7 +26,17 @@
 ## In-app auto-update
 
 - Implemented in `lib/core/update/` (`UpdateChecker`, `UpdateInstaller`) with providers in `lib/core/di/update_providers.dart`.
-- Checks GitHub Releases on app startup and via the "Check for updates" button in Settings (`lib/features/settings/settings_screen.dart`).
+- Checks GitHub Releases on app startup and via the "Check for updates" button in Settings (`lib/features/settings/update_settings_screen.dart`).
+- The two checks write to different providers on purpose. Both fill `availableUpdateProvider`
+  (what the update page renders); only the startup check also fills
+  `startupUpdatePromptProvider`, which `AppShell` turns into a dialog offering to open that
+  page. Keeping them apart is what stops the manual button from raising a dialog in front of
+  the page it was pressed on.
+- Answering that dialog with OK has to cross two private boundaries: `NavShell` owns the tab
+  index (hence its optional controlled mode) and `SettingsScreen` owns the tab's Navigator
+  (hence `openUpdatePageRequestedProvider` in `lib/features/settings/settings_navigation.dart`).
+- Nothing about a dismissed update is persisted, so it is offered again on the next start.
+  That is deliberate, not an oversight.
 - On update: downloads the platform ZIP, verifies its SHA256 checksum against the `.sha256` file from the release, extracts, and swaps the installation.
 - Only wired up for macOS/Windows (`Platform.isMacOS || Platform.isWindows` gate in the settings screen) — matches the platforms actually built by the release workflow.
 
