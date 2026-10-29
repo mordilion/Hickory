@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-10-29
+
 ### Added
 
 - Say it when a new version is there: if the check at startup finds one, Hickory now asks right away instead of waiting to be looked up in Settings. OK opens the update page, Cancel closes the message and nothing else. An update that was waved away comes up again at the next start, for as long as it is still waiting.
@@ -14,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix Windows crashing every time the app is quit from the tray menu, and at the end of an in-app update. The window was torn down in an order that let Flutter's shutdown reach back into itself, so Windows killed the process instead of letting it exit. Quitting and updating now end cleanly.
+- Keep the timer pill's elapsed time on a single line. A timer left running for more than a thousand hours produced a number wider than the pill, which then overflowed the small window it lives in.
 
 ## [1.5.0] - 2026-09-11
 
@@ -130,9 +133,14 @@ which were never distributed to users.
 - Fix the Settings screen not being scrollable when its content overflows the window.
 - Fix the in-app updater silently relaunching the unchanged app on macOS/Windows when it can't write to the install directory; it now fails with a clear, actionable message before quitting instead.
 
-[Unreleased]: https://github.com/mordilion/Hickory/compare/v1.4.1...HEAD
+[Unreleased]: https://github.com/mordilion/Hickory/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/mordilion/Hickory/compare/v1.5.0...v1.6.0
+[1.5.0]: https://github.com/mordilion/Hickory/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/mordilion/Hickory/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/mordilion/Hickory/compare/v1.3.2...v1.4.0
+[1.3.2]: https://github.com/mordilion/Hickory/compare/v1.3.1...v1.3.2
+[1.3.1]: https://github.com/mordilion/Hickory/compare/v1.3.0...v1.3.1
+[1.3.0]: https://github.com/mordilion/Hickory/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/mordilion/Hickory/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/mordilion/Hickory/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/mordilion/Hickory/releases/tag/v1.0.2
