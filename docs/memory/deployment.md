@@ -9,7 +9,13 @@
 
 1. Set the new version in `pubspec.yaml`.
 2. Move the relevant `[Unreleased]` entries in `CHANGELOG.md` into a new `## [X.Y.Z] - YYYY-MM-DD` section.
-3. Push a Git tag `vX.Y.Z` — this triggers `.github/workflows/release.yml`.
+3. Add the compare links at the bottom of `CHANGELOG.md`: point `[Unreleased]` at the new
+   tag and add a `[X.Y.Z]` line. Easy to miss, because nothing enforces it — the `awk`
+   extraction reads only the `## [...]` headings, so the release succeeds with the links
+   broken. The 1.5.0 bump (`2573d5f`) skipped them and left `[Unreleased]` comparing
+   against `v1.4.1`; 1.3.0–1.3.2 and 1.5.0 had no link at all until 1.6.0 restored them.
+4. Merge to `main`, so the tag names a commit that is on the release branch.
+5. Push a Git tag `vX.Y.Z` — this triggers `.github/workflows/release.yml`.
 
 ## CI: `.github/workflows/release.yml` (trigger: tag push `v*`)
 
