@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-10-29
+
+### Changed
+
+- No functional change. This release exists so that an installation of 1.6.0 has a newer version to update to, which is the only way to walk the in-app update from end to end — including the Windows shutdown at the end of it that 1.6.0 fixed.
+
 ## [1.6.0] - 2026-10-29
 
 ### Added
@@ -133,7 +139,8 @@ which were never distributed to users.
 - Fix the Settings screen not being scrollable when its content overflows the window.
 - Fix the in-app updater silently relaunching the unchanged app on macOS/Windows when it can't write to the install directory; it now fails with a clear, actionable message before quitting instead.
 
-[Unreleased]: https://github.com/mordilion/Hickory/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/mordilion/Hickory/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/mordilion/Hickory/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/mordilion/Hickory/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/mordilion/Hickory/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/mordilion/Hickory/compare/v1.4.0...v1.4.1
